@@ -11,6 +11,7 @@ public enum Messages {
 	NO_NSFW_CHANNEL_PERM("You can't use a NSFW command in a non-NSFW channel, p-pervert!"),	
 	NO_PRIVATE_CHAT_PERM("You are not allowed to use this command in a private chat!"),
 	
+	TITLE_BUSY("Busy"),
 	TITLE_CMD_DISABLED("Command Disabled"),
 	TITLE_CMD_NSFW("NSFW Command"),
 	TITLE_ON_COOLDOWN("On Cooldown!"),
