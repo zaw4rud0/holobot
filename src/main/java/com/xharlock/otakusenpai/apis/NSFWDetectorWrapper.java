@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import com.xharlock.otakusenpai.core.Main;
 
-public class NSFWDetectorAPI
+public class NSFWDetectorWrapper
 {
     private static final String url = "https://api.deepai.org/api/nsfw-detector";
     
