@@ -1,4 +1,4 @@
-package com.xharlock.otakusenpai.apis;
+package com.xharlock.otakusenpai.image.nsfw;
 
 import java.io.IOException;
 import com.google.gson.JsonObject;
@@ -20,6 +20,7 @@ public class NSFWDetectorWrapper
         return object.getAsJsonObject("output").get("nsfw_score").getAsDouble();
     }
     
+    // Get more informations about nsfw elements in the image
     public static JsonObject getJsonObject(String imageUrl) throws IOException {
     	String token = Main.otakuSenpai.getConfig().getKeyDeepAI();
         Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + url);

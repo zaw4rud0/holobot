@@ -1,4 +1,4 @@
-package com.xharlock.otakusenpai.apis;
+package com.xharlock.otakusenpai.image;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -11,9 +11,7 @@ public class SauceNAOWrapper {
 	private static final String base_url = "https://saucenao.com/search.php?db=999&output_type=2&api_key=";
 
 	public static JsonObject getJsonObject(String imageUrl) throws IOException {
-		
-		URL url = new URL(imageUrl);
-		HttpURLConnection connection = new HttpURLConnection(url);
+		HttpURLConnection connection = (HttpURLConnection) new URL(imageUrl).openConnection();
 		
 	
 		// TODO Finish -> https://saucenao.com/user.php?page=search-api

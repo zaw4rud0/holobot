@@ -1,4 +1,4 @@
-package com.xharlock.otakusenpai.commands.cmds;
+package com.xharlock.otakusenpai.games;
 
 import java.util.List;
 import java.util.concurrent.TimeUnit;

@@ -1,4 +1,4 @@
-package com.xharlock.otakusenpai.apis;
+package com.xharlock.otakusenpai.image.nsfw;
 
 import java.io.IOException;
 import com.google.gson.JsonArray;

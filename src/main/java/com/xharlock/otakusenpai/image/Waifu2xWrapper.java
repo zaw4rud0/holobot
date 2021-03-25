@@ -1,4 +1,4 @@
-package com.xharlock.otakusenpai.apis;
+package com.xharlock.otakusenpai.image;
 
 import java.io.IOException;
 import com.google.gson.JsonParser;
@@ -11,7 +11,7 @@ public class Waifu2xWrapper {
 	private static final String url = "https://api.deepai.org/api/waifu2x";
 
 	/**
-	 * Method to send an image to waifu2x and returns the url of the upscaled image
+	 * Method to send an image url to waifu2x and returns the url of the upscaled image
 	 * 
 	 * @param imageUrl = Url to the image to be upscaled
 	 * @return Url to the upscaled image
