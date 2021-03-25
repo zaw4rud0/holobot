@@ -5,3 +5,4 @@ A simple bot for Discord that has a variety of functions and features
 * Music Player
 * Image Provider
 * Pokédex
+* Akinator
