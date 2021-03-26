@@ -30,8 +30,7 @@ public class PingCmd extends Command {
 		builder.setDescription("Ping: `...` ms\nHeartbeat: `...` ms");
 		if (e.isFromGuild()) {
 			builder.setColor(getGuildColor(e.getGuild()));
-			String name = e.getGuild().retrieveMember(e.getAuthor()).complete().getEffectiveName();
-			builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", name),
+			builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 					e.getAuthor().getEffectiveAvatarUrl());
 		} else {
 			builder.setColor(Main.otakuSenpai.getConfig().getColor());

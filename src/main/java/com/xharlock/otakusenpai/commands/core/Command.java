@@ -74,22 +74,21 @@ public abstract class Command {
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		builder.setColor(getGuildColor(e.getGuild()));
-		if (e.isFromGuild() && footer) {
-			String name = e.getGuild().retrieveMember(e.getAuthor()).complete().getEffectiveName();
-			builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", name),
-					e.getAuthor().getEffectiveAvatarUrl());
+		if (e.isFromGuild()) {
+			if (footer)
+				builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+			builder.setColor(getGuildColor(e.getGuild()));
+		} else {
+			Main.otakuSenpai.getConfig().getColor();
 		}
 		e.getChannel().sendMessage(builder.build()).queue();
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
 		if (e.isFromGuild()) {
-			if (footer) {
-				String name = e.getGuild().retrieveMember(e.getAuthor()).complete().getEffectiveName();
-				builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", name),
+			if (footer)
+				builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 						e.getAuthor().getEffectiveAvatarUrl());
-			}
 			builder.setColor(getGuildColor(e.getGuild()));
 		} else {
 			Main.otakuSenpai.getConfig().getColor();

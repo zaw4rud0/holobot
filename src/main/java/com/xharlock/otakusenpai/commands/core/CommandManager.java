@@ -6,9 +6,9 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.xharlock.otakusenpai.commands.cmds.AkinatorCmd;
 import com.xharlock.otakusenpai.commands.cmds.InfoBotCmd;
 import com.xharlock.otakusenpai.commands.cmds.PingCmd;
+import com.xharlock.otakusenpai.games.AkinatorCmd;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 

@@ -12,10 +12,10 @@ public class SauceNAOWrapper {
 
 	public static JsonObject getJsonObject(String imageUrl) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(imageUrl).openConnection();
-		
-	
+
+		return null;
 		// TODO Finish -> https://saucenao.com/user.php?page=search-api
-		
+
 	}
-	
+
 }

@@ -22,14 +22,19 @@ public class InfoBotCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
-		EmbedBuilder builder = new EmbedBuilder();
+		String description = "";
+		if (e.isFromGuild()) {
+			e.getMessage().delete().queue();
+			description = "Your senpai for anything :heart:" + "\nUse `" + getGuildPrefix(e.getGuild()) + "help` to see all commands";
+		} else {
+			description = "Your senpai for anything :heart:" + "\nUse `" + Main.otakuSenpai.getConfig().getPrefix() + "help` to see all commands";
+		}
+		EmbedBuilder builder = new EmbedBuilder();		
 		builder.setTitle(e.getJDA().getSelfUser().getName() + " | Informations");
 		builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl());
-		builder.setDescription("Your senpai for anything :heart:"
-				+ "\nUse `" + getGuildPrefix(e.getGuild()) + "help` to see all commands");
-		builder.addField("Version", Main.otakuSenpai.getConfig().getVersion(), false);
-		builder.addField("Source", "No link yet", false);		// TODO Add source link
-		sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);
+		builder.setDescription(description);
+		builder.addField("Version", "`" + Main.otakuSenpai.getConfig().getVersion() + "`", false);
+		builder.addField("Source", "No link yet", false);
+		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 	}
 }
