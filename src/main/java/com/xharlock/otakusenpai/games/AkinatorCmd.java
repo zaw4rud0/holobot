@@ -1,5 +1,6 @@
 package com.xharlock.otakusenpai.games;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
@@ -23,21 +24,19 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
-// TODO CLEAN EVERYTHING UP
-
 public class AkinatorCmd extends Command {
-
-	private boolean busy;
 
 	private EventWaiter waiter;
 	private Akiwrapper akinator;
-	private Guess final_guess;
-	AtomicInteger counter;
+	private boolean busy;
 
-	// TODO If a person gets rejected because someone is already playing, their
-	// cooldown gets reset xD
+	private double probability = 0.65;
+	
+	private Reaction[] reactions;
+	private AtomicInteger counter;
+	private List<String> wrong;
 
-	// TODO Better continue emote
+	// TODO If user calls it while it's busy they will get cd
 
 	public AkinatorCmd(String name, EventWaiter waiter) {
 		super(name);
@@ -51,16 +50,21 @@ public class AkinatorCmd extends Command {
 		setCmdCooldown(300);
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.MISC);
+
 		this.waiter = waiter;
 		this.busy = false;
 		counter = new AtomicInteger();
+		wrong = new ArrayList<>();
+
+		this.reactions = new Reaction[] { new Reaction("1\u20e3", Answer.YES), new Reaction("2\u20e3", Answer.NO),
+				new Reaction("3\u20e3", Answer.DONT_KNOW), new Reaction("4\u20e3", Answer.PROBABLY),
+				new Reaction("5\u20e3", Answer.PROBABLY_NOT) };
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setThumbnail(Akinator.DEFAULT.getUrl());
-
 		if (busy) {
 			builder.setTitle(Messages.TITLE_BUSY.getText());
 			builder.setDescription("I'm currently busy, please wait until I'm done!");
@@ -76,41 +80,27 @@ public class AkinatorCmd extends Command {
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-
 		busy = true;
-		counter.set(0);
-		
+		start(e);
+	}
+
+	private void start(MessageReceivedEvent e) {
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
+		builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		builder.setDescription(
 				"To start the game, please think about a real or fictional character. I will try to guess who it is by asking some questions."
-						+ "\nIf you are ready, please react with a tick, or if you want to cancel the game, react with a cross.");
-
-		if (e.isFromGuild()) {
-			builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
-					e.getAuthor().getEffectiveAvatarUrl());
-			builder.setColor(getGuildColor(e.getGuild()));
-		} else {
-			Main.otakuSenpai.getConfig().getColor();
-		}
+						+ "\nIf you are ready, please react with a tick mark, or if you want to cancel the game, react with a cross.");
+		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
+				e.getAuthor().getEffectiveAvatarUrl());
 
 		Message msg = e.getChannel().sendMessage(builder.build()).complete();
+		addStartReactions(msg);
 
-		msg.addReaction(Emotes.TICK.getAsReaction()).queue();
-		msg.addReaction(Emotes.CROSS.getAsReaction()).queue();
-
-		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
+		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {			
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())) {
-					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-					msg.clearReactions().queue();
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
-					return true;
-				}
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())
+						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
 					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
 					msg.clearReactions().queue();
 					try {
@@ -124,20 +114,31 @@ public class AkinatorCmd extends Command {
 			return false;
 		}, evt -> {
 			if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())) {
-				start(e, msg, builder);
+				inGame(e, msg);
 			} else if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
-				cancel(e, msg, builder);
+				cancel(e, msg);
 			} else
-				errorEmbed(e, msg);
+				error(e, msg);
 		}, 5, TimeUnit.MINUTES, () -> {
 			msg.delete().queue();
-			busy = false;
-			akinator = null;
-			final_guess = null;
+			cleanup();
 		});
+
 	}
 
-	private void start(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
+	private void inGame(MessageReceivedEvent e, Message msg) {
+		
+		// Check if Akinator has run out of questions
+		if (akinator.getCurrentQuestion() == null) {
+			defeat(e, msg);
+			return;			
+		}
+		
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Akinator");
+		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
+				e.getAuthor().getEffectiveAvatarUrl());
 		builder.setThumbnail(Akinator.START.getUrl());
 		builder.setDescription(
 				"**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
@@ -151,45 +152,17 @@ public class AkinatorCmd extends Command {
 		askQuestion(e, msg, builder);
 	}
 
-	private void cancel(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
-		builder.setThumbnail(Akinator.CANCEL.getUrl());
-		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
-		builder.clearFields();
-		msg.editMessage(builder.build()).queue();
-		msg.delete().queueAfter(15, TimeUnit.SECONDS);
-		busy = false;
-		akinator = null;
-		final_guess = null;
-	}
-
 	private void askQuestion(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
 				if (evt.getReactionEmote().isEmoji()) {
-					if (evt.getReactionEmote().getEmoji().equals("1\u20e3")) {
-						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-						akinator.answerCurrentQuestion(Answer.YES);
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals("2\u20e3")) {
-						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-						akinator.answerCurrentQuestion(Answer.NO);
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals("3\u20e3")) {
-						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-						akinator.answerCurrentQuestion(Answer.DONT_KNOW);
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals("4\u20e3")) {
-						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-						akinator.answerCurrentQuestion(Answer.PROBABLY);
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals("5\u20e3")) {
-						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-						akinator.answerCurrentQuestion(Answer.PROBABLY_NOT);
-						return true;
+					for (int i = 0; i < 5; i++) {
+						Reaction r = reactions[i];
+						if (evt.getReactionEmote().getEmoji().equals(r.emote)) {
+							evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
+							akinator.answerCurrentQuestion(r.answer);
+							return true;
+						}
 					}
 				} else {
 					if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.UNDO.getAsReaction())) {
@@ -197,9 +170,8 @@ public class AkinatorCmd extends Command {
 						if (counter.get() > 1) {
 							akinator.undoAnswer();
 							return true;
-						} else {
+						} else
 							return false;
-						}
 					}
 					if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
 						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
@@ -214,23 +186,45 @@ public class AkinatorCmd extends Command {
 			if (!evt.getReactionEmote().isEmoji()
 					&& evt.getReactionEmote().getAsReactionCode().equals(Emotes.UNDO.getAsReaction())) {
 				builder.setThumbnail(getRandomThinking());
-				builder.setDescription(
-						"**Q" + counter.decrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
+				builder.setDescription("**Q" + counter.decrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
 				msg.editMessage(builder.build()).queue();
 				askQuestion(e, msg, builder);
 			}
 			// Cancel
 			else if (!evt.getReactionEmote().isEmoji()
 					&& evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
-				cancel(e, msg, builder);
-			} else {
-				for (Guess guess : akinator.getGuesses()) {
-					if (guess.getProbability() >= 0.9) {
-						final_guess = guess;
-						guess(e, msg, builder);
+				cancel(e, msg);
+			}
+			// Any answer
+			else {
+				// Akinator has some guesses
+				if (akinator.getGuessesAboveProbability(probability).size() != 0) {
+					Guess max = null;
+
+					for (Guess guess : akinator.getGuessesAboveProbability(probability)) {
+						if (wrong.contains(guess.getName())) {
+							continue;
+						}
+						if (max == null) {
+							max = guess;
+							continue;
+						}
+						if (guess.getProbability() > max.getProbability()) {
+							max = guess;
+						}
+					}
+
+					if (max != null) {
+						guess(e, msg, max);
 						return;
 					}
 				}
+				// Check if Akinator has run out of questions
+				if (akinator.getCurrentQuestion() == null) {
+					defeat(e, msg);
+					return;
+				}
+				
 				builder.setThumbnail(getRandomThinking());
 				builder.setDescription(
 						"**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
@@ -239,14 +233,18 @@ public class AkinatorCmd extends Command {
 			}
 		}, 5, TimeUnit.MINUTES, () -> {
 			msg.delete().queue();
-			busy = false;
-			akinator = null;
-			final_guess = null;
+			cleanup();
 		});
-
 	}
 
-	private void guess(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
+	/**
+	 * Displays his most probable character guess
+	 * 
+	 * @param e     = MessageReceivedEvent
+	 * @param msg   = Message
+	 * @param guess = Character
+	 */
+	private void guess(MessageReceivedEvent e, Message msg, Guess guess) {
 		msg.clearReactions().queue();
 
 		try {
@@ -255,109 +253,117 @@ public class AkinatorCmd extends Command {
 			e1.printStackTrace();
 		}
 
-		msg.addReaction(Emotes.TICK.getAsReaction()).queue();		
-		msg.addReaction(Emotes.CROSS.getAsReaction()).queue();
-		msg.addReaction(Emotes.CONTINUE.getAsReaction()).queue();
-		
-		builder.setTitle("Akinator");
-		builder.setThumbnail(Akinator.GUESSING.getUrl());
-		builder.clearFields();
+		addGuessReactions(msg);
 
-		if (final_guess.getDescription() == null || final_guess.getDescription().equals("null")) {
-			builder.setDescription("Your character is: " + final_guess.getName());
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Akinator");
+		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setThumbnail(Akinator.GUESSING.getUrl());
+		builder.setFooter(e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
+		
+		if (guess.getDescription() == null || guess.getDescription().equals("null")) {
+			builder.setDescription("Your character is: " + guess.getName());
 		} else
-			builder.setDescription("Your character is: " + final_guess.getName() + "\n" + final_guess.getDescription());
-		if (final_guess.getImage() != null)
-			builder.setImage(final_guess.getImage().toString());
+			builder.setDescription("Your character is: " + guess.getName() + "\n" + guess.getDescription());
+		if (guess.getImage() != null)
+			builder.setImage(guess.getImage().toString());
 
 		msg.editMessage(builder.build()).queue();
 
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
-
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())) {
+				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())
+						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CONTINUE.getAsReaction())
+						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
 					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
 					msg.clearReactions().queue();
-					return true;
-				}
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
-					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-					msg.clearReactions().queue();
-					return true;
-				}
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CONTINUE.getAsReaction())) {
-					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
-					msg.clearReactions().queue();
-					try {
-						Thread.sleep(1000);
-					} catch (InterruptedException e1) {
-						e1.printStackTrace();
-					}
 					return true;
 				}
 			}
 			return false;
 		}, evt -> {
 			if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())) {
-				victory(e, msg, builder);
+				victory(e, msg, guess);
 			} else if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
-				defeat(e, msg, builder);
+				cancel(e, msg);
 			} else {
-				EmbedBuilder builder_new = new EmbedBuilder();
-				builder_new.setTitle("Akinator");
-				builder_new.setThumbnail(getRandomThinking());
-				builder_new.setDescription(
-						"**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
-				builder_new.addField("Answers",
-						":one: Yes\n" + ":two: No\n" + ":three: I don't know\n" + ":four: Probably\n" + ":five: Probably not",
-						false);
-				builder_new.addField("Other",
-						Emotes.UNDO.getAsText() + " Undo last answer\n" + Emotes.CROSS.getAsText() + " Cancel game", false);
-				msg.editMessage(builder_new.build()).queue();
-				addInGameReactions(msg);
-				askQuestion(e, msg, builder);
+				wrong.add(guess.getName());
+				inGame(e, msg);
 			}
 		}, 5, TimeUnit.MINUTES, () -> {
 			msg.delete().queue();
-			busy = false;
-			akinator = null;
-			final_guess = null;
+			cleanup();
 		});
 	}
 
 	// What happens if Akinator wins
-	private void victory(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
-
-		
-		
-		busy = false;
-		akinator = null;
-		final_guess = null;
+	private void victory(MessageReceivedEvent e, Message msg, Guess right) {
+		msg.clearReactions().queue();
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Akinator");
+		builder.setThumbnail(Akinator.VICTORY.getUrl());
+		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setDescription("Great, guessed right one more time!\n"
+				+ "It took me `" + counter.get() + "` guesses to get " + right.getName());
+		if (right.getImage() != null)
+			builder.setImage(right.getImage().toString());
+		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
+				e.getAuthor().getEffectiveAvatarUrl());
+		msg.editMessage(builder.build()).queue();
+		cleanup();
 	}
 
 	// What happens if Akinator loses
-	private void defeat(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
-
+	private void defeat(MessageReceivedEvent e, Message msg) {
 		msg.clearReactions().queue();
-		
-		builder = new EmbedBuilder();
-		
-		
-		busy = false;
-		akinator = null;
-		final_guess = null;
-	}
-	
-	private void questionEmbed(MessageReceivedEvent e, Message msg) {
-				
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Akinator");
+		builder.setThumbnail(Akinator.DEFEAT.getUrl());
+		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
+		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
+				e.getAuthor().getEffectiveAvatarUrl());
+		msg.editMessage(builder.build()).queue();
+		cleanup();
 	}
 
-	private void errorEmbed(MessageReceivedEvent e, Message msg) {
+	// User cancels the game
+	private void cancel(MessageReceivedEvent e, Message msg) {
+		msg.clearReactions().queue();
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Akinator");
+		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setThumbnail(Akinator.CANCEL.getUrl());
+		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
+		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
+				e.getAuthor().getEffectiveAvatarUrl());
+		msg.editMessage(builder.build()).queue();
+		msg.delete().queueAfter(15, TimeUnit.SECONDS);
+		cleanup();
+	}
+
+	private void cleanup() {
+		this.akinator = null;
+		this.busy = false;
+		this.wrong.clear();
+		this.counter.set(0);
+	}
+
+	private void error(MessageReceivedEvent e, Message msg) {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(Messages.TITLE_ERROR.getText());
 		builder.setDescription("Something went wrong");
 		sendEmbed(e, builder, 15, TimeUnit.MINUTES, false);
+	}
+
+	private void addStartReactions(Message msg) {
+		msg.addReaction(Emotes.TICK.getAsReaction()).queue(v -> {
+		}, err -> {
+		});
+		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
+		}, err -> {
+		});
 	}
 
 	private void addInGameReactions(Message msg) {
@@ -383,10 +389,22 @@ public class AkinatorCmd extends Command {
 		}, err -> {
 		});
 	}
-	
-	public String getRandomThinking() {		
+
+	private void addGuessReactions(Message msg) {
+		msg.addReaction(Emotes.TICK.getAsReaction()).queue(v -> {
+		}, err -> {
+		});
+		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
+		}, err -> {
+		});
+		msg.addReaction(Emotes.CONTINUE.getAsReaction()).queue(v -> {
+		}, err -> {
+		});
+	}
+
+	public String getRandomThinking() {
 		Random rand = new Random();
-		int index = rand.nextInt(7);		
+		int index = rand.nextInt(7);
 		if (index == 0)
 			return Akinator.THINKING_1.getUrl();
 		else if (index == 1)
@@ -401,5 +419,15 @@ public class AkinatorCmd extends Command {
 			return Akinator.THINKING_6.getUrl();
 		else
 			return Akinator.START.getUrl();
+	}
+}
+
+class Reaction {
+	public String emote;
+	public Answer answer;
+
+	public Reaction(String emote, Answer answer) {
+		this.emote = emote;
+		this.answer = answer;
 	}
 }
