@@ -87,10 +87,11 @@ public class AkinatorCmd extends Command {
 	private void start(MessageReceivedEvent e) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
+		builder.setThumbnail(AkinatorSprites.DEFAULT.getUrl());
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		builder.setDescription(
 				"To start the game, please think about a real or fictional character. I will try to guess who it is by asking some questions."
-						+ "\nIf you are ready, please react with a tick mark, or if you want to cancel the game, react with a cross.");
+						+ "\nIf you are ready, please react with " + Emotes.TICK.getAsText() + ", or if you want to cancel the game, react with " + Emotes.CROSS.getAsText() + ".");
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 				e.getAuthor().getEffectiveAvatarUrl());
 
@@ -200,7 +201,6 @@ public class AkinatorCmd extends Command {
 				// Akinator has some guesses
 				if (akinator.getGuessesAboveProbability(probability).size() != 0) {
 					Guess max = null;
-
 					for (Guess guess : akinator.getGuessesAboveProbability(probability)) {
 						if (wrong.contains(guess.getName())) {
 							continue;
@@ -268,6 +268,9 @@ public class AkinatorCmd extends Command {
 		if (guess.getImage() != null)
 			builder.setImage(guess.getImage().toString());
 
+		builder.addField("Answers", Emotes.TICK.getAsText() + " Correct, that was my character!\n" + 
+				Emotes.CONTINUE.getAsText() + " Wrong, continue game\n" + Emotes.CROSS.getAsText() + "Cancel game", false);
+		
 		msg.editMessage(builder.build()).queue();
 
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
@@ -304,7 +307,7 @@ public class AkinatorCmd extends Command {
 		builder.setThumbnail(AkinatorSprites.VICTORY.getUrl());
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		builder.setDescription("Great, guessed right one more time!\n"
-				+ "It took me `" + counter.get() + "` questions to guess " + right.getName());
+				+ "It took me `" + counter.get() + "` questions to correctly guess " + right.getName());
 		if (right.getImage() != null)
 			builder.setImage(right.getImage().toString());
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
@@ -394,10 +397,10 @@ public class AkinatorCmd extends Command {
 		msg.addReaction(Emotes.TICK.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
+		msg.addReaction(Emotes.CONTINUE.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.CONTINUE.getAsReaction()).queue(v -> {
+		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
 	}

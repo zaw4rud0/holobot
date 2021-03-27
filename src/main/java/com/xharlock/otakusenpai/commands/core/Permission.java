@@ -51,6 +51,8 @@ public class Permission {
 		blacklisted.add(user);
 	}
 
+	@Deprecated
+	// Write these methods in the Command Class so you can tweak them for each command
 	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
 		EmbedBuilder builder = new EmbedBuilder();
 		if (e.isFromGuild())
@@ -63,7 +65,7 @@ public class Permission {
 			if (now - cmd.onTimeout.get(e.getAuthor()) < cmd.getCmdCooldown()) {
 				builder.setTitle(Messages.TITLE_ON_COOLDOWN.getText());
 				int remaining = cmd.getCmdCooldown() - (int) (now - cmd.onTimeout.get(e.getAuthor()));
-				builder.setDescription(Messages.CMD_USER_ON_COOLDOWN.getText().replace("{0}", e.getAuthor().getName())
+				builder.setDescription(Messages.CMD_USER_ON_COOLDOWN.getText().replace("{0}", e.getAuthor().getAsMention())
 						.replace("{1}", String.valueOf(remaining)));
 				cmd.sendEmbed(e, builder, 10L, TimeUnit.SECONDS, false);				
 				if (warned) this.lastUserWarning.replace(e.getAuthor(), now);
