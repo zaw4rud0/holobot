@@ -64,7 +64,7 @@ public class AkinatorCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setThumbnail(Akinator.DEFAULT.getUrl());
+		builder.setThumbnail(AkinatorSprites.DEFAULT.getUrl());
 		if (busy) {
 			builder.setTitle(Messages.TITLE_BUSY.getText());
 			builder.setDescription("I'm currently busy, please wait until I'm done!");
@@ -139,7 +139,7 @@ public class AkinatorCmd extends Command {
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 				e.getAuthor().getEffectiveAvatarUrl());
-		builder.setThumbnail(Akinator.START.getUrl());
+		builder.setThumbnail(AkinatorSprites.START.getUrl());
 		builder.setDescription(
 				"**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
 		builder.addField("Answers",
@@ -258,7 +258,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
-		builder.setThumbnail(Akinator.GUESSING.getUrl());
+		builder.setThumbnail(AkinatorSprites.GUESSING.getUrl());
 		builder.setFooter(e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
 		
 		if (guess.getDescription() == null || guess.getDescription().equals("null")) {
@@ -301,10 +301,10 @@ public class AkinatorCmd extends Command {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setThumbnail(Akinator.VICTORY.getUrl());
+		builder.setThumbnail(AkinatorSprites.VICTORY.getUrl());
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		builder.setDescription("Great, guessed right one more time!\n"
-				+ "It took me `" + counter.get() + "` guesses to get " + right.getName());
+				+ "It took me `" + counter.get() + "` questions to guess " + right.getName());
 		if (right.getImage() != null)
 			builder.setImage(right.getImage().toString());
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
@@ -318,7 +318,7 @@ public class AkinatorCmd extends Command {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setThumbnail(Akinator.DEFEAT.getUrl());
+		builder.setThumbnail(AkinatorSprites.DEFEAT.getUrl());
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
@@ -333,7 +333,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setColor(Main.otakuSenpai.getConfig().getColor());
-		builder.setThumbnail(Akinator.CANCEL.getUrl());
+		builder.setThumbnail(AkinatorSprites.CANCEL.getUrl());
 		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 				e.getAuthor().getEffectiveAvatarUrl());
@@ -406,19 +406,19 @@ public class AkinatorCmd extends Command {
 		Random rand = new Random();
 		int index = rand.nextInt(7);
 		if (index == 0)
-			return Akinator.THINKING_1.getUrl();
+			return AkinatorSprites.THINKING_1.getUrl();
 		else if (index == 1)
-			return Akinator.THINKING_2.getUrl();
+			return AkinatorSprites.THINKING_2.getUrl();
 		else if (index == 2)
-			return Akinator.THINKING_3.getUrl();
+			return AkinatorSprites.THINKING_3.getUrl();
 		else if (index == 3)
-			return Akinator.THINKING_4.getUrl();
+			return AkinatorSprites.THINKING_4.getUrl();
 		else if (index == 4)
-			return Akinator.THINKING_5.getUrl();
+			return AkinatorSprites.THINKING_5.getUrl();
 		else if (index == 5)
-			return Akinator.THINKING_6.getUrl();
+			return AkinatorSprites.THINKING_6.getUrl();
 		else
-			return Akinator.START.getUrl();
+			return AkinatorSprites.START.getUrl();
 	}
 }
 

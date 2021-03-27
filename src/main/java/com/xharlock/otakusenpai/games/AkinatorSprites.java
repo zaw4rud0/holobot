@@ -1,6 +1,6 @@
 package com.xharlock.otakusenpai.games;
 
-public enum Akinator {
+public enum AkinatorSprites {
 	DEFAULT("https://media.discordapp.net/attachments/824916413139124254/824917438062919740/akinator_default.png"),
 	START("https://media.discordapp.net/attachments/824916413139124254/824927512827527178/akinator_start.png"),	
 	THINKING_1("https://media.discordapp.net/attachments/824916413139124254/824917445125865472/akinator_thinking_1.png"),
@@ -18,7 +18,7 @@ public enum Akinator {
 	
 	private String url;
 	
-	Akinator(String url) {
+	AkinatorSprites(String url) {
 		this.url = url;
 	}
 	
