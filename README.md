@@ -4,6 +4,6 @@ A simple bot for Discord that has a variety of functions and features
 * Anime & Manga Search
 * Music Player
 * Image Provider
-# Games
+### Games
 * Pokédex
 * Akinator
