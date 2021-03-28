@@ -62,7 +62,8 @@ public class AkinatorCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(MessageReceivedEvent e) {		
+		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setThumbnail(AkinatorSprites.DEFAULT.getUrl());
 		if (busy) {
