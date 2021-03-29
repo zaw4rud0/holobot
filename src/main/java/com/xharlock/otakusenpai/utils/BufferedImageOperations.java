@@ -51,9 +51,7 @@ public class BufferedImageOperations {
 		return result;
 	}
 
-	public static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2, BufferedImage img3,
-			String direction) {
-
+	public static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2, BufferedImage img3, String direction) {
 		BufferedImage result = null;
 
 		if (direction.equals("horizontal")) {

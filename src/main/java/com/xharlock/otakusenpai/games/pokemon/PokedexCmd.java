@@ -1,6 +1,11 @@
 package com.xharlock.otakusenpai.games.pokemon;
 
+import java.io.IOException;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
+
 import com.xharlock.otakusenpai.commands.core.Command;
+import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,35 +14,65 @@ public class PokedexCmd extends Command {
 
 	public PokedexCmd(String name) {
 		super(name);
+		setAliases(List.of());
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		String[] args = this.getArgs();
 		
+		EmbedBuilder builder = new EmbedBuilder();
+		
 		if (args.length == 0) {
-			this.addErrorReaction(e.getMessage());
-			this.errorEmbed(e, "Incorrect Usage", "Please provide a Pok\u00e9mon name", "pokedex");
+			addErrorReaction(e.getMessage());
+			builder.setTitle(Messages.TITLE_INCORRECT_USAGE.getText());
+			builder.setDescription("Please provide a name!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
+		
 		String search = args[0].replace("\u00e9", "e").replace(".", "-").replace(":", "-").replace("'", "")
 				.replace("\\\u2640", "-f").replace("\\\u2642", "-m").replace(":female_sign", "-f")
 				.replace(":male_sign:", "-m");
-		PokemonSpecies pokemon = new PokemonSpecies(PokeAPI.getPokemonSpecies(search.toLowerCase()));
-		if (pokemon.name == null) {
-			this.addErrorReaction(e.getMessage());
-			this.errorEmbed(e, "Pok\u00e9mon not found", "Please check for typos and try again!", "pokedex");
+		
+		PokemonSpecies pokemon = null;
+		
+		try {
+			pokemon = new PokemonSpecies(PokeAPI.getPokemonSpecies(search.toLowerCase()));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+		
+		if (pokemon == null) {
+			addErrorReaction(e.getMessage());
+			builder.setTitle("Error");
+			builder.setDescription("Something went wrong, please try again in a few minutes!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
+		
+		if (pokemon.name == null) {
+			addErrorReaction(e.getMessage());
+			builder.setTitle("Pokémon not found");
+			builder.setDescription("Please check for typos and try again!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			return;
+		}
+		
 		if (e.isFromGuild()) {
 			e.getMessage().delete().queue();
 		}
-		EmbedBuilder builder = new EmbedBuilder();
 		
 		builder.setTitle(pokemon.name + " | " + "#" + pokemon.pokedexId + " | " + pokemon.generation);
 		builder.setThumbnail(pokemon.artwork);
 		builder.setDescription((CharSequence) pokemon.genus);
-		builder.addField("Type", pokemon.type, true);
+		
+		if (pokemon.type2 == null)
+			builder.addField("Type", pokemon.type1.getEmote().getAsText() + " " + pokemon.type1.getName(), true);
+		else
+			builder.addField("Type", pokemon.type1.getEmote().getAsText() + " " + pokemon.type1.getName()
+			+ "\n" + pokemon.type2.getEmote().getAsText() + " " + pokemon.type2.getName(), true);
+		
 		builder.addField("Ability", pokemon.abilities, true);
 		
 		if (pokemon.isLegendary) {
@@ -54,9 +89,11 @@ public class PokedexCmd extends Command {
 		builder.addField("Height", pokemon.height, true);
 		builder.addField("Weight", pokemon.weight, true);
 		builder.addField("Pok\u00e9dex Entry", pokemon.pokedexEntry, false);
+		
 		if (pokemon.evolutionChain != null) {
 			builder.addField("Evolution", pokemon.evolutionChain, false);
 		}
+		
 		this.sendEmbed(e, builder, true);
 	}
 

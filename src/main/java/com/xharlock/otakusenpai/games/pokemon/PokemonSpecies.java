@@ -8,7 +8,6 @@ import java.util.Random;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.xharlock.otakusenpai.misc.Emotes;
 import com.xharlock.otakusenpai.utils.HttpResponse;
 import com.xharlock.otakusenpai.utils.StringUtils;
 
@@ -19,7 +18,10 @@ public class PokemonSpecies {
 	public String genus;
 	public String generation;
 	public String pokedexEntry;
-	public String type;
+
+	public PokemonType type1;
+	public PokemonType type2;
+
 	public String genderRate;
 	public String height;
 	public String weight;
@@ -41,13 +43,14 @@ public class PokemonSpecies {
 			return;
 		}
 		JsonObject pokemon = null;
-		for (int i = 0; i < species.getAsJsonArray("varieties").size(); ++i) {
+
+		for (int i = 0; i < species.getAsJsonArray("varieties").size(); i++) {
 			if (species.getAsJsonArray("varieties").get(i).getAsJsonObject().get("is_default").getAsBoolean()) {
 				pokemon = HttpResponse.getJsonObject(species.getAsJsonArray("varieties").get(i).getAsJsonObject()
 						.get("pokemon").getAsJsonObject().get("url").getAsString());
 			}
 		}
-		final JsonObject evolution = HttpResponse
+		JsonObject evolution = HttpResponse
 				.getJsonObject(species.getAsJsonObject("evolution_chain").get("url").getAsString());
 		this.pokedexId = this.getPokedexNumber(species);
 		this.name = this.getName(species);
@@ -64,7 +67,9 @@ public class PokemonSpecies {
 		this.sprite = this.getSprite(pokemon, "front_default");
 		this.artwork = this.getArtwork(pokemon);
 		this.animated = null;
-		this.type = this.getType(pokemon);
+
+		setPokemonTypes(pokemon);
+
 		this.evolutionChain = this.getEvolutionChain(evolution);
 		this.isBaby = species.get("is_baby").getAsBoolean();
 		this.isLegendary = species.get("is_legendary").getAsBoolean();
@@ -73,7 +78,7 @@ public class PokemonSpecies {
 	}
 
 	private int getPokedexNumber(JsonObject species) {
-		for (int i = 0; i < species.get("pokedex_numbers").getAsJsonArray().size(); ++i) {
+		for (int i = 0; i < species.get("pokedex_numbers").getAsJsonArray().size(); i++) {
 			if (species.get("pokedex_numbers").getAsJsonArray().get(i).getAsJsonObject().get("pokedex")
 					.getAsJsonObject().get("name").getAsString().equals("national")) {
 				return species.get("pokedex_numbers").getAsJsonArray().get(i).getAsJsonObject().get("entry_number")
@@ -85,7 +90,7 @@ public class PokemonSpecies {
 
 	private String getName(JsonObject species) {
 		String s = "";
-		for (int i = 0; i < species.getAsJsonArray("names").size(); ++i) {
+		for (int i = 0; i < species.getAsJsonArray("names").size(); i++) {
 			if (species.getAsJsonArray("names").get(i).getAsJsonObject().getAsJsonObject("language").get("name")
 					.getAsString().equals("en")) {
 				s = species.getAsJsonArray("names").get(i).getAsJsonObject().get("name").getAsString()
@@ -99,7 +104,7 @@ public class PokemonSpecies {
 		Random rand = new Random();
 		List<String> entries = new ArrayList<String>();
 		JsonArray arr = species.get("flavor_text_entries").getAsJsonArray();
-		for (int i = 0; i < arr.size(); ++i) {
+		for (int i = 0; i < arr.size(); i++) {
 			if (arr.get(i).getAsJsonObject().getAsJsonObject("language").get("name").getAsString().equals("en")) {
 				String s = arr.get(i).getAsJsonObject().get("flavor_text").getAsString().replaceAll("\\n", " ")
 						.replaceAll(System.getProperty("line.separator"), " ").replace("\f", " ")
@@ -121,7 +126,7 @@ public class PokemonSpecies {
 
 	private String getGenus(JsonObject species) {
 		String s = "";
-		for (int i = 0; i < species.get("genera").getAsJsonArray().size(); ++i) {
+		for (int i = 0; i < species.get("genera").getAsJsonArray().size(); i++) {
 			if (species.get("genera").getAsJsonArray().get(i).getAsJsonObject().get("language").getAsJsonObject()
 					.get("name").getAsString().equals("en")) {
 				s = species.get("genera").getAsJsonArray().get(i).getAsJsonObject().get("genus").getAsString();
@@ -141,36 +146,59 @@ public class PokemonSpecies {
 		return s;
 	}
 
-	private String getType(JsonObject pokemon) {
-		String type = "ERROR";
+	private void setPokemonTypes(JsonObject pokemon) {
 		if (pokemon.get("types").getAsJsonArray().size() == 1) {
-			type = pokemon.getAsJsonArray("types").get(0).getAsJsonObject().getAsJsonObject("type").get("name")
-					.getAsString();
+			this.type1 = setPokemonTypesHelper(pokemon.getAsJsonArray("types").get(0).getAsJsonObject()
+					.getAsJsonObject("type").get("name").getAsString());
 		} else {
-			type = String
-					.valueOf(pokemon.getAsJsonArray("types").get(0).getAsJsonObject().getAsJsonObject("type")
-							.get("name").getAsString())
-					+ "\n" + pokemon.getAsJsonArray("types").get(1).getAsJsonObject().getAsJsonObject("type")
-							.get("name").getAsString();
+			this.type1 = setPokemonTypesHelper(pokemon.getAsJsonArray("types").get(0).getAsJsonObject()
+					.getAsJsonObject("type").get("name").getAsString());
+			this.type2 = setPokemonTypesHelper(pokemon.getAsJsonArray("types").get(1).getAsJsonObject()
+					.getAsJsonObject("type").get("name").getAsString());
 		}
-		return type.replaceAll("electric", Emotes.TYPE_ELECTRIC.getAsText() + " Electric")
-				.replaceAll("water", Emotes.TYPE_WATER.getAsText() + " Water")
-				.replaceAll("fire", Emotes.TYPE_FIRE.getAsText() + " Fire")
-				.replaceAll("grass", Emotes.TYPE_GRASS.getAsText() + " Grass")
-				.replaceAll("poison", Emotes.TYPE_POISON.getAsText() + " Poison")
-				.replaceAll("dark", Emotes.TYPE_DARK.getAsText() + " Dark")
-				.replaceAll("fairy", Emotes.TYPE_FAIRY.getAsText() + " Fairy")
-				.replaceAll("psychic", Emotes.TYPE_PSYCHIC.getAsText() + " Psychic")
-				.replaceAll("steel", Emotes.TYPE_STEEL.getAsText() + " Steel")
-				.replaceAll("rock", Emotes.TYPE_ROCK.getAsText() + " Rock")
-				.replaceAll("ground", Emotes.TYPE_GROUND.getAsText() + " Ground")
-				.replaceAll("flying", Emotes.TYPE_FLYING.getAsText() + " Flying")
-				.replaceAll("fighting", Emotes.TYPE_FIGHTING.getAsText() + " Fighting")
-				.replaceAll("normal", Emotes.TYPE_NORMAL.getAsText() + " Normal")
-				.replaceAll("ghost", Emotes.TYPE_GHOST.getAsText() + " Ghost")
-				.replaceAll("bug", Emotes.TYPE_BUG.getAsText() + " Bug")
-				.replaceAll("ice", Emotes.TYPE_ICE.getAsText() + " Ice")
-				.replaceAll("dragon", Emotes.TYPE_DRAGON.getAsText() + " Dragon");
+	}
+
+	private PokemonType setPokemonTypesHelper(String type) {
+		switch (type) {
+		case ("normal"):
+			return PokemonType.NORMAL;
+		case ("fire"):
+			return PokemonType.FIRE;
+		case ("fighting"):
+			return PokemonType.FIGHTING;
+		case ("flying"):
+			return PokemonType.FLYING;
+		case ("water"):
+			return PokemonType.WATER;
+		case ("grass"):
+			return PokemonType.GRASS;
+		case ("electric"):
+			return PokemonType.ELECTRIC;
+		case ("poison"):
+			return PokemonType.POISON;
+		case ("dark"):
+			return PokemonType.DARK;
+		case ("fairy"):
+			return PokemonType.FAIRY;
+		case ("psychic"):
+			return PokemonType.PSYCHIC;
+		case ("steel"):
+			return PokemonType.STEEL;
+		case ("rock"):
+			return PokemonType.ROCK;
+		case ("ground"):
+			return PokemonType.GROUND;
+		case ("bug"):
+			return PokemonType.BUG;
+		case ("dragon"):
+			return PokemonType.DRAGON;
+		case ("ghost"):
+			return PokemonType.GHOST;
+		case ("ice"):
+			return PokemonType.ICE;
+		default:
+			return null;
+		}
 	}
 
 	private String getCurrentForm(JsonObject pokemon) {
@@ -181,7 +209,7 @@ public class PokemonSpecies {
 
 	private String getForms(JsonObject species, String name) {
 		String forms = "";
-		for (int i = 0; i < species.get("varieties").getAsJsonArray().size(); ++i) {
+		for (int i = 0; i < species.get("varieties").getAsJsonArray().size(); i++) {
 			if (!species.get("varieties").getAsJsonArray().get(i).getAsJsonObject().get("pokemon").getAsJsonObject()
 					.get("name").getAsString().equals(name)) {
 				forms = String.valueOf(forms)
@@ -194,7 +222,7 @@ public class PokemonSpecies {
 
 	private String getAbility(JsonObject pokemon) {
 		String ability = "";
-		for (int i = 0; i < pokemon.get("abilities").getAsJsonArray().size(); ++i) {
+		for (int i = 0; i < pokemon.get("abilities").getAsJsonArray().size(); i++) {
 			ability = String.valueOf(ability)
 					+ StringUtils.firstLetterUp(String.valueOf(pokemon.get("abilities").getAsJsonArray().get(i)
 							.getAsJsonObject().get("ability").getAsJsonObject().get("name").getAsString()) + "\n");
@@ -213,7 +241,7 @@ public class PokemonSpecies {
 			chain = String.valueOf(stage1) + " \u2192 "
 					+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
 							.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
-			for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size(); ++i) {
+			for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size(); i++) {
 				chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 "
 						+ StringUtils
 								.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
@@ -232,7 +260,7 @@ public class PokemonSpecies {
 								.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
 								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
-						.size(); ++i) {
+						.size(); i++) {
 					chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 "
 							+ StringUtils.firstLetterUp(
 									pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(i)
@@ -251,7 +279,7 @@ public class PokemonSpecies {
 								.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
 								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				for (int j = 1; j < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(0)
-						.getAsJsonObject().getAsJsonArray("evolves_to").size(); ++j) {
+						.getAsJsonObject().getAsJsonArray("evolves_to").size(); j++) {
 					chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 " + stage2 + " \u2192 "
 							+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
 									.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
