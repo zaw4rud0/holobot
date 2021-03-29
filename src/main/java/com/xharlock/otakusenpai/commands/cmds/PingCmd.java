@@ -9,6 +9,7 @@ import com.xharlock.otakusenpai.core.Main;
 import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PingCmd extends Command {
@@ -24,7 +25,6 @@ public class PingCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		long start = System.currentTimeMillis();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Pong!");
 		builder.setDescription("Ping: `...` ms\nHeartbeat: `...` ms");
@@ -35,12 +35,11 @@ public class PingCmd extends Command {
 		} else {
 			builder.setColor(Main.otakuSenpai.getConfig().getColor());
 		}
-
-		e.getChannel().sendMessage(builder.build()).queue(msg -> {
-			long ping = System.currentTimeMillis() - start;
-			builder.setDescription("Ping: `" + ping + "` ms\nHeartbeat: `" + e.getJDA().getGatewayPing() + "` ms");
-			msg.editMessage(builder.build()).queue();
-			msg.delete().queueAfter(1L, TimeUnit.MINUTES);
-		});
+		long start = System.currentTimeMillis();
+		Message message = e.getChannel().sendMessage(builder.build()).complete();
+		long ms = System.currentTimeMillis() - start;
+		builder.setDescription("Ping: `" + ms + "` ms\nHeartbeat: `" + e.getJDA().getGatewayPing() + "` ms");		
+		message.editMessage(builder.build()).queue();
+		message.delete().queueAfter(1, TimeUnit.MINUTES);
 	}
 }
