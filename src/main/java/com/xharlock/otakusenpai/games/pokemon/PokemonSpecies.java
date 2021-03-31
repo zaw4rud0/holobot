@@ -159,7 +159,7 @@ public class PokemonSpecies {
 	}
 
 	private PokemonType setPokemonTypesHelper(String type) {
-		switch (type) {
+		switch (type.toLowerCase()) {
 		case ("normal"):
 			return PokemonType.NORMAL;
 		case ("fire"):

@@ -12,7 +12,7 @@ public enum PokemonType {
 	FLYING("Flying", Emotes.TYPE_FLYING, new Color(168, 144, 240)),
 	WATER("Water", Emotes.TYPE_WATER, new Color(104, 144, 240)),
 	GRASS("Grass", Emotes.TYPE_GRASS, new Color(120, 200, 80)),
-	ELECTRIC("Electric", Emotes.TYPE_ELECTRIC, new Color(248, 208, 48)),
+	ELECTRIC("Electric", Emotes.TYPE_ELECTRIC, new Color(248, 228, 48)),
 	POISON("Poison", Emotes.TYPE_POISON, new Color(160, 64, 160)),
 	DARK("Dark", Emotes.TYPE_DARK, new Color(112, 88, 72)),
 	FAIRY("Fairy", Emotes.TYPE_FAIRY, new Color(238, 153, 172)),
@@ -33,6 +33,7 @@ public enum PokemonType {
 	PokemonType(String name, Emotes emote, Color color) {
 		this.name = name;
 		this.emote = emote;
+		this.color = color;
 	}
 	
 	public String getName() {
