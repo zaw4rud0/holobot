@@ -25,8 +25,8 @@ public class SuggestionCmd extends Command {
 		super(name);
 		setDescription("Use this command if you want to suggest a feature. Suggestions are always appreciated");
 		setUsage(name + " [text]");
-		setAliases(List.of());
 		setExample(name + " make this bot more awesome :D");
+		setAliases(List.of());
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GENERAL);
 	}
