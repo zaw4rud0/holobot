@@ -8,6 +8,7 @@ import com.xharlock.otakusenpai.commands.core.CommandCategory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CancelCmd extends Command {
+	
     public CancelCmd(final String name) {
         super(name);
         setDescription("Use this command to cancel all ongoing requests");
