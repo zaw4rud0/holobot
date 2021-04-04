@@ -6,8 +6,10 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.xharlock.otakusenpai.commands.cmds.BugCmd;
 import com.xharlock.otakusenpai.commands.cmds.InfoBotCmd;
 import com.xharlock.otakusenpai.commands.cmds.PingCmd;
+import com.xharlock.otakusenpai.commands.cmds.SuggestionCmd;
 import com.xharlock.otakusenpai.commands.owner.CancelCmd;
 import com.xharlock.otakusenpai.commands.owner.DeleteCmd;
 import com.xharlock.otakusenpai.commands.owner.NicknameCmd;
@@ -27,7 +29,9 @@ public class CommandManager extends ListenerAdapter {
 	public CommandManager(EventWaiter waiter) {
 		this.commands = new LinkedHashMap<>();
 
-		// GENERAL CMDS
+		// General Cmds
+		addCommand(new BugCmd("bug"));
+		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new PingCmd("ping"));
 		addCommand(new InfoBotCmd("info"));
 
