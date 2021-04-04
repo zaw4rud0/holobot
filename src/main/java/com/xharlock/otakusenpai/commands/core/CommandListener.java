@@ -38,8 +38,7 @@ public class CommandListener extends ListenerAdapter {
 		if (!e.getMessage().getContentRaw().startsWith(prefix))
 			return;
 
-		String[] split = e.getMessage().getContentRaw()
-				.replaceFirst("(?i)" + Pattern.quote(prefix), "").split("\\s+");
+		String[] split = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(prefix), "").split("\\s+");
 		String invoke = split[0].toLowerCase();
 
 		if (this.commandManager.getCommand(invoke) == null)
