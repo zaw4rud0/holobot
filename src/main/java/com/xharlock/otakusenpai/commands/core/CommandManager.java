@@ -19,6 +19,8 @@ import com.xharlock.otakusenpai.commands.owner.StatusCmd;
 import com.xharlock.otakusenpai.games.AkinatorCmd;
 import com.xharlock.otakusenpai.games.pokemon.PokedexCmd;
 import com.xharlock.otakusenpai.games.pokemon.PokemonTeamCmd;
+import com.xharlock.otakusenpai.image.AvatarCmd;
+import com.xharlock.otakusenpai.image.HoloCmd;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -35,11 +37,13 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new PingCmd("ping"));
 		addCommand(new InfoBotCmd("info"));
 
-		// ANIME CMDS
+		// Anime Cmds
 
-		// MUSIC CMDS
+		// Music Cmds
 
-		// IMAGE CMDS
+		// Image Cmds
+		addCommand(new AvatarCmd("avatar"));
+		addCommand(new HoloCmd("holo"));
 
 		// Game Cmds
 		addCommand(new AkinatorCmd("akinator", waiter));

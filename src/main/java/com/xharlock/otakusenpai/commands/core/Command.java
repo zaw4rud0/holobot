@@ -1,6 +1,7 @@
 package com.xharlock.otakusenpai.commands.core;
 
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -20,7 +21,7 @@ public abstract class Command {
 	protected String description;
 	protected String usage;
 	protected String example;
-	protected List<String> aliases;
+	protected List<String> aliases = new ArrayList<>();
 	protected String[] args;
 
 	protected boolean isOwnerCommand = false;

@@ -8,12 +8,12 @@ public class CollageCmd extends Command {
 
 	public CollageCmd(String name) {
 		super(name);
-		// TODO Auto-generated constructor stub
+		
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		// TODO Auto-generated method stub
+		
 		
 	}
 
