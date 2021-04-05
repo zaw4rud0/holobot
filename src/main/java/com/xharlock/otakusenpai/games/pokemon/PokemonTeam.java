@@ -83,16 +83,16 @@ public class PokemonTeam {
 		g2.setColor(oldColor);
 		temp = BufferedImageOperations.resize(img, 420, 420);
 		g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
-		drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30));
+		drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30), Color.BLACK);
 		g2.dispose();
 		return res;
 	}
 
-	private static void drawName(Graphics2D g2, String text, Rectangle rect, Font font) {
+	private static void drawName(Graphics2D g2, String text, Rectangle rect, Font font, Color color) {
 		FontMetrics metrics = g2.getFontMetrics(font);
 		int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
 		int y = rect.height - 20;
-		g2.setColor(Color.BLACK);
+		g2.setColor(color);
 		g2.setFont(font);
 		g2.drawString(text, x, y);
 	}

@@ -1,7 +1,9 @@
 package com.xharlock.otakusenpai.anime;
 
-public class AnimePlanetAPI {
+// AnimePlanet Scraper
 
+public class AnimePlanetAPI {
+	
 	
 	
 }
