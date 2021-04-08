@@ -24,7 +24,7 @@ public class WhoisCmd extends Command {
 		setDescription("Use this command to get more informations about a given user or bot");
 		setUsage(name + " [user or bot]");
 		setExample(name + " " + Main.otakuSenpai.getJDA().getSelfUser().getAsMention());
-		setAliases(List.of());
+		setAliases(List.of("stalk"));
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GENERAL);
 	}
@@ -45,62 +45,77 @@ public class WhoisCmd extends Command {
 
 		try {
 			user = e.getGuild().getMemberById(args[0].replace("<@!", "").replace(">", "")).getUser();
+		} catch (Exception ex) {
 		}
-		catch (Exception ex) {}
-		
+
 		Member member = e.getGuild().retrieveMember(user).complete();
-		
+
 		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
 		builder.setThumbnail(user.getEffectiveAvatarUrl());
 		builder.addField("Nickname", "`" + member.getEffectiveName() + "`", false);
-		
+
 		OffsetDateTime d = member.getTimeJoined();
-		String s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));		
+		String s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
 		builder.addField("Join Date", "`" + s + "`", false);
-		
-		List<Role> roles = member.getRoles();		
-		Role highest = roles.get(0);
-		Role hoisted = null;
-		
-		for (Role role : roles) {
-			if (role.getPosition() > highest.getPosition())
-				highest = role;
-			if (hoisted == null && role.isHoisted())
-				hoisted = role;
-			else {
-				if (!role.isHoisted() || role.getPosition() <= hoisted.getPosition())
-					continue;
-				hoisted = role;
+
+		List<Role> roles = member.getRoles();
+
+		// Member has no roles in this guild
+		if (roles.size() == 0) {
+			builder.addField("Highest Role", "@everyone", true);
+			builder.addField("Hoisted Role", "`Unhoisted`", true);
+			builder.addField("Roles", "@everyone", false);
+		} 
+		// Member has roles
+		else {
+			Role highest = roles.get(0);
+			Role hoisted = null;
+
+			for (Role role : roles) {
+				if (role.getPosition() > highest.getPosition())
+					highest = role;
+				if (hoisted == null && role.isHoisted())
+					hoisted = role;
+				else {
+					if (!role.isHoisted() || role.getPosition() <= hoisted.getPosition())
+						continue;
+					hoisted = role;
+				}
 			}
-		}
-		
-		builder.addField("Highest Role", highest.getAsMention(), true);
-		builder.addField("Hoisted Role", hoisted.getAsMention(), true);
-		
-		String rolesString = roles.get(0).getAsMention();
-		
-		int counter = 1;
-		
-		for (int i = 1; i < roles.size(); ++i) {
-			if (counter == 10) {
-				rolesString = rolesString + ", `and " + (roles.size() - counter) + " more...`";
-				break;
+
+			builder.addField("Highest Role", highest.getAsMention(), true);
+			
+			if (hoisted == null)
+				builder.addField("Hoisted Role", "`Unhoisted`", true);
+			else
+				builder.addField("Hoisted Role", hoisted.getAsMention(), true);
+
+			String rolesString = roles.get(0).getAsMention();
+
+			int counter = 1;
+
+			for (int i = 1; i < roles.size(); ++i) {
+				if (counter == 10) {
+					rolesString = rolesString + ", `and " + (roles.size() - counter) + " more...`";
+					break;
+				}
+				rolesString = rolesString + ", " + roles.get(i).getAsMention();
+				counter++;
 			}
-			rolesString = rolesString + ", " + roles.get(i).getAsMention();
-			counter++;
+
+			builder.addField("Roles", rolesString, false);
+
 		}
-		
-		builder.addField("Roles", rolesString, false);
-		
+
 		d = user.getTimeCreated();
-		s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));		
-		builder.addField("Creation Date", "`" + s + "`", false);
-		
+		s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
+		builder.addField("Account Creation Date", "`" + s + "`", false);
+
 		if (user.isBot())
 			builder.addField("Account Type", "Bot", true);
 		else
 			builder.addField("Account Type", "User", true);
-		
+
 		this.sendEmbed(e, builder, true);
 	}
 
