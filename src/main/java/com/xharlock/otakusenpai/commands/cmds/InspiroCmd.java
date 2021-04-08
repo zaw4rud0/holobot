@@ -1,10 +1,6 @@
 package com.xharlock.otakusenpai.commands.cmds;
 
 import java.io.IOException;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
@@ -13,7 +9,6 @@ import com.xharlock.otakusenpai.misc.Messages;
 import com.xharlock.otakusenpai.utils.HttpResponse;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class InspiroCmd extends Command {
@@ -24,7 +19,6 @@ public class InspiroCmd extends Command {
 		super(name);
 		setDescription("Use this command to get a random quote from [Inspirobot](https://inspirobot.me/)");
 		setUsage(name);
-		
 		setCommandCategory(CommandCategory.MISC);
 	}
 
