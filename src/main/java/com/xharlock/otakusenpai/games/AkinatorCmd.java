@@ -36,8 +36,6 @@ public class AkinatorCmd extends Command {
 	private AtomicInteger counter;
 	private List<String> wrong;
 
-	// TODO If user calls it while it's busy they will get cd
-
 	public AkinatorCmd(String name, EventWaiter waiter) {
 		super(name);
 		setDescription("Use this command to start a new game of Akinator."
