@@ -1,7 +1,6 @@
 package com.xharlock.otakusenpai.commands.cmds;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONArray;
@@ -26,14 +25,15 @@ public class SuggestionCmd extends Command {
 		setDescription("Use this command if you want to suggest a feature. Suggestions are always appreciated");
 		setUsage(name + " [text]");
 		setExample(name + " make this bot more awesome :D");
-		setAliases(List.of());
-		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GENERAL);
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (this.getArgs().length == 0) {
@@ -54,12 +54,15 @@ public class SuggestionCmd extends Command {
 			guild.put("Guild Name", e.getGuild().getName());
 			guild.put("Channel Id", e.getChannel().getId());
 			obj.put("Guild", guild);
+		} else {
+			obj.put("Private Channel", e.getPrivateChannel().getIdLong());
 		}
 		
 		JSONObject author = new JSONObject();
 		author.put("Id", e.getAuthor().getIdLong());
 		author.put("Tag", e.getAuthor().getAsTag());
-		author.put("Username", e.getAuthor().getName());
+		if (e.isFromGuild())
+			author.put("Nickname", e.getMember().getEffectiveName());
 		obj.put("Author", author);
 		obj.put("Suggestion", text);
 
