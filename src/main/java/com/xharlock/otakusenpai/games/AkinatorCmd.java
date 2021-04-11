@@ -14,7 +14,7 @@ import com.markozajc.akiwrapper.core.entities.Guess;
 import com.markozajc.akiwrapper.core.exceptions.ServerNotFoundException;
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.core.Main;
+import com.xharlock.otakusenpai.core.Bootstrap;
 import com.xharlock.otakusenpai.misc.Emojis;
 import com.xharlock.otakusenpai.misc.Emotes;
 import com.xharlock.otakusenpai.misc.Messages;
@@ -87,7 +87,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprites.DEFAULT.getUrl());
-		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setDescription(
 				"To start the game, please think about a real or fictional character. I will try to guess who it is by asking some questions."
 						+ "\nIf you are ready, please react with " + Emotes.TICK.getAsText() + ", or if you want to cancel the game, react with " + Emotes.CROSS.getAsText() + ".");
@@ -136,7 +136,7 @@ public class AkinatorCmd extends Command {
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 				e.getAuthor().getEffectiveAvatarUrl());
 		builder.setThumbnail(AkinatorSprites.START.getUrl());
@@ -256,7 +256,7 @@ public class AkinatorCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setThumbnail(AkinatorSprites.GUESSING.getUrl());
 		builder.setFooter(e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
 		
@@ -304,7 +304,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprites.VICTORY.getUrl());
-		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setDescription("Great, guessed right one more time!\n"
 				+ "It took me `" + counter.get() + "` questions to correctly guess " + right.getName());
 		if (right.getImage() != null)
@@ -321,7 +321,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprites.DEFEAT.getUrl());
-		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 				e.getAuthor().getEffectiveAvatarUrl());
@@ -334,7 +334,7 @@ public class AkinatorCmd extends Command {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(Main.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setThumbnail(AkinatorSprites.CANCEL.getUrl());
 		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
 		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
