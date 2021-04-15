@@ -31,7 +31,8 @@ public class AvatarCmd extends Command {
             builder.setDescription("Please provide only one argument");
             sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
             return;
-        }        
+        }
+        
         e.getMessage().delete().queue();
         
         User user = e.getAuthor();

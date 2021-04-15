@@ -21,15 +21,14 @@ public class HoloCmd extends Command {
 		setDescription("Use this command to get a picture of Holo");
 		setAliases(List.of("bestgirl", "waifu", "wisewolf"));
 		setUsage(name);
-		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.IMAGE);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
-		EmbedBuilder builder = new EmbedBuilder();
 		
+		EmbedBuilder builder = new EmbedBuilder();		
 		String url = null;
 		
 		try {
