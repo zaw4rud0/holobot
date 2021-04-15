@@ -5,7 +5,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.core.Main;
+import com.xharlock.otakusenpai.core.Bootstrap;
 import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -33,7 +33,7 @@ public class PingCmd extends Command {
 			builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
 					e.getAuthor().getEffectiveAvatarUrl());
 		} else {
-			builder.setColor(Main.otakuSenpai.getConfig().getColor());
+			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		}
 		long start = System.currentTimeMillis();
 		Message message = e.getChannel().sendMessage(builder.build()).complete();

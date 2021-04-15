@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.core.Main;
+import com.xharlock.otakusenpai.core.Bootstrap;
 import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -23,7 +23,7 @@ public class WhoisCmd extends Command {
 		super(name);
 		setDescription("Use this command to get more informations about a given user or bot");
 		setUsage(name + " [user or bot]");
-		setExample(name + " " + Main.otakuSenpai.getJDA().getSelfUser().getAsMention());
+		setExample(name + " " + Bootstrap.otakuSenpai.getJDA().getSelfUser().getAsMention());
 		setAliases(List.of("stalk"));
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GENERAL);
