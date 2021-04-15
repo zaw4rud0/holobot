@@ -47,7 +47,7 @@ public class AkinatorCmd extends Command {
 		setAliases(List.of());
 		setCmdCooldown(300);
 		setIsGuildOnlyCommand(true);
-		setCommandCategory(CommandCategory.MISC);
+		setCommandCategory(CommandCategory.GAMES);
 
 		this.waiter = waiter;
 		this.busy = false;

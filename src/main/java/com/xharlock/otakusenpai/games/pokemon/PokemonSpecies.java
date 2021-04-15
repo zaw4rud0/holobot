@@ -8,8 +8,8 @@ import java.util.Random;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.xharlock.otakusenpai.utils.Formatter;
 import com.xharlock.otakusenpai.utils.HttpResponse;
-import com.xharlock.otakusenpai.utils.StringUtils;
 
 public class PokemonSpecies {
 
@@ -204,7 +204,7 @@ public class PokemonSpecies {
 	private String getCurrentForm(JsonObject pokemon) {
 		String s = "";
 		s = pokemon.get("name").getAsString();
-		return StringUtils.firstLetterUp(s);
+		return Formatter.firstLetterUp(s);
 	}
 
 	private String getForms(JsonObject species, String name) {
@@ -213,7 +213,7 @@ public class PokemonSpecies {
 			if (!species.get("varieties").getAsJsonArray().get(i).getAsJsonObject().get("pokemon").getAsJsonObject()
 					.get("name").getAsString().equals(name)) {
 				forms = String.valueOf(forms)
-						+ StringUtils.firstLetterUp(String.valueOf(species.get("varieties").getAsJsonArray().get(i)
+						+ Formatter.firstLetterUp(String.valueOf(species.get("varieties").getAsJsonArray().get(i)
 								.getAsJsonObject().get("pokemon").getAsJsonObject().get("name").getAsString()) + "\n");
 			}
 		}
@@ -224,7 +224,7 @@ public class PokemonSpecies {
 		String ability = "";
 		for (int i = 0; i < pokemon.get("abilities").getAsJsonArray().size(); i++) {
 			ability = String.valueOf(ability)
-					+ StringUtils.firstLetterUp(String.valueOf(pokemon.get("abilities").getAsJsonArray().get(i)
+					+ Formatter.firstLetterUp(String.valueOf(pokemon.get("abilities").getAsJsonArray().get(i)
 							.getAsJsonObject().get("ability").getAsJsonObject().get("name").getAsString()) + "\n");
 		}
 		return ability;
@@ -236,52 +236,52 @@ public class PokemonSpecies {
 			chain = null;
 		} else if (pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(0).getAsJsonObject()
 				.getAsJsonArray("evolves_to").size() == 0) {
-			String stage1 = StringUtils.firstLetterUp(
+			String stage1 = Formatter.firstLetterUp(
 					pokemonEvolution.getAsJsonObject("chain").getAsJsonObject("species").get("name").getAsString());
 			chain = String.valueOf(stage1) + " \u2192 "
-					+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
+					+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
 							.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 			for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size(); i++) {
 				chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 "
-						+ StringUtils
+						+ Formatter
 								.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
 										.get(i).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 			}
 		} else {
-			String stage1 = StringUtils.firstLetterUp(
+			String stage1 = Formatter.firstLetterUp(
 					pokemonEvolution.getAsJsonObject("chain").getAsJsonObject("species").get("name").getAsString());
 			if (pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size() > 1) {
 				chain = String.valueOf(stage1) + " \u2192 "
-						+ StringUtils
+						+ Formatter
 								.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
 										.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString())
 						+ " \u2192 "
-						+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
+						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
 								.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
 								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
 						.size(); i++) {
 					chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 "
-							+ StringUtils.firstLetterUp(
+							+ Formatter.firstLetterUp(
 									pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(i)
 											.getAsJsonObject().getAsJsonObject("species").get("name").getAsString())
 							+ " \u2192 "
-							+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
+							+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
 									.getAsJsonArray("evolves_to").get(i).getAsJsonObject().getAsJsonArray("evolves_to")
 									.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				}
 			} else {
-				String stage2 = StringUtils
+				String stage2 = Formatter
 						.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(0)
 								.getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				chain = String.valueOf(stage1) + " \u2192 " + stage2 + " \u2192 "
-						+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
+						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
 								.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
 								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				for (int j = 1; j < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(0)
 						.getAsJsonObject().getAsJsonArray("evolves_to").size(); j++) {
 					chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 " + stage2 + " \u2192 "
-							+ StringUtils.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
+							+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
 									.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
 									.get(j).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				}
