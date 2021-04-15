@@ -1,7 +1,5 @@
 package com.xharlock.otakusenpai.commands.owner;
 
-import java.util.List;
-
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
 
@@ -13,9 +11,7 @@ public class ShutdownCmd extends Command {
         super(name);
         setDescription("(Owner-only) Use this command to shutdown the bot");
         setUsage(name);
-        setAliases(List.of());
         setIsOwnerCommand(true);
-        setIsGuildOnlyCommand(false);
         setCommandCategory(CommandCategory.OWNER);
     }
     

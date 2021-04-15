@@ -15,7 +15,6 @@ public class NicknameCmd extends Command {
 		setUsage(name + " [nickname]");
 		setAliases(List.of("nick"));
 		setIsOwnerCommand(true);
-        setIsGuildOnlyCommand(false);
         setCommandCategory(CommandCategory.OWNER);
 	}
 

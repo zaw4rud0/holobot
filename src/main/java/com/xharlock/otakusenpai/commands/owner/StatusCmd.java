@@ -1,7 +1,6 @@
 package com.xharlock.otakusenpai.commands.owner;
 
 import java.util.Arrays;
-import java.util.List;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
@@ -15,9 +14,7 @@ public class StatusCmd extends Command {
 		super(name);
 		setDescription("(Owner-only) Use this command to set the status of the bot");
 		setUsage(name);
-		setAliases(List.of());
         setIsOwnerCommand(true);
-        setIsGuildOnlyCommand(false);
         setCommandCategory(CommandCategory.OWNER);
 	}
 

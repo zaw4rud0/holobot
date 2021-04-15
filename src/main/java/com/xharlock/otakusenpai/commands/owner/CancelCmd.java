@@ -1,7 +1,5 @@
 package com.xharlock.otakusenpai.commands.owner;
 
-import java.util.List;
-
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
 
@@ -11,11 +9,9 @@ public class CancelCmd extends Command {
 	
     public CancelCmd(final String name) {
         super(name);
-        setDescription("Use this command to cancel all ongoing requests");
+        setDescription("(Owner-only) Use this command to cancel all ongoing requests");
         setUsage(name);
-        setAliases(List.of());
         setIsOwnerCommand(true);
-        setIsGuildOnlyCommand(true);
         setCommandCategory(CommandCategory.OWNER);
     }
     
