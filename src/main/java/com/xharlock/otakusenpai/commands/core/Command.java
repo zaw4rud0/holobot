@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.xharlock.otakusenpai.core.Main;
+import com.xharlock.otakusenpai.core.Bootstrap;
 import com.xharlock.otakusenpai.misc.Emojis;
 import com.xharlock.otakusenpai.misc.Messages;
 
@@ -58,11 +58,11 @@ public abstract class Command {
 	}
 
 	protected String getGuildPrefix(Guild guild) {
-		return Main.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getGuildPrefix();
+		return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getGuildPrefix();
 	}
 
 	protected int getGuildColor(Guild guild) {
-		return Main.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getEmbedColor();
+		return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getEmbedColor();
 	}
 
 	protected boolean isValidURL(String url) {
@@ -80,7 +80,7 @@ public abstract class Command {
 				builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 			builder.setColor(getGuildColor(e.getGuild()));
 		} else {
-			Main.otakuSenpai.getConfig().getColor();
+			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		}
 		e.getChannel().sendMessage(builder.build()).queue();
 	}
@@ -92,7 +92,7 @@ public abstract class Command {
 						e.getAuthor().getEffectiveAvatarUrl());
 			builder.setColor(getGuildColor(e.getGuild()));
 		} else {
-			Main.otakuSenpai.getConfig().getColor();
+			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		}
 		e.getChannel().sendMessage(builder.build()).queue(msg -> {
 			msg.delete().queueAfter(delay, unit);

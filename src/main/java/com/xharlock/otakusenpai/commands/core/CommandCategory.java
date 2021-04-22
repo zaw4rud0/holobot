@@ -7,6 +7,7 @@ public enum CommandCategory {
 	MUSIC("Music Commands"),
 	GAMES("Game Commands"),
 	IMAGE("Image Commands"),
+	PLACE("Place Commands"),
 	MISC("Miscellaneous Commands"),
 	ADMIN("Admin Commands"),
 	OWNER("Owner Commands"),

@@ -1,10 +1,16 @@
 package com.xharlock.otakusenpai.commands.core;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import com.xharlock.otakusenpai.core.Main;
+import javax.imageio.ImageIO;
+
+import com.xharlock.otakusenpai.core.Bootstrap;
+import com.xharlock.otakusenpai.misc.ChatClient;
+import com.xharlock.otakusenpai.place.Place;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -21,10 +27,30 @@ public class CommandListener extends ListenerAdapter {
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
 
+		if (!e.getAuthor().equals(e.getJDA().getSelfUser())) {
+			ChatClient.doStuff(e);
+		}
+		
+		// TODO Rework
+		if (e.getMessage().getContentRaw().equals("--getplace")) {
+			try {
+				ImageIO.write(Place.getCanvas(), "png", new File("C:/Users/adria/Desktop/place.png"));
+				System.out.println("Printing place");
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			return;
+		}
+		
+		// Place stuff
+		if (e.getMessage().getContentRaw().toLowerCase().startsWith(".place")) {
+			Bootstrap.otakuSenpai.getPlace().doStuff(e);
+			return;
+		}
+		
 		if (e.isWebhookMessage())
 			return;
 
-		// TODO Implement BotHandler
 		if (e.getAuthor().isBot())
 			return;
 
@@ -33,7 +59,7 @@ public class CommandListener extends ListenerAdapter {
 		if (e.isFromGuild())
 			prefix = getGuildPrefix(e.getGuild());
 		else
-			prefix = Main.otakuSenpai.getConfig().getPrefix();
+			prefix = Bootstrap.otakuSenpai.getConfig().getPrefix();
 		
 		if (!e.getMessage().getContentRaw().startsWith(prefix))
 			return;
@@ -47,7 +73,7 @@ public class CommandListener extends ListenerAdapter {
 		Command cmd = this.commandManager.getCommand(invoke);
 
 		// Check if user can do anything
-		if (!Main.otakuSenpai.getPermission().check(e, cmd))
+		if (!Bootstrap.otakuSenpai.getPermission().check(e, cmd))
 			return;
 
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
@@ -57,6 +83,6 @@ public class CommandListener extends ListenerAdapter {
 	}
 
 	private String getGuildPrefix(Guild guild) {
-		return Main.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getGuildPrefix();
+		return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getGuildPrefix();
 	}
 }
