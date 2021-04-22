@@ -1,4 +1,4 @@
-package com.xharlock.otakusenpai.image.nsfw;
+package com.xharlock.otakusenpai.image;
 
 import java.io.IOException;
 import com.google.gson.JsonArray;
@@ -31,7 +31,7 @@ public class GelbooruAPIWrapper {
 	
 	public static JsonArray getJsonArray(Rating rating, Sort sort, int limit, String tags) throws IOException {
 		String urlQueryString = baseUrl + "limit=" + limit + "&tags=rating:" + rating.getName() + "%20sort:" + sort
-				+ "%20" + tags;
+				+ "%20" + tags;		
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent",
