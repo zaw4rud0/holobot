@@ -17,6 +17,7 @@ public class DeleteCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
+		e.getMessage().delete().queue();
 		if (args.length != 1)
 			return;
 		e.getChannel().retrieveMessageById(args[0]).complete().delete().queue(v -> {}, err -> {});

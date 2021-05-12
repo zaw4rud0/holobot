@@ -17,7 +17,6 @@ public class ShutdownCmd extends Command {
     
     @Override
     public void onCommand(MessageReceivedEvent e) {
-        addSuccessReaction(e.getMessage());
         Runtime.getRuntime().exit(0);
     }
 
