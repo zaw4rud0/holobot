@@ -10,6 +10,11 @@ public class Misc extends ListenerAdapter {
 	}
 
 	private void heart(MessageReceivedEvent e) {
+		
+		if (e.getChannel().equals(e.getJDA().getTextChannelById(819966095070330950L))) {
+			return;
+		}
+		
 		if (e.getMessage().getContentRaw().contains("<3")) {
 			e.getMessage().addReaction(Emojis.HEART.getAsReaction()).queue();
 		}

@@ -9,8 +9,8 @@ public class ReadyListener extends ListenerAdapter {
 	@Override
 	public void onReady(ReadyEvent e) {
 		System.out.println(String.format("%s is ready!\n", e.getJDA().getSelfUser().getAsTag()));
-		Main.otakuSenpai.registerManagers();
-		Main.otakuSenpai.registerListeners();
+		Bootstrap.otakuSenpai.registerManagers();
+		Bootstrap.otakuSenpai.registerListeners();
 	}
 	
 	public void onException(ExceptionEvent e) {

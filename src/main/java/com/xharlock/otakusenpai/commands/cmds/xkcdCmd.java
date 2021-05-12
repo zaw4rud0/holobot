@@ -1,7 +1,6 @@
-package com.xharlock.otakusenpai.discarded;
+package com.xharlock.otakusenpai.commands.cmds;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
@@ -19,9 +18,8 @@ public class xkcdCmd extends Command {
 	
 	public xkcdCmd(String name) {
 		super(name);
-		setDescription("");
-		setUsage("");
-		setAliases(List.of());
+		setDescription("Use this command to access the comics of xkcd");
+		setUsage(name + " [new|issue_nr]");
 		setCommandCategory(CommandCategory.MISC);
 		
 		try {

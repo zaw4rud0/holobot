@@ -45,6 +45,9 @@ public class AvatarCmd extends Command {
         Member member = e.getGuild().retrieveMember(user).complete();
         
         String url = user.getEffectiveAvatarUrl() + "?size=512";        
+        
+        System.out.println(url);
+        
         builder.setTitle(member.getEffectiveName() + "'s Avatar", url);
         builder.setImage(url);
         

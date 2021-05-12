@@ -1,10 +1,10 @@
 package com.xharlock.otakusenpai.games.pokemon;
 
 import java.io.IOException;
-import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
+import com.xharlock.otakusenpai.commands.core.CommandCategory;
 import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -14,7 +14,10 @@ public class PokedexCmd extends Command {
 
 	public PokedexCmd(String name) {
 		super(name);
-		setAliases(List.of());
+		setDescription("Use this command to look up a Pokémon");
+		setUsage(name + " <Pokémon name or id>");
+		setIsGuildOnlyCommand(false);
+		setCommandCategory(CommandCategory.GAMES);
 	}
 
 	@Override
@@ -53,15 +56,14 @@ public class PokedexCmd extends Command {
 		
 		if (pokemon.name == null) {
 			addErrorReaction(e.getMessage());
-			builder.setTitle("Pok�mon not found");
+			builder.setTitle("Pok�mon not found");
 			builder.setDescription("Please check for typos and try again!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 		
-		if (e.isFromGuild()) {
+		if (e.isFromGuild())
 			e.getMessage().delete().queue();
-		}
 		
 		builder.setTitle(pokemon.name + " | " + "#" + pokemon.pokedexId + " | " + pokemon.generation);
 		builder.setThumbnail(pokemon.artwork);
@@ -75,26 +77,24 @@ public class PokedexCmd extends Command {
 		
 		builder.addField("Ability", pokemon.abilities, true);
 		
-		if (pokemon.isLegendary) {
+		if (pokemon.isLegendary)
 			builder.addField("Category", "Legendary", true);
-		} else if (pokemon.isMythical) {
+		else if (pokemon.isMythical)
 			builder.addField("Category", "Mythical", true);
-		} else if (pokemon.isUltraBeast) {
+		else if (pokemon.isUltraBeast)
 			builder.addField("Category", "Ultra Beast", true);
-		} else {
+		else
 			builder.addBlankField(true);
-		}
 		
 		builder.addField("Gender Ratio", pokemon.genderRate, true);
 		builder.addField("Height", pokemon.height, true);
 		builder.addField("Weight", pokemon.weight, true);
 		builder.addField("Pok\u00e9dex Entry", pokemon.pokedexEntry, false);
 		
-		if (pokemon.evolutionChain != null) {
+		if (pokemon.evolutionChain != null)
 			builder.addField("Evolution", pokemon.evolutionChain, false);
-		}
 		
-		this.sendEmbed(e, builder, true);
+		sendEmbed(e, builder, true);
 	}
 
 }

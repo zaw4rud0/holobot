@@ -6,6 +6,7 @@ import java.net.URL;
 
 import com.google.gson.JsonObject;
 
+@SuppressWarnings("unused")
 public class SauceNAOWrapper {
 
 	private static final String base_url = "https://saucenao.com/search.php?db=999&output_type=2&api_key=";

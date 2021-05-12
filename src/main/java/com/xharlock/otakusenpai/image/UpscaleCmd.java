@@ -1,10 +1,15 @@
 package com.xharlock.otakusenpai.image;
 
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+import com.google.gson.JsonParser;
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
+import com.xharlock.otakusenpai.core.Bootstrap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -51,7 +56,7 @@ public class UpscaleCmd extends Command {
 		String imgUrl = "";
 
 		try {
-			imgUrl = Waifu2xWrapper.upscaleImage(oldUrl);
+			imgUrl = upscaleImage(oldUrl);
 		} catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while communicating with the API");
@@ -62,6 +67,24 @@ public class UpscaleCmd extends Command {
 		builder.setTitle("Upscaled Image");
 		builder.setImage(imgUrl);
 		sendEmbed(e, builder, 2L, TimeUnit.MINUTES, true);
+	}
+	
+	private static final String url = "https://api.deepai.org/api/waifu2x";
+	
+	/**
+	 * Method to send an image url to waifu2x and return the url of the upscaled
+	 * image 
+	 * @param imageUrl = Url to the image to be upscaled
+	 * @return Url to the upscaled image
+	 * @throws IOException
+	 */
+	private static String upscaleImage(String imageUrl) throws IOException {
+		String token = Bootstrap.otakuSenpai.getConfig().getKeyDeepAI();
+		Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + url);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+		String result = reader.lines().collect(Collectors.joining("\n"));
+		reader.close();
+		return JsonParser.parseString(result).getAsJsonObject().get("output_url").getAsString();
 	}
 
 }

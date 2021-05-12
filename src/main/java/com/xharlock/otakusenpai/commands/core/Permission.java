@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.xharlock.otakusenpai.core.Main;
+import com.xharlock.otakusenpai.core.Bootstrap;
 import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -108,7 +108,7 @@ public class Permission {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		// Checks if user is bot-owner and can use owner-only commands
-		if (cmd.isOwnerCommand() && e.getAuthor().getIdLong() != Main.otakuSenpai.getConfig().getOwnerId()) {
+		if (cmd.isOwnerCommand() && e.getAuthor().getIdLong() != Bootstrap.otakuSenpai.getConfig().getOwnerId()) {
 			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle(Messages.TITLE_NO_PERM.getText());
 			builder.setDescription(Messages.CMD_OWNER_ONLY.getText());
@@ -117,7 +117,7 @@ public class Permission {
 		}
 
 		if (e.isFromGuild()) {
-			Role admin = Main.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getAdminRole();
+			Role admin = Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getAdminRole();
 			if (admin == null) {
 				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor())) {
 					cmd.addErrorReaction(e.getMessage());

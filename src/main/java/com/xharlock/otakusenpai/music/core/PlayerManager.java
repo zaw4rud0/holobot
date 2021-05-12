@@ -3,6 +3,7 @@ package com.xharlock.otakusenpai.music.core;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
@@ -12,6 +13,7 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -22,9 +24,9 @@ public class PlayerManager {
 	private AudioPlayerManager audioPlayerManager;
 
 	public PlayerManager() {
-		this.musicManagers = new HashMap<Long, GuildMusicManager>();
-		AudioSourceManagers.registerRemoteSources(this.audioPlayerManager = new DefaultAudioPlayerManager());
-		AudioSourceManagers.registerLocalSource(this.audioPlayerManager);
+		musicManagers = new HashMap<Long, GuildMusicManager>();
+		AudioSourceManagers.registerRemoteSources(audioPlayerManager = new DefaultAudioPlayerManager());
+		AudioSourceManagers.registerLocalSource(audioPlayerManager);
 	}
 
 	public GuildMusicManager getMusicManager(Guild guild) {
@@ -35,37 +37,55 @@ public class PlayerManager {
 		});
 	}
 
-	public void loadAndPlay(MessageReceivedEvent e, String trackURL) {
-		final GuildMusicManager musicManager = this.getMusicManager(e.getGuild());
-		this.audioPlayerManager.loadItemOrdered((Object) musicManager, trackURL,
-				new AudioLoadResultHandler() {
-					public void trackLoaded(final AudioTrack track) {
-						musicManager.scheduler.enqueue(track);
-						e.getChannel().sendMessage((CharSequence) "Added to the queue: `")
-								.append((CharSequence) track.getInfo().title).append((CharSequence) "` by `")
-								.append((CharSequence) track.getInfo().author).append((CharSequence) "`").queue();
-					}
+	public void loadAndPlay(MessageReceivedEvent e, EmbedBuilder builder, String trackUrl) {
+		GuildMusicManager musicManager = getMusicManager(e.getGuild());
+		this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
 
-					public void playlistLoaded(AudioPlaylist playlist) {
-						final List<AudioTrack> tracks = (List<AudioTrack>) playlist.getTracks();
-						e.getChannel().sendMessage((CharSequence) "Added to the queue: `")
-								.append((CharSequence) String.valueOf(tracks.size()))
-								.append((CharSequence) "` tracks from playlist `")
-								.append((CharSequence) playlist.getName()).append((CharSequence) "`").queue();
-						for (AudioTrack track : tracks) {
-							musicManager.scheduler.enqueue(track);
-						}
-					}
+			@Override
+			public void trackLoaded(AudioTrack track) {
+				musicManager.scheduler.enqueue(track);
 
-					public void noMatches() {
-						e.getChannel().sendMessage((CharSequence) "Something went wrong").queue();
-					}
+				String uri = track.getInfo().uri.split("v=")[1].split("&")[0];
+				String thumbnail = "https://img.youtube.com/vi/" + uri + "/hqdefault.jpg";
 
-					public void loadFailed(FriendlyException exception) {
-						e.getChannel().sendMessage((CharSequence) "Something went wrong").queue();
-						exception.printStackTrace();
-					}
-				});
+				builder.setTitle("Added to the queue");
+				builder.setThumbnail(thumbnail);
+				builder.addField("Title", track.getInfo().title, false);
+				builder.addField("Uploader", track.getInfo().author, false);
+				builder.addField("Link", "[Youtube](" + trackUrl + ")", false);
+
+				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+			}
+
+			@Override
+			public void playlistLoaded(AudioPlaylist playlist) {
+				List<AudioTrack> tracks = (List<AudioTrack>) playlist.getTracks();
+				for (AudioTrack track : tracks)
+					musicManager.scheduler.enqueue(track);
+
+				builder.setTitle("Added to the queue");
+				builder.setDescription("`" + tracks.size() + "` tracks from playlist `" + playlist.getName() + "`");
+				builder.addField("Link", "[Youtube](" + trackUrl + ")", false);
+
+				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+			}
+
+			@Override
+			public void noMatches() {
+				builder.setTitle("No matches!");
+				builder.setDescription(
+						"Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
+				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+			}
+
+			@Override
+			public void loadFailed(FriendlyException exception) {
+				builder.setTitle("Load failed!");
+				builder.setDescription(
+						"Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
+				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+			}
+		});
 	}
 
 	public static PlayerManager getInstance() {

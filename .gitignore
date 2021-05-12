@@ -6,3 +6,8 @@
 /.settings
 /builds
 /bin/
+/output/
+/src/main/resources/
+/src/main/resources/database/
+/src/main/resources/misc/
+/lib/

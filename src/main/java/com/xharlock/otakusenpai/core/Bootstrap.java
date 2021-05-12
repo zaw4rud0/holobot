@@ -9,7 +9,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.otakusenpai.config.Config;
 import com.xharlock.otakusenpai.utils.JSONReader;
 
-public class Main {
+public class Bootstrap {
 	public static OtakuSenpai otakuSenpai;
 	public static long startup_time;
 	

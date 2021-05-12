@@ -7,6 +7,7 @@ import com.xharlock.otakusenpai.commands.core.Command;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+@SuppressWarnings("unused")
 public class Action extends Command {
 
 	private List<String> categories;
@@ -56,6 +57,7 @@ public class Action extends Command {
 
 	}
 
+	
 	private void blush(MessageReceivedEvent e) {
 
 	}

@@ -1,12 +1,14 @@
 package com.xharlock.otakusenpai.config;
 
-import com.xharlock.otakusenpai.core.Main;
+import com.xharlock.otakusenpai.core.Bootstrap;
 
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.VoiceChannel;
 
 public class GuildConfig {
 	
 	private Role admin_role;
+	private VoiceChannel music_channel;
 	private Role dj_role;
 	private String prefix;
 	private int embed_color;
@@ -17,6 +19,14 @@ public class GuildConfig {
 
 	public void setAdminRole(Role admin_role) {
 		this.admin_role = admin_role;
+	}
+	
+	public VoiceChannel getMusicChannel() {
+		return this.music_channel;
+	}
+	
+	public void setMusicChannel(VoiceChannel channel) {
+		this.music_channel = channel;
 	}
 	
 	public Role getDJRole() {
@@ -44,10 +54,10 @@ public class GuildConfig {
 	}
 	
 	public void setDefaultPrefix() {
-		this.prefix = Main.otakuSenpai.getConfig().getPrefix();
+		this.prefix = Bootstrap.otakuSenpai.getConfig().getPrefix();
 	}
 	
 	public void setDefaultColor() {
-		this.embed_color = Main.otakuSenpai.getConfig().getColor();
+		this.embed_color = Bootstrap.otakuSenpai.getConfig().getColor();
 	}
 }

@@ -8,16 +8,16 @@ public class GuildMusicManager {
 
 	public AudioPlayer audioPlayer;
 	public TrackScheduler scheduler;
-	private AudioPlayerHandler audioPlayerHandler;
+	private AudioPlayerSendHandler audioPlayerHandler;
 	
 	public GuildMusicManager(AudioPlayerManager manager) {
 		this.audioPlayer = manager.createPlayer();
         this.scheduler = new TrackScheduler(this.audioPlayer);
         this.audioPlayer.addListener((AudioEventListener)this.scheduler);
-        this.audioPlayerHandler = new AudioPlayerHandler(this.audioPlayer);
+        this.audioPlayerHandler = new AudioPlayerSendHandler(this.audioPlayer);
 	}
 	
-	public AudioPlayerHandler getAudioPlayerHandler() {
+	public AudioPlayerSendHandler getAudioPlayerHandler() {
         return this.audioPlayerHandler;
     }
 }

@@ -1,44 +1,18 @@
 package com.xharlock.otakusenpai.commands.core;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.xharlock.otakusenpai.commands.cmds.BugCmd;
-import com.xharlock.otakusenpai.commands.cmds.HelpCmd;
-import com.xharlock.otakusenpai.commands.cmds.InfoBotCmd;
-import com.xharlock.otakusenpai.commands.cmds.InspiroCmd;
-import com.xharlock.otakusenpai.commands.cmds.PingCmd;
-import com.xharlock.otakusenpai.commands.cmds.SuggestionCmd;
-import com.xharlock.otakusenpai.commands.cmds.WhoisCmd;
-import com.xharlock.otakusenpai.commands.owner.CancelCmd;
-import com.xharlock.otakusenpai.commands.owner.DeleteCmd;
-import com.xharlock.otakusenpai.commands.owner.NicknameCmd;
-import com.xharlock.otakusenpai.commands.owner.SayCmd;
-import com.xharlock.otakusenpai.commands.owner.ShutdownCmd;
-import com.xharlock.otakusenpai.commands.owner.StatusCmd;
+import com.xharlock.otakusenpai.commands.cmds.*;
+import com.xharlock.otakusenpai.commands.owner.*;
 import com.xharlock.otakusenpai.games.AkinatorCmd;
-import com.xharlock.otakusenpai.games.pokemon.PokedexCmd;
-import com.xharlock.otakusenpai.games.pokemon.PokemonTeamCmd;
-import com.xharlock.otakusenpai.games.pokemon.RandomPokemonCmd;
-import com.xharlock.otakusenpai.image.AvatarCmd;
-import com.xharlock.otakusenpai.image.BannerCmd;
-import com.xharlock.otakusenpai.image.HoloCmd;
-import com.xharlock.otakusenpai.image.ImageCmd;
-import com.xharlock.otakusenpai.image.NekoCmd;
-import com.xharlock.otakusenpai.image.UpscaleCmd;
-import com.xharlock.otakusenpai.music.cmds.ClearCmd;
-import com.xharlock.otakusenpai.music.cmds.JoinCmd;
-import com.xharlock.otakusenpai.music.cmds.LeaveCmd;
-import com.xharlock.otakusenpai.music.cmds.NowCmd;
-import com.xharlock.otakusenpai.music.cmds.PlayCmd;
-import com.xharlock.otakusenpai.music.cmds.QueueCmd;
-import com.xharlock.otakusenpai.music.cmds.ShuffleCmd;
-import com.xharlock.otakusenpai.place.BullyCmd;
-import com.xharlock.otakusenpai.place.ConvertCmd;
-import com.xharlock.otakusenpai.place.DrawTxtCmd;
+import com.xharlock.otakusenpai.games.pokemon.*;
+import com.xharlock.otakusenpai.image.*;
+import com.xharlock.otakusenpai.music.cmds.*;
+import com.xharlock.otakusenpai.place.*;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -53,8 +27,9 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new BugCmd("bug"));
 		addCommand(new HelpCmd("help", this));
 		addCommand(new InfoBotCmd("info"));
-		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new PingCmd("ping"));
+//		addCommand(new ServerInfoCmd("serverinfo"));
+		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new WhoisCmd("whois"));
 
 		// Anime Cmds
@@ -64,17 +39,25 @@ public class CommandManager extends ListenerAdapter {
 //		addCommand(new MangaSearchCmd("mangasearch", waiter));
 
 		// Music Cmds
+		addCommand(new ClearCmd("clear", waiter));
+//		addCommand(new CloneCmd("clone"));
 		addCommand(new JoinCmd("join"));
 		addCommand(new LeaveCmd("leave"));
-		addCommand(new PlayCmd("play"));
+//		addCommand(new LoopCmd("loop"));
 		addCommand(new NowCmd("now"));
+//		addCommand(new PauseCmd("pause"));
+		addCommand(new PlayCmd("play"));
 		addCommand(new QueueCmd("queue"));
-		addCommand(new ClearCmd("clear"));
+//		addCommand(new RemoveCmd("remove"));
 		addCommand(new ShuffleCmd("shuffle"));
+		addCommand(new SkipCmd("skip", waiter));
+		addCommand(new StopCmd("stop"));
 		
 		// Image Cmds
 		addCommand(new AvatarCmd("avatar"));
 		addCommand(new BannerCmd("banner"));
+		addCommand(new CheckNSFWCmd("check"));
+//		addCommand(new CollageCmd("collage"));
 		addCommand(new HoloCmd("holo"));
 		addCommand(new ImageCmd("image"));
 		addCommand(new NekoCmd("neko"));
@@ -83,8 +66,8 @@ public class CommandManager extends ListenerAdapter {
 		// Game Cmds
 		addCommand(new AkinatorCmd("akinator", waiter));
 		addCommand(new PokedexCmd("pokedex"));
-		addCommand(new RandomPokemonCmd("randompokemon"));
 		addCommand(new PokemonTeamCmd("pokemonteam"));
+		addCommand(new RandomPokemonCmd("randompokemon"));		
 
 		// Place Cmds
 		addCommand(new ConvertCmd("convert"));
@@ -93,6 +76,7 @@ public class CommandManager extends ListenerAdapter {
 		
 		// Misc Cmds
 		addCommand(new InspiroCmd("inspiro"));
+		addCommand(new xkcdCmd("xkcd"));
 
 		// Owner Cmds
 		addCommand(new CancelCmd("cancel"));
@@ -114,7 +98,7 @@ public class CommandManager extends ListenerAdapter {
 	}
 
 	public List<Command> getCommands(CommandCategory category) {
-		HashSet<Command> commands = new HashSet<>();
+		LinkedHashSet<Command> commands = new LinkedHashSet<>();
 		for (Command cmd : this.commands.values())
 			if (cmd.getCommandCategory() == category)
 				commands.add(cmd);

@@ -179,7 +179,7 @@ public class BufferedImageOperations {
 		return res;
 	}
 	
-	public static InputStream convert(BufferedImage img) throws IOException {
+	public static InputStream convertToInputStream(BufferedImage img) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(img, "png", os);
         return new ByteArrayInputStream(os.toByteArray());

@@ -1,18 +1,48 @@
 package com.xharlock.otakusenpai.music.cmds;
 
+import java.util.concurrent.TimeUnit;
+
+import com.xharlock.otakusenpai.misc.Emojis;
 import com.xharlock.otakusenpai.music.core.MusicCommand;
 
+import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.managers.AudioManager;
 
 public class JoinCmd extends MusicCommand {
 
 	public JoinCmd(String name) {
 		super(name);
+		setDescription("Use this command to me bring to your current voice channel");
+		setUsage(name);
+		setIsOwnerCommand(true);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
+
+		e.getMessage().delete().queue();
+		EmbedBuilder builder = new EmbedBuilder();
+		AudioManager audioManager = e.getGuild().getAudioManager();
+
+		if (isBotInChannel(e)) {
+			builder.setTitle("Error");
+			builder.setDescription("I'm already in a voice channel!\n" + "Join me in `"
+					+ e.getMember().getVoiceState().getChannel().getName() + "`");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			return;
+		}
+
+		if (!isUserInChannel(e)) {
+			addErrorReaction(e.getMessage());
+			return;
+		}
+
+		audioManager.openAudioConnection(e.getMember().getVoiceState().getChannel());
+
+		builder.setTitle("Connected " + Emojis.NOTE.getAsText());
+		builder.setDescription("Join me in `" + e.getMember().getVoiceState().getChannel().getName() + "`");
+		sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 	}
 
 }
