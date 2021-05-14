@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 
-public class JikanWrapper {
+public class JikanAPI {
 	private static final String baseUrl = "https://api.jikan.moe/v3";
 	private static int limit = 10;
 
@@ -35,12 +35,20 @@ public class JikanWrapper {
 
 	private static JsonObject getJsonObject(String urlQueryString) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
-		connection.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+		connection.setRequestProperty("User-Agent",	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+		
+		String redirect = connection.getHeaderField("Location");
+		
+		while (redirect != null) {
+			connection = (HttpURLConnection) new URL(redirect).openConnection();
+			redirect = connection.getHeaderField("Location");
+		}
+		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String s = reader.lines().collect(Collectors.joining("\n"));
 		reader.close();
 		connection.disconnect();
+		
 		return JsonParser.parseString(s).getAsJsonObject();
 	}
 }
