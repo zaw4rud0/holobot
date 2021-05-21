@@ -1,5 +1,5 @@
 # Changelog
-This page will document all changes of each version
+This page will document all changes of each version.
 ## Version 2.1.0
 ### Changes:
 * <animesearch and <mangasearch cmds are enabled again
