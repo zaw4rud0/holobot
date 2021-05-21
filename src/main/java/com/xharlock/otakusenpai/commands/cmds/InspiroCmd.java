@@ -23,8 +23,9 @@ public class InspiroCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+	public void onCommand(MessageReceivedEvent e) {		
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();		
         EmbedBuilder builder = new EmbedBuilder();
         
         String url = "";

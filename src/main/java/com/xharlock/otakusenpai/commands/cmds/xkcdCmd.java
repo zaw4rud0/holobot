@@ -24,7 +24,6 @@ public class xkcdCmd extends Command {
 		
 		try {
 			newest_issue = HttpResponse.getJsonObject("https://xkcd.com/info.0.json").get("num").getAsInt();
-			System.out.println(newest_issue);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -32,7 +31,10 @@ public class xkcdCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 		if (args.length == 0) {
 			Random random = new Random();

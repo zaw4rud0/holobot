@@ -27,7 +27,7 @@ public class BugCmd extends Command {
 		setExample(name + " something went wrong");
 		setCommandCategory(CommandCategory.GENERAL);
 	}
-
+	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCommand(MessageReceivedEvent e) {

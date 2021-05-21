@@ -109,12 +109,11 @@ public class WhoisCmd extends Command {
 
 		d = user.getTimeCreated();
 		s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
-		builder.addField("Account Creation Date", "`" + s + "`", false);
-
-		if (user.isBot())
-			builder.addField("Account Type", "Bot", true);
-		else
-			builder.addField("Account Type", "User", true);
+		
+		String type = user.isBot() ? "Bot" : "User";
+		
+		builder.addField("Additional Checks", "Account Type: `" + type + "`\n"
+				+ "Creation Date: `" + s + "`", false);
 
 		this.sendEmbed(e, builder, true);
 	}

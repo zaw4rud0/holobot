@@ -18,7 +18,7 @@ public class TrackScheduler extends AudioEventAdapter {
 	public boolean looping;
 
 	public TrackScheduler(AudioPlayer player) {
-		this.queue = new LinkedBlockingQueue<AudioTrack>();
+		this.queue = new LinkedBlockingQueue<>();
 		this.audioPlayer = player;
 		this.looping = false;
 	}
@@ -33,7 +33,7 @@ public class TrackScheduler extends AudioEventAdapter {
 	}
 
 	public void shuffle() {
-		List<AudioTrack> queueList = new ArrayList<AudioTrack>(this.queue);
+		List<AudioTrack> queueList = new ArrayList<>(this.queue);
 		Collections.shuffle(queueList);
 		this.queue.clear();
 		for (AudioTrack track : queueList)

@@ -417,7 +417,7 @@ public class ImageCmd extends Command {
 		JsonArray array = null;
 
 		try {
-			array = GelbooruAPIWrapper.getJsonArray(GelbooruAPIWrapper.Rating.SAFE, GelbooruAPIWrapper.Sort.SCORE_DESC, 500, tag);
+			array = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.SAFE, GelbooruAPI.Sort.SCORE_DESC, 500, tag);
 		} catch (IOException e) {
 			return null;
 		}

@@ -140,7 +140,7 @@ public class PokemonSpecies {
 		if (species.get("gender_rate").getAsInt() == -1) {
 			s = "100% \u26b2";
 		} else {
-			int percentage = species.get("gender_rate").getAsInt() * 100 / 8;
+			double percentage = species.get("gender_rate").getAsInt() * 100 / 8.0;
 			s = 100 - percentage + "% \\\u2642 | " + percentage + "% \\\u2640";
 		}
 		return s;

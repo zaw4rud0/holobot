@@ -14,6 +14,7 @@ import com.xharlock.otakusenpai.place.Place;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.user.UserTypingEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandListener extends ListenerAdapter {
@@ -24,6 +25,12 @@ public class CommandListener extends ListenerAdapter {
 		this.commandManager = commandManager;
 	}
 
+	@Override
+	public void onUserTyping(UserTypingEvent e) {
+		if (e.getUser().getIdLong() == 0L)
+			e.getChannel().sendTyping().queue();
+	}
+	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
 

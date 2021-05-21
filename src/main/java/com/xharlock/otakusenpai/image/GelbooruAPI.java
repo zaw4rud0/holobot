@@ -11,7 +11,7 @@ import java.net.HttpURLConnection;
 
 import com.google.gson.JsonObject;
 
-public class GelbooruAPIWrapper {
+public class GelbooruAPI {
 
 	private static final String baseUrl = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&";
 

@@ -6,6 +6,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.xharlock.otakusenpai.anime.AnimeSearchCmd;
+import com.xharlock.otakusenpai.anime.MangaSearchCmd;
 import com.xharlock.otakusenpai.commands.cmds.*;
 import com.xharlock.otakusenpai.commands.owner.*;
 import com.xharlock.otakusenpai.games.AkinatorCmd;
@@ -28,19 +30,19 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new HelpCmd("help", this));
 		addCommand(new InfoBotCmd("info"));
 		addCommand(new PingCmd("ping"));
-//		addCommand(new ServerInfoCmd("serverinfo"));
+		addCommand(new ServerEmotes("serveremotes"));
+		addCommand(new ServerInfoCmd("serverinfo"));
+		addCommand(new ServerRoles("serverroles"));
 		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new WhoisCmd("whois"));
 
 		// Anime Cmds
-//		addCommand(new AnimeCmd("anime"));
-//		addCommand(new MangaCmd("manga"));
-//		addCommand(new AnimeSearchCmd("animesearch", waiter));
-//		addCommand(new MangaSearchCmd("mangasearch", waiter));
+		addCommand(new AnimeSearchCmd("animesearch", waiter));
+		addCommand(new MangaSearchCmd("mangasearch", waiter));
 
 		// Music Cmds
-		addCommand(new ClearCmd("clear", waiter));
-//		addCommand(new CloneCmd("clone"));
+//		addCommand(new ClearCmd("clear", waiter));
+		addCommand(new CloneCmd("clone"));
 		addCommand(new JoinCmd("join"));
 		addCommand(new LeaveCmd("leave"));
 //		addCommand(new LoopCmd("loop"));
@@ -50,9 +52,9 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new QueueCmd("queue"));
 //		addCommand(new RemoveCmd("remove"));
 		addCommand(new ShuffleCmd("shuffle"));
-		addCommand(new SkipCmd("skip", waiter));
+//		addCommand(new SkipCmd("skip", waiter));
 		addCommand(new StopCmd("stop"));
-		
+
 		// Image Cmds
 		addCommand(new AvatarCmd("avatar"));
 		addCommand(new BannerCmd("banner"));
@@ -67,15 +69,17 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new AkinatorCmd("akinator", waiter));
 		addCommand(new PokedexCmd("pokedex"));
 		addCommand(new PokemonTeamCmd("pokemonteam"));
-		addCommand(new RandomPokemonCmd("randompokemon"));		
+		addCommand(new RandomPokemonCmd("randompokemon"));
 
 		// Place Cmds
 		addCommand(new ConvertCmd("convert"));
 		addCommand(new DrawTxtCmd("drawtxt"));
+		addCommand(new PreviewCmd("preview"));
 		addCommand(new BullyCmd("bully"));
-		
+
 		// Misc Cmds
 		addCommand(new InspiroCmd("inspiro"));
+		addCommand(new UwuCmd("uwu"));
 		addCommand(new xkcdCmd("xkcd"));
 
 		// Owner Cmds

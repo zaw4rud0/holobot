@@ -84,6 +84,6 @@ public class HelpCmd extends Command {
             }
         }
         
-        sendEmbed(e, builder, 1L, TimeUnit.MINUTES, true);
+        sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
 	}
 }

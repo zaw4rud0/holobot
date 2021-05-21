@@ -20,29 +20,25 @@ public class JoinCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-
 		e.getMessage().delete().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		AudioManager audioManager = e.getGuild().getAudioManager();
 
 		if (isBotInChannel(e)) {
 			builder.setTitle("Error");
-			builder.setDescription("I'm already in a voice channel!\n" + "Join me in `"
-					+ e.getMember().getVoiceState().getChannel().getName() + "`");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			builder.setDescription("I'm already in a voice channel!\nJoin me in " + e.getGuild().getSelfMember().getVoiceState().getChannel().getAsMention());
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);
 			return;
 		}
 
 		if (!isUserInChannel(e)) {
-			addErrorReaction(e.getMessage());
 			return;
 		}
 
 		audioManager.openAudioConnection(e.getMember().getVoiceState().getChannel());
 
 		builder.setTitle("Connected " + Emojis.NOTE.getAsText());
-		builder.setDescription("Join me in `" + e.getMember().getVoiceState().getChannel().getName() + "`");
-		sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
+		builder.setDescription("Join me in " + e.getMember().getVoiceState().getChannel().getAsMention());		
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);
 	}
-
 }

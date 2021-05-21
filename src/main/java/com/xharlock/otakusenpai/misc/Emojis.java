@@ -14,18 +14,18 @@ public enum Emojis {
 	NOTE("U+1F3B5", ":musical_note:"),
 	NOTES("U+1F3B6", ":notes:"),
 	
-	ZERO("U+0030 U+20E3", ":zero:"),
-	ONE("U+0031 U+20E3", ":one:"),
-	TWO("U+0032 U+20E3", ":two:"),
-	THREE("U+0033 U+20E3", ":three:"),
-	FOUR("U+0034 U+20E3", ":four:"),
-	FIVE("U+0035 U+20E3", ":five:"),
-	SIX("U+0036 U+20E3", ":six:"),
-	SEVEN("U+0037 U+20E3", ":seven:"),
-	EIGHT("U+0038 U+20E3", ":eight:"),
-	NINE("U+0039 U+20E3", ":nine:"),
-	TEN("U+1F51F", ":keycap_ten:"),
-	HUNDRED("U+1F4AF", ":100:");
+	ZERO("0️⃣", ":zero:"),
+	ONE("1⃣", ":one:"),
+	TWO("2⃣", ":two:"),
+	THREE("3⃣", ":three:"),
+	FOUR("4⃣", ":four:"),
+	FIVE("5⃣", ":five:"),
+	SIX("6⃣", ":six:"),
+	SEVEN("7⃣", ":seven:"),
+	EIGHT("8⃣", ":eight:"),
+	NINE("9⃣", ":nine:"),
+	TEN("🔟", ":keycap_ten:"),
+	HUNDRED("💯", ":100:");
 	;
 	
 	private String unicode;
