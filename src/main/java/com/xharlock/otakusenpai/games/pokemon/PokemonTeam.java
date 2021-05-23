@@ -139,7 +139,7 @@ class SortedPokemon {
 		List<SortedPokemon> doublePokes = doublePokes(pokes);
 		List<SortedPokemon> bestTeam = new ArrayList<>();
 		
-		rec(doublePokes, new int[1], bestTeam, new ArrayList<>());
+		findBestMatches(doublePokes, new int[1], bestTeam, new ArrayList<>());
 
 		// creates the image
 		List<BufferedImage> ordered = new ArrayList<>();
@@ -152,6 +152,7 @@ class SortedPokemon {
 			PokemonType type1 = null;
 			PokemonType type2 = null;
 
+			// We set type1 and type2 correctly for the draw function
 			if (!p.swapped) {
 				type1 = pokemon.type1;
 				type2 = (pokemon.type2 == null) ? type1 : pokemon.type2;
@@ -172,21 +173,38 @@ class SortedPokemon {
 	 * Doubles the pokemon list by swapping the types
 	 */
 	public static List<SortedPokemon> doublePokes(List<SortedPokemon> pokes) {
-		List<SortedPokemon> add = new ArrayList<>();
-		for (SortedPokemon p : pokes) {
-			add.add(p.copy());
+		List<SortedPokemon> copies = new ArrayList<>();
+		List<String> types = new ArrayList<>();
+		// this first loop is simply to take note of all types
+		for (SortedPokemon p: pokes) {
+			types.add(p.type1);
+			// we add the second type if its a different one
+			if (!p.type1.equals(p.type2)) types.add(p.type2);
 		}
-		pokes.addAll(add);
+		// now we can iterate through pokes and if they have unique types, don't copy them
+		for (SortedPokemon p : pokes) {
+			// iterate over the list and find multiple instances
+			int t1 = 0;  // counter for occurences of first type
+			int t2 = 0;  // counter for occurences of second type
+			for (String s: types) {
+				if (s.equals(p.type1)) t1++;
+				if (s.equals(p.type2)) t2++;
+			}
+			// if t1 or t2 > 1, more than 1 pokemon has that type
+			if (t1 > 1 || t2 > 1) copies.add(p.copy());
+		}
+		pokes.addAll(copies);
 		return pokes;
 	}
 
 	/*
 	 * Creates the array with the best matchings
 	 */
-	public static void rec(List<SortedPokemon> pokes, int[] best, List<SortedPokemon> bestTeam,
+	public static void findBestMatches(List<SortedPokemon> pokes, int[] best, List<SortedPokemon> bestTeam,
 			List<SortedPokemon> cur) {
 		
 		if (cur.size() == 6) {
+			// If the current array is 6 big, count the matchings
 			int m = matchings(cur);
 			if (best[0] <= m) {
 				best[0] = m;
@@ -200,7 +218,7 @@ class SortedPokemon {
 				continue;
 			List<SortedPokemon> copy = new ArrayList<>(cur);
 			copy.add(p);
-			rec(pokes, best, bestTeam, copy);
+			findBestMatches(pokes, best, bestTeam, copy);
 		}
 	}
 
@@ -240,6 +258,10 @@ class SortedPokemon {
 		return false;
 	}
 
+	/*
+	 * Returns a copied version of a pokemon with 'swapped'
+	 * set to true
+	 */
 	public SortedPokemon copy() {
 		SortedPokemon p = new SortedPokemon(name, type2, type1, id);
 		p.swapped = true;
