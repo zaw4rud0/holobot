@@ -14,7 +14,7 @@ import com.xharlock.otakusenpai.utils.HttpResponse;
 public class PokemonSpecies {
 
 	public String name;
-	public int pokedexId;
+	public String pokedexId;
 	public String genus;
 	public String generation;
 	public String pokedexEntry;
@@ -77,15 +77,15 @@ public class PokemonSpecies {
 		this.isUltraBeast = this.isUltraBeast();
 	}
 
-	private int getPokedexNumber(JsonObject species) {
+	private String getPokedexNumber(JsonObject species) {
 		for (int i = 0; i < species.get("pokedex_numbers").getAsJsonArray().size(); i++) {
 			if (species.get("pokedex_numbers").getAsJsonArray().get(i).getAsJsonObject().get("pokedex")
 					.getAsJsonObject().get("name").getAsString().equals("national")) {
-				return species.get("pokedex_numbers").getAsJsonArray().get(i).getAsJsonObject().get("entry_number")
-						.getAsInt();
+				return String.format("%03d", species.get("pokedex_numbers").getAsJsonArray().get(i).getAsJsonObject()
+						.get("entry_number").getAsInt());
 			}
 		}
-		return -1;
+		return null;
 	}
 
 	private String getName(JsonObject species) {
@@ -243,22 +243,20 @@ public class PokemonSpecies {
 							.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 			for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size(); i++) {
 				chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 "
-						+ Formatter
-								.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
-										.get(i).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
+						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
+								.get(i).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 			}
 		} else {
 			String stage1 = Formatter.firstLetterUp(
 					pokemonEvolution.getAsJsonObject("chain").getAsJsonObject("species").get("name").getAsString());
 			if (pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size() > 1) {
 				chain = String.valueOf(stage1) + " \u2192 "
-						+ Formatter
-								.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
-										.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString())
+						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
+								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString())
 						+ " \u2192 "
-						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
-								.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
-								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
+						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
+								.get(0).getAsJsonObject().getAsJsonArray("evolves_to").get(0).getAsJsonObject()
+								.getAsJsonObject("species").get("name").getAsString());
 				for (int i = 1; i < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
 						.size(); i++) {
 					chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 "
@@ -275,9 +273,9 @@ public class PokemonSpecies {
 						.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(0)
 								.getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
 				chain = String.valueOf(stage1) + " \u2192 " + stage2 + " \u2192 "
-						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain")
-								.getAsJsonArray("evolves_to").get(0).getAsJsonObject().getAsJsonArray("evolves_to")
-								.get(0).getAsJsonObject().getAsJsonObject("species").get("name").getAsString());
+						+ Formatter.firstLetterUp(pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to")
+								.get(0).getAsJsonObject().getAsJsonArray("evolves_to").get(0).getAsJsonObject()
+								.getAsJsonObject("species").get("name").getAsString());
 				for (int j = 1; j < pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").get(0)
 						.getAsJsonObject().getAsJsonArray("evolves_to").size(); j++) {
 					chain = String.valueOf(chain) + "\n" + stage1 + " \u2192 " + stage2 + " \u2192 "
@@ -291,8 +289,8 @@ public class PokemonSpecies {
 	}
 
 	private boolean isUltraBeast() {
-		List<Integer> ids = new ArrayList<Integer>(
-				Arrays.asList(793, 794, 795, 796, 797, 798, 799, 803, 804, 805, 806));
+		List<String> ids = new ArrayList<>(
+				Arrays.asList("793", "794", "795", "796", "797", "798", "799", "803", "804", "805", "806"));
 		return ids.contains(this.pokedexId);
 	}
 }

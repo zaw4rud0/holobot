@@ -11,8 +11,9 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonObject;
 
 public class PokeAPI {
-	
+
 	private static final String baseUrl = "https://pokeapi.co/api/v2";
+	private static final int PokemonCount = 898;
 
 	public static JsonObject getPokemon(String name) throws IOException {
 		String url = baseUrl + "/pokemon/" + name + "/";
@@ -34,6 +35,18 @@ public class PokeAPI {
 		return getJsonObject(url);
 	}
 
+	public static int getPokemonCount() {
+		return PokemonCount;
+	}
+
+	public static PokemonSpecies[] getRandomTeam() throws IOException {
+		PokemonSpecies[] team = new PokemonSpecies[6];
+
+		// TODO Create 6 threads that fetch pokemons
+
+		return null;
+	}
+
 	private static JsonObject getJsonObject(String urlQueryString) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestProperty("User-Agent",
@@ -44,4 +57,24 @@ public class PokeAPI {
 		connection.disconnect();
 		return JsonParser.parseString(s).getAsJsonObject();
 	}
+}
+
+class PokemonFetcher implements Runnable {
+
+	int id;
+	PokemonSpecies pokemon;
+
+	public PokemonFetcher(int id) {
+		this.id = id;
+	}
+
+	@Override
+	public void run() {
+		try {
+			this.pokemon = new PokemonSpecies(PokeAPI.getPokemonSpecies(id));
+		} catch (IOException ex) {
+			ex.printStackTrace();
+		}
+	}
+
 }

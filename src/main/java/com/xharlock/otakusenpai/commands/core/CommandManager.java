@@ -46,6 +46,7 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new JoinCmd("join"));
 		addCommand(new LeaveCmd("leave"));
 //		addCommand(new LoopCmd("loop"));
+		addCommand(new LyricsCmd("lyrics"));
 		addCommand(new NowCmd("now"));
 //		addCommand(new PauseCmd("pause"));
 		addCommand(new PlayCmd("play"));

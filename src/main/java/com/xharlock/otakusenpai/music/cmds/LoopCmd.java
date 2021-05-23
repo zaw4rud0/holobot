@@ -12,7 +12,6 @@ public class LoopCmd extends MusicCommand {
 		super(name);
 		setDescription("Use this command to loop the current track");
 		setUsage(name);
-		setIsGuildOnlyCommand(true);
 	}
 
 	@Override
@@ -20,8 +19,6 @@ public class LoopCmd extends MusicCommand {
         GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
         boolean repeating = !musicManager.scheduler.looping;
         musicManager.scheduler.looping = repeating;
-        addSuccessReaction(e.getMessage());
         e.getChannel().sendMessageFormat("Loop %s", repeating ? "enabled" : "disabled").queue();
 	}
-
 }

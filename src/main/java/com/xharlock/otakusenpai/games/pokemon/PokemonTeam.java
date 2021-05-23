@@ -17,8 +17,6 @@ import com.xharlock.otakusenpai.utils.ImageDownloader;
 
 public class PokemonTeam {
 
-	private static final int pokemon_count = 898;
-
 	/**
 	 * Method to display six random Pok�mon on an image
 	 * 
@@ -32,7 +30,7 @@ public class PokemonTeam {
 		List<PokemonFetcher> fetchers = new ArrayList<>();
 		
 		for (int i = 0; i < 6; i++) {
-			int id = rand.nextInt(pokemon_count) + 1;			
+			int id = rand.nextInt(PokeAPI.getPokemonCount()) + 1;			
 			PokemonFetcher fetcher = new PokemonFetcher(id);
 			Thread t = new Thread(fetcher);
 			fetchers.add(fetcher);
@@ -82,7 +80,7 @@ public class PokemonTeam {
 
 		g2.setColor(oldColor);
 		temp = BufferedImageOperations.resize(img, 420, 420);
-		g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
+		g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);		
 		drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30), Color.BLACK);
 		g2.dispose();
 		return res;

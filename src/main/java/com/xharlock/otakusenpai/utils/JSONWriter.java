@@ -21,5 +21,4 @@ public class JSONWriter {
 		writer.flush();
 		writer.close();
 	}
-
 }

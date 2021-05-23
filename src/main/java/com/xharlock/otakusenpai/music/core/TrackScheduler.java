@@ -16,11 +16,13 @@ public class TrackScheduler extends AudioEventAdapter {
 	public BlockingQueue<AudioTrack> queue;
 	public final AudioPlayer audioPlayer;
 	public boolean looping;
+	public boolean paused;
 
 	public TrackScheduler(AudioPlayer player) {
 		this.queue = new LinkedBlockingQueue<>();
 		this.audioPlayer = player;
 		this.looping = false;
+		this.paused = false;
 	}
 
 	public void enqueue(AudioTrack track) {

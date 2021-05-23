@@ -41,12 +41,12 @@ public class NowCmd extends MusicCommand {
 				+ Formatter.formatTrackTime(audioPlayer.getPlayingTrack().getDuration()) + "`]";
 		
 		// Get youtube thumbnail
-		String uri = info.uri.split("v=")[1].split("&")[0];		
+		String uri = info.uri.split("v=")[1].split("&")[0];
 		String thumbnail = "https://img.youtube.com/vi/" + uri + "/hqdefault.jpg";
 		
 		builder.setThumbnail(thumbnail);
 		builder.addField("Title", info.title, false);
-		builder.addField("Current Timestamp", timestamp, false);
+		builder.addField("Current Timestamp", timestamp, true);
 		builder.addField("Link", "[Youtube](" + info.uri + ")", false);
 		
 		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
