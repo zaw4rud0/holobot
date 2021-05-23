@@ -162,7 +162,7 @@ class SortedPokemon {
 			}
 
 			img = PokemonTeam.draw(ImageDownloader.downloadBufferedImage(pokemon.artwork), type1.getColor(),
-					type2.getColor(), "#" + pokemon.pokedexId + " " + pokemon.name);
+					type2.getColor(), "#" + String.format("%03d", pokemon.pokedexId) + " " + pokemon.name);
 
 			ordered.add(img);
 		}
