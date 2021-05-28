@@ -2,6 +2,8 @@ package com.xharlock.otakusenpai.misc;
 
 public enum Emojis {
 
+	// https://www.emojiall.com/en
+	
 	// TODO Each emoji can have multiple different appearances such as 👍
 	
 	THUMBSUP("U+1F44D", ":thumbsup:", "👍"),
@@ -35,18 +37,18 @@ public enum Emojis {
 	RADIO("U+1F4FB", ":radio:", ""),
 	
 	// Numbers
-	ZERO("0️⃣", ":zero:", "0️⃣"),
-	ONE("1⃣", ":one:", "1️⃣"),
-	TWO("2⃣", ":two:", "2️⃣"),
-	THREE("3⃣", ":three:", "3️⃣"),
-	FOUR("4⃣", ":four:", ""),
-	FIVE("5⃣", ":five:", ""),
-	SIX("6⃣", ":six:", ""),
-	SEVEN("7⃣", ":seven:", ""),
-	EIGHT("8⃣", ":eight:", ""),
-	NINE("9⃣", ":nine:", ""),
-	TEN("🔟", ":keycap_ten:", ""),
-	HUNDRED("💯", ":100:", ""),
+	ZERO("U+0030", ":zero:", "0️⃣"),
+	ONE("U+0031", ":one:", "1️⃣"),
+	TWO("U+0032", ":two:", "2️⃣"),
+	THREE("U+0033", ":three:", "3️⃣"),
+	FOUR("U+0034", ":four:", "4️⃣"),
+	FIVE("U+0035", ":five:", "5️⃣"),
+	SIX("U+0036", ":six:", "6️⃣"),
+	SEVEN("U+0037", ":seven:", "7️⃣"),
+	EIGHT("U+0038", ":eight:", "8️⃣"),
+	NINE("U+0039", ":nine:", "9️⃣"),
+	TEN("U+1F51F", ":keycap_ten:", "🔟"),
+	HUNDRED("U+1F4AF", ":100:", "💯"),
 	
 	// Signs and warnings
 	WARNING("U+26A0", ":warning", "⚠️"),
