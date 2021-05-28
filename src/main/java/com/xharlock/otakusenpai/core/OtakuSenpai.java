@@ -45,11 +45,14 @@ public class OtakuSenpai {
 
 		Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
 
+		//###############################
+		// TODO Rework
 		try {
 			place = new Place();
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
+		//###############################
 
 		try {
 			JDABuilder builder = JDABuilder.createDefault(getConfig().getDiscordToken());

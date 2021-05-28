@@ -8,8 +8,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.core.Bootstrap;
-import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
@@ -22,8 +20,8 @@ public class WhoisCmd extends Command {
 	public WhoisCmd(String name) {
 		super(name);
 		setDescription("Use this command to get more informations about a given user or bot");
-		setUsage(name + " [user or bot]");
-		setExample(name + " " + Bootstrap.otakuSenpai.getJDA().getSelfUser().getAsMention());
+		setUsage(name + " [user id]");
+		setExample(name + " @Holo");
 		setAliases(List.of("stalk"));
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GENERAL);
@@ -32,22 +30,22 @@ public class WhoisCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
+
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length > 1) {
-			builder.setTitle(Messages.TITLE_INCORRECT_USAGE.getText());
-			builder.setDescription("Please only provide one argument");
+			builder.setTitle("Incorrect Usage");
+			builder.setDescription("Please only provide at most one argument");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
 		User user = e.getAuthor();
-
 		try {
-			user = e.getGuild().getMemberById(args[0].replace("<@!", "").replace(">", "")).getUser();
+			user = e.getJDA().getUserById(Long.parseLong(args[0].replace("<@!", "").replace(">", "")));
 		} catch (Exception ex) {
 		}
-
 		Member member = e.getGuild().retrieveMember(user).complete();
 
 		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
@@ -65,7 +63,7 @@ public class WhoisCmd extends Command {
 			builder.addField("Highest Role", "@everyone", true);
 			builder.addField("Hoisted Role", "`Unhoisted`", true);
 			builder.addField("Roles", "@everyone", false);
-		} 
+		}
 		// Member has roles
 		else {
 			Role highest = roles.get(0);
@@ -84,7 +82,7 @@ public class WhoisCmd extends Command {
 			}
 
 			builder.addField("Highest Role", highest.getAsMention(), true);
-			
+
 			if (hoisted == null)
 				builder.addField("Hoisted Role", "`Unhoisted`", true);
 			else
@@ -93,7 +91,6 @@ public class WhoisCmd extends Command {
 			String rolesString = roles.get(0).getAsMention();
 
 			int counter = 1;
-
 			for (int i = 1; i < roles.size(); ++i) {
 				if (counter == 10) {
 					rolesString = rolesString + ", `and " + (roles.size() - counter) + " more...`";
@@ -102,20 +99,14 @@ public class WhoisCmd extends Command {
 				rolesString = rolesString + ", " + roles.get(i).getAsMention();
 				counter++;
 			}
-
 			builder.addField("Roles", rolesString, false);
-
 		}
 
 		d = user.getTimeCreated();
 		s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
-		
 		String type = user.isBot() ? "Bot" : "User";
-		
-		builder.addField("Additional Checks", "Account Type: `" + type + "`\n"
-				+ "Creation Date: `" + s + "`", false);
 
-		this.sendEmbed(e, builder, true);
+		builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
 	}
-
 }

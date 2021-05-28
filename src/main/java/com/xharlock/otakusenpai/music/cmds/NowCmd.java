@@ -23,11 +23,13 @@ public class NowCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 		
+		e.getChannel().sendTyping().queue();
+		
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 		AudioPlayer audioPlayer = musicManager.audioPlayer;
 		
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle(Emojis.SPEAKER.getAsText() + " Track Information");
+		builder.setTitle(Emojis.SPEAKER.getAsNormal() + " Track Information");
 		
 		if (audioPlayer.getPlayingTrack() == null) {
 			builder.setDescription("I'm not playing any tracks right now");

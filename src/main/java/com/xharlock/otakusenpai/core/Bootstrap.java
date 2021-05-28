@@ -14,10 +14,9 @@ public class Bootstrap {
 	public static long startup_time;
 	
 	public static void main(String[] args) {
-		startup_time = System.currentTimeMillis();		
-		long before = System.currentTimeMillis();
+		startup_time = System.currentTimeMillis();
 		init();
-		long totalTime = System.currentTimeMillis() - before;		
+		long totalTime = System.currentTimeMillis() - startup_time;
 		System.out.println(String.format("It took %s %d ms to load!", otakuSenpai.getJDA().getSelfUser().getAsTag(), totalTime));
 	}
 

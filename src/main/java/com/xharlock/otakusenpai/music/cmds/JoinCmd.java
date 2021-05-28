@@ -21,6 +21,9 @@ public class JoinCmd extends MusicCommand {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
+		
+		e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 		AudioManager audioManager = e.getGuild().getAudioManager();
 
@@ -37,7 +40,7 @@ public class JoinCmd extends MusicCommand {
 
 		audioManager.openAudioConnection(e.getMember().getVoiceState().getChannel());
 
-		builder.setTitle("Connected " + Emojis.NOTE.getAsText());
+		builder.setTitle("Connected " + Emojis.NOTE.getAsNormal());
 		builder.setDescription("Join me in " + e.getMember().getVoiceState().getChannel().getAsMention());		
 		sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);
 	}

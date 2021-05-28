@@ -13,6 +13,7 @@ import com.xharlock.otakusenpai.commands.core.CommandCategory;
 import com.xharlock.otakusenpai.core.Bootstrap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Message.Attachment;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -22,16 +23,23 @@ public class CheckNSFWCmd extends Command {
 		super(name);
 		setDescription(
 				"Use this command to evaluate the likelyhood of an image being NSFW. You may add the image as an attachment so no link is needed. Replying to a message containing a picture also works.");
+		setUsage(name + " [image link]");
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.IMAGE);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
+		
+		// In dire need of a cleanup :hyperkekw:		
+		
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();
 
-		e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
 
-		String oldUrl = "";
+		String oldUrl = null;
+		Message referenced = null;
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length == 0) {
@@ -39,13 +47,42 @@ public class CheckNSFWCmd extends Command {
 			// If message is replying to another message
 			if (e.getMessage().getReferencedMessage() != null) {
 
-				// Message is embed, get image url
-				if (!e.getMessage().getReferencedMessage().getEmbeds().isEmpty()) {
-					oldUrl = e.getMessage().getReferencedMessage().getEmbeds().get(0).getImage().getUrl();
+				referenced = e.getMessage().getReferencedMessage();
+				
+				// Message is embed, get image url from it
+				if (!referenced.getEmbeds().isEmpty()) {
+					
+					if (referenced.getEmbeds().get(0).getImage() != null)
+						oldUrl = referenced.getEmbeds().get(0).getImage().getUrl();
 				}
 
+				// No embed, try to get image
 				else {
+					if (!e.getMessage().getReferencedMessage().getAttachments().isEmpty()) {
 
+						Attachment attachment = e.getMessage().getReferencedMessage().getAttachments().get(0);
+
+						if (attachment.getFileExtension().equals("png") || attachment.getFileExtension().equals("jpg")
+								|| attachment.getFileExtension().equals("gif")
+								|| attachment.getFileExtension().equals("jpeg"))
+							oldUrl = e.getMessage().getReferencedMessage().getAttachments().get(0).getUrl();
+
+						else {
+							builder.setTitle("Invalid Attachment");
+							builder.setDescription("I only support images of the format `png`, `jpg`, `gif` or `jpeg`");
+							sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+							return;
+						}
+					}
+
+					else {
+						for (String s : args) {
+							if (isValidURL(s)) {
+								oldUrl = s;
+								break;
+							}
+						}
+					}
 				}
 			}
 
@@ -79,6 +116,14 @@ public class CheckNSFWCmd extends Command {
 			oldUrl = args[0].replace("<", "").replace(">", "");
 		}
 
+		if (oldUrl == null) {
+			builder.setTitle("Incorrect Usage");
+			builder.setDescription("Use `" + this.getGuildPrefix(e.getGuild())
+					+ "help check` to see the correct usage of this command");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			return;
+		}
+
 		double score = 0.0;
 
 		try {
@@ -94,7 +139,11 @@ public class CheckNSFWCmd extends Command {
 
 		builder.setTitle("NSFW Check");
 		builder.setDescription("Your image is " + scoreString + " likely to contain NSFW elements");
-		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+		
+		if (referenced != null)
+			sendReplyEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+		else
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 	}
 
 	private static final String url = "https://api.deepai.org/api/nsfw-detector";

@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.misc.Messages;
 import com.xharlock.otakusenpai.utils.HttpResponse;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,7 +24,10 @@ public class InspiroCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {		
 		if (e.isFromGuild())
-			e.getMessage().delete().queue();		
+			e.getMessage().delete().queue();
+		
+		e.getChannel().sendTyping().queue();
+		
         EmbedBuilder builder = new EmbedBuilder();
         
         String url = "";
@@ -34,7 +36,7 @@ public class InspiroCmd extends Command {
             url = HttpResponse.readLine(baseUrl);
         }
         catch (IOException ex) {
-        	builder.setTitle(Messages.TITLE_ERROR.getText());
+        	builder.setTitle("Error");
         	builder.setDescription("Something went wrong! Please try again in a few minutes.");
         	sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
         	return;

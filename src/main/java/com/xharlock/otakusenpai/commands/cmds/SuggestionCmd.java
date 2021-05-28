@@ -1,6 +1,7 @@
 package com.xharlock.otakusenpai.commands.cmds;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import org.json.simple.JSONArray;
@@ -9,7 +10,6 @@ import org.json.simple.parser.ParseException;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.misc.Messages;
 import com.xharlock.otakusenpai.utils.JSONReader;
 import com.xharlock.otakusenpai.utils.JSONWriter;
 
@@ -23,8 +23,9 @@ public class SuggestionCmd extends Command {
 	public SuggestionCmd(String name) {
 		super(name);
 		setDescription("Use this command if you want to suggest a feature. Suggestions are always appreciated");
-		setUsage(name + " [text]");
+		setUsage(name + " <text>");
 		setExample(name + " make this bot more awesome :D");
+		setAliases(List.of("suggest"));
 		setCommandCategory(CommandCategory.GENERAL);
 	}
 
@@ -34,12 +35,14 @@ public class SuggestionCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
+		e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (this.getArgs().length == 0) {
-			builder.setTitle(Messages.TITLE_INCORRECT_USAGE.getText());
+			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a description of your suggestion");
-			sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
@@ -71,14 +74,15 @@ public class SuggestionCmd extends Command {
 			array.add(obj);
 			JSONWriter.writeJSONArray(array, filepath);
 		} catch (IOException | ParseException e1) {
-			builder.setTitle(Messages.TITLE_ERROR.getText());
+			builder.setTitle("Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 		
 		builder.setTitle("Message Sent");
 		builder.setDescription("Thank you for your suggestion!");
-		this.sendEmbed(e, builder, 1L, TimeUnit.MINUTES, false);
+		this.sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 	}
 
 }

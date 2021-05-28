@@ -23,6 +23,8 @@ public class ServerRoles extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
+		
 		List<Role> roles = e.getGuild().getRoles();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Roles of " + e.getGuild().getName());

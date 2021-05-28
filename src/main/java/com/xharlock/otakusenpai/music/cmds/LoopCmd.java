@@ -15,10 +15,14 @@ public class LoopCmd extends MusicCommand {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {        
-        GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
-        boolean repeating = !musicManager.scheduler.looping;
-        musicManager.scheduler.looping = repeating;
-        e.getChannel().sendMessageFormat("Loop %s", repeating ? "enabled" : "disabled").queue();
+	public void onCommand(MessageReceivedEvent e) {
+		e.getMessage().delete().queue();
+		
+		e.getChannel().sendTyping().queue();
+		
+		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
+		boolean repeating = !musicManager.scheduler.looping;
+		musicManager.scheduler.looping = repeating;
+		e.getChannel().sendMessageFormat("Loop %s", repeating ? "enabled" : "disabled").queue();
 	}
 }

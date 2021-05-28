@@ -13,7 +13,7 @@ import javax.imageio.ImageIO;
 
 public class BufferedImageOperations {
 
-	public static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2, String direction) {
+	public static BufferedImage join(BufferedImage img1, BufferedImage img2, String direction) {
 		BufferedImage result = null;
 
 		if (direction.equals("horizontal")) {
@@ -51,7 +51,7 @@ public class BufferedImageOperations {
 		return result;
 	}
 
-	public static BufferedImage joinBufferedImage(BufferedImage img1, BufferedImage img2, BufferedImage img3, String direction) {
+	public static BufferedImage join(BufferedImage img1, BufferedImage img2, BufferedImage img3, String direction) {
 		BufferedImage result = null;
 
 		if (direction.equals("horizontal")) {
@@ -179,13 +179,13 @@ public class BufferedImageOperations {
 		return res;
 	}
 	
-	public static InputStream convertToInputStream(BufferedImage img) throws IOException {
+	public static InputStream toInputStream(BufferedImage img) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(img, "png", os);
         return new ByteArrayInputStream(os.toByteArray());
     }
     
-    public static int[][] getRGBS(BufferedImage img) {
+    public static int[][] getRGB(BufferedImage img) {
         int[][] rgbs = new int[img.getWidth()][img.getHeight()];
         for (int i = 0; i < img.getHeight(); ++i) {
             for (int j = 0; j < img.getWidth(); ++j) {

@@ -33,6 +33,10 @@ public class CommandListener extends ListenerAdapter {
 	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
+		
+		if (e.getChannel().getIdLong() == 845811337703325697L && !e.getAuthor().isBot()) {			
+			//e.getMessage().addReaction(Emojis.THUMBSUP.getAsBrowser()).queue();
+		}
 
 		if (!e.getAuthor().equals(e.getJDA().getSelfUser())) {
 			ChatClient.doStuff(e);

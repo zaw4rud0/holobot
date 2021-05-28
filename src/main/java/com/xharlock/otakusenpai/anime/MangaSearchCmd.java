@@ -18,9 +18,10 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 public class MangaSearchCmd extends Command {
 
 	private EventWaiter waiter;
-	private List<String> numbers = Arrays.asList(Emojis.ONE.getAsText(), Emojis.TWO.getAsText(),
-			Emojis.THREE.getAsText(), Emojis.FOUR.getAsText(), Emojis.FIVE.getAsText(), Emojis.SIX.getAsText(),
-			Emojis.SEVEN.getAsText(), Emojis.EIGHT.getAsText(), Emojis.NINE.getAsText(), Emojis.TEN.getAsText());
+	private List<String> numbers = Arrays.asList(Emojis.ONE.getAsNormal(), Emojis.TWO.getAsNormal(),
+			Emojis.THREE.getAsNormal(), Emojis.FOUR.getAsNormal(), Emojis.FIVE.getAsNormal(), Emojis.SIX.getAsNormal(),
+			Emojis.SEVEN.getAsNormal(), Emojis.EIGHT.getAsNormal(), Emojis.NINE.getAsNormal(),
+			Emojis.TEN.getAsNormal());
 	private int id = -1;
 
 	public MangaSearchCmd(String name, EventWaiter waiter) {
@@ -35,17 +36,14 @@ public class MangaSearchCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-
 		EmbedBuilder builder = new EmbedBuilder();
+		e.getChannel().sendTyping().queue();
 
 		if (args.length == 0) {
 			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
 			builder.setDescription("Please provide a name!");
-			if (e.isFromGuild())
-				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			else
-				sendEmbed(e, builder, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
@@ -60,10 +58,7 @@ public class MangaSearchCmd extends Command {
 			builder.setTitle("Error");
 			builder.setDescription(
 					"Something went wrong while fetching data from the API. Please try again in a few minutes!");
-			if (e.isFromGuild())
-				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			else
-				sendEmbed(e, builder, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
@@ -116,7 +111,8 @@ public class MangaSearchCmd extends Command {
 
 			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
 				if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
-					
+
+					// So reactions on other messages are ignored
 					if (evt.getMessageIdLong() != msg.getIdLong()) {
 						return false;
 					}
@@ -217,5 +213,4 @@ public class MangaSearchCmd extends Command {
 		builder.addField("Link", "[MyAnimeList](" + manga.url + ")", false);
 		sendEmbed(e, builder, true);
 	}
-
 }

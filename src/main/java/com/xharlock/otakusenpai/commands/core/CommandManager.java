@@ -8,6 +8,7 @@ import java.util.List;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.otakusenpai.anime.AnimeSearchCmd;
 import com.xharlock.otakusenpai.anime.MangaSearchCmd;
+import com.xharlock.otakusenpai.anime.ReadCmd;
 import com.xharlock.otakusenpai.commands.cmds.*;
 import com.xharlock.otakusenpai.commands.owner.*;
 import com.xharlock.otakusenpai.games.AkinatorCmd;
@@ -35,7 +36,12 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new ServerRoles("serverroles"));
 		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new WhoisCmd("whois"));
-
+		
+		
+		// Experimental Commands
+		addCommand(new ReadCmd("read"));
+		addCommand(new PokemonCmd("pokemon"));
+		
 		// Anime Cmds
 		addCommand(new AnimeSearchCmd("animesearch", waiter));
 		addCommand(new MangaSearchCmd("mangasearch", waiter));
@@ -69,7 +75,7 @@ public class CommandManager extends ListenerAdapter {
 		// Game Cmds
 		addCommand(new AkinatorCmd("akinator", waiter));
 		addCommand(new PokedexCmd("pokedex"));
-		addCommand(new PokemonTeamCmd("pokemonteam"));
+		addCommand(new PokemonTeamCmdOld("pokemonteam"));
 		addCommand(new RandomPokemonCmd("randompokemon"));
 
 		// Place Cmds

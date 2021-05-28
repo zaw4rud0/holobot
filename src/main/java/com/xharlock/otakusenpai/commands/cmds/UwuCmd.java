@@ -21,6 +21,8 @@ public class UwuCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
+		e.getChannel().sendTyping().queue();
+		
 		if (e.getMessage().getReferencedMessage() != null)
 			e.getChannel().sendMessage(uwuify(e.getMessage().getReferencedMessage().getContentRaw().split(" "))).queue();
 		else

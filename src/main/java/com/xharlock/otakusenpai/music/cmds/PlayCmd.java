@@ -2,8 +2,6 @@ package com.xharlock.otakusenpai.music.cmds;
 
 import java.util.concurrent.TimeUnit;
 
-import com.xharlock.otakusenpai.core.Bootstrap;
-import com.xharlock.otakusenpai.misc.Messages;
 import com.xharlock.otakusenpai.music.core.MusicCommand;
 import com.xharlock.otakusenpai.music.core.PlayerManager;
 
@@ -20,12 +18,10 @@ public class PlayCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
-		e.getMessage().delete().queue();
+		e.getMessage().delete().queue();		
+		e.getChannel().sendTyping().queue();
 		
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
-		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		
 		if (!isUserInSameChannel(e)) {
 			builder.setTitle("Not in same voice channel!");
@@ -43,7 +39,7 @@ public class PlayCmd extends MusicCommand {
         
         String link = args[0].replace("<", "").replace(">", "");
         
-        if (!isValidUrl(link)) {
+        if (!isValidURL(link)) {
             builder.setTitle("Invalid Link");
         	builder.setDescription("Please provide a valid youtube link!");
         	sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -52,5 +48,4 @@ public class PlayCmd extends MusicCommand {
         
         PlayerManager.getInstance().loadAndPlay(e, builder, link);
 	}
-
 }

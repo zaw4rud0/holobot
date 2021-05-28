@@ -1,8 +1,7 @@
 package com.xharlock.otakusenpai.anime;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonArray;
@@ -18,9 +17,10 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 public class AnimeSearchCmd extends Command {
 
 	private EventWaiter waiter;
-	private List<String> numbers = Arrays.asList(Emojis.ONE.getAsText(), Emojis.TWO.getAsText(),
-			Emojis.THREE.getAsText(), Emojis.FOUR.getAsText(), Emojis.FIVE.getAsText(), Emojis.SIX.getAsText(),
-			Emojis.SEVEN.getAsText(), Emojis.EIGHT.getAsText(), Emojis.NINE.getAsText(), Emojis.TEN.getAsText());
+	private List<String> numbers = Arrays.asList(Emojis.ONE.getAsNormal(), Emojis.TWO.getAsNormal(),
+			Emojis.THREE.getAsNormal(), Emojis.FOUR.getAsNormal(), Emojis.FIVE.getAsNormal(), Emojis.SIX.getAsNormal(),
+			Emojis.SEVEN.getAsNormal(), Emojis.EIGHT.getAsNormal(), Emojis.NINE.getAsNormal(),
+			Emojis.TEN.getAsNormal());
 	private int id = -1;
 
 	public AnimeSearchCmd(String name, EventWaiter waiter) {
@@ -35,17 +35,17 @@ public class AnimeSearchCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
-
+		
 		if (args.length == 0) {
 			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
-			builder.setDescription("Please provide a name!");
-			if (e.isFromGuild())
-				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			else
-				sendEmbed(e, builder, false);
+			builder.setDescription("Please provide an anime name!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
@@ -58,17 +58,10 @@ public class AnimeSearchCmd extends Command {
 			ex.printStackTrace();
 			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
-			builder.setDescription(
-					"Something went wrong while fetching data from the API. Please try again in a few minutes!");
-			if (e.isFromGuild())
-				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			else
-				sendEmbed(e, builder, false);
+			builder.setDescription("Something went wrong while fetching data from the API. Please try again in a few minutes!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
 
 		StringBuilder sb = new StringBuilder();
 
@@ -117,10 +110,11 @@ public class AnimeSearchCmd extends Command {
 			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
 				if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
 
+					// So reactions on other messages will be ignored
 					if (evt.getMessageIdLong() != msg.getIdLong()) {
 						return false;
 					}
-					
+
 					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.ONE.getAsReaction())) {
 						this.id = array.get(0).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
@@ -217,5 +211,4 @@ public class AnimeSearchCmd extends Command {
 		builder.addField("Link", "[MyAnimeList](" + anime.url + ")", false);
 		sendEmbed(e, builder, true);
 	}
-
 }

@@ -24,11 +24,11 @@ public class HelpCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		
+	public void onCommand(MessageReceivedEvent e) {		
         EmbedBuilder builder = new EmbedBuilder();
+        e.getChannel().sendTyping().queue();
         
-        // Given command doesn't exist
+        // Given command doesn't exist or <help was called
         if (args.length == 1 && !this.manager.isValidName(args[0])) {
             addErrorReaction(e.getMessage());
             builder.setTitle("Command not found");
@@ -45,7 +45,9 @@ public class HelpCmd extends Command {
             builder.setTitle("Command Help");
             builder.addField("Name", cmd.getName(), false);
             builder.addField("Description", cmd.getDescription(), false);
-            builder.addField("Usage", "`" + getGuildPrefix(e.getGuild()) + cmd.getUsage() + "`", false);
+            
+            if (cmd.getUsage() != null)
+            	builder.addField("Usage", "`" + getGuildPrefix(e.getGuild()) + cmd.getUsage() + "`", false);
             
             if (cmd.getExample() != null)
                 builder.addField("Example", "`" + getGuildPrefix(e.getGuild()) + cmd.getExample() + "`", false);
@@ -64,6 +66,8 @@ public class HelpCmd extends Command {
             builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl());
             builder.setDescription("I currently use `" + this.getGuildPrefix(e.getGuild()) + "` as prefix for all commands\n" + "For more information on each command, use `" + this.getGuildPrefix(e.getGuild()) + "help [command]`");
             
+            
+            // TODO Rework so it hides owner and admin commands from normal users
             for (int length = CommandCategory.values().length, k = 0; k < length; ++k) {
                 CommandCategory category = CommandCategory.values()[k];
                 

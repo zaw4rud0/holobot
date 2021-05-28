@@ -9,7 +9,6 @@ import org.json.simple.parser.ParseException;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.misc.Messages;
 import com.xharlock.otakusenpai.utils.JSONReader;
 import com.xharlock.otakusenpai.utils.JSONWriter;
 
@@ -23,7 +22,7 @@ public class BugCmd extends Command {
 	public BugCmd(String name) {
 		super(name);
 		setDescription("Use this command to report a bug. Please provide a description of the bug and how it happened");
-		setUsage(name + " [text]");
+		setUsage(name + " <text>");
 		setExample(name + " something went wrong");
 		setCommandCategory(CommandCategory.GENERAL);
 	}
@@ -34,12 +33,14 @@ public class BugCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
+		e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (this.getArgs().length == 0) {
-			builder.setTitle(Messages.TITLE_INCORRECT_USAGE.getText());
+			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a description of the bug");
-			sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
@@ -72,14 +73,15 @@ public class BugCmd extends Command {
 			JSONArray array = JSONReader.readJSONArray(filepath);
 			array.add(obj);
 			JSONWriter.writeJSONArray(array, filepath);
-		} catch (IOException | ParseException e1) {
-			builder.setTitle(Messages.TITLE_ERROR.getText());
+		} catch (IOException | ParseException ex) {
+			builder.setTitle("Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 
 		builder.setTitle("Message Sent");
 		builder.setDescription("Thank you for reporting the bug!");
-		this.sendEmbed(e, builder, 1L, TimeUnit.MINUTES, false);
+		sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 	}
 }

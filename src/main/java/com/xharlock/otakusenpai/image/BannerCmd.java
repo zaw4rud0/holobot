@@ -12,8 +12,7 @@ public class BannerCmd extends Command {
 
 	public BannerCmd(String name) {
 		super(name);
-		setDescription(
-				"Use this command to get the current banner of this guild. A guild needs to be boosted to Level 2 in order to have a banner set.");
+		setDescription("Use this command to get the current banner of this guild. A guild needs to be boosted to Level 2 in order to have a banner set.");
 		setUsage(name);
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.IMAGE);
@@ -21,9 +20,10 @@ public class BannerCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		EmbedBuilder builder = new EmbedBuilder();
-		
 		e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
+
+		EmbedBuilder builder = new EmbedBuilder();		
 		
 		if (e.getGuild().getBannerUrl() == null) {
 			builder.setTitle("No Banner Found!");
@@ -35,5 +35,4 @@ public class BannerCmd extends Command {
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 		}
 	}
-
 }

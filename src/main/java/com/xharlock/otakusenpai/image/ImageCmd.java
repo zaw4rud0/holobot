@@ -32,8 +32,11 @@ public class ImageCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-
-		e.getMessage().delete().queue();
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();
+		
+		e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length == 0 || args[0].toLowerCase().equals("list")) {
@@ -46,7 +49,7 @@ public class ImageCmd extends Command {
 
 		if (!categories.contains(args[0].toLowerCase())) {
 			builder.setTitle("Tag not found");
-			builder.setDescription("Use `" + getGuildPrefix(e.getGuild()) + "image <tag>` to see all available tags");
+			builder.setDescription("Use `" + getGuildPrefix(e.getGuild()) + "image` to see all available tags");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
 		}
@@ -64,7 +67,7 @@ public class ImageCmd extends Command {
 		}
 		case "tanjiro": {
 			url = getImage("kamado_tanjirou");
-			name = "Tanjiro Kamado (Demon Slayer)";
+			name = "Tanjiro Kamado";
 			break;
 		}
 		case "catboy": {
@@ -84,12 +87,12 @@ public class ImageCmd extends Command {
 		}
 		case "kaguya": {
 			url = getImage("shinomiya_kaguya");
-			name = "Kaguya Shinomiya (Kaguya-sama: Love Is War)";
+			name = "Kaguya Shinomiya";
 			break;
 		}
 		case "kosaki": {
 			url = getImage("onodera_kosaki");
-			name = "Kosaki Onodera (Nisekoi: False Love)";
+			name = "Kosaki Onodera";
 			break;
 		}
 		case "kurisu": {
@@ -109,12 +112,17 @@ public class ImageCmd extends Command {
 		}
 		case "marika": {
 			url = getImage("tachibana_marika");
-			name = "Marika Tachibana (Nisekoi: False Love)";
+			name = "Marika Tachibana";
 			break;
 		}
 		case "mikasa": {
 			url = getImage("mikasa_ackerman");
 			name = "Mikasa Ackerman (Attack on Titan)";
+			break;
+		}
+		case "misaka": {
+			url = getImage("misaka_mikoto");
+			name = "Misaka Mikoto";
 			break;
 		}
 		case "modeus": {
@@ -129,12 +137,12 @@ public class ImageCmd extends Command {
 		}
 		case "nezuko": {
 			url = getImage("kamado_nezuko");
-			name = "Nezuko Kamado (Demon Slayer)";
+			name = "Nezuko Kamado";
 			break;
 		}
 		case "tsugumi": {
 			url = getImage("tsugumi_seishirou");
-			name = "Tsugumi Seishirou (Nisekoi: False Love)";
+			name = "Tsugumi Seishirou";
 			break;
 		}
 		case "cerberus": {
@@ -144,7 +152,7 @@ public class ImageCmd extends Command {
 		}
 		case "yukina": {
 			url = getImage("himeragi_yukina");
-			name = "Yukina Himeragi (Strike The Blood)";
+			name = "Yukina Himeragi";
 			break;
 		}
 		case "kitsune": {
@@ -154,12 +162,12 @@ public class ImageCmd extends Command {
 		}
 		case "zenitsu": {
 			url = getImage("agatsuma_zenitsu");
-			name = "Zenitsu Agatsuma (Demon Slayer)";
+			name = "Zenitsu Agatsuma";
 			break;
 		}
 		case "zerotwo": {
 			url = getImage("zero_two_(darling_in_the_franxx)");
-			name = "Zero Two (Darling In The FranXX)";
+			name = "Zero Two";
 			break;
 		}
 		case "2b": {
@@ -189,7 +197,7 @@ public class ImageCmd extends Command {
 		}
 		case "rei": {
 			url = getImage("ayanami_rei");
-			name = "Rei Ayanami (Neon Genesis Evangelion)";
+			name = "Rei Ayanami";
 			break;
 		}
 		case "rem": {
@@ -199,7 +207,7 @@ public class ImageCmd extends Command {
 		}
 		case "yuu": {
 			url = getImage("ishigami_yuu");
-			name = "Yuu Ishigami (Kaguya-sama: Love Is War)";
+			name = "Yuu Ishigami";
 			break;
 		}
 		case "aqua": {
@@ -239,7 +247,7 @@ public class ImageCmd extends Command {
 		}
 		case "asuka": {
 			url = getImage("souryuu_asuka_langley");
-			name = "Asuka Langley Sohryu (Neon Genesis Evangelion)";
+			name = "Asuka Langley Sohryu";
 			break;
 		}
 		case "asuna": {
@@ -249,7 +257,7 @@ public class ImageCmd extends Command {
 		}
 		case "chika": {
 			url = getImage("fujiwara_chika");
-			name = "Chika Fujiwara (Kaguya-sama: Love Is War)";
+			name = "Chika Fujiwara";
 			break;
 		}
 		case "kanao": {
@@ -264,7 +272,7 @@ public class ImageCmd extends Command {
 		}
 		case "reimi": {
 			url = getImage("sugimoto_reimi");
-			name = "Reimi Sugimoto (JoJo's Bizarre Adventure)";
+			name = "Reimi Sugimoto";
 			break;
 		}
 		case "robin": {
@@ -274,7 +282,7 @@ public class ImageCmd extends Command {
 		}
 		case "senko": {
 			url = getImage("senko_(sewayaki_kitsune_no_senko-san)");
-			name = "Senko (The Helpful Fox Senko-san)";
+			name = "Senko";
 			break;
 		}
 		case "taiga": {
@@ -294,12 +302,12 @@ public class ImageCmd extends Command {
 		}
 		case "hayasaka": {
 			url = getImage("hayasaka_ai");
-			name = "Ai Hayasaka (Kaguya-sama: Love Is War)";
+			name = "Ai Hayasaka";
 			break;
 		}
 		case "chitoge": {
 			url = getImage("kirisaki_chitoge");
-			name = "Chitoge Kirisaki (Nisekoi: False Love)";
+			name = "Chitoge Kirisaki";
 			break;
 		}
 		case "chocola": {
@@ -324,7 +332,7 @@ public class ImageCmd extends Command {
 		}
 		case "darkness": {
 			url = getImage("darkness_(konosuba)");
-			name = "Lalatina \"Darkness\" Dustiness Ford (Konosuba)";
+			name = "Lalatina \"Darkness\" Dustiness";
 			break;
 		}
 		case "inosuke": {
@@ -337,13 +345,17 @@ public class ImageCmd extends Command {
 			name = "Shinobu Kochou (Demon Slayer)";
 			break;
 		}
+		case "tanya": {
+			url = getImage("tanya_degurechaff");
+			name = "Tanya von Degurechaff";
+			break;
+		}
 		default:
 			url = getImage(category);
+			name = Formatter.firstLetterUp(category);
 			break;
 		}
 		
-		name = Formatter.firstLetterUp(category);
-
 		builder.setTitle(name);
 		
 		if (url != null)
@@ -351,7 +363,7 @@ public class ImageCmd extends Command {
 		else
 			builder.setDescription("Something went wrong while retrieving the image! Please try again in a few minutes");
 		
-		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+		sendEmbed(e, builder, true);
 	}
 
 	private void loadCategories() {
@@ -385,6 +397,7 @@ public class ImageCmd extends Command {
 		categories.add("lucy");
 		categories.add("marika");
 		categories.add("mikasa");
+		categories.add("misaka");
 		categories.add("mitsuri");
 		categories.add("modeus");
 		categories.add("myuri");
@@ -403,6 +416,7 @@ public class ImageCmd extends Command {
 		categories.add("senko");
 		categories.add("shinobu");
 		categories.add("tanjiro");
+		categories.add("tanya");
 		categories.add("touka");
 		categories.add("tsugumi");
 		categories.add("vanilla");

@@ -7,7 +7,6 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.core.Bootstrap;
-import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
@@ -63,11 +62,10 @@ public class Permission {
 			if (warned && now - this.lastUserWarning.get(e.getAuthor()) < 10L)
 				return true;			
 			if (now - cmd.onTimeout.get(e.getAuthor()) < cmd.getCmdCooldown()) {
-				builder.setTitle(Messages.TITLE_ON_COOLDOWN.getText());
+				builder.setTitle("On Cooldown!");
 				int remaining = cmd.getCmdCooldown() - (int) (now - cmd.onTimeout.get(e.getAuthor()));
-				builder.setDescription(Messages.CMD_USER_ON_COOLDOWN.getText().replace("{0}", e.getAuthor().getAsMention())
-						.replace("{1}", String.valueOf(remaining)));
-				cmd.sendEmbed(e, builder, 10L, TimeUnit.SECONDS, false);				
+				builder.setDescription(String.format("%s, you are on cooldown!\nPlease wait `%d` seconds before using this command again.", e.getAuthor().getAsMention(), remaining));
+				cmd.sendEmbed(e, builder, 10L, TimeUnit.SECONDS, false);
 				if (warned) this.lastUserWarning.replace(e.getAuthor(), now);
 				else this.lastUserWarning.put(e.getAuthor(), now);				
 				return true;
@@ -89,15 +87,15 @@ public class Permission {
 		EmbedBuilder builder = new EmbedBuilder();
 		if (e.isFromType(ChannelType.PRIVATE) && cmd.isGuildOnlyCommand()) {
 			cmd.addErrorReaction(e.getMessage());
-			builder.setTitle(Messages.TITLE_ERROR.getText());
-			builder.setDescription(Messages.NO_PRIVATE_CHAT_PERM.getText());
+			builder.setTitle("No Permission");
+			builder.setDescription("You are not allowed to use this command in a private chat!");
 			cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
 			return false;
 		}
 		if (e.isFromGuild() && !e.getTextChannel().isNSFW() && cmd.isNSFW()) {
 			cmd.addErrorReaction(e.getMessage());
-			builder.setTitle(Messages.TITLE_CMD_NSFW.getText());
-			builder.setDescription(Messages.NO_NSFW_CHANNEL_PERM.getText());
+			builder.setTitle("NSFW Command");
+			builder.setDescription("You can't use a NSFW command in a non-NSFW channel, p-pervert!");
 			cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
 			return false;
 		}
@@ -110,19 +108,20 @@ public class Permission {
 		// Checks if user is bot-owner and can use owner-only commands
 		if (cmd.isOwnerCommand() && e.getAuthor().getIdLong() != Bootstrap.otakuSenpai.getConfig().getOwnerId()) {
 			cmd.addErrorReaction(e.getMessage());
-			builder.setTitle(Messages.TITLE_NO_PERM.getText());
-			builder.setDescription(Messages.CMD_OWNER_ONLY.getText());
+			builder.setTitle("No Permission");
+			builder.setDescription("This command is owner-only");
 			cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
 			return false;
 		}
 
+		// Checks if user is an admin or server-owner and if he can use admin commands
 		if (e.isFromGuild()) {
 			Role admin = Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getAdminRole();
 			if (admin == null) {
 				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor())) {
 					cmd.addErrorReaction(e.getMessage());
-					builder.setTitle(Messages.TITLE_NO_PERM.getText());
-					builder.setDescription(Messages.CMD_ADMIN_ONLY.getText());
+					builder.setTitle("No Permission");
+					builder.setDescription("This command is admin-only");
 					cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
 					return false;
 				}
@@ -130,8 +129,8 @@ public class Permission {
 				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor())
 						&& !e.getGuild().getMember(e.getAuthor()).getRoles().contains(admin)) {
 					cmd.addErrorReaction(e.getMessage());
-					builder.setTitle(Messages.TITLE_NO_PERM.getText());
-					builder.setDescription(Messages.CMD_ADMIN_ONLY.getText());
+					builder.setTitle("No Permission");
+					builder.setDescription("This command is admin-only");
 					cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
 					return false;
 				}

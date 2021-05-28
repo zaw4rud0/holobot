@@ -17,7 +17,6 @@ import com.xharlock.otakusenpai.commands.core.CommandCategory;
 import com.xharlock.otakusenpai.core.Bootstrap;
 import com.xharlock.otakusenpai.misc.Emojis;
 import com.xharlock.otakusenpai.misc.Emotes;
-import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -44,7 +43,6 @@ public class AkinatorCmd extends Command {
 				+ "Possible answers are 'yes', 'no', 'don't know', 'probably' and 'probably not'."
 				+ "After some questions Akinator will try to guess your character.");
 		setUsage(name);
-		setAliases(List.of());
 		setCmdCooldown(300);
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GAMES);
@@ -59,22 +57,26 @@ public class AkinatorCmd extends Command {
 				new Reaction("5\u20e3", Answer.PROBABLY_NOT) };
 	}
 
+	// TODO Clean up
+	
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
-		
+	public void onCommand(MessageReceivedEvent e) {
+		e.getChannel().sendTyping().queue();
 		EmbedBuilder builder = new EmbedBuilder();
+		
 		builder.setThumbnail(AkinatorSprites.DEFAULT.getUrl());
+		
 		if (busy) {
-			builder.setTitle(Messages.TITLE_BUSY.getText());
+			builder.setTitle("Busy");
 			builder.setDescription("I'm currently busy, please wait until I'm done!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-
+		
 		try {
 			akinator = new AkiwrapperBuilder().build();
 		} catch (ServerNotFoundException ex) {
-			builder.setTitle(Messages.TITLE_ERROR.getText());
+			builder.setTitle("Error");
 			builder.setDescription("Failed to connect. Please try again later!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
@@ -87,14 +89,11 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprites.DEFAULT.getUrl());
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setDescription(
 				"To start the game, please think about a real or fictional character. I will try to guess who it is by asking some questions."
 						+ "\nIf you are ready, please react with " + Emotes.TICK.getAsText() + ", or if you want to cancel the game, react with " + Emotes.CROSS.getAsText() + ".");
-		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
-				e.getAuthor().getEffectiveAvatarUrl());
 
-		Message msg = e.getChannel().sendMessage(builder.build()).complete();
+		Message msg = sendEmbedAndGetMessage(e, builder, true);
 		addStartReactions(msg);
 
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {			
@@ -137,8 +136,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
-		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
-				e.getAuthor().getEffectiveAvatarUrl());
+		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		builder.setThumbnail(AkinatorSprites.START.getUrl());
 		builder.setDescription(
 				"**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
@@ -309,8 +307,7 @@ public class AkinatorCmd extends Command {
 				+ "It took me `" + counter.get() + "` questions to correctly guess " + right.getName());
 		if (right.getImage() != null)
 			builder.setImage(right.getImage().toString());
-		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
-				e.getAuthor().getEffectiveAvatarUrl());
+		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		msg.editMessage(builder.build()).queue();
 		cleanup();
 	}
@@ -323,8 +320,7 @@ public class AkinatorCmd extends Command {
 		builder.setThumbnail(AkinatorSprites.DEFEAT.getUrl());
 		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
-		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
-				e.getAuthor().getEffectiveAvatarUrl());
+		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		msg.editMessage(builder.build()).queue();
 		cleanup();
 	}
@@ -337,8 +333,7 @@ public class AkinatorCmd extends Command {
 		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 		builder.setThumbnail(AkinatorSprites.CANCEL.getUrl());
 		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
-		builder.setFooter(Messages.CMD_INVOKED_BY.getText().replace("{0}", e.getMember().getEffectiveName()),
-				e.getAuthor().getEffectiveAvatarUrl());
+		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		msg.editMessage(builder.build()).queue();
 		msg.delete().queueAfter(15, TimeUnit.SECONDS);
 		cleanup();
@@ -354,7 +349,7 @@ public class AkinatorCmd extends Command {
 	private void error(MessageReceivedEvent e, Message msg) {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle(Messages.TITLE_ERROR.getText());
+		builder.setTitle("Error");
 		builder.setDescription("Something went wrong");
 		sendEmbed(e, builder, 15, TimeUnit.MINUTES, false);
 	}

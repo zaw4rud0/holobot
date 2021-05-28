@@ -25,6 +25,8 @@ public class ServerEmotes extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
+		
 		List<Emote> emotes = e.getGuild().getEmotes();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Emotes of " + e.getGuild().getName());
