@@ -15,6 +15,8 @@ public class RemoveCmd extends MusicCommand {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		
+		e.getChannel().sendTyping().queue();
+		
 		// Check if index is out of bounds
 		
 		

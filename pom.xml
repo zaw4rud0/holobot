@@ -2,10 +2,10 @@
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>OtakuSenpaiBot</groupId>
-	<artifactId>OtakuSenpaiBot</artifactId>
+	<groupId>HoloBot</groupId>
+	<artifactId>HoloBot</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<description>Bot</description>
+	<description>Java Discord Bot</description>
 
 	<properties>
 		<maven.compiler.source>11</maven.compiler.source>
@@ -85,19 +85,16 @@
 			<artifactId>commons-collections4</artifactId>
 			<version>4.4</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpcore</artifactId>
 			<version>4.4.14</version>
 		</dependency>
-
 		<dependency>
 			<groupId>org.apache.httpcomponents</groupId>
 			<artifactId>httpclient</artifactId>
 			<version>4.5.13</version>
 		</dependency>
-
 		<dependency>
 			<groupId>commons-io</groupId>
 			<artifactId>commons-io</artifactId>
@@ -129,6 +126,19 @@
 			<artifactId>JLyrics</artifactId>
 			<version>0.3</version>
 		</dependency>
+
+		<!-- Plugins that extend the number of formats supported by ImageIO -->
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-jpeg</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+		<dependency>
+			<groupId>com.twelvemonkeys.imageio</groupId>
+			<artifactId>imageio-tiff</artifactId>
+			<version>3.7.0</version>
+		</dependency>
+
 	</dependencies>
 
 	<repositories>
@@ -139,7 +149,7 @@
 			<url>https://m2.dv8tion.net/releases</url>
 		</repository>
 
-		<!-- TODO -->
+		<!-- Used by various dependencies -->
 		<repository>
 			<id>jcenter</id>
 			<name>jcenter-bintray</name>

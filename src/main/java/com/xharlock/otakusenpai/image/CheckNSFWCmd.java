@@ -89,7 +89,7 @@ public class CheckNSFWCmd extends Command {
 			else {
 				if (e.getMessage().getAttachments().size() == 0) {
 					builder.setTitle("Incorrect Usage");
-					builder.setDescription("Use `" + this.getGuildPrefix(e.getGuild())
+					builder.setDescription("Use `" + getPrefix(e)
 							+ "help check` to see the correct usage of this command");
 					sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 					return;
@@ -108,7 +108,7 @@ public class CheckNSFWCmd extends Command {
 			if (args.length != 1) {
 				e.getMessage().delete().queue();
 				builder.setTitle("Incorrect Usage");
-				builder.setDescription("Use `" + this.getGuildPrefix(e.getGuild())
+				builder.setDescription("Use `" + getPrefix(e)
 						+ "help check` to see the correct usage of this command");
 				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 				return;
@@ -118,7 +118,7 @@ public class CheckNSFWCmd extends Command {
 
 		if (oldUrl == null) {
 			builder.setTitle("Incorrect Usage");
-			builder.setDescription("Use `" + this.getGuildPrefix(e.getGuild())
+			builder.setDescription("Use `" + getPrefix(e)
 					+ "help check` to see the correct usage of this command");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;

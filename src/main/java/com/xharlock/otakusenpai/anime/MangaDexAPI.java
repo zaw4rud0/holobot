@@ -25,8 +25,7 @@ public class MangaDexAPI {
 
 	// Get chapters of a manga, e.g. Solo Leveling:
 	// https://api.mangadex.org/manga/32d76d19-8a05-4db0-9fc2-e0b0648fe9d0/feed?limit=500
-	private static String chapterFeed = baseUrl
-			+ "manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en";
+	private static String chapterFeed = baseUrl	+ "manga/{id}/feed?limit=500&order[chapter]=asc&translatedLanguage[]=en";
 
 	public static JsonArray search(String terms) throws IOException {
 		String url = baseUrl + "manga?limit=10&title=" + Formatter.escapeCharacters(terms);

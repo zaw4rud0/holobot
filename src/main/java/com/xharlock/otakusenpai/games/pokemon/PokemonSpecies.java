@@ -1,10 +1,7 @@
 package com.xharlock.otakusenpai.games.pokemon;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Random;
+import java.util.*;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -18,10 +15,8 @@ public class PokemonSpecies {
 	public String genus;
 	public String generation;
 	public String pokedexEntry;
-
 	public PokemonType type1;
 	public PokemonType type2;
-
 	public String genderRate;
 	public String height;
 	public String weight;
@@ -35,7 +30,6 @@ public class PokemonSpecies {
 	public boolean isLegendary = false;
 	public boolean isUltraBeast = false;
 	public boolean formsSwitchable = false;
-	public String form;
 	public String forms;
 
 	public PokemonSpecies(JsonObject species) throws IOException {
@@ -62,8 +56,6 @@ public class PokemonSpecies {
 		this.genderRate = this.getGenderRate(species);
 		this.height = pokemon.get("height").getAsDouble() / 10.0 + " m";
 		this.weight = pokemon.get("weight").getAsDouble() / 10.0 + " kg";
-		this.form = this.getCurrentForm(pokemon);
-		this.forms = this.getForms(species, this.form.toLowerCase());
 		this.sprite = this.getSprite(pokemon, "front_default");
 		this.artwork = this.getArtwork(pokemon);
 		this.animated = null;
@@ -77,7 +69,7 @@ public class PokemonSpecies {
 		this.isUltraBeast = this.isUltraBeast();
 	}
 
-	private String getPokedexNumber(JsonObject species) {
+	protected String getPokedexNumber(JsonObject species) {
 		for (int i = 0; i < species.get("pokedex_numbers").getAsJsonArray().size(); i++) {
 			if (species.get("pokedex_numbers").getAsJsonArray().get(i).getAsJsonObject().get("pokedex")
 					.getAsJsonObject().get("name").getAsString().equals("national")) {
@@ -88,7 +80,7 @@ public class PokemonSpecies {
 		return null;
 	}
 
-	private String getName(JsonObject species) {
+	protected String getName(JsonObject species) {
 		String s = "";
 		for (int i = 0; i < species.getAsJsonArray("names").size(); i++) {
 			if (species.getAsJsonArray("names").get(i).getAsJsonObject().getAsJsonObject("language").get("name")
@@ -100,7 +92,7 @@ public class PokemonSpecies {
 		return s;
 	}
 
-	private String getPokedexEntry(JsonObject species) {
+	protected String getPokedexEntry(JsonObject species) {
 		Random rand = new Random();
 		List<String> entries = new ArrayList<String>();
 		JsonArray arr = species.get("flavor_text_entries").getAsJsonArray();
@@ -115,16 +107,16 @@ public class PokemonSpecies {
 		return entries.get(rand.nextInt(entries.size()));
 	}
 
-	private String getSprite(JsonObject pokemon, String spriteName) {
+	protected String getSprite(JsonObject pokemon, String spriteName) {
 		return pokemon.getAsJsonObject("sprites").get(spriteName).getAsString();
 	}
 
-	private String getArtwork(JsonObject pokemon) {
+	protected String getArtwork(JsonObject pokemon) {
 		return pokemon.getAsJsonObject("sprites").getAsJsonObject("other").getAsJsonObject("official-artwork")
 				.get("front_default").getAsString();
 	}
 
-	private String getGenus(JsonObject species) {
+	protected String getGenus(JsonObject species) {
 		String s = "";
 		for (int i = 0; i < species.get("genera").getAsJsonArray().size(); i++) {
 			if (species.get("genera").getAsJsonArray().get(i).getAsJsonObject().get("language").getAsJsonObject()
@@ -135,7 +127,7 @@ public class PokemonSpecies {
 		return s;
 	}
 
-	private String getGenderRate(JsonObject species) {
+	protected String getGenderRate(JsonObject species) {
 		String s = "";
 		if (species.get("gender_rate").getAsInt() == -1) {
 			s = "100% \u26b2";
@@ -146,7 +138,7 @@ public class PokemonSpecies {
 		return s;
 	}
 
-	private void setPokemonTypes(JsonObject pokemon) {
+	protected void setPokemonTypes(JsonObject pokemon) {
 		if (pokemon.get("types").getAsJsonArray().size() == 1) {
 			this.type1 = setPokemonTypesHelper(pokemon.getAsJsonArray("types").get(0).getAsJsonObject()
 					.getAsJsonObject("type").get("name").getAsString());
@@ -158,7 +150,7 @@ public class PokemonSpecies {
 		}
 	}
 
-	private PokemonType setPokemonTypesHelper(String type) {
+	protected PokemonType setPokemonTypesHelper(String type) {
 		switch (type.toLowerCase()) {
 		case ("normal"):
 			return PokemonType.NORMAL;
@@ -201,13 +193,13 @@ public class PokemonSpecies {
 		}
 	}
 
-	private String getCurrentForm(JsonObject pokemon) {
+	protected String getCurrentForm(JsonObject pokemon) {
 		String s = "";
 		s = pokemon.get("name").getAsString();
 		return Formatter.firstLetterUp(s);
 	}
 
-	private String getForms(JsonObject species, String name) {
+	protected String getForms(JsonObject species, String name) {
 		String forms = "";
 		for (int i = 0; i < species.get("varieties").getAsJsonArray().size(); i++) {
 			if (!species.get("varieties").getAsJsonArray().get(i).getAsJsonObject().get("pokemon").getAsJsonObject()
@@ -220,7 +212,7 @@ public class PokemonSpecies {
 		return forms;
 	}
 
-	private String getAbility(JsonObject pokemon) {
+	protected String getAbility(JsonObject pokemon) {
 		String ability = "";
 		for (int i = 0; i < pokemon.get("abilities").getAsJsonArray().size(); i++) {
 			ability = String.valueOf(ability)
@@ -230,7 +222,7 @@ public class PokemonSpecies {
 		return ability;
 	}
 
-	private String getEvolutionChain(JsonObject pokemonEvolution) {
+	protected String getEvolutionChain(JsonObject pokemonEvolution) {
 		String chain = "ERROR";
 		if (pokemonEvolution.getAsJsonObject("chain").getAsJsonArray("evolves_to").size() == 0) {
 			chain = null;
@@ -288,9 +280,9 @@ public class PokemonSpecies {
 		return chain;
 	}
 
-	private boolean isUltraBeast() {
+	protected boolean isUltraBeast() {
 		List<String> ids = new ArrayList<>(
-				Arrays.asList("793", "794", "795", "796", "797", "798", "799", "803", "804", "805", "806"));
+				List.of("793", "794", "795", "796", "797", "798", "799", "803", "804", "805", "806"));
 		return ids.contains(this.pokedexId);
 	}
 }

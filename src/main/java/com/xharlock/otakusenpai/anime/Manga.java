@@ -63,4 +63,8 @@ public class Manga {
 		}
 	}
 
+	// TODO Constructor for an Anime-Planet Manga object
+	public Manga(String title2, String chapters2, String image, String year, String description, String[] tags, String url2) {
+	
+	}
 }

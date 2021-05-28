@@ -2,6 +2,8 @@ package com.xharlock.otakusenpai.core;
 
 import java.io.IOException;
 
+import javax.security.auth.login.LoginException;
+
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
 
@@ -20,14 +22,14 @@ public class Bootstrap {
 		System.out.println(String.format("It took %s %d ms to load!", otakuSenpai.getJDA().getSelfUser().getAsTag(), totalTime));
 	}
 
-	private static void init() {
+	static void init() {
 		EventWaiter waiter = new EventWaiter();		
 		try {
 			Config config = initializeConfig();
 			otakuSenpai = new OtakuSenpai(config, waiter);
-		} catch (IOException | ParseException ex) {
+		} catch (IOException | ParseException | LoginException ex) {
 			ex.printStackTrace();
-		}		
+		}
 	}
 	
 	private static Config initializeConfig() throws IOException, ParseException {
@@ -41,5 +43,4 @@ public class Bootstrap {
 		config.setVersion((String) object.get("version"));
 		return config;
 	}
-	
 }

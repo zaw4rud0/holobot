@@ -40,24 +40,27 @@ public abstract class Command {
 
 	public abstract void onCommand(MessageReceivedEvent e);
 	
-	public void addSuccessReaction(Message msg) {
+	protected void addSuccessReaction(Message msg) {
 		msg.addReaction(Emojis.THUMBSUP.getAsReaction());
 	}
 
-	public void addErrorReaction(Message msg) {
+	protected void addErrorReaction(Message msg) {
 		msg.addReaction(Emojis.THUMBSDOWN.getAsReaction());
 	}
 
-	public void deleteMessage(MessageReceivedEvent e) {
+	protected void deleteMessage(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 	}
 
-	public void deleteMessage(MessageReceivedEvent e, long delay, TimeUnit unit) {
+	protected void deleteMessage(MessageReceivedEvent e, long delay, TimeUnit unit) {
 		e.getMessage().delete().queueAfter(delay, unit);
 	}
 
-	protected String getGuildPrefix(Guild guild) {
-		return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getGuildPrefix();
+	protected String getPrefix(MessageReceivedEvent e) {		
+		if (e.isFromGuild())
+			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
+		else
+			return Bootstrap.otakuSenpai.getConfig().getPrefix();
 	}
 
 	protected int getGuildColor(Guild guild) {

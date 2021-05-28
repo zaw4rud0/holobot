@@ -2,6 +2,7 @@ package com.xharlock.otakusenpai.music.cmds;
 
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jlyrics.Lyrics;
 import com.jagrosh.jlyrics.LyricsClient;
@@ -20,11 +21,15 @@ public class LyricsCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {		
+		e.getMessage().delete().queue();
+		e.getChannel().sendTyping().queue();
+		EmbedBuilder builder = new EmbedBuilder();
+		
 		LyricsClient client = new LyricsClient();
 		Lyrics lyrics = null;
 		
 		// If no arguments given, look up the current song of the music player
-		if (args.length == 0) {
+		if (args.length == 0) {			
 			try {
 				lyrics = client.getLyrics("smooth criminal").get();
 			} catch (InterruptedException | ExecutionException ex) {
@@ -38,12 +43,17 @@ public class LyricsCmd extends MusicCommand {
 			}
 		}
 		
-		String content = lyrics.getContent();
+		if (lyrics == null || lyrics.getContent() == null || lyrics.getContent().equals("")) {
+			builder.setTitle("Error");
+			builder.setDescription("Couldn't find any lyrics for `" + String.join(" ", args) + "`");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
+			return;
+		}
 		
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("Lyrics | " + lyrics.getTitle() + " | " + lyrics.getAuthor().replace("Lyrics", ""));
+		String text = lyrics.getContent();		
+		builder.setTitle("Lyrics | " + lyrics.getTitle() + " by " + lyrics.getAuthor().replace("Lyrics", ""));
 		
-		Scanner scanner = new Scanner(content);
+		Scanner scanner = new Scanner(text);
 		String block = "";
 		
 		while (scanner.hasNextLine()) {
@@ -52,14 +62,15 @@ public class LyricsCmd extends MusicCommand {
 				builder.addField("", block, false);
 				block = "";
 			} else {
+				
+				// Check if it's less than 1024 characters				
 				block += s + "\n";
+				
 			}
 		}
-		builder.addField("", block, false);
 		
-		sendEmbed(e, builder, true);
-		
+		builder.addField("", block, false);		
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);		
 		scanner.close();
 	}
-
 }

@@ -1,20 +1,12 @@
 package com.xharlock.otakusenpai.commands.core;
 
-import java.io.File;
-import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
-import javax.imageio.ImageIO;
-
 import com.xharlock.otakusenpai.core.Bootstrap;
-import com.xharlock.otakusenpai.misc.ChatClient;
-import com.xharlock.otakusenpai.place.Place;
 
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.user.UserTypingEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
 public class CommandListener extends ListenerAdapter {
@@ -24,40 +16,11 @@ public class CommandListener extends ListenerAdapter {
 	public CommandListener(CommandManager commandManager) {
 		this.commandManager = commandManager;
 	}
-
-	@Override
-	public void onUserTyping(UserTypingEvent e) {
-		if (e.getUser().getIdLong() == 0L)
-			e.getChannel().sendTyping().queue();
-	}
 	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
 		
-		if (e.getChannel().getIdLong() == 845811337703325697L && !e.getAuthor().isBot()) {			
-			//e.getMessage().addReaction(Emojis.THUMBSUP.getAsBrowser()).queue();
-		}
-
-		if (!e.getAuthor().equals(e.getJDA().getSelfUser())) {
-			ChatClient.doStuff(e);
-		}
-		
-		// TODO Rework
-		if (e.getMessage().getContentRaw().equals("--getplace")) {
-			try {
-				ImageIO.write(Place.getCanvas(), "png", new File("C:/Users/adria/Desktop/place.png"));
-				System.out.println("Printing place");
-			} catch (IOException e1) {
-				e1.printStackTrace();
-			}
-			return;
-		}
-		
-		// Place stuff
-		if (e.getMessage().getContentRaw().toLowerCase().startsWith(".place")) {
-			Bootstrap.otakuSenpai.getPlace().doStuff(e);
-			return;
-		}
+		// TODO Clean up
 		
 		if (e.isWebhookMessage())
 			return;
@@ -65,13 +28,7 @@ public class CommandListener extends ListenerAdapter {
 		if (e.getAuthor().isBot())
 			return;
 
-		String prefix;
-		
-		if (e.isFromGuild())
-			prefix = getGuildPrefix(e.getGuild());
-		else
-			prefix = Bootstrap.otakuSenpai.getConfig().getPrefix();
-		
+		String prefix = getPrefix(e);
 		if (!e.getMessage().getContentRaw().startsWith(prefix))
 			return;
 
@@ -84,16 +41,20 @@ public class CommandListener extends ListenerAdapter {
 		Command cmd = this.commandManager.getCommand(invoke);
 
 		// Check if user can do anything
-		if (!Bootstrap.otakuSenpai.getPermission().check(e, cmd))
+		if (!Bootstrap.otakuSenpai.getPermissionManager().check(e, cmd))
 			return;
 
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
-		System.out.println(String.valueOf(LocalDateTime.now().toString()) + " : " + e.getAuthor() + " has called "
-				+ cmd.getName());
 		cmd.onCommand(e);
+		
+		// TODO Replace with proper logger
+		System.out.println(String.valueOf(LocalDateTime.now().toString()) + " : " + e.getAuthor() + " has called " + cmd.getName());	
 	}
 
-	private String getGuildPrefix(Guild guild) {
-		return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getGuildPrefix();
+	private String getPrefix(MessageReceivedEvent e) {
+		if (e.isFromGuild())
+			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
+		else
+			return Bootstrap.otakuSenpai.getConfig().getPrefix();
 	}
 }

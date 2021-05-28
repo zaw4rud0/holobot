@@ -64,4 +64,8 @@ public class Anime {
 		}
 	}
 
+	// TODO Constructor for an Anime-Planet Anime object
+	public Anime(String title2, String alternativeTitle, String image, String episodes2, String year, AnimeSeason season2, String description, String[] tags, String studio, String url2) {
+		
+	}
 }

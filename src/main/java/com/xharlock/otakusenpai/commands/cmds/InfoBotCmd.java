@@ -57,7 +57,7 @@ public class InfoBotCmd extends Command {
 		String prefix = "";
 		
 		if (e.isFromGuild())
-			prefix = getGuildPrefix(e.getGuild());
+			prefix = getPrefix(e);
 		else
 			prefix = Bootstrap.otakuSenpai.getConfig().getPrefix();
 

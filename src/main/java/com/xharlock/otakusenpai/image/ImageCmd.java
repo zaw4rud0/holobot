@@ -42,14 +42,14 @@ public class ImageCmd extends Command {
 		if (args.length == 0 || args[0].toLowerCase().equals("list")) {
 			builder.setTitle("Image Tags");
 			builder.setDescription(getCategoriesString());
-			builder.addField("Usage", "`" + getGuildPrefix(e.getGuild()) + "image <tag>`", false);
+			builder.addField("Usage", "`" + getPrefix(e) + "image <tag>`", false);
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 			return;
 		}
 
 		if (!categories.contains(args[0].toLowerCase())) {
 			builder.setTitle("Tag not found");
-			builder.setDescription("Use `" + getGuildPrefix(e.getGuild()) + "image` to see all available tags");
+			builder.setDescription("Use `" + getPrefix(e) + "image` to see all available tags");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
 		}

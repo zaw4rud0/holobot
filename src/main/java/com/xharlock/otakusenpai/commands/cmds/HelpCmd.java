@@ -24,11 +24,12 @@ public class HelpCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
+	public void onCommand(MessageReceivedEvent e) {
+		e.getChannel().sendTyping().queue();
+		
         EmbedBuilder builder = new EmbedBuilder();
-        e.getChannel().sendTyping().queue();
         
-        // Given command doesn't exist or <help was called
+        // Given command doesn't exist
         if (args.length == 1 && !this.manager.isValidName(args[0])) {
             addErrorReaction(e.getMessage());
             builder.setTitle("Command not found");
@@ -47,10 +48,10 @@ public class HelpCmd extends Command {
             builder.addField("Description", cmd.getDescription(), false);
             
             if (cmd.getUsage() != null)
-            	builder.addField("Usage", "`" + getGuildPrefix(e.getGuild()) + cmd.getUsage() + "`", false);
+            	builder.addField("Usage", "`" + getPrefix(e) + cmd.getUsage() + "`", false);
             
             if (cmd.getExample() != null)
-                builder.addField("Example", "`" + getGuildPrefix(e.getGuild()) + cmd.getExample() + "`", false);
+                builder.addField("Example", "`" + getPrefix(e) + cmd.getExample() + "`", false);
             
             if (cmd.getAliases().size() != 0) {
                 String aliases = "`" + cmd.getAliases().get(0) + "`";
@@ -64,7 +65,7 @@ public class HelpCmd extends Command {
         if (args.length == 0) {
         	builder.setTitle("Help Page");
             builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl());
-            builder.setDescription("I currently use `" + this.getGuildPrefix(e.getGuild()) + "` as prefix for all commands\n" + "For more information on each command, use `" + this.getGuildPrefix(e.getGuild()) + "help [command]`");
+            builder.setDescription("I currently use `" + getPrefix(e) + "` as prefix for all commands\n" + "For more information on each command, use `" + getPrefix(e) + "help [command]`");
             
             
             // TODO Rework so it hides owner and admin commands from normal users

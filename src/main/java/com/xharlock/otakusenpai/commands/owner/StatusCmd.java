@@ -30,7 +30,7 @@ public class StatusCmd extends Command {
 		}
 		
 		if (args[0].equals("default")) {
-			e.getJDA().getPresence().setActivity(Activity.watching(getGuildPrefix(e.getGuild()) + "help"));
+			e.getJDA().getPresence().setActivity(Activity.watching(getPrefix(e) + "help"));
 			return;
 		}
 

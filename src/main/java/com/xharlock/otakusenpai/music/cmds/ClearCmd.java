@@ -27,6 +27,8 @@ public class ClearCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 		
+		e.getChannel().sendTyping().queue();
+		
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 		
 		EmbedBuilder builder = new EmbedBuilder();

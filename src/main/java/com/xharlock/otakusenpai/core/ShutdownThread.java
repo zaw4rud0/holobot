@@ -10,6 +10,6 @@ public class ShutdownThread extends Thread {
 	}
 	
 	public void run() {
-		System.out.println("\nI'm going to sleep but I will be back soon!\n");
+		System.out.println("\nSee you soon!\n");
 	}
 }

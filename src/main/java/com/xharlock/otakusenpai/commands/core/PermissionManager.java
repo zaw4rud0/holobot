@@ -15,12 +15,12 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class Permission {
+public class PermissionManager {
 
 	private List<User> blacklisted;
 	private HashMap<User, Long> lastUserWarning;
 
-	public Permission() {
+	public PermissionManager() {
 		blacklisted = new ArrayList<>();
 		lastUserWarning = new HashMap<>();
 	}
@@ -50,7 +50,6 @@ public class Permission {
 		blacklisted.add(user);
 	}
 
-	@Deprecated
 	// Write these methods in the Command Class so you can tweak them for each command
 	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
 		EmbedBuilder builder = new EmbedBuilder();

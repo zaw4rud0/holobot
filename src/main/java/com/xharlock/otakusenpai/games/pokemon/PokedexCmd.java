@@ -5,7 +5,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.otakusenpai.commands.core.Command;
 import com.xharlock.otakusenpai.commands.core.CommandCategory;
-import com.xharlock.otakusenpai.misc.Messages;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -28,11 +27,13 @@ public class PokedexCmd extends Command {
 		
 		if (args.length == 0) {
 			addErrorReaction(e.getMessage());
-			builder.setTitle(Messages.TITLE_INCORRECT_USAGE.getText());
+			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a name!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
+		
+		e.getChannel().sendTyping().queue();
 		
 		String search = args[0].replace("\u00e9", "e").replace(".", "-").replace(":", "-").replace("'", "")
 				.replace("\\\u2640", "-f").replace("\\\u2642", "-m").replace(":female_sign", "-f")
@@ -56,7 +57,7 @@ public class PokedexCmd extends Command {
 		
 		if (pokemon.name == null) {
 			addErrorReaction(e.getMessage());
-			builder.setTitle("Pok�mon not found");
+			builder.setTitle("Pokémon not found");
 			builder.setDescription("Please check for typos and try again!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;

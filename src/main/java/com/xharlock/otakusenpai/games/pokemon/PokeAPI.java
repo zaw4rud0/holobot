@@ -6,6 +6,9 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 import com.google.gson.JsonObject;
@@ -39,18 +42,31 @@ public class PokeAPI {
 		return PokemonCount;
 	}
 
-	public static PokemonSpecies[] getRandomTeam() throws IOException {
-		PokemonSpecies[] team = new PokemonSpecies[6];
-
-		// TODO Create 6 threads that fetch pokemons
-
-		return null;
+	public static List<Pokemon> getRandomTeam() throws IOException, InterruptedException {
+		List<Pokemon> team = new ArrayList<>();
+		Random rand = new Random();
+		List<Thread> threads = new ArrayList<>();
+		List<PokemonFetcher> fetchers = new ArrayList<>();
+		for (int i = 0; i < 6; i++) {
+			int id = rand.nextInt(PokeAPI.getPokemonCount() + 1);
+			PokemonFetcher fetcher = new PokemonFetcher(id);
+			Thread t = new Thread(fetcher);
+			threads.add(t);
+			fetchers.add(fetcher);
+			t.start();
+		}		
+		for (int i = 0; i < 6; i++) {
+			threads.get(i).join();
+			team.add(fetchers.get(i).pokemon);
+		}		
+		return team;
 	}
 
 	private static JsonObject getJsonObject(String urlQueryString) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestProperty("User-Agent",
 				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+		connection.setRequestMethod("GET");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String s = reader.lines().collect(Collectors.joining("\n"));
 		reader.close();
@@ -60,9 +76,8 @@ public class PokeAPI {
 }
 
 class PokemonFetcher implements Runnable {
-
 	int id;
-	PokemonSpecies pokemon;
+	Pokemon pokemon;
 
 	public PokemonFetcher(int id) {
 		this.id = id;
@@ -71,10 +86,9 @@ class PokemonFetcher implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.pokemon = new PokemonSpecies(PokeAPI.getPokemonSpecies(id));
+			this.pokemon = new Pokemon(PokeAPI.getPokemonSpecies(id));
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
 	}
-
 }
