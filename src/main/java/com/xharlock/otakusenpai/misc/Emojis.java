@@ -35,10 +35,10 @@ public enum Emojis {
 	RADIO("U+1F4FB", ":radio:", ""),
 	
 	// Numbers
-	ZERO("0️⃣", ":zero:", ""),
-	ONE("1⃣", ":one:", ""),
-	TWO("2⃣", ":two:", ""),
-	THREE("3⃣", ":three:", ""),
+	ZERO("0️⃣", ":zero:", "0️⃣"),
+	ONE("1⃣", ":one:", "1️⃣"),
+	TWO("2⃣", ":two:", "2️⃣"),
+	THREE("3⃣", ":three:", "3️⃣"),
 	FOUR("4⃣", ":four:", ""),
 	FIVE("5⃣", ":five:", ""),
 	SIX("6⃣", ":six:", ""),
