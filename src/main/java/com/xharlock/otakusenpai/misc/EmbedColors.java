@@ -2,6 +2,8 @@ package com.xharlock.otakusenpai.misc;
 
 public enum EmbedColors {
 
+	// TODO More colors
+	
 	RED(16711680), BLUE(0), GREEN(0), YELLOW(0), ORANGE(0), CYAN(0), LIME(0), PURPLE(0), PINK(0), WHITE(0), BLACK(0),
 	GRAY(3092790),
 
