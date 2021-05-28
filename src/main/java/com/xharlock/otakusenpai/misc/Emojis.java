@@ -6,15 +6,16 @@ public enum Emojis {
 	
 	THUMBSUP("U+1F44D", ":thumbsup:", "👍"),
 	THUMBSDOWN("U+1F44E", ":thumbsdown:", "👎"),
-	HEART("U+2764", ":heart:", ""),
-	BLUSH("U+1F633", ":blush:", ""),
-	ZZZ("U+1F4A4", ":zzz:", ""),
+	HEART("U+2764", ":heart:", "❤️"),
+	BLUSH("U+1F633", ":blush:", "😊"),
+	FLUSHED("", ":flushed:", "😳"),
+	ZZZ("U+1F4A4", ":zzz:", "💤"),
 	
 	// Arrows and other direction signs
-	UPVOTE("U+2B06", ":arrow_up:", ""),
-	DOWNVOTE("U+2B07", ":arrow_down:", ""),
-	ARROW_LEFT("U+2B05", ":arrow_left:", ""),
-	ARROW_RIGHT("U+27A1", ":arrow_right:", ""),
+	UPVOTE("U+2B06", ":arrow_up:", "⬆️"),
+	DOWNVOTE("U+2B07", ":arrow_down:", "⬇️"),
+	ARROW_LEFT("U+2B05", ":arrow_left:", "⬅️"),
+	ARROW_RIGHT("U+27A1", ":arrow_right:", "➡️"),
 	
 	// Music and sound emojis
 	SPEAKER_MUTED("U+1F507", ":mute:", ""),
@@ -48,12 +49,12 @@ public enum Emojis {
 	HUNDRED("💯", ":100:", ""),
 	
 	// Signs and warnings
-	WARNING("U+26A0", ":warning", ""),
-	NO_ENTRY("U+26D4", ":no_entry:", ""),
-	PROHIBITED("U+1F6AB", ":no_entry_sign:", ""),
-	RADIOACTIVE("U+2622", ":radioactive:", ""),
-	BIOHAZARD("U+2623", ":biohazard:", ""),
-	UNDERAGE("U+1F51E", ":underage:", ""),
+	WARNING("U+26A0", ":warning", "⚠️"),
+	NO_ENTRY("U+26D4", ":no_entry:", "⛔"),
+	PROHIBITED("U+1F6AB", ":no_entry_sign:", "🚫"),
+	RADIOACTIVE("U+2622", ":radioactive:", "☢️"),
+	BIOHAZARD("U+2623", ":biohazard:", "☣️"),
+	UNDERAGE("U+1F51E", ":underage:", "🔞"),
 	;
 	
 	private String unicode;
