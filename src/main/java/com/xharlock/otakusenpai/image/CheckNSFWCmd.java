@@ -31,7 +31,7 @@ public class CheckNSFWCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		
-		// In dire need of a cleanup :hyperkekw:		
+		// TODO In dire need of a cleanup :hyperkekw:		
 		
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();

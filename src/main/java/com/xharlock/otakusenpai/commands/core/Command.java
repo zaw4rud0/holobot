@@ -109,17 +109,28 @@ public abstract class Command {
 		}		
 	}
 
+	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
+		if (e.isFromGuild()) {
+			if (footer)
+				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+			builder.setColor(getGuildColor(e.getGuild()));
+		} else {
+			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
+		}
+		e.getMessage().getReferencedMessage().reply(builder.build()).queue();
+	}
+	
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
 		if (e.isFromGuild()) {
 			if (footer)
 				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 			builder.setColor(getGuildColor(e.getGuild()));
-			e.getChannel().sendMessage(builder.build()).queue(msg -> {
+			e.getMessage().getReferencedMessage().reply(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
 			});
 		} else {
 			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
-			e.getChannel().sendMessage(builder.build()).queue();
+			e.getMessage().getReferencedMessage().reply(builder.build()).queue();
 		}	
 	}
 	
