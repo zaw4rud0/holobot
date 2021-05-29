@@ -10,7 +10,7 @@ public class DeleteCmd extends Command {
 	public DeleteCmd(String name) {
 		super(name);
 		setDescription("(Owner-only) Use this command to delete a message");
-		setUsage(name + " [msg id]");
+		setUsage(name + " <msg id>");
 		setIsOwnerCommand(true);
 		setCommandCategory(CommandCategory.OWNER);
 	}

@@ -38,13 +38,15 @@ public class OtakuSenpai {
 	private void init() throws LoginException {
 		System.out.println("Starting bot...");
 		Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
+		
+		// Create new JDA instance
 		JDABuilder builder = JDABuilder.createDefault(getConfig().getDiscordToken());
 		builder.enableIntents(EnumSet.allOf(GatewayIntent.class));
 		builder.setChunkingFilter(ChunkingFilter.ALL);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.enableCache(CacheFlag.VOICE_STATE, new CacheFlag[0]);
 		builder.addEventListeners(new ReadyListener(), this.waiter);
-		builder.setActivity(Activity.watching(String.valueOf(this.config.getPrefix()) + "help"));
+		builder.setActivity(Activity.watching(this.config.getPrefix() + "help"));
 		this.jda = builder.build();
 	}
 

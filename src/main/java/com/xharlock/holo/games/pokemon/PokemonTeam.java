@@ -9,6 +9,7 @@ import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -98,16 +99,12 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to display the given Pokémon team as a BufferedImage
-	 * 
-	 * @param team      = List of Pokemon to display
-	 * @param matchings = Match the types of the Pokémon
-	 * @return Reordered List of Pokémon
+	 * Method to display the current Pokémon team as a BufferedImage
 	 */
-	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IOException {
+	public BufferedImage displayTeam(boolean matchings) throws IOException {
 
-		if (team.size() > 6)
-			throw new IllegalArgumentException("The list may not be bigger than 6!");
+		// Convert team array to a List
+		List<Pokemon> team = Arrays.asList(this.team);
 
 		// Types of the Pokémon in the team should match, Markbeep's code here
 		// Basically reorder and rearrange the types here
@@ -118,20 +115,63 @@ public class PokemonTeam {
 		List<BufferedImage> pokemon_images = new ArrayList<>();
 
 		for (Pokemon pokemon : team) {
-			BufferedImage img = null;
-			BufferedImage artwork = ImageIO.read(new URL(pokemon.artwork));
+			// No Pokémon in this slot, draw a simple gray background
+			if (pokemon == null) {
+				pokemon_images.add(drawGray());
+			} else {
+				BufferedImage img = null;
+				BufferedImage artwork = ImageIO.read(new URL(pokemon.artwork));
 
-			// If Pokémon doesn't have a secondary type, fill background with only 1 color
-			if (pokemon.type2 == null)
-				img = draw(artwork, pokemon.type1.getColor(), pokemon.type1.getColor(),
-						"#" + pokemon.pokedexId + " " + pokemon.name);
-			else
-				img = draw(artwork, pokemon.type1.getColor(), pokemon.type2.getColor(),
-						"#" + pokemon.pokedexId + " " + pokemon.name);
+				// If Pokémon doesn't have a secondary type, fill background with only 1 color
+				if (pokemon.type2 == null)
+					img = draw(artwork, pokemon.type1.getColor(), pokemon.type1.getColor(),
+							"#" + pokemon.pokedexId + " " + pokemon.name);
+				else
+					img = draw(artwork, pokemon.type1.getColor(), pokemon.type2.getColor(),
+							"#" + pokemon.pokedexId + " " + pokemon.name);
+				pokemon_images.add(img);
+			}
+		}
+		return CollageMaker.create3x2Collage(pokemon_images);
+	}
 
-			pokemon_images.add(img);
+	/**
+	 * Method to display the given Pokémon team as a BufferedImage
+	 * 
+	 * @param team      = List of Pokemon to display
+	 * @param matchings = Match the types of the Pokémon
+	 * @return Reordered List of Pokémon
+	 */
+	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IOException {
+
+		if (team.size() > 6)
+			throw new IllegalArgumentException("The list may not contain more than 6 Pokémon!");
+
+		// Types of the Pokémon in the team should match, Markbeep's code here
+		// Basically reorder and rearrange the types here
+		if (matchings) {
+			team = match(team);
 		}
 
+		List<BufferedImage> pokemon_images = new ArrayList<>();
+
+		for (Pokemon pokemon : team) {
+			// No Pokémon in this slot, draw a simple gray background
+			if (pokemon == null) {
+				pokemon_images.add(drawGray());
+			} else {
+				BufferedImage img = null;
+				BufferedImage artwork = ImageIO.read(new URL(pokemon.artwork));
+
+				// If Pokémon doesn't have a secondary type, fill background with only 1 color
+				if (pokemon.type2 == null)
+					img = draw(artwork, pokemon.type1.getColor(), null, "#" + pokemon.pokedexId + " " + pokemon.name);
+				else
+					img = draw(artwork, pokemon.type1.getColor(), pokemon.type2.getColor(),
+							"#" + pokemon.pokedexId + " " + pokemon.name);
+				pokemon_images.add(img);
+			}
+		}
 		return CollageMaker.create3x2Collage(pokemon_images);
 	}
 
@@ -187,7 +227,170 @@ public class PokemonTeam {
 		g2.drawString(text, x, y);
 	}
 
+	/**
+	 * Method to draw a simple gray image for when there is no Pokémon in a slot
+	 */
+	private static BufferedImage drawGray() {
+		int width = 500, height = 500;
+		BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+		Graphics2D g2 = res.createGraphics();
+		g2.setPaint(Color.DARK_GRAY);
+		g2.fillRect(0, 0, width, height);
+		g2.dispose();
+		return res;
+	}
+
 	private static List<Pokemon> match(List<Pokemon> team) {
-		return null;
+		List<Pokemon> result = team;
+
+		return result;
 	}
 }
+
+// ###################################################
+// Unchanged code
+
+//Code by MarkBeep
+class SortedPokemon {
+	String name;
+	String type1;
+	String type2;
+	int id;
+
+	boolean swapped;
+
+	SortedPokemon(String name, String type1, String type2, int id) {
+		this.name = name;
+		this.type1 = type1;
+		this.type2 = type2;
+		this.id = id;
+	}
+
+	public static List<BufferedImage> orderImages(List<SortedPokemon> pokes, List<PokemonSpecies> allPokemon)
+			throws Exception {
+		
+		List<SortedPokemon> doublePokes = doublePokes(pokes);
+		List<SortedPokemon> bestTeam = new ArrayList<>();
+		
+		findBestMatches(doublePokes, new int[1], bestTeam, new ArrayList<>());
+
+		// creates the image
+		List<BufferedImage> ordered = new ArrayList<>();
+		
+		for (SortedPokemon p : bestTeam) {
+
+			BufferedImage img = null;
+			PokemonSpecies pokemon = allPokemon.get(p.id);
+
+			PokemonType type1 = null;
+			PokemonType type2 = null;
+
+			// We set type1 and type2 correctly for the draw function
+			if (!p.swapped) {
+				type1 = pokemon.type1;
+				type2 = (pokemon.type2 == null) ? type1 : pokemon.type2;
+			} else {
+				  type2 = pokemon.type1;
+				  type1 = (pokemon.type2==null) ? type2: pokemon.type2;
+			}
+
+			ordered.add(img);
+		}
+		return ordered;
+	}
+
+	/*
+	 * Doubles the pokemon list by swapping the types
+	 */
+	public static List<SortedPokemon> doublePokes(List<SortedPokemon> pokes) {
+		List<SortedPokemon> copies = new ArrayList<>();
+		List<String> types = new ArrayList<>();
+		// this first loop is simply to take note of all types
+		for (SortedPokemon p: pokes) {
+			types.add(p.type1);
+			// we add the second type if its a different one
+			if (!p.type1.equals(p.type2)) types.add(p.type2);
+		}
+		// now we can iterate through pokes and if they have unique types, don't copy them
+		for (SortedPokemon p : pokes) {
+			// iterate over the list and find multiple instances
+			int t1 = 0;  // counter for occurences of first type
+			int t2 = 0;  // counter for occurences of second type
+			for (String s: types) {
+				if (s.equals(p.type1)) t1++;
+				if (s.equals(p.type2)) t2++;
+			}
+			// if t1 or t2 > 1, more than 1 pokemon has that type
+			if (t1 > 1 || t2 > 1) copies.add(p.copy());
+		}
+		pokes.addAll(copies);
+		return pokes;
+	}
+
+	/*
+	 * Creates the array with the best matchings
+	 */
+	public static void findBestMatches(List<SortedPokemon> pokes, int[] best, List<SortedPokemon> bestTeam,
+			List<SortedPokemon> cur) {
+		
+		if (cur.size() == 6) {
+			// If the current array is 6 big, count the matchings
+			int m = matchings(cur);
+			if (best[0] <= m) {
+				best[0] = m;
+				bestTeam.clear();
+				bestTeam.addAll(cur);
+			}
+			return;
+		}
+		for (SortedPokemon p : pokes) {
+			if (cur.contains(p))
+				continue;
+			List<SortedPokemon> copy = new ArrayList<>(cur);
+			copy.add(p);
+			findBestMatches(pokes, best, bestTeam, copy);
+		}
+	}
+
+	/*
+	 * Counts the amount of matchings in a given list
+	 */
+	public static int matchings(List<SortedPokemon> q) {
+		int t = 0;
+		for (int i = 0; i < 6; i++) {
+			if (i < 2) {
+				if (q.get(i).type2 == q.get(i + 1).type1)
+					t++;
+				if (q.get(i).type2 == q.get(i + 3).type1)
+					t++;
+			} else if (i == 2) {
+				if (q.get(i).type2 == q.get(i + 3).type1)
+					t++;
+			} else if (i < 5) {
+				if (q.get(i).type2 == q.get(i + 1).type1)
+					t++;
+			}
+		}
+		return t;
+	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (o instanceof SortedPokemon) {
+			SortedPokemon p = (SortedPokemon) o;
+			return p.id == this.id;
+		}
+		return false;
+	}
+
+	/*
+	 * Returns a copied version of a pokemon with 'swapped'
+	 * set to true
+	 */
+	public SortedPokemon copy() {
+		SortedPokemon p = new SortedPokemon(name, type2, type1, id);
+		p.swapped = true;
+		return p;
+	}
+}
+//###################################################

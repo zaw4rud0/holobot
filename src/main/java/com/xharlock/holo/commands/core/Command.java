@@ -10,12 +10,15 @@ import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.holo.misc.Emojis;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+/**
+ * Abstract class representing a bot command
+ */
 public abstract class Command {
+
 	protected String name;
 	protected String description;
 	protected String usage;
@@ -39,7 +42,7 @@ public abstract class Command {
 	}
 
 	public abstract void onCommand(MessageReceivedEvent e);
-	
+
 	protected void addSuccessReaction(Message msg) {
 		msg.addReaction(Emojis.THUMBSUP.getAsReaction());
 	}
@@ -48,23 +51,18 @@ public abstract class Command {
 		msg.addReaction(Emojis.THUMBSDOWN.getAsReaction());
 	}
 
-	protected void deleteMessage(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
-	}
-
-	protected void deleteMessage(MessageReceivedEvent e, long delay, TimeUnit unit) {
-		e.getMessage().delete().queueAfter(delay, unit);
-	}
-
-	protected String getPrefix(MessageReceivedEvent e) {		
+	protected String getPrefix(MessageReceivedEvent e) {
 		if (e.isFromGuild())
 			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
 		else
 			return Bootstrap.otakuSenpai.getConfig().getPrefix();
 	}
 
-	protected int getGuildColor(Guild guild) {
-		return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(guild).getEmbedColor();
+	protected int getColor(MessageReceivedEvent e) {
+		if (e.isFromGuild())
+			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();
+		else
+			return Bootstrap.otakuSenpai.getConfig().getColor();
 	}
 
 	protected boolean isValidURL(String url) {
@@ -77,64 +75,60 @@ public abstract class Command {
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		if (e.isFromGuild()) {
-			if (footer)
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-			builder.setColor(getGuildColor(e.getGuild()));
-		} else {
-			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
-		}
+		builder.setColor(getColor(e));
+		
+		if (e.isFromGuild() && footer)
+			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+		
 		e.getChannel().sendMessage(builder.build()).queue();
 	}
 
-	protected Message sendEmbedAndGetMessage(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		if (e.isFromGuild()) {
-			if (footer)
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-			builder.setColor(getGuildColor(e.getGuild()));
-		} else {
-			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
-		}
-		return e.getChannel().sendMessage(builder.build()).complete();
-	}
-	
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
+		builder.setColor(getColor(e));
+		
 		if (e.isFromGuild()) {
-			if (footer)
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-			builder.setColor(getGuildColor(e.getGuild()));
+			if (footer) {
+				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
+			}	
 			e.getChannel().sendMessage(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
 			});
 		} else {
-			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 			e.getChannel().sendMessage(builder.build()).queue();
-		}		
+		}
 	}
 
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		if (e.isFromGuild()) {
-			if (footer)
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-			builder.setColor(getGuildColor(e.getGuild()));
-		} else {
-			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
-		}
+		builder.setColor(getColor(e));
+		
+		if (e.isFromGuild() && footer)
+			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+		
 		e.getMessage().getReferencedMessage().reply(builder.build()).queue();
 	}
-	
+
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
+		builder.setColor(getColor(e));
+		
 		if (e.isFromGuild()) {
-			if (footer)
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-			builder.setColor(getGuildColor(e.getGuild()));
+			if (footer) {
+				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
+			}
 			e.getMessage().getReferencedMessage().reply(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
 			});
 		} else {
-			builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
 			e.getMessage().getReferencedMessage().reply(builder.build()).queue();
-		}	
+		}
+	}
+
+	protected Message sendEmbedAndGetMessage(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
+		builder.setColor(getColor(e));
+		
+		if (e.isFromGuild() && footer)
+			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+		
+		return e.getChannel().sendMessage(builder.build()).complete();
 	}
 	
 	public String getName() {

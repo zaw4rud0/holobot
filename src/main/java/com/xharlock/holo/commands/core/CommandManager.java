@@ -15,7 +15,6 @@ import com.xharlock.holo.games.AkinatorCmd;
 import com.xharlock.holo.games.pokemon.*;
 import com.xharlock.holo.image.*;
 import com.xharlock.holo.music.cmds.*;
-import com.xharlock.holo.place.*;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -36,7 +35,6 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new ServerRoles("serverroles"));
 		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new WhoisCmd("whois"));
-		
 		
 		// Experimental Commands
 		addCommand(new ReadCmd("read"));
@@ -77,13 +75,7 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new PokedexCmd("pokedex"));
 		addCommand(new PokemonTeamCmd("pokemonteam"));
 		addCommand(new RandomPokemonCmd("randompokemon"));
-
-		// Place Cmds
-		addCommand(new ConvertCmd("convert"));
-		addCommand(new DrawTxtCmd("drawtxt"));
-		addCommand(new PreviewCmd("preview"));
-		addCommand(new BullyCmd("bully"));
-
+		
 		// Misc Cmds
 		addCommand(new InspiroCmd("inspiro"));
 		addCommand(new UwuCmd("uwu"));
@@ -91,8 +83,11 @@ public class CommandManager extends ListenerAdapter {
 
 		// Owner Cmds
 		addCommand(new CancelCmd("cancel"));
+		addCommand(new CountCmd("count"));
 		addCommand(new DeleteCmd("delete"));
 		addCommand(new NicknameCmd("nickname"));
+		addCommand(new NukeCmd("nuke"));
+		addCommand(new PurgeCmd("purge"));
 		addCommand(new SayCmd("say"));
 		addCommand(new ShutdownCmd("shutdown"));
 		addCommand(new StatusCmd("status"));
@@ -104,26 +99,39 @@ public class CommandManager extends ListenerAdapter {
 			this.commands.put(alias, cmd);
 	}
 
+	public Command getCommand(String name) {
+		return this.commands.get(name);
+	}
+	
 	public LinkedHashMap<String, Command> getCommands() {
 		return this.commands;
 	}
 
-	public List<Command> getCommands(CommandCategory category) {
+	/**
+	 * Method to get every {@link Command} of a given {@link CommandCategory} as a List
+	 */
+	public List<Command> getCommands(CommandCategory category) {		
+		// LinkedHashSet so the List keeps the item insertion order
 		LinkedHashSet<Command> commands = new LinkedHashSet<>();
-		for (Command cmd : this.commands.values())
-			if (cmd.getCommandCategory() == category)
+		
+		for (Command cmd : this.commands.values()) {
+			if (cmd.getCommandCategory() == category) {
 				commands.add(cmd);
+			}
+		}
 		return new ArrayList<>(commands);
 	}
 
-	public Command getCommand(String name) {
-		return this.commands.get(name);
-	}
-
+	/**
+	 * Method to check if a given name is linked to a {@link Command}
+	 */
 	public boolean isValidName(String name) {
 		return this.commands.containsKey(name);
 	}
 
+	/**
+	 * Method to check if a given name is among the aliases of a {@link Command}
+	 */
 	public boolean isAlias(Command cmd, String name) {
 		return cmd.getAliases().contains(name);
 	}

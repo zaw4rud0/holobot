@@ -285,4 +285,15 @@ public class PokemonSpecies {
 				List.of("793", "794", "795", "796", "797", "798", "799", "803", "804", "805", "806"));
 		return ids.contains(this.pokedexId);
 	}
+	
+	/**
+	 * Method to check if two Pokémon share the same species (i.e. Pokédex id)
+	 */
+	public boolean isSameSpecies(PokemonSpecies p) {
+		return p.pokedexId.equals(this.pokedexId);
+	}
+	
+	public static boolean isSameSpecies(PokemonSpecies p1, PokemonSpecies p2) {
+		return p1.pokedexId.equals(p2.pokedexId);
+	}
 }

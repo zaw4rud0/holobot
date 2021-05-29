@@ -28,18 +28,20 @@ public class LyricsCmd extends MusicCommand {
 		LyricsClient client = new LyricsClient();
 		Lyrics lyrics = null;
 		
-		// If no arguments given, look up the current song of the music player
-		if (args.length == 0) {			
-			try {
-				lyrics = client.getLyrics("smooth criminal").get();
-			} catch (InterruptedException | ExecutionException ex) {
-				ex.printStackTrace();
-			}			
+		// TODO If no arguments given, look up the current song of the music player
+		if (args.length == 0) {
+			builder.setTitle("Incorrect Usage");
+			builder.setDescription("Please provide a song name");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			return;
 		} else {
 			try {
 				lyrics = client.getLyrics(String.join(" ", args)).get();
 			} catch (InterruptedException | ExecutionException ex) {
-				ex.printStackTrace();
+				builder.setTitle("Error");
+				builder.setDescription("Something went wrong while communicating with the API. Please try again in a few minutes!");
+				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+				return;
 			}
 		}
 		
@@ -63,7 +65,7 @@ public class LyricsCmd extends MusicCommand {
 				block = "";
 			} else {
 				
-				// Check if it's less than 1024 characters				
+				// TODO Check if it's less than 1024 characters				
 				block += s + "\n";
 				
 			}

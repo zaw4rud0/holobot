@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class CollageCmd extends Command {
 
+	// TODO
+	
 	public CollageCmd(String name) {
 		super(name);
 		

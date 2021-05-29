@@ -15,6 +15,8 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+// In dire need of refactoring
+
 public class PermissionManager {
 
 	private List<User> blacklisted;
@@ -53,14 +55,14 @@ public class PermissionManager {
 	// Write these methods in the Command Class so you can tweak them for each command
 	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
 		EmbedBuilder builder = new EmbedBuilder();
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
 		long now = Instant.now().getEpochSecond();
 		if (cmd.onTimeout.containsKey(e.getAuthor())) {			
 			boolean warned = this.lastUserWarning.containsKey(e.getAuthor());			
 			if (warned && now - this.lastUserWarning.get(e.getAuthor()) < 10L)
 				return true;			
 			if (now - cmd.onTimeout.get(e.getAuthor()) < cmd.getCmdCooldown()) {
+				if (e.isFromGuild())
+					e.getMessage().delete().queue();
 				builder.setTitle("On Cooldown!");
 				int remaining = cmd.getCmdCooldown() - (int) (now - cmd.onTimeout.get(e.getAuthor()));
 				builder.setDescription(String.format("%s, you are on cooldown!\nPlease wait `%d` seconds before using this command again.", e.getAuthor().getAsMention(), remaining));
