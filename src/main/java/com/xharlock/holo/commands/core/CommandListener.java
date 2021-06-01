@@ -4,6 +4,9 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.xharlock.holo.core.Bootstrap;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -13,6 +16,8 @@ public class CommandListener extends ListenerAdapter {
 
 	private CommandManager commandManager;
 
+	private static final Logger logger = LoggerFactory.getLogger(CommandListener.class);
+	
 	public CommandListener(CommandManager commandManager) {
 		this.commandManager = commandManager;
 	}
@@ -41,20 +46,19 @@ public class CommandListener extends ListenerAdapter {
 		Command cmd = this.commandManager.getCommand(invoke);
 
 		// Check if user can do anything
-		if (!Bootstrap.otakuSenpai.getPermissionManager().check(e, cmd))
+		if (!Bootstrap.holo.getPermissionManager().check(e, cmd))
 			return;
 
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
 		cmd.onCommand(e);
-		
-		// TODO Replace with proper logging
-		System.out.println(String.valueOf(LocalDateTime.now().toString()) + " : " + e.getAuthor() + " has called " + cmd.getName());	
+
+		logger.info(LocalDateTime.now().toString() + " : " + e.getAuthor() + " has called " + cmd.getName());
 	}
 
 	private String getPrefix(MessageReceivedEvent e) {
 		if (e.isFromGuild())
-			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
+			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
 		else
-			return Bootstrap.otakuSenpai.getConfig().getPrefix();
+			return Bootstrap.holo.getConfig().getPrefix();
 	}
 }

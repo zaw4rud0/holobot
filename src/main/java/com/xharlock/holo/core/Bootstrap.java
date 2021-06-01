@@ -6,28 +6,33 @@ import javax.security.auth.login.LoginException;
 
 import org.json.simple.JSONObject;
 import org.json.simple.parser.ParseException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.config.Config;
 import com.xharlock.holo.utils.JSONReader;
 
 public class Bootstrap {
-	public static OtakuSenpai otakuSenpai;
+	public static Holo holo;
 	public static long startup_time;
+	
+	private static final Logger logger = LoggerFactory.getLogger(Bootstrap.class);
 	
 	public static void main(String[] args) {
 		startup_time = System.currentTimeMillis();
 		init();
 		long totalTime = System.currentTimeMillis() - startup_time;
-		System.out.println(String.format("It took %s %d ms to load!", otakuSenpai.getJDA().getSelfUser().getAsTag(), totalTime));
+		logger.info(String.format("It took %s %d ms to load!", holo.getJDA().getSelfUser().getAsTag(), totalTime));
 	}
 
 	static void init() {
 		EventWaiter waiter = new EventWaiter();		
 		try {
 			Config config = initializeConfig();
-			otakuSenpai = new OtakuSenpai(config, waiter);
+			holo = new Holo(config, waiter);
 		} catch (IOException | ParseException | LoginException ex) {
+			logger.error(ex.getMessage());
 			ex.printStackTrace();
 		}
 	}

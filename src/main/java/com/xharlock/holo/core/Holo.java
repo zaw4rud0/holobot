@@ -4,6 +4,9 @@ import java.util.EnumSet;
 
 import javax.security.auth.login.LoginException;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.commands.core.CommandListener;
 import com.xharlock.holo.commands.core.CommandManager;
@@ -19,7 +22,7 @@ import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import net.dv8tion.jda.api.utils.cache.CacheFlag;
 
-public class OtakuSenpai {
+public class Holo {
 
 	private JDA jda;
 
@@ -28,15 +31,17 @@ public class OtakuSenpai {
 	private CommandManager commandManager;
 	private PermissionManager permissionManager;
 	private EventWaiter waiter;
+	
+	private static final Logger logger = LoggerFactory.getLogger(Holo.class);
 
-	public OtakuSenpai(Config config, EventWaiter waiter) throws LoginException {
+	public Holo(Config config, EventWaiter waiter) throws LoginException {
 		this.config = config;
 		this.waiter = waiter;
 		init();
 	}
 
 	private void init() throws LoginException {
-		System.out.println("Starting bot...");
+		logger.info("Starting bot...");
 		Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
 		
 		// Create new JDA instance
