@@ -109,7 +109,7 @@ public class PokemonTeam {
 		// Types of the Pokémon in the team should match, Markbeep's code here
 		// Basically reorder and rearrange the types here
 		if (matchings) {
-			team = match(team);
+			team = orderPokemon(team);
 		}
 
 		List<BufferedImage> pokemon_images = new ArrayList<>();
@@ -142,7 +142,8 @@ public class PokemonTeam {
 	 * @param matchings = Match the types of the Pokémon
 	 * @return Reordered List of Pokémon
 	 */
-	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IllegalArgumentException, IOException {
+	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings)
+			throws IllegalArgumentException, IOException {
 
 		if (team.size() > 6)
 			throw new IllegalArgumentException("The list may not contain more than 6 Pokémon!");
@@ -150,7 +151,7 @@ public class PokemonTeam {
 		// Types of the Pokémon in the team should match, Markbeep's code here
 		// Basically reorder and rearrange the types here
 		if (matchings) {
-			team = match(team);
+			team = orderPokemon(team);
 		}
 
 		List<BufferedImage> pokemon_images = new ArrayList<>();
@@ -240,54 +241,40 @@ public class PokemonTeam {
 		return res;
 	}
 
-	
-	// TODO Method that calls the code of Markbeep
-	private static List<Pokemon> match(List<Pokemon> team) {
-		
-		return SortedPokemon.orderPokemon(team);
-	}
-}
-
-// ###################################################
-// Unchanged code
-
-//Code by MarkBeep
-class SortedPokemon {
-
-	/*
-	 * Orders the given Pokemon list so that
-	 * the most type colors overlap
+	/**
+	 * Orders the given Pokemon list so that the most type colors overlap
 	 */
-	public static List<Pokemon> orderPokemon(List<Pokemon> pokes) {
-		
+	private static List<Pokemon> orderPokemon(List<Pokemon> pokes) {
 		List<Pokemon> doublePokes = doublePokes(pokes);
 		List<Pokemon> bestTeam = new ArrayList<>();
-		
 		findBestMatches(doublePokes, new int[1], bestTeam, new ArrayList<>());
-
 		return bestTeam;
 	}
 
-	/*
+	/**
 	 * Doubles the pokemon list by swapping the types
 	 */
-	public static List<Pokemon> doublePokes(List<Pokemon> pokes) {
+	private static List<Pokemon> doublePokes(List<Pokemon> pokes) {
 		List<Pokemon> copies = new ArrayList<>();
 		List<PokemonType> types = new ArrayList<>();
 		// this first loop is simply to take note of all types
-		for (Pokemon p: pokes) {
+		for (Pokemon p : pokes) {
 			types.add(p.type1);
 			// we add the second type if its a different one
-			if (!p.type1.equals(p.type2)) types.add(p.type2);
+			if (!p.type1.equals(p.type2))
+				types.add(p.type2);
 		}
-		// now we can iterate through pokes and if they have unique types, don't copy them
+		// now we can iterate through pokes and if they have unique types, don't copy
+		// them
 		for (Pokemon p : pokes) {
 			// iterate over the list and find multiple instances
-			int t1 = 0;  // counter for occurences of first type
-			int t2 = 0;  // counter for occurences of second type
-			for (PokemonType s: types) {
-				if (s.equals(p.type1)) t1++;
-				if (s.equals(p.type2)) t2++;
+			int t1 = 0; // counter for occurences of first type
+			int t2 = 0; // counter for occurences of second type
+			for (PokemonType s : types) {
+				if (s.equals(p.type1))
+					t1++;
+				if (s.equals(p.type2))
+					t2++;
 			}
 			// if t1 or t2 > 1, more than 1 pokemon has that type
 			if (t1 > 1 || t2 > 1) {
@@ -308,13 +295,11 @@ class SortedPokemon {
 		return pokes;
 	}
 
-	/*
-	 * Creates the array with the best matchings
+	/**
+	 * Creates the array with the best matchings <br>
 	 * Works in a recursive fashion
 	 */
-	public static void findBestMatches(List<Pokemon> pokes, int[] best, List<Pokemon> bestTeam,
-			List<Pokemon> cur) {
-		
+	private static void findBestMatches(List<Pokemon> pokes, int[] best, List<Pokemon> bestTeam, List<Pokemon> cur) {
 		if (cur.size() == 6) {
 			// If the current array is 6 big, count the matchings
 			int m = matchings(cur);
@@ -326,18 +311,17 @@ class SortedPokemon {
 			return;
 		}
 		for (Pokemon p : pokes) {
-			if (cur.contains(p))
-				continue;
+			if (cur.contains(p)) continue;
 			List<Pokemon> copy = new ArrayList<>(cur);
 			copy.add(p);
 			findBestMatches(pokes, best, bestTeam, copy);
 		}
 	}
 
-	/*
+	/**
 	 * Counts the amount of matchings in a given list
 	 */
-	public static int matchings(List<Pokemon> q) {
+	private static int matchings(List<Pokemon> q) {
 		int t = 0;
 		for (int i = 0; i < 6; i++) {
 			if (i < 2) {
@@ -359,6 +343,4 @@ class SortedPokemon {
 		}
 		return t;
 	}
-
 }
-//###################################################
