@@ -277,11 +277,12 @@ class SortedPokemon {
 		// this first loop is simply to take note of all types
 		for (Pokemon p: pokes) {
 			types.add(p.type1);
-			// we add the second type if its a different one
-			if (!p.type1.equals(p.type2)) types.add(p.type2);
+			// we add the second type if its a different one and not null
+			if (p.type2 != null && !p.type1.equals(p.type2)) types.add(p.type2);
 		}
 		// now we can iterate through pokes and if they have unique types, don't copy them
 		for (Pokemon p : pokes) {
+			if (p.type2 == null) continue; // no point swapping, as both types are the same
 			// iterate over the list and find multiple instances
 			int t1 = 0;  // counter for occurences of first type
 			int t2 = 0;  // counter for occurences of second type
@@ -340,20 +341,23 @@ class SortedPokemon {
 	public static int matchings(List<Pokemon> q) {
 		int t = 0;
 		for (int i = 0; i < 6; i++) {
+			Pokemon current = q.get(i);
+			PokemonType t2 = current.type2;
+			if (t2 == null) t2 = current.type1;
 			if (i < 2) {
 				// pokemon is in first or second position, so check if it matches with
 				// bottom or right type
-				if (q.get(i).type2.equals(q.get(i + 1).type1))
+				if (t2.equals(q.get(i + 1).type1))
 					t++;
-				if (q.get(i).type2.equals(q.get(i + 3).type1))
+				if (t2.equals(q.get(i + 3).type1))
 					t++;
 			} else if (i == 2) {
 				// pokemon is in the third position, so check below type match
-				if (q.get(i).type2.equals(q.get(i + 3).type1))
+				if (t2.equals(q.get(i + 3).type1))
 					t++;
 			} else if (i < 5) {
 				// pokemon is 4th and 5th position, so check type to the right
-				if (q.get(i).type2.equals(q.get(i + 1).type1))
+				if (t2.equals(q.get(i + 1).type1))
 					t++;
 			}
 		}
