@@ -43,14 +43,14 @@ public class InfoBotCmd extends Command {
 		} else {
 			double avg = os.getSystemLoadAverage();
 			double cpu_usage = avg * 100.0 / (double) cores;
-			cpu_percentage = "" + ((int) (cpu_usage * 100) / 100.0) + "%";
+			cpu_percentage = "" + ((cpu_usage * 100) / 100.0) + "%";
 		}	
 		
 		long heap = memory.getHeapMemoryUsage().getUsed();
 		long max = memory.getHeapMemoryUsage().getMax();
 		double heap_percentage = (double)((heap * 10000) / max) / 100.0;
 		
-		String system_info = "**CPU:** `" + cpu_percentage + " on " + cores + " cores`\n"
+		String system_info = "**CPU:** `" + cpu_percentage + " on " + cores + " core(s)`\n"
 						+ "**Memory:** `" + heap / 1024 / 1024 + "MB / " + max / 1024 / 1024 + "MB (" + heap_percentage + "%)`\n"
 						+ "**Uptime:** " + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startup_time);
 				
