@@ -2,7 +2,8 @@
 
 # HoloBot (Java Discord Bot)
 
-A simple bot for Discord that has a variety of functions and features
+Holo is a discord bot based on Holo the Wisewolf from the series Spice & Wolf. Not only can it provide music, it also lets you search for animes and mangas informations and can provide numerous images of nekos and waifus. To see all features of Holo, jump to this [section](#features).
+Note that this bot is still in development and that many different features will be added in the future. If you encounter a bug, please report it by opening an issue in this repository or by using the bug command of Holo in your server.
 
 ## Overview
 
@@ -14,14 +15,11 @@ A simple bot for Discord that has a variety of functions and features
 ### General
 * Anime & Manga Search
 * Image Provider
+* Music Player
 
 ### Games
 * Pokédex
 * Akinator
-
-### Music Player
-
-
 
 ## Dependencies
 
