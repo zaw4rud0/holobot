@@ -1,4 +1,4 @@
-<img align="right" src="https://github.com/xHarlock/HoloBot/blob/master/assets/logo.png" height="220" width="220">
+<img align="right" src="https://github.com/xHarlock/HoloBot/blob/master/src/main/resources/logo.png" height="220" width="220">
 
 # HoloBot (Java Discord Bot)
 
