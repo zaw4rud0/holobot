@@ -59,7 +59,7 @@ public class InfoBotCmd extends Command {
 		if (e.isFromGuild())
 			prefix = getPrefix(e);
 		else
-			prefix = Bootstrap.otakuSenpai.getConfig().getPrefix();
+			prefix = Bootstrap.holo.getConfig().getPrefix();
 
 		String description = "Your senpai for everything :heart:\nUse `" + prefix + "help` to see all commands";
 		
@@ -67,8 +67,8 @@ public class InfoBotCmd extends Command {
 		builder.setTitle(e.getJDA().getSelfUser().getName() + " | Informations");
 		builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 		builder.setDescription(description);
-		builder.addField("Creator", e.getJDA().getUserById(Bootstrap.otakuSenpai.getConfig().getOwnerId()).getAsMention(), false);
-		builder.addField("Version", "`" + Bootstrap.otakuSenpai.getConfig().getVersion() + "`", false);
+		builder.addField("Creator", e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId()).getAsMention(), false);
+		builder.addField("Version", "`" + Bootstrap.holo.getConfig().getVersion() + "`", false);
 		builder.addField("System Informations", system_info, false);
 		builder.addField("Source", "No link yet", false);
 		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);

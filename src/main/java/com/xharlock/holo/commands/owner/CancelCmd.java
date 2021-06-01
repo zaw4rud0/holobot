@@ -26,7 +26,7 @@ public class CancelCmd extends Command {
 		
 		e.getJDA().cancelRequests();
 		
-		e.getJDA().openPrivateChannelById(Bootstrap.otakuSenpai.getConfig().getOwnerId()).queue(channel -> {
+		e.getJDA().openPrivateChannelById(Bootstrap.holo.getConfig().getOwnerId()).queue(channel -> {
 			EmbedBuilder builder = new EmbedBuilder();
 			builder.setTitle("Success");
 			builder.setDescription("Cancelled all requests");

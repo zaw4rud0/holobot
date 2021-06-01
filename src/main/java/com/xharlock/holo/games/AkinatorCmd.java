@@ -141,7 +141,7 @@ public class AkinatorCmd extends Command {
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.holo.getConfig().getColor());
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		builder.setThumbnail(AkinatorSprites.START.getUrl());
 		builder.setDescription(
@@ -267,7 +267,7 @@ public class AkinatorCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.holo.getConfig().getColor());
 		builder.setThumbnail(AkinatorSprites.GUESSING.getUrl());
 		builder.setFooter(e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
 		
@@ -321,7 +321,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprites.VICTORY.getUrl());
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.holo.getConfig().getColor());
 		builder.setDescription("Great, guessed right one more time!\n"
 				+ "It took me `" + counter.get() + "` questions to correctly guess " + right.getName());
 		if (right.getImage() != null)
@@ -337,7 +337,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprites.DEFEAT.getUrl());
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.holo.getConfig().getColor());
 		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		msg.editMessage(builder.build()).queue();
@@ -349,7 +349,7 @@ public class AkinatorCmd extends Command {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(Bootstrap.otakuSenpai.getConfig().getColor());
+		builder.setColor(Bootstrap.holo.getConfig().getColor());
 		builder.setThumbnail(AkinatorSprites.CANCEL.getUrl());
 		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());

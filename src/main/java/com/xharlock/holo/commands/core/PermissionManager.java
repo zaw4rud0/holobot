@@ -116,7 +116,7 @@ public class PermissionManager {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		// Checks if user is bot-owner and can use owner-only commands
-		if (cmd.isOwnerCommand() && e.getAuthor().getIdLong() != Bootstrap.otakuSenpai.getConfig().getOwnerId()) {
+		if (cmd.isOwnerCommand() && e.getAuthor().getIdLong() != Bootstrap.holo.getConfig().getOwnerId()) {
 			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("No Permission");
 			builder.setDescription("This command is owner-only");
@@ -126,7 +126,7 @@ public class PermissionManager {
 
 		// Checks if user is an admin or server-owner and if he can use admin commands
 		if (e.isFromGuild()) {
-			Role admin = Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getAdminRole();
+			Role admin = Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getAdminRole();
 			if (admin == null) {
 				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor())) {
 					cmd.addErrorReaction(e.getMessage());

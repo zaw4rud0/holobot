@@ -27,7 +27,7 @@ public class PurgeCmd extends Command {
 		// TODO Select messages of author
 		
 		int limit = 100;
-		long id = Bootstrap.otakuSenpai.getConfig().getOwnerId();
+		long id = Bootstrap.holo.getConfig().getOwnerId();
 		int n = 10;
 		
 		TextChannel c = (TextChannel) e.getChannel();

@@ -73,6 +73,6 @@ public class BlacklistCmd extends Command {
 		builder.setTimestamp(Instant.now());
 		
 		sendToOwner(e, builder);
-		Bootstrap.otakuSenpai.getPermissionManager().blacklist(toBlacklist);
+		Bootstrap.holo.getPermissionManager().blacklist(toBlacklist);
 	}
 }

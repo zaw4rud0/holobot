@@ -53,16 +53,16 @@ public abstract class Command {
 
 	protected String getPrefix(MessageReceivedEvent e) {
 		if (e.isFromGuild())
-			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
+			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
 		else
-			return Bootstrap.otakuSenpai.getConfig().getPrefix();
+			return Bootstrap.holo.getConfig().getPrefix();
 	}
 
 	protected int getColor(MessageReceivedEvent e) {
 		if (e.isFromGuild())
-			return Bootstrap.otakuSenpai.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();
+			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();
 		else
-			return Bootstrap.otakuSenpai.getConfig().getColor();
+			return Bootstrap.holo.getConfig().getColor();
 	}
 
 	protected boolean isValidURL(String url) {
@@ -80,7 +80,7 @@ public abstract class Command {
 	}
 	
 	protected boolean isBotOwner(MessageReceivedEvent e) {
-		if (e.getAuthor().getIdLong() == Bootstrap.otakuSenpai.getConfig().getOwnerId())
+		if (e.getAuthor().getIdLong() == Bootstrap.holo.getConfig().getOwnerId())
 			return true;
 		else
 			return false;
@@ -144,7 +144,7 @@ public abstract class Command {
 	}
 	
 	protected void sendToOwner(MessageReceivedEvent e, EmbedBuilder builder) {
-		e.getJDA().getUserById(Bootstrap.otakuSenpai.getConfig().getOwnerId()).openPrivateChannel().complete().sendMessage(builder.build()).queue();
+		e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId()).openPrivateChannel().complete().sendMessage(builder.build()).queue();
 	}
 	
 	public String getName() {

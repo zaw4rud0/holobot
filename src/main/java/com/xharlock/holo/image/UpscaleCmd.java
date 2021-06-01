@@ -80,7 +80,7 @@ public class UpscaleCmd extends Command {
 	 * @throws IOException
 	 */
 	private static String upscaleImage(String imageUrl) throws IOException {
-		String token = Bootstrap.otakuSenpai.getConfig().getKeyDeepAI();
+		String token = Bootstrap.holo.getConfig().getKeyDeepAI();
 		Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + url);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 		String result = reader.lines().collect(Collectors.joining("\n"));

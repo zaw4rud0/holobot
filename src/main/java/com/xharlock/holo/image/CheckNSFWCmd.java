@@ -149,7 +149,7 @@ public class CheckNSFWCmd extends Command {
 	private static final String url = "https://api.deepai.org/api/nsfw-detector";
 
 	private static double getNSFWScore(String imageUrl) throws IOException {
-		String token = Bootstrap.otakuSenpai.getConfig().getKeyDeepAI();
+		String token = Bootstrap.holo.getConfig().getKeyDeepAI();
 		Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + url);
 		String result = new BufferedReader(new InputStreamReader(pr.getInputStream())).lines()
 				.collect(Collectors.joining("\n"));
@@ -160,7 +160,7 @@ public class CheckNSFWCmd extends Command {
 	// Get more informations about nsfw elements in the image
 	@SuppressWarnings("unused")
 	private static JsonObject getJsonObject(String imageUrl) throws IOException {
-		String token = Bootstrap.otakuSenpai.getConfig().getKeyDeepAI();
+		String token = Bootstrap.holo.getConfig().getKeyDeepAI();
 		Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + url);
 		String result = new BufferedReader(new InputStreamReader(pr.getInputStream())).lines()
 				.collect(Collectors.joining("\n"));

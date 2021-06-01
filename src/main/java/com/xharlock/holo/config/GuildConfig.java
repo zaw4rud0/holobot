@@ -54,10 +54,10 @@ public class GuildConfig {
 	}
 	
 	public void setDefaultPrefix() {
-		this.prefix = Bootstrap.otakuSenpai.getConfig().getPrefix();
+		this.prefix = Bootstrap.holo.getConfig().getPrefix();
 	}
 	
 	public void setDefaultColor() {
-		this.embed_color = Bootstrap.otakuSenpai.getConfig().getColor();
+		this.embed_color = Bootstrap.holo.getConfig().getColor();
 	}
 }
