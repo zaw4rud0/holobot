@@ -101,7 +101,7 @@ public class PokemonTeam {
 	/**
 	 * Method to display the current Pokémon team as a BufferedImage
 	 */
-	public BufferedImage displayTeam(boolean matchings) throws IOException {
+	public BufferedImage displayTeam(boolean matchings) throws IllegalArgumentException, IOException {
 
 		// Convert team array to a List
 		List<Pokemon> team = Arrays.asList(this.team);
@@ -136,13 +136,13 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to display the given Pokémon team as a BufferedImage
+	 * Method to display a given Pokémon team as a BufferedImage
 	 * 
 	 * @param team      = List of Pokemon to display
 	 * @param matchings = Match the types of the Pokémon
 	 * @return Reordered List of Pokémon
 	 */
-	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IOException {
+	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IllegalArgumentException, IOException {
 
 		if (team.size() > 6)
 			throw new IllegalArgumentException("The list may not contain more than 6 Pokémon!");
@@ -240,9 +240,13 @@ public class PokemonTeam {
 		return res;
 	}
 
+	
+	// TODO Method that calls the code of Markbeep
 	private static List<Pokemon> match(List<Pokemon> team) {
 		List<Pokemon> result = team;
 
+		// Execute Markbeep's algorithm here
+		
 		return result;
 	}
 }

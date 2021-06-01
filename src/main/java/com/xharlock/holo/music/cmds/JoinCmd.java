@@ -22,14 +22,12 @@ public class JoinCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
 		AudioManager audioManager = e.getGuild().getAudioManager();
-
+		
 		if (isBotInChannel(e)) {
 			builder.setTitle("Error");
-			builder.setDescription("I'm already in a voice channel!\nJoin me in " + e.getGuild().getSelfMember().getVoiceState().getChannel().getAsMention());
+			builder.setDescription("I'm already in a voice channel!\nJoin me in <#" + e.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong() + ">");
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);
 			return;
 		}
@@ -41,7 +39,8 @@ public class JoinCmd extends MusicCommand {
 		audioManager.openAudioConnection(e.getMember().getVoiceState().getChannel());
 
 		builder.setTitle("Connected " + Emojis.NOTE.getAsNormal());
-		builder.setDescription("Join me in " + e.getMember().getVoiceState().getChannel().getAsMention());		
+		builder.setDescription("Join me in <#" + e.getMember().getVoiceState().getChannel().getIdLong() + ">");
+		
 		sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);
 	}
 }

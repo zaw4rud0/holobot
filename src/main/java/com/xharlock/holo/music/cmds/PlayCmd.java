@@ -18,8 +18,7 @@ public class PlayCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();		
-		e.getChannel().sendTyping().queue();
+		e.getMessage().delete().queue();
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		

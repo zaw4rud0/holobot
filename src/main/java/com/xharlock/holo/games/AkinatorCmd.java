@@ -52,9 +52,9 @@ public class AkinatorCmd extends Command {
 		counter = new AtomicInteger();
 		wrong = new ArrayList<>();
 
-		this.reactions = new Reaction[] { new Reaction("1\u20e3", Answer.YES), new Reaction("2\u20e3", Answer.NO),
-				new Reaction("3\u20e3", Answer.DONT_KNOW), new Reaction("4\u20e3", Answer.PROBABLY),
-				new Reaction("5\u20e3", Answer.PROBABLY_NOT) };
+		this.reactions = new Reaction[] { new Reaction(Emojis.ONE.getAsBrowser(), Answer.YES), new Reaction(Emojis.TWO.getAsBrowser(), Answer.NO),
+				new Reaction(Emojis.THREE.getAsBrowser(), Answer.DONT_KNOW), new Reaction(Emojis.FOUR.getAsBrowser(), Answer.PROBABLY),
+				new Reaction(Emojis.FIVE.getAsBrowser(), Answer.PROBABLY_NOT) };
 	}
 
 	// TODO Clean up
@@ -96,7 +96,13 @@ public class AkinatorCmd extends Command {
 		Message msg = sendEmbedAndGetMessage(e, builder, true);
 		addStartReactions(msg);
 
-		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {			
+		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
+			
+			// So reactions on other messages are ignored
+			if (evt.getMessageIdLong() != msg.getIdLong()) {
+				return false;
+			}
+			
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
 				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())
 						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
@@ -152,7 +158,14 @@ public class AkinatorCmd extends Command {
 
 	private void askQuestion(MessageReceivedEvent e, Message msg, EmbedBuilder builder) {
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
+			
+			// So reactions on other messages are ignored
+			if (evt.getMessageIdLong() != msg.getIdLong()) {
+				return false;
+			}
+			
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
+				
 				if (evt.getReactionEmote().isEmoji()) {
 					for (int i = 0; i < 5; i++) {
 						Reaction r = reactions[i];
@@ -271,7 +284,13 @@ public class AkinatorCmd extends Command {
 		msg.editMessage(builder.build()).queue();
 
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
-			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
+			
+			// So reactions on other messages are ignored
+			if (evt.getMessageIdLong() != msg.getIdLong()) {
+				return false;
+			}
+			
+			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {				
 				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())
 						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CONTINUE.getAsReaction())
 						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
@@ -364,19 +383,19 @@ public class AkinatorCmd extends Command {
 	}
 
 	private void addInGameReactions(Message msg) {
-		msg.addReaction(Emojis.ONE.getAsReaction()).queue(v -> {
+		msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.TWO.getAsReaction()).queue(v -> {
+		msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.THREE.getAsReaction()).queue(v -> {
+		msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.FOUR.getAsReaction()).queue(v -> {
+		msg.addReaction(Emojis.FOUR.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.FIVE.getAsReaction()).queue(v -> {
+		msg.addReaction(Emojis.FIVE.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
 		msg.addReaction(Emotes.UNDO.getAsReaction()).queue(v -> {

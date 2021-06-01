@@ -35,8 +35,6 @@ public class SuggestionCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (this.getArgs().length == 0) {

@@ -43,8 +43,8 @@ public class ReadCmd extends Command {
 			return;
 		}
 		
-		msg.addReaction(Emojis.ARROW_LEFT.getAsReaction()).queue();
-		msg.addReaction(Emojis.ARROW_RIGHT.getAsReaction()).queue();
+		msg.addReaction(Emojis.ARROW_LEFT.getAsBrowser()).queue();
+		msg.addReaction(Emojis.ARROW_RIGHT.getAsBrowser()).queue();
 		
 		// Set to manga title
 		builder.setTitle("Manga Reader");

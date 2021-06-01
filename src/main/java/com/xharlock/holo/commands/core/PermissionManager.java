@@ -44,16 +44,21 @@ public class PermissionManager {
 		return true;
 	}
 
+	// TODO Make a db request
 	public boolean isBlacklisted(User user) {
 		return blacklisted.contains(user);
 	}
 
+	// TODO Write blacklisted user to db
 	public void blacklist(User user) {
 		blacklisted.add(user);
 	}
 
 	// Write these methods in the Command Class so you can tweak them for each command
 	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
+		
+		e.getMessage().delete().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 		long now = Instant.now().getEpochSecond();
 		if (cmd.onTimeout.containsKey(e.getAuthor())) {			
@@ -66,9 +71,13 @@ public class PermissionManager {
 				builder.setTitle("On Cooldown!");
 				int remaining = cmd.getCmdCooldown() - (int) (now - cmd.onTimeout.get(e.getAuthor()));
 				builder.setDescription(String.format("%s, you are on cooldown!\nPlease wait `%d` seconds before using this command again.", e.getAuthor().getAsMention(), remaining));
-				cmd.sendEmbed(e, builder, 10L, TimeUnit.SECONDS, false);
-				if (warned) this.lastUserWarning.replace(e.getAuthor(), now);
-				else this.lastUserWarning.put(e.getAuthor(), now);				
+				cmd.sendEmbed(e, builder, 10, TimeUnit.SECONDS, false);
+				
+				if (warned) 
+					this.lastUserWarning.replace(e.getAuthor(), now);
+				else 
+					this.lastUserWarning.put(e.getAuthor(), now);
+				
 				return true;
 			} else {
 				cmd.onTimeout.replace(e.getAuthor(), now);
@@ -90,14 +99,14 @@ public class PermissionManager {
 			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("No Permission");
 			builder.setDescription("You are not allowed to use this command in a private chat!");
-			cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
+			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return false;
 		}
 		if (e.isFromGuild() && !e.getTextChannel().isNSFW() && cmd.isNSFW()) {
 			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("NSFW Command");
 			builder.setDescription("You can't use a NSFW command in a non-NSFW channel, p-pervert!");
-			cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
+			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return false;
 		}
 		return true;
@@ -111,7 +120,7 @@ public class PermissionManager {
 			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("No Permission");
 			builder.setDescription("This command is owner-only");
-			cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
+			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return false;
 		}
 
@@ -123,7 +132,7 @@ public class PermissionManager {
 					cmd.addErrorReaction(e.getMessage());
 					builder.setTitle("No Permission");
 					builder.setDescription("This command is admin-only");
-					cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
+					cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 					return false;
 				}
 			} else {
@@ -132,7 +141,7 @@ public class PermissionManager {
 					cmd.addErrorReaction(e.getMessage());
 					builder.setTitle("No Permission");
 					builder.setDescription("This command is admin-only");
-					cmd.sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
+					cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 					return false;
 				}
 			}

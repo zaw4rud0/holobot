@@ -22,8 +22,7 @@ public class CloneCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();		
-		e.getChannel().sendTyping().queue();
+		e.getMessage().delete().queue();
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());

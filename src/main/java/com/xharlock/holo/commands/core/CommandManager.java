@@ -6,9 +6,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.xharlock.holo.anime.AnimeSearchCmd;
-import com.xharlock.holo.anime.MangaSearchCmd;
-import com.xharlock.holo.anime.ReadCmd;
+import com.xharlock.holo.anime.*;
 import com.xharlock.holo.commands.cmds.*;
 import com.xharlock.holo.commands.owner.*;
 import com.xharlock.holo.games.AkinatorCmd;
@@ -37,15 +35,15 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new WhoisCmd("whois"));
 		
 		// Experimental Commands
-		addCommand(new ReadCmd("read"));
-		addCommand(new PokemonCmd("pokemon"));
+//		addCommand(new ReadCmd("read"));
+//		addCommand(new PokemonCmd("pokemon"));
 		
 		// Anime Cmds
 		addCommand(new AnimeSearchCmd("animesearch", waiter));
 		addCommand(new MangaSearchCmd("mangasearch", waiter));
 
 		// Music Cmds
-//		addCommand(new ClearCmd("clear", waiter));
+		addCommand(new ClearCmd("clear", waiter));
 		addCommand(new CloneCmd("clone"));
 		addCommand(new JoinCmd("join"));
 		addCommand(new LeaveCmd("leave"));
@@ -57,7 +55,7 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new QueueCmd("queue"));
 //		addCommand(new RemoveCmd("remove"));
 		addCommand(new ShuffleCmd("shuffle"));
-//		addCommand(new SkipCmd("skip", waiter));
+		addCommand(new SkipCmd("skip", waiter));
 		addCommand(new StopCmd("stop"));
 
 		// Image Cmds
@@ -82,6 +80,7 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new xkcdCmd("xkcd"));
 
 		// Owner Cmds
+		addCommand(new BlacklistCmd("blacklist"));
 		addCommand(new CancelCmd("cancel"));
 		addCommand(new CountCmd("count"));
 		addCommand(new DeleteCmd("delete"));

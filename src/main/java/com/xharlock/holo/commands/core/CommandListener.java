@@ -47,7 +47,7 @@ public class CommandListener extends ListenerAdapter {
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
 		cmd.onCommand(e);
 		
-		// TODO Replace with proper logger
+		// TODO Replace with proper logging
 		System.out.println(String.valueOf(LocalDateTime.now().toString()) + " : " + e.getAuthor() + " has called " + cmd.getName());	
 	}
 

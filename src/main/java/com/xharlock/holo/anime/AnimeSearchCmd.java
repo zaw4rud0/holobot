@@ -35,8 +35,6 @@ public class AnimeSearchCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
 		e.getChannel().sendTyping().queue();
 		
 		EmbedBuilder builder = new EmbedBuilder();
@@ -62,13 +60,17 @@ public class AnimeSearchCmd extends Command {
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
+		
+		if (e.isFromGuild())
+			e.getMessage().delete().queue();
 
 		StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < array.size(); i++)
+		for (int i = 0; i < array.size(); i++) {
 			sb.append(numbers.get(i) + " " + array.get(i).getAsJsonObject().get("title").getAsString() + " ["
 					+ array.get(i).getAsJsonObject().get("type").getAsString() + "]\n");
-
+		}
+		
 		String result = sb.toString();
 
 		builder.setTitle("Anime Search Results");
@@ -76,82 +78,63 @@ public class AnimeSearchCmd extends Command {
 
 		e.getChannel().sendMessage(builder.build()).queue(msg -> {
 
-			msg.addReaction(Emojis.ONE.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.TWO.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.THREE.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.FOUR.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.FIVE.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.SIX.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.SEVEN.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.EIGHT.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.NINE.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
-			msg.addReaction(Emojis.TEN.getAsReaction()).queue(v -> {
-			}, err -> {
-			});
+			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.FOUR.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.FIVE.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.SIX.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.SEVEN.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.EIGHT.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.NINE.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.TEN.getAsBrowser()).queue(v -> {}, err -> {});
 
 			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
+				
+				// So reactions on other messages are ignored
+				if (evt.getMessageIdLong() != msg.getIdLong()) {
+					return false;
+				}
+				
 				if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
 
-					// So reactions on other messages will be ignored
-					if (evt.getMessageIdLong() != msg.getIdLong()) {
-						return false;
-					}
-
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.ONE.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.ONE.getAsBrowser())) {
 						this.id = array.get(0).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.TWO.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.TWO.getAsBrowser())) {
 						this.id = array.get(1).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.THREE.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.THREE.getAsBrowser())) {
 						this.id = array.get(2).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.FOUR.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.FOUR.getAsBrowser())) {
 						this.id = array.get(3).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.FIVE.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.FIVE.getAsBrowser())) {
 						this.id = array.get(4).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.SIX.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.SIX.getAsBrowser())) {
 						this.id = array.get(5).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.SEVEN.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.SEVEN.getAsBrowser())) {
 						this.id = array.get(6).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.EIGHT.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.EIGHT.getAsBrowser())) {
 						this.id = array.get(7).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.NINE.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.NINE.getAsBrowser())) {
 						this.id = array.get(8).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emojis.TEN.getAsReaction())) {
+					if (evt.getReactionEmote().getEmoji().equals(Emojis.TEN.getAsBrowser())) {
 						this.id = array.get(9).getAsJsonObject().get("mal_id").getAsInt();
 						return true;
 					}
@@ -173,6 +156,9 @@ public class AnimeSearchCmd extends Command {
 			anime = new Anime(JikanAPI.getAnime(id));
 		} catch (IOException ex) {
 			ex.printStackTrace();
+			builder.setTitle("Error");
+			builder.setDescription("Something went wrong while fetching your anime. Please try again in a few minutes!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 

@@ -44,11 +44,11 @@ public abstract class Command {
 	public abstract void onCommand(MessageReceivedEvent e);
 
 	protected void addSuccessReaction(Message msg) {
-		msg.addReaction(Emojis.THUMBSUP.getAsReaction());
+		msg.addReaction(Emojis.THUMBSUP.getAsBrowser());
 	}
 
 	protected void addErrorReaction(Message msg) {
-		msg.addReaction(Emojis.THUMBSDOWN.getAsReaction());
+		msg.addReaction(Emojis.THUMBSDOWN.getAsBrowser());
 	}
 
 	protected String getPrefix(MessageReceivedEvent e) {
@@ -72,6 +72,18 @@ public abstract class Command {
 		} catch (Exception ex) {
 			return false;
 		}
+	}
+	
+	// TODO
+	protected boolean isGuildAdmin(MessageReceivedEvent e) {
+		return false;
+	}
+	
+	protected boolean isBotOwner(MessageReceivedEvent e) {
+		if (e.getAuthor().getIdLong() == Bootstrap.otakuSenpai.getConfig().getOwnerId())
+			return true;
+		else
+			return false;
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
@@ -129,6 +141,10 @@ public abstract class Command {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		
 		return e.getChannel().sendMessage(builder.build()).complete();
+	}
+	
+	protected void sendToOwner(MessageReceivedEvent e, EmbedBuilder builder) {
+		e.getJDA().getUserById(Bootstrap.otakuSenpai.getConfig().getOwnerId()).openPrivateChannel().complete().sendMessage(builder.build()).queue();
 	}
 	
 	public String getName() {

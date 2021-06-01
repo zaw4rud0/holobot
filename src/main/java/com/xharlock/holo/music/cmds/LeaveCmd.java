@@ -21,8 +21,6 @@ public class LeaveCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (!isBotInChannel(e)) {

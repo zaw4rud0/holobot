@@ -15,6 +15,8 @@ public class TrackScheduler extends AudioEventAdapter {
 
 	public BlockingQueue<AudioTrack> queue;
 	public final AudioPlayer audioPlayer;
+	
+	// TODO Actually implement looping and paused
 	public boolean looping;
 	public boolean paused;
 

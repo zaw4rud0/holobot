@@ -69,7 +69,7 @@ public enum Emojis {
 	/**
 	 * The emoji as reaction
 	 */
-	public String getAsReaction() {
+	public String getAsUnicode() {
 		return this.unicode;
 	}
 

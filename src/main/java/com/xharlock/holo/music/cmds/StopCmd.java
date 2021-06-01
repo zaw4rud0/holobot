@@ -22,8 +22,6 @@ public class StopCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 
@@ -35,7 +33,8 @@ public class StopCmd extends MusicCommand {
 		}
 
 		musicManager.scheduler.audioPlayer.stopTrack();
-
+		musicManager.scheduler.queue.clear();
+		
 		builder.setTitle("Success");
 		builder.setDescription("Stopped current track and cleared queue!");
 		sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);

@@ -1,4 +1,4 @@
-package com.xharlock.holo.db;
+package com.xharlock.holo.database;
 
 import java.sql.SQLException;
 

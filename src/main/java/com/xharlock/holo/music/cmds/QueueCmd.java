@@ -24,45 +24,44 @@ public class QueueCmd extends MusicCommand {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
-		
-		e.getChannel().sendTyping().queue();
-		
-		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
-        BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
-        
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Queue");
-        
-        if (queue.isEmpty()) {
-            builder.setDescription("My queue is empty!");
-            sendEmbed(e, builder, 15L, TimeUnit.SECONDS, true);
-            return;
-        }
-        
-        int trackCount = Math.min(queue.size(), 12);
-        
-        List<AudioTrack> trackList = new ArrayList<AudioTrack>(queue);
-        StringBuilder sb = new StringBuilder();        
-        
-        for (int i = 0; i < trackCount; ++i) {        	
-            AudioTrack track = trackList.get(i);
-            AudioTrackInfo info = track.getInfo();            
-            sb.append(String.format("`#%02d %s by %s [%s]`", i + 1, info.title, info.author, Formatter.formatTrackTime(track.getDuration()))).append("\n");
-        }
-        
-        if (trackList.size() > trackCount) {
-            sb.append("And `").append(trackList.size() - trackCount).append("` more...");
-        }
-        
-        long duration = 0L;        
-        for (AudioTrack track : trackList) {
-        	duration += track.getDuration();
-        }
-        
-        builder.setDescription(sb.toString());        
-        builder.addField("Total Duration", Formatter.formatTrackTime(duration), false);
-       
-        sendEmbed(e, builder, 1L, TimeUnit.MINUTES, true);
-	}
 
+		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
+		BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
+
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Queue");
+
+		if (queue.isEmpty()) {
+			builder.setDescription("My queue is empty!");
+			sendEmbed(e, builder, 15L, TimeUnit.SECONDS, true);
+			return;
+		}
+
+		int trackCount = Math.min(queue.size(), 12);
+
+		List<AudioTrack> trackList = new ArrayList<AudioTrack>(queue);
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < trackCount; ++i) {
+			AudioTrack track = trackList.get(i);
+			AudioTrackInfo info = track.getInfo();
+			sb.append(String.format("`#%02d %s by %s [%s]`", i + 1, info.title, info.author, Formatter.formatTrackTime(track.getDuration()))).append("\n");
+		}
+
+		if (trackList.size() > trackCount) {
+			sb.append("And `").append(trackList.size() - trackCount).append("` more...");
+		}
+
+		// Get total duration of the queue + current track
+		AudioTrack current = musicManager.audioPlayer.getPlayingTrack();		
+		long duration = current != null ? current.getDuration() - current.getPosition() : 0L;		
+		for (AudioTrack track : trackList) {
+			duration += track.getDuration();
+		}
+
+		builder.setDescription(sb.toString());
+		builder.addField("Total Duration", Formatter.formatTrackTime(duration), false);
+
+		sendEmbed(e, builder, 1L, TimeUnit.MINUTES, true);
+	}
 }

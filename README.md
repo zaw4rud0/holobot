@@ -11,7 +11,6 @@ A simple bot for Discord that has a variety of functions and features
 
 ### General
 * Anime & Manga Search
-* Music Player
 * Image Provider
 
 ### Games
@@ -20,14 +19,24 @@ A simple bot for Discord that has a variety of functions and features
 
 ### Music Player
 
+
+
 ## Dependencies
 
 This discord bot uses the following dependencies for its functionalities:
 
 ### [JDA](https://github.com/DV8FromTheWorld/JDA)
 
+JDA (Java Discord API) makes up the core of this bot 
+
 ### [JDA-Utilities](https://github.com/JDA-Applications/JDA-Utilities)
+
+Library with many useful features for JDA bots
 
 ### [LavaPlayer](https://github.com/sedmelluq/lavaplayer)
 
+The most popular library used by java music bots.
+
 ### [AkiWrapper](https://github.com/markozajc/Akiwrapper)
+
+A simple wrapper for Akinator
