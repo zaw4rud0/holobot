@@ -243,11 +243,8 @@ public class PokemonTeam {
 	
 	// TODO Method that calls the code of Markbeep
 	private static List<Pokemon> match(List<Pokemon> team) {
-		List<Pokemon> result = team;
-
-		// Execute Markbeep's algorithm here
 		
-		return result;
+		return SortedPokemon.orderPokemon(team);
 	}
 }
 
@@ -256,76 +253,56 @@ public class PokemonTeam {
 
 //Code by MarkBeep
 class SortedPokemon {
-	String name;
-	String type1;
-	String type2;
-	int id;
 
-	boolean swapped;
-
-	SortedPokemon(String name, String type1, String type2, int id) {
-		this.name = name;
-		this.type1 = type1;
-		this.type2 = type2;
-		this.id = id;
-	}
-
-	public static List<BufferedImage> orderImages(List<SortedPokemon> pokes, List<PokemonSpecies> allPokemon)
-			throws Exception {
+	/*
+	 * Orders the given Pokemon list so that
+	 * the most type colors overlap
+	 */
+	public static List<Pokemon> orderPokemon(List<Pokemon> pokes) {
 		
-		List<SortedPokemon> doublePokes = doublePokes(pokes);
-		List<SortedPokemon> bestTeam = new ArrayList<>();
+		List<Pokemon> doublePokes = doublePokes(pokes);
+		List<Pokemon> bestTeam = new ArrayList<>();
 		
 		findBestMatches(doublePokes, new int[1], bestTeam, new ArrayList<>());
 
-		// creates the image
-		List<BufferedImage> ordered = new ArrayList<>();
-		
-		for (SortedPokemon p : bestTeam) {
-
-			BufferedImage img = null;
-			PokemonSpecies pokemon = allPokemon.get(p.id);
-
-			PokemonType type1 = null;
-			PokemonType type2 = null;
-
-			// We set type1 and type2 correctly for the draw function
-			if (!p.swapped) {
-				type1 = pokemon.type1;
-				type2 = (pokemon.type2 == null) ? type1 : pokemon.type2;
-			} else {
-				  type2 = pokemon.type1;
-				  type1 = (pokemon.type2==null) ? type2: pokemon.type2;
-			}
-
-			ordered.add(img);
-		}
-		return ordered;
+		return bestTeam;
 	}
 
 	/*
 	 * Doubles the pokemon list by swapping the types
 	 */
-	public static List<SortedPokemon> doublePokes(List<SortedPokemon> pokes) {
-		List<SortedPokemon> copies = new ArrayList<>();
-		List<String> types = new ArrayList<>();
+	public static List<Pokemon> doublePokes(List<Pokemon> pokes) {
+		List<Pokemon> copies = new ArrayList<>();
+		List<PokemonType> types = new ArrayList<>();
 		// this first loop is simply to take note of all types
-		for (SortedPokemon p: pokes) {
+		for (Pokemon p: pokes) {
 			types.add(p.type1);
 			// we add the second type if its a different one
 			if (!p.type1.equals(p.type2)) types.add(p.type2);
 		}
 		// now we can iterate through pokes and if they have unique types, don't copy them
-		for (SortedPokemon p : pokes) {
+		for (Pokemon p : pokes) {
 			// iterate over the list and find multiple instances
 			int t1 = 0;  // counter for occurences of first type
 			int t2 = 0;  // counter for occurences of second type
-			for (String s: types) {
+			for (PokemonType s: types) {
 				if (s.equals(p.type1)) t1++;
 				if (s.equals(p.type2)) t2++;
 			}
 			// if t1 or t2 > 1, more than 1 pokemon has that type
-			if (t1 > 1 || t2 > 1) copies.add(p.copy());
+			if (t1 > 1 || t2 > 1) {
+				// Copies the pokemon and additionally swaps type1 and type2
+				Pokemon copy;
+				try {
+					copy = p.clone();
+				} catch (CloneNotSupportedException e) {
+					continue;
+				}
+				PokemonType tmp = copy.type2;
+				copy.type1 = copy.type2;
+				copy.type2 = tmp;
+				copies.add(copy);
+			}
 		}
 		pokes.addAll(copies);
 		return pokes;
@@ -333,9 +310,10 @@ class SortedPokemon {
 
 	/*
 	 * Creates the array with the best matchings
+	 * Works in a recursive fashion
 	 */
-	public static void findBestMatches(List<SortedPokemon> pokes, int[] best, List<SortedPokemon> bestTeam,
-			List<SortedPokemon> cur) {
+	public static void findBestMatches(List<Pokemon> pokes, int[] best, List<Pokemon> bestTeam,
+			List<Pokemon> cur) {
 		
 		if (cur.size() == 6) {
 			// If the current array is 6 big, count the matchings
@@ -347,10 +325,10 @@ class SortedPokemon {
 			}
 			return;
 		}
-		for (SortedPokemon p : pokes) {
+		for (Pokemon p : pokes) {
 			if (cur.contains(p))
 				continue;
-			List<SortedPokemon> copy = new ArrayList<>(cur);
+			List<Pokemon> copy = new ArrayList<>(cur);
 			copy.add(p);
 			findBestMatches(pokes, best, bestTeam, copy);
 		}
@@ -359,42 +337,28 @@ class SortedPokemon {
 	/*
 	 * Counts the amount of matchings in a given list
 	 */
-	public static int matchings(List<SortedPokemon> q) {
+	public static int matchings(List<Pokemon> q) {
 		int t = 0;
 		for (int i = 0; i < 6; i++) {
 			if (i < 2) {
-				if (q.get(i).type2 == q.get(i + 1).type1)
+				// pokemon is in first or second position, so check if it matches with
+				// bottom or right type
+				if (q.get(i).type2.equals(q.get(i + 1).type1))
 					t++;
-				if (q.get(i).type2 == q.get(i + 3).type1)
+				if (q.get(i).type2.equals(q.get(i + 3).type1))
 					t++;
 			} else if (i == 2) {
-				if (q.get(i).type2 == q.get(i + 3).type1)
+				// pokemon is in the third position, so check below type match
+				if (q.get(i).type2.equals(q.get(i + 3).type1))
 					t++;
 			} else if (i < 5) {
-				if (q.get(i).type2 == q.get(i + 1).type1)
+				// pokemon is 4th and 5th position, so check type to the right
+				if (q.get(i).type2.equals(q.get(i + 1).type1))
 					t++;
 			}
 		}
 		return t;
 	}
 
-	@Override
-	public boolean equals(Object o) {
-		if (o instanceof SortedPokemon) {
-			SortedPokemon p = (SortedPokemon) o;
-			return p.id == this.id;
-		}
-		return false;
-	}
-
-	/*
-	 * Returns a copied version of a pokemon with 'swapped'
-	 * set to true
-	 */
-	public SortedPokemon copy() {
-		SortedPokemon p = new SortedPokemon(name, type2, type1, id);
-		p.swapped = true;
-		return p;
-	}
 }
 //###################################################
