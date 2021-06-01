@@ -260,9 +260,8 @@ public class PokemonTeam {
 		// this first loop is simply to take note of all types
 		for (Pokemon p : pokes) {
 			types.add(p.type1);
-			// we add the second type if its a different one
-			if (!p.type1.equals(p.type2))
-				types.add(p.type2);
+			// we add the second type if its a different one and not null
+			if (p.type2 != null && !p.type1.equals(p.type2)) types.add(p.type2);
 		}
 		// now we can iterate through pokes and if they have unique types, don't copy
 		// them
