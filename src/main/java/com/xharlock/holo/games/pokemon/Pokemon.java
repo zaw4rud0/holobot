@@ -17,4 +17,9 @@ public class Pokemon extends PokemonSpecies {
 		super(species);
 	}
 
+	@Override
+	public Pokemon clone() throws CloneNotSupportedException {
+		Pokemon p = (Pokemon)super.clone();
+		return p;
+	}
 }
