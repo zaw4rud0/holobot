@@ -1,3 +1,5 @@
+<img align="right" src="https://github.com/xharlock/HoloBot/assets/logo.png" height="200" width="200">
+
 # HoloBot (Java Discord Bot)
 
 A simple bot for Discord that has a variety of functions and features
