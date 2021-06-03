@@ -45,7 +45,7 @@ public class RandomPokemonCmd extends Command {
 		else
 			builder.addField("Type", pokemon.type1.getEmote().getAsText() + " " + pokemon.type1.getName(), false);
 		
-		builder.setThumbnail(pokemon.sprite);
+		builder.setThumbnail(pokemon.sprite_front);
 		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
 	}
 

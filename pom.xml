@@ -67,7 +67,7 @@
 			<version>1.5.1.1</version>
 		</dependency>
 
-		<!-- LavaPlayer Stuff -->
+		<!-- LavaPlayer -->
 		<dependency>
 			<groupId>com.sedmelluq</groupId>
 			<artifactId>lavaplayer</artifactId>

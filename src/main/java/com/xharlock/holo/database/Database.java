@@ -8,7 +8,7 @@ import java.sql.Statement;
 
 public class Database {
 
-	private static final String path = "./src/main/resources/database/OtakuSenpai.db";
+	private static final String path = "./src/main/resources/database/Holo.db";
 	private static Connection conn;
 	
 	public static void connect() throws ClassNotFoundException, SQLException {

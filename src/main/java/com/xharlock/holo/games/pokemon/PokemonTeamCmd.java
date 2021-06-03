@@ -8,7 +8,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.utils.BufferedImageOperations;
+import com.xharlock.holo.utils.BufferedImageOps;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
@@ -35,7 +35,7 @@ public class PokemonTeamCmd extends Command {
 		
 		// Display help page
 		if (args.length == 0) {
-			e.getChannel().sendMessage("This feature is in development and thus not available yet").queue();
+			e.getChannel().sendMessage("This feature is in development and thus not available yet. You probably meant `" + getPrefix(e) + "pokemonteam random`").queue();
 		}
 		
 		else if (args[0].equals("random")) {
@@ -51,7 +51,7 @@ public class PokemonTeamCmd extends Command {
 			try {
 				List<Pokemon> team = PokeAPI.getRandomTeam();
 				BufferedImage img = PokemonTeam.displayTeam(team, matching);
-				input = BufferedImageOperations.toInputStream(img);
+				input = BufferedImageOps.toInputStream(img);
 			} catch (IOException | InterruptedException ex) {
 				builder.setTitle("Error");
 				builder.setDescription("Something went wrong while creating a Pokémon team. Please try again in a few minutes!");

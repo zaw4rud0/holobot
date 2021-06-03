@@ -11,7 +11,7 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-public class BufferedImageOperations {
+public class BufferedImageOps {
 
 	public static BufferedImage join(BufferedImage img1, BufferedImage img2, String direction) {
 		BufferedImage result = null;

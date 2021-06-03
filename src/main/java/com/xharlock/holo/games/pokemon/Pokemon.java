@@ -15,11 +15,16 @@ public class Pokemon extends PokemonSpecies {
 	
 	public Pokemon(JsonObject species) throws IOException {
 		super(species);
+		assignGender();
 	}
 
+	private void assignGender() {
+		
+	}
+	
 	@Override
 	public Pokemon clone() throws CloneNotSupportedException {
-		Pokemon p = (Pokemon)super.clone();
+		Pokemon p = (Pokemon) super.clone();
 		return p;
 	}
 }

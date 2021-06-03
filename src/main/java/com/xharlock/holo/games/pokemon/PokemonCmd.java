@@ -38,14 +38,13 @@ public class PokemonCmd extends Command {
 			
 			builder.setTitle("A wild " + pokemon.name + " has appeared!");
 			builder.addField("Level", "" + (rand.nextInt(75) + 1), false);
-			builder.setThumbnail(pokemon.sprite);
+			builder.setThumbnail(pokemon.sprite_front);
 			Message msg = sendEmbedAndGetMessage(e, builder, false);
 			msg.addReaction(Emotes.POKE_BALL.getAsReaction()).queue();
 			msg.addReaction(Emotes.GREAT_BALL.getAsReaction()).queue();
 			msg.addReaction(Emotes.ULTRA_BALL.getAsReaction()).queue();
 			msg.addReaction(Emotes.MASTER_BALL.getAsReaction()).queue();
 		}
-		
 	}
 
 }

@@ -47,9 +47,10 @@ public enum PokemonType {
 	public Color getColor() {
 		return this.color;
 	}
-
-	@Override
-	public boolean equals(Object o) {
-		return o.getName().equals(this.getName());
+	
+	public boolean isSame(PokemonType type) {
+		if (type == null)
+			return false;
+		return this.name.equals(type.getName());
 	}
 }

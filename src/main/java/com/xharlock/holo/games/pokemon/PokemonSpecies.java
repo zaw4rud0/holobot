@@ -17,11 +17,13 @@ public class PokemonSpecies {
 	public String pokedexEntry;
 	public PokemonType type1;
 	public PokemonType type2;
-	public String genderRate;
+	/** The chance of this Pokémon being female with -1 for genderless. */
+	public double genderRate;
 	public String height;
 	public String weight;
 	public String abilities;
-	public String sprite;
+	public String sprite_front;
+	public String sprite_back;
 	public String artwork;
 	public String animated;
 	public String evolutionChain;
@@ -56,7 +58,8 @@ public class PokemonSpecies {
 		this.genderRate = this.getGenderRate(species);
 		this.height = pokemon.get("height").getAsDouble() / 10.0 + " m";
 		this.weight = pokemon.get("weight").getAsDouble() / 10.0 + " kg";
-		this.sprite = this.getSprite(pokemon, "front_default");
+		this.sprite_front = this.getSprite(pokemon, "front_default");
+		this.sprite_back = this.getSprite(pokemon, "back_default");
 		this.artwork = this.getArtwork(pokemon);
 		this.animated = null;
 
@@ -108,7 +111,10 @@ public class PokemonSpecies {
 	}
 
 	protected String getSprite(JsonObject pokemon, String spriteName) {
-		return pokemon.getAsJsonObject("sprites").get(spriteName).getAsString();
+		if (pokemon.getAsJsonObject("sprites").get(spriteName).isJsonNull())
+			return null;
+		else
+			return pokemon.getAsJsonObject("sprites").get(spriteName).getAsString();
 	}
 
 	protected String getArtwork(JsonObject pokemon) {
@@ -126,16 +132,10 @@ public class PokemonSpecies {
 		}
 		return s;
 	}
-
-	protected String getGenderRate(JsonObject species) {
-		String s = "";
-		if (species.get("gender_rate").getAsInt() == -1) {
-			s = "100% \u26b2";
-		} else {
-			double percentage = species.get("gender_rate").getAsInt() * 100 / 8.0;
-			s = 100 - percentage + "% \\\u2642 | " + percentage + "% \\\u2640";
-		}
-		return s;
+	
+	protected double getGenderRate(JsonObject species) {		
+		int ratio = species.get("gender_rate").getAsInt();
+		return ratio == -1 ? -1.0  : ratio / 8.0;
 	}
 
 	protected void setPokemonTypes(JsonObject pokemon) {

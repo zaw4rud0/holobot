@@ -87,10 +87,21 @@ public class PokedexCmd extends Command {
 		else
 			builder.addBlankField(true);
 		
-		builder.addField("Gender Ratio", pokemon.genderRate, true);
+		String gender_ratio = "";
+		
+		if (pokemon.genderRate == -1.0) {
+			gender_ratio = "100% \\\u26b2";
+		}
+		else {
+			double percentage = pokemon.genderRate * 100;
+			gender_ratio = 100 - percentage + "% \\\u2642 | " + percentage + "% \\\u2640";
+		}
+		
+		builder.addField("Gender Ratio", gender_ratio , true);
+		
 		builder.addField("Height", pokemon.height, true);
 		builder.addField("Weight", pokemon.weight, true);
-		builder.addField("Pok\u00e9dex Entry", pokemon.pokedexEntry, false);
+		builder.addField("Pokédex Entry", pokemon.pokedexEntry, false);
 		
 		if (pokemon.evolutionChain != null)
 			builder.addField("Evolution", pokemon.evolutionChain, false);

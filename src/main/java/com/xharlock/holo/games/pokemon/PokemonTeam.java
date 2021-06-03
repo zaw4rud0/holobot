@@ -14,7 +14,7 @@ import java.util.List;
 
 import javax.imageio.ImageIO;
 
-import com.xharlock.holo.utils.BufferedImageOperations;
+import com.xharlock.holo.utils.BufferedImageOps;
 import com.xharlock.holo.utils.CollageMaker;
 
 public class PokemonTeam {
@@ -142,8 +142,7 @@ public class PokemonTeam {
 	 * @param matchings = Match the types of the Pokémon
 	 * @return Reordered List of Pokémon
 	 */
-	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings)
-			throws IllegalArgumentException, IOException {
+	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IllegalArgumentException, IOException {
 
 		if (team.size() > 6)
 			throw new IllegalArgumentException("The list may not contain more than 6 Pokémon!");
@@ -203,7 +202,7 @@ public class PokemonTeam {
 		}
 
 		g2.setColor(oldColor);
-		temp = BufferedImageOperations.resize(img, 420, 420);
+		temp = BufferedImageOps.resize(img, 420, 420);
 		g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
 		drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30), Color.BLACK);
 		g2.dispose();
@@ -229,7 +228,7 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to draw a simple gray image for when there is no Pokémon in a slot
+	 * Method to draw a simple gray square for when there is no Pokémon in a slot
 	 */
 	private static BufferedImage drawGray() {
 		int width = 500, height = 500;
@@ -251,29 +250,36 @@ public class PokemonTeam {
 		return bestTeam;
 	}
 
-	/**
+	/*
 	 * Doubles the pokemon list by swapping the types
 	 */
-	private static List<Pokemon> doublePokes(List<Pokemon> pokes) {
+	public static List<Pokemon> doublePokes(List<Pokemon> pokes) {
 		List<Pokemon> copies = new ArrayList<>();
 		List<PokemonType> types = new ArrayList<>();
 		// this first loop is simply to take note of all types
-		for (Pokemon p : pokes) {
+		for (Pokemon p: pokes) {
 			types.add(p.type1);
+			// we add the second type if its a different one
+			if (!p.type1.isSame(p.type2)) types.add(p.type2);
 			// we add the second type if its a different one and not null
-			if (p.type2 != null && !p.type1.equals(p.type2)) types.add(p.type2);
+			if (p.type2 != null && !p.type1.isSame(p.type2)) types.add(p.type2);
 		}
-		// now we can iterate through pokes and if they have unique types, don't copy
-		// them
+		
+		System.out.println(types);
+		
+		// now we can iterate through pokes and if they have unique types, don't copy them
 		for (Pokemon p : pokes) {
+			if (p.type2 == null) continue; // no point swapping, as both types are the same
 			// iterate over the list and find multiple instances
-			int t1 = 0; // counter for occurences of first type
-			int t2 = 0; // counter for occurences of second type
-			for (PokemonType s : types) {
-				if (s.equals(p.type1))
-					t1++;
-				if (s.equals(p.type2))
-					t2++;
+			int t1 = 0;  // counter for occurences of first type
+			int t2 = 0;  // counter for occurences of second type
+			for (PokemonType s: types) {
+				
+				if (s == null)
+					continue;
+				
+				if (s.isSame(p.type1)) t1++;
+				if (s.isSame(p.type2)) t2++;
 			}
 			// if t1 or t2 > 1, more than 1 pokemon has that type
 			if (t1 > 1 || t2 > 1) {
@@ -294,15 +300,18 @@ public class PokemonTeam {
 		return pokes;
 	}
 
-	/**
-	 * Creates the array with the best matchings <br>
+	/*
+	 * Creates the array with the best matchings
 	 * Works in a recursive fashion
 	 */
-	private static void findBestMatches(List<Pokemon> pokes, int[] best, List<Pokemon> bestTeam, List<Pokemon> cur) {
+	public static void findBestMatches(List<Pokemon> pokes, int[] best, List<Pokemon> bestTeam,
+			List<Pokemon> cur) {
+		
 		if (cur.size() == 6) {
 			// If the current array is 6 big, count the matchings
 			int m = matchings(cur);
 			if (best[0] <= m) {
+				System.out.println("Matchings: " + m);  // insert this line HERE
 				best[0] = m;
 				bestTeam.clear();
 				bestTeam.addAll(cur);
@@ -310,7 +319,8 @@ public class PokemonTeam {
 			return;
 		}
 		for (Pokemon p : pokes) {
-			if (cur.contains(p)) continue;
+			if (cur.contains(p))
+				continue;
 			List<Pokemon> copy = new ArrayList<>(cur);
 			copy.add(p);
 			findBestMatches(pokes, best, bestTeam, copy);
@@ -320,23 +330,36 @@ public class PokemonTeam {
 	/**
 	 * Counts the amount of matchings in a given list
 	 */
-	private static int matchings(List<Pokemon> q) {
+	public static int matchings(List<Pokemon> q) {
+		
 		int t = 0;
 		for (int i = 0; i < 6; i++) {
+			Pokemon current = q.get(i);
+			PokemonType t2 = current.type2;
+			if (t2 == null) t2 = current.type1;
 			if (i < 2) {
 				// pokemon is in first or second position, so check if it matches with
 				// bottom or right type
-				if (q.get(i).type2.equals(q.get(i + 1).type1))
+				System.out.println(current.name);
+				System.out.println(current.type1);
+				System.out.println(current.type2);
+				
+				
+				if (q.get(i).type2.isSame(q.get(i + 1).type1))
+				if (t2.isSame(q.get(i + 1).type1))
 					t++;
-				if (q.get(i).type2.equals(q.get(i + 3).type1))
+				if (q.get(i).type2.isSame(q.get(i + 3).type1))
+				if (t2.isSame(q.get(i + 3).type1))
 					t++;
 			} else if (i == 2) {
 				// pokemon is in the third position, so check below type match
-				if (q.get(i).type2.equals(q.get(i + 3).type1))
+				if (q.get(i).type2.isSame(q.get(i + 3).type1))
+				if (t2.isSame(q.get(i + 3).type1))
 					t++;
 			} else if (i < 5) {
 				// pokemon is 4th and 5th position, so check type to the right
-				if (q.get(i).type2.equals(q.get(i + 1).type1))
+				if (q.get(i).type2.isSame(q.get(i + 1).type1))
+				if (t2.isSame(q.get(i + 1).type1))
 					t++;
 			}
 		}
