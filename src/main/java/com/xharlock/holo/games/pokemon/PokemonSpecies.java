@@ -296,4 +296,12 @@ public class PokemonSpecies {
 	public static boolean isSameSpecies(PokemonSpecies p1, PokemonSpecies p2) {
 		return p1.pokedexId.equals(p2.pokedexId);
 	}
+
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof PokemonSpecies)) {
+            return false;
+        }
+		return isSameSpecies((PokemonSpecies)o);
+	}
 }
