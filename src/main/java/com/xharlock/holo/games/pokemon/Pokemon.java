@@ -4,7 +4,7 @@ import java.io.IOException;
 
 import com.google.gson.JsonObject;
 
-public class Pokemon extends PokemonSpecies {
+public class Pokemon extends PokemonSpecies implements Cloneable {
 
 	public String nickname;
 	public String gender;

@@ -260,7 +260,7 @@ public class PokemonTeam {
 		for (Pokemon p: pokes) {
 			types.add(p.type1);
 			// we add the second type if its a different one and not null
-			if (p.type2 != null && !p.type1.isSame(p.type2)) types.add(p.type2);
+			if (p.type2 != null && p.type1 != p.type2) types.add(p.type2);
 		}
 		
 		// now we can iterate through pokes and if they have unique types, don't copy them
@@ -270,8 +270,8 @@ public class PokemonTeam {
 			int t1 = 0;  // counter for occurences of first type
 			int t2 = 0;  // counter for occurences of second type
 			for (PokemonType s: types) {
-				if (s.isSame(p.type1)) t1++;
-				if (s.isSame(p.type2)) t2++;
+				if (s == p.type1) t1++;
+				if (s == p.type2) t2++;
 			}
 			// if t1 or t2 > 1, more than 1 pokemon has that type
 			if (t1 > 1 || t2 > 1) {
@@ -283,8 +283,8 @@ public class PokemonTeam {
 					continue;
 				}
 				PokemonType tmp = copy.type2;
-				copy.type1 = copy.type2;
-				copy.type2 = tmp;
+				copy.type2 = copy.type1;
+				copy.type1 = tmp;
 				copies.add(copy);
 			}
 		}
@@ -303,7 +303,6 @@ public class PokemonTeam {
 			// If the current array is 6 big, count the matchings
 			int m = matchings(cur);
 			if (best[0] <= m) {
-				System.out.println("Matchings: " + m);  // insert this line HERE
 				best[0] = m;
 				bestTeam.clear();
 				bestTeam.addAll(cur);
@@ -334,17 +333,17 @@ public class PokemonTeam {
 			if (i < 2) {
 				// pokemon is in first or second position, so check if it matches with
 				// bottom or right type
-				if (t2.isSame(q.get(i + 1).type1))
+				if (t2 == q.get(i + 1).type1)
 					t++;
-				if (t2.isSame(q.get(i + 3).type1))
+				if (t2 == q.get(i + 3).type1)
 					t++;
 			} else if (i == 2) {
 				// pokemon is in the third position, so check below type match
-				if (t2.isSame(q.get(i + 3).type1))
+				if (t2 == q.get(i + 3).type1)
 					t++;
 			} else if (i < 5) {
 				// pokemon is 4th and 5th position, so check type to the right
-				if (t2.isSame(q.get(i + 1).type1))
+				if (t2 == q.get(i + 1).type1)
 					t++;
 			}
 		}
