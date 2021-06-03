@@ -259,13 +259,9 @@ public class PokemonTeam {
 		// this first loop is simply to take note of all types
 		for (Pokemon p: pokes) {
 			types.add(p.type1);
-			// we add the second type if its a different one
-			if (!p.type1.isSame(p.type2)) types.add(p.type2);
 			// we add the second type if its a different one and not null
 			if (p.type2 != null && !p.type1.isSame(p.type2)) types.add(p.type2);
 		}
-		
-		System.out.println(types);
 		
 		// now we can iterate through pokes and if they have unique types, don't copy them
 		for (Pokemon p : pokes) {
@@ -274,10 +270,6 @@ public class PokemonTeam {
 			int t1 = 0;  // counter for occurences of first type
 			int t2 = 0;  // counter for occurences of second type
 			for (PokemonType s: types) {
-				
-				if (s == null)
-					continue;
-				
 				if (s.isSame(p.type1)) t1++;
 				if (s.isSame(p.type2)) t2++;
 			}
@@ -336,29 +328,22 @@ public class PokemonTeam {
 		for (int i = 0; i < 6; i++) {
 			Pokemon current = q.get(i);
 			PokemonType t2 = current.type2;
+			// This if clause will be called if the given 
+			// Pokemon only has 1 type, then type2 is null
 			if (t2 == null) t2 = current.type1;
 			if (i < 2) {
 				// pokemon is in first or second position, so check if it matches with
 				// bottom or right type
-				System.out.println(current.name);
-				System.out.println(current.type1);
-				System.out.println(current.type2);
-				
-				
-				if (q.get(i).type2.isSame(q.get(i + 1).type1))
 				if (t2.isSame(q.get(i + 1).type1))
 					t++;
-				if (q.get(i).type2.isSame(q.get(i + 3).type1))
 				if (t2.isSame(q.get(i + 3).type1))
 					t++;
 			} else if (i == 2) {
 				// pokemon is in the third position, so check below type match
-				if (q.get(i).type2.isSame(q.get(i + 3).type1))
 				if (t2.isSame(q.get(i + 3).type1))
 					t++;
 			} else if (i < 5) {
 				// pokemon is 4th and 5th position, so check type to the right
-				if (q.get(i).type2.isSame(q.get(i + 1).type1))
 				if (t2.isSame(q.get(i + 1).type1))
 					t++;
 			}
