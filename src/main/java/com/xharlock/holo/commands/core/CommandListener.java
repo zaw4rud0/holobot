@@ -1,6 +1,5 @@
 package com.xharlock.holo.commands.core;
 
-import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.regex.Pattern;
 
@@ -24,26 +23,19 @@ public class CommandListener extends ListenerAdapter {
 	
 	@Override
 	public void onMessageReceived(MessageReceivedEvent e) {
+		// Ignore webhooks and bots
+		if (e.isWebhookMessage() || e.getAuthor().isBot()) return;
 		
-		// TODO Clean up
-		
-		if (e.isWebhookMessage())
+		if (!e.getMessage().getContentRaw().startsWith(getPrefix(e)))
 			return;
 
-		if (e.getAuthor().isBot())
-			return;
-
-		String prefix = getPrefix(e);
-		if (!e.getMessage().getContentRaw().startsWith(prefix))
-			return;
-
-		String[] split = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(prefix), "").split("\\s+");
+		String[] split = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(e)), "").split("\\s+");
 		String invoke = split[0].toLowerCase();
 
-		if (this.commandManager.getCommand(invoke) == null)
+		if (commandManager.getCommand(invoke) == null)
 			return;
 
-		Command cmd = this.commandManager.getCommand(invoke);
+		Command cmd = commandManager.getCommand(invoke);
 
 		// Check if user can do anything
 		if (!Bootstrap.holo.getPermissionManager().check(e, cmd))
@@ -52,7 +44,7 @@ public class CommandListener extends ListenerAdapter {
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
 		cmd.onCommand(e);
 
-		logger.info(LocalDateTime.now().toString() + " : " + e.getAuthor() + " has called " + cmd.getName());
+		logger.info(e.getAuthor() + " has called " + cmd.getName());
 	}
 
 	private String getPrefix(MessageReceivedEvent e) {

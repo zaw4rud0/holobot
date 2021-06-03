@@ -1,10 +1,10 @@
 package com.xharlock.holo.image;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonParser;
 
-import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.stream.Collectors;
@@ -30,7 +30,7 @@ public class GelbooruAPI {
 	}
 
 	public static JsonArray getJsonArray(Rating rating, Sort sort, int limit, String tags) throws IOException {
-		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + "sort:" + sort.getName()	+ "%20" + tags;		
+		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags;		
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36");

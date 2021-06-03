@@ -38,6 +38,7 @@ public class PokemonSpecies {
 		if (species == null) {
 			return;
 		}
+		
 		JsonObject pokemon = null;
 
 		for (int i = 0; i < species.getAsJsonArray("varieties").size(); i++) {
@@ -46,6 +47,7 @@ public class PokemonSpecies {
 						.get("pokemon").getAsJsonObject().get("url").getAsString());
 			}
 		}
+		
 		JsonObject evolution = HttpResponse
 				.getJsonObject(species.getAsJsonObject("evolution_chain").get("url").getAsString());
 		this.pokedexId = this.getPokedexNumber(species);
@@ -62,9 +64,7 @@ public class PokemonSpecies {
 		this.sprite_back = this.getSprite(pokemon, "back_default");
 		this.artwork = this.getArtwork(pokemon);
 		this.animated = null;
-
 		setPokemonTypes(pokemon);
-
 		this.evolutionChain = this.getEvolutionChain(evolution);
 		this.isBaby = species.get("is_baby").getAsBoolean();
 		this.isLegendary = species.get("is_legendary").getAsBoolean();

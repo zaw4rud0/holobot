@@ -15,8 +15,7 @@ public class AvatarCmd extends Command {
 
 	public AvatarCmd(String name) {
 		super(name);
-		setDescription(
-				"Use this command to get your own avatar or the avatar of a given user inside the guild. Tip: Use the id of the user if you don't want to ping them.");
+		setDescription("Use this command to get your own avatar or the avatar of a given user inside the guild. Tip: Use the id of the user if you don't want to ping them.");
 		setUsage(name + " [user id]");
 		setAliases(List.of("av"));
 		setIsGuildOnlyCommand(true);
@@ -26,7 +25,6 @@ public class AvatarCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
-		e.getChannel().sendTyping().queue();
 
 		EmbedBuilder builder = new EmbedBuilder();
 
@@ -40,8 +38,7 @@ public class AvatarCmd extends Command {
 		User user = e.getAuthor();
 		try {
 			user = e.getJDA().getUserById(Long.parseLong(args[0].replace("<@!", "").replace(">", "")));
-		} catch (Exception ex) {
-		}
+		} catch (Exception ex) {}
 		Member member = e.getGuild().retrieveMember(user).complete();
 
 		String url = user.getEffectiveAvatarUrl() + "?size=512";

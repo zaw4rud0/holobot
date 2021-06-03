@@ -30,8 +30,6 @@ public class InfoBotCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
 		MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
 		

@@ -21,23 +21,9 @@ public class PokemonBattle {
 	private static final int width = 256;
 	private static final int height = 192;
 	
-	public static void main(String[] args) throws IOException {
-
-		BufferedImage raw = ImageIO.read(new File("C:\\Users\\adria\\Desktop\\pokemon\\assets\\trainer/bucks_back_raw.png"));
-		
-		
-		for (int i = 0; i < raw.getHeight(); i++) {
-			for (int j = 0; j < raw.getWidth(); j++) {
-				Color c = new Color(raw.getRGB(j, i));
-				if (c.getRed() == 147 && c.getGreen() == 187 && c.getBlue() == 236) {
-					
-				}
-			}			
-		}
-		
-		
+	public static void main(String[] args) throws IOException {		
 		for (int i = 0; i < 0; i++) {
-			Pokemon pokemon = new Pokemon(PokeAPI.getPokemonSpecies(new Random().nextInt(PokeAPI.getPokemonCount()) + 1));
+			Pokemon pokemon = new Pokemon(PokeAPI.getPokemonSpecies(new Random().nextInt(PokeAPI.PokemonCount) + 1));
 			BufferedImage img = createBattle(pokemon, Background.MOUNTAIN_DAY);
 			ImageIO.write(BufferedImageOps.resize(img, width * scale, height * scale), "png", new File("C:/Users/adria/Desktop/test/hmrr" + i + ".png"));
 		}
@@ -51,6 +37,9 @@ public class PokemonBattle {
 
 		// Get outer most pixels of a sprite
 		int top = 0, right = 0, bottom = 0, left = 0;
+		
+		System.out.println(top + " " + right + " " + bottom + " " + left);
+		
 		boolean first = true;
 		// Iterate from top to bottom and find top most and bottom most pixels
 		for (int i = 0; i < pokemonImg.getHeight(); i++) {

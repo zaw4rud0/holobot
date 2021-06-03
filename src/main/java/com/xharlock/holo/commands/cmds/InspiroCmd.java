@@ -26,8 +26,6 @@ public class InspiroCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
         EmbedBuilder builder = new EmbedBuilder();
         
         String url = "";

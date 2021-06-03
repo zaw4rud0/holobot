@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.holo.misc.Emojis;
 import com.xharlock.holo.music.core.*;
 
@@ -42,6 +43,14 @@ public class ClearCmd extends MusicCommand {
 			return;
 		}
 
+		// Owner can always clear
+		if (e.getAuthor().getIdLong() == Bootstrap.holo.getConfig().getOwnerId()) {
+			musicManager.setVoting(false);
+			musicManager.getCounter().set(0);
+			clear(e);
+			return;
+		}
+		
 		// Checks vc conditions (user and bot in same vc, etc.)
 		if (!isUserInSameChannel(e)) {
 			builder.setTitle("Not in same voice channel!");

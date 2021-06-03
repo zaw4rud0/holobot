@@ -35,8 +35,6 @@ public class ImageCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length == 0 || args[0].toLowerCase().equals("list")) {
@@ -60,6 +58,11 @@ public class ImageCmd extends Command {
 		String category = args[0].toLowerCase();
 
 		switch (category) {
+		case "albedo": {
+			url = getImage("albedo_(overlord)");
+			name = "Albedo (Overlord)";
+			break;
+		}
 		case "echidna": {
 			url = getImage("echidna_(re:zero)");
 			name = "Echidna (Re:Zero)";
@@ -265,6 +268,11 @@ public class ImageCmd extends Command {
 			name = "Kanao Tsuyuri (Demon Slayer)";
 			break;
 		}
+		case "monika": {
+			url = getImage("monika_(doki_doki_literature_club)");
+			name = "Monika";
+			break;
+		}
 		case "myuri": {
 			url = getImage("myuri_(spice_and_wolf)");
 			name = "Myuri (Spice & Wolf)";
@@ -340,6 +348,16 @@ public class ImageCmd extends Command {
 			name = "Inosuke Hashibira (Demon Slayer)";
 			break;
 		}
+		case "sayori": {
+			url = getImage("sayori_(doki_doki_literature_club)");
+			name = "Sayori";
+			break;
+		}
+		case "shalltear": {
+			url = getImage("shalltear_bloodfallen");
+			name = "Shalltear Bloodfallen";
+			break;
+		}
 		case "shinobu": {
 			url = getImage("kochou_shinobu");
 			name = "Shinobu Kochou (Demon Slayer)";
@@ -369,6 +387,7 @@ public class ImageCmd extends Command {
 	private void loadCategories() {
 		categories.add("2b");
 		categories.add("a2");
+		categories.add("albedo");
 		categories.add("alice");
 		categories.add("asuka");
 		categories.add("asuna");
@@ -400,6 +419,7 @@ public class ImageCmd extends Command {
 		categories.add("misaka");
 		categories.add("mitsuri");
 		categories.add("modeus");
+		categories.add("monika");
 		categories.add("myuri");
 		categories.add("nami");
 		categories.add("nanako");
@@ -413,7 +433,9 @@ public class ImageCmd extends Command {
 		categories.add("reimi");
 		categories.add("rem");
 		categories.add("robin");
+		categories.add("sayori");
 		categories.add("senko");
+		categories.add("shalltear");
 		categories.add("shinobu");
 		categories.add("tanjiro");
 		categories.add("tanya");

@@ -23,9 +23,7 @@ public class PingCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		EmbedBuilder builder = new EmbedBuilder();
-		e.getChannel().sendTyping().queue();
-		
+		EmbedBuilder builder = new EmbedBuilder();		
 		builder.setTitle("Pong!");
 		builder.setDescription("Ping: `...` ms\nHeartbeat: `...` ms");
 		long start = System.currentTimeMillis();

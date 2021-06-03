@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class TraceMoeWrapper {
+public class TraceMoeAPI {
 	
 	private static final String url = "https://trace.moe/api/search";
 	

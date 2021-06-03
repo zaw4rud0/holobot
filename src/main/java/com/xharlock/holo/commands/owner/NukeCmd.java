@@ -21,9 +21,7 @@ public class NukeCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
-		
+	public void onCommand(MessageReceivedEvent e) {		
 		int amount = 0;
 
 		try { amount = Integer.parseInt(args[0]);

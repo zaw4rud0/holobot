@@ -1,13 +1,13 @@
 package com.xharlock.holo.anime;
 
 import java.io.IOException;
-import com.google.gson.JsonParser;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.stream.Collectors;
 
+import com.google.gson.JsonParser;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonArray;
 
@@ -37,8 +37,8 @@ public class JikanAPI {
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestProperty("User-Agent",	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
 		
+		// In case the site redirects you multiple times
 		String redirect = connection.getHeaderField("Location");
-		
 		while (redirect != null) {
 			connection = (HttpURLConnection) new URL(redirect).openConnection();
 			redirect = connection.getHeaderField("Location");

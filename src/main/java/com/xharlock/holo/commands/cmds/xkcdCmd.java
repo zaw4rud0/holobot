@@ -34,8 +34,6 @@ public class xkcdCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
 		if (args.length == 0) {
 			Random random = new Random();

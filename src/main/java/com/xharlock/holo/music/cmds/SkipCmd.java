@@ -6,6 +6,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.holo.misc.Emojis;
 import com.xharlock.holo.music.core.GuildMusicManager;
 import com.xharlock.holo.music.core.MusicCommand;
@@ -41,6 +42,14 @@ public class SkipCmd extends MusicCommand {
 			builder.setTitle("Error");
 			builder.setDescription("I'm not playing any tracks at the moment!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
+			return;
+		}
+
+		// Owner can always skip
+		if (e.getAuthor().getIdLong() == Bootstrap.holo.getConfig().getOwnerId()) {
+			musicManager.setVoting(false);
+			musicManager.getCounter().set(0);
+			skip(e);
 			return;
 		}
 

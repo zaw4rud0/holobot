@@ -23,7 +23,6 @@ public class PurgeCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-
 		// TODO Select messages of author
 		
 		int limit = 100;

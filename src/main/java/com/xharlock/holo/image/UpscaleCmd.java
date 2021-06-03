@@ -19,7 +19,7 @@ public class UpscaleCmd extends Command {
 	public UpscaleCmd(String name) {
 		super(name);
 		setDescription("Use this command to upscale an image. You can also use an image as attachment or a link to it.");
-		setUsage(name + " [image link]");
+		setUsage(name + " <image link>");
 		setCommandCategory(CommandCategory.IMAGE);
 	}
 

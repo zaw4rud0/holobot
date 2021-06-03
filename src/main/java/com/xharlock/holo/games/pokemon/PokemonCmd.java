@@ -29,7 +29,7 @@ public class PokemonCmd extends Command {
 			Random rand = new Random();			
 			Pokemon pokemon = null;
 			try {
-				pokemon = new Pokemon(PokeAPI.getPokemonSpecies(rand.nextInt(PokeAPI.getPokemonCount())));
+				pokemon = new Pokemon(PokeAPI.getPokemonSpecies(rand.nextInt(PokeAPI.PokemonCount)));
 			} catch (IOException ex) {
 				builder.setTitle("Error");
 				builder.setDescription("Something went wrong while communicating with the API. Please try again in a few minutes!");

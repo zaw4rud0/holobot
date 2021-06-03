@@ -23,6 +23,7 @@ public class LyricsCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {		
 		e.getMessage().delete().queue();
 		e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		LyricsClient client = new LyricsClient();
@@ -59,15 +60,18 @@ public class LyricsCmd extends MusicCommand {
 		String block = "";
 		
 		while (scanner.hasNextLine()) {
-			String s = scanner.nextLine();
-			if (s.isBlank()) {
+			String line = scanner.nextLine();
+			if (line.isBlank()) {
 				builder.addField("", block, false);
 				block = "";
 			} else {
-				
-				// TODO Check if it's less than 1024 characters				
-				block += s + "\n";
-				
+				// A field can't contain more than 1024 characters
+				if (block.length() + line.length() > 1024) {
+					builder.addField("", block, false);
+					builder.addField("", line, false);
+					block = "";
+				} else
+					block += line + "\n";				
 			}
 		}
 		

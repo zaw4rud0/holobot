@@ -14,25 +14,36 @@ public class UwuCmd extends Command {
 		setCommandCategory(CommandCategory.MISC);
 	}
 
-	// TODO Optimization
-	
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
-		
-		e.getChannel().sendTyping().queue();
-		
-		if (e.getMessage().getReferencedMessage() != null)
-			e.getChannel().sendMessage(uwuify(e.getMessage().getReferencedMessage().getContentRaw().split(" "))).queue();
-		else
-			e.getChannel().sendMessage(uwuify(args)).queue();
+
+		String uwu = uwuify(args);
+
+		if (e.getMessage().getReferencedMessage() != null) {
+			if (uwu.length() > 2000) {
+				e.getChannel().sendMessage(uwu.substring(0, 2000)).queue();
+				e.getChannel().sendMessage(uwu.substring(2000, uwu.length())).queue();
+			} else {
+				e.getChannel().sendMessage(uwu).queue();
+			}
+		} else {
+			if (uwu.length() > 2000) {
+				e.getChannel().sendMessage(uwu.substring(0, 2000)).queue();
+				e.getChannel().sendMessage(uwu.substring(2000, uwu.length())).queue();
+			} else {
+				e.getChannel().sendMessage(uwu).queue();
+			}
+		}
 	}
-	
-	private String uwuify(String[] raw) {		
-		String result = "";		
+
+	private String uwuify(String[] raw) {
+		String result = "";
 		for (String s : raw) {
-			String word = s.replace("you", "uwu").replace("You", "Uwu").replace("r", "w").replace("R", "W").replace("l", "w").replace("L", "W").replace("at", "awt").replace("it", "iwt").replace("It", "Iwt").replace("is", "iws").replace("Is", "Iws").replace("to", "tuwu");			
+			String word = s.replace("you", "uwu").replace("You", "Uwu").replace("r", "w").replace("R", "W")
+					.replace("l", "w").replace("L", "W").replace("at", "awt").replace("it", "iwt").replace("It", "Iwt")
+					.replace("is", "iws").replace("Is", "Iws").replace("to", "tuwu");
 			result += word + " ";
 		}
 		return result;

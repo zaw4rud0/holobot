@@ -34,8 +34,6 @@ public class NekoCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		e.getChannel().sendTyping().queue();
-		
 		Random rand = new Random();
 		EmbedBuilder builder = new EmbedBuilder();
 		String url = null;

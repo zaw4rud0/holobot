@@ -20,13 +20,10 @@ public class PokedexCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		String[] args = this.getArgs();
-		
+	public void onCommand(MessageReceivedEvent e) {		
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		if (args.length == 0) {
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a name!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -44,19 +41,13 @@ public class PokedexCmd extends Command {
 		try {
 			pokemon = new PokemonSpecies(PokeAPI.getPokemonSpecies(search.toLowerCase()));
 		} catch (IOException ex) {
-			ex.printStackTrace();
-		}
-		
-		if (pokemon == null) {
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
-			builder.setDescription("Something went wrong, please try again in a few minutes!");
+			builder.setDescription("Something went wrong. Please try again in a few minutes!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
 		
 		if (pokemon.name == null) {
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Pokémon not found");
 			builder.setDescription("Please check for typos and try again!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);

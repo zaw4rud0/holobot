@@ -5,6 +5,11 @@ import java.util.List;
 
 public class CollageMaker {
 
+	/**
+	 * Method to stick four BufferedImages together in the form of <br>
+	 * # # <br>
+	 * # #
+	 */
 	public static BufferedImage create2x2Collage(List<BufferedImage> images) throws IllegalArgumentException {
 		if (images.size() != 4)
 			throw new IllegalArgumentException("This method requires four images!");
@@ -13,6 +18,11 @@ public class CollageMaker {
 		return BufferedImageOps.join(row1, row2, "vertical");
 	}
 
+	/**
+	 * Method to stick six images together in the form of <br>
+	 * # # # <br>
+	 * # # #
+	 */
 	public static BufferedImage create3x2Collage(List<BufferedImage> images) throws IllegalArgumentException {
 		if (images.size() != 6)
 			throw new IllegalArgumentException("This method requires six images!");
@@ -23,6 +33,12 @@ public class CollageMaker {
 		return BufferedImageOps.join(row1, row2, "vertical");
 	}
 
+	/**
+	 * Method to stick nine images together in the form of <br>
+	 * # # # <br>
+	 * # # # <br>
+	 * # # #
+	 */
 	public static BufferedImage create3x3Collage(List<BufferedImage> images) throws IllegalArgumentException {
 		if (images.size() != 9)
 			throw new IllegalArgumentException("This method requires nine images!");

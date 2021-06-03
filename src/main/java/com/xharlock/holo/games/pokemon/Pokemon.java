@@ -18,8 +18,11 @@ public class Pokemon extends PokemonSpecies implements Cloneable {
 		assignGender();
 	}
 
+	/**
+	 * Method to assign the gender of a Pokémon in relation to the gender ratio of their species
+	 */
 	private void assignGender() {
-		
+		// TODO
 	}
 	
 	@Override
