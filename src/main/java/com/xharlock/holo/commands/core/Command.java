@@ -58,6 +58,9 @@ public abstract class Command {
 			return Bootstrap.holo.getConfig().getPrefix();
 	}
 
+	/**
+	 * Method to get the embed color of a guild or the default bot embed color if it's in a private channel
+	 */
 	protected int getColor(MessageReceivedEvent e) {
 		if (e.isFromGuild())
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();

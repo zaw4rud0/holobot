@@ -27,7 +27,7 @@ public class NowCmd extends MusicCommand {
 		AudioPlayer audioPlayer = musicManager.audioPlayer;
 		
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle(Emojis.SPEAKER.getAsNormal() + " Track Information");
+		builder.setTitle(Emojis.SPEAKER_LOUD.getAsNormal() + " Track Information");
 		
 		if (audioPlayer.getPlayingTrack() == null) {
 			builder.setDescription("I'm not playing any tracks right now");

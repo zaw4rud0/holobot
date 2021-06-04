@@ -21,6 +21,7 @@ public class PlayCmd extends MusicCommand {
 		e.getMessage().delete().queue();
 		
 		EmbedBuilder builder = new EmbedBuilder();
+		builder.setColor(getColor(e));
 		
 		if (!isUserInSameChannel(e)) {
 			builder.setTitle("Not in same voice channel!");

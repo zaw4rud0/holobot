@@ -22,6 +22,7 @@ public class LyricsCmd extends MusicCommand {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {		
 		e.getMessage().delete().queue();
+		
 		e.getChannel().sendTyping().queue();
 		
 		EmbedBuilder builder = new EmbedBuilder();
@@ -29,7 +30,6 @@ public class LyricsCmd extends MusicCommand {
 		LyricsClient client = new LyricsClient();
 		Lyrics lyrics = null;
 		
-		// TODO If no arguments given, look up the current song of the music player
 		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a song name");
