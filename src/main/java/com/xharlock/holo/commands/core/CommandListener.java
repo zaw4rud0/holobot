@@ -42,15 +42,14 @@ public class CommandListener extends ListenerAdapter {
 			return;
 
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
-		cmd.onCommand(e);
-
 		logger.info(e.getAuthor() + " has called " + cmd.getName());
+		cmd.onCommand(e);	
 	}
 
 	private String getPrefix(MessageReceivedEvent e) {
 		if (e.isFromGuild())
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
 		else
-			return Bootstrap.holo.getConfig().getPrefix();
+			return Bootstrap.holo.getConfig().getDefaultPrefix();
 	}
 }

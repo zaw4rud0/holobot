@@ -69,11 +69,12 @@ public class xkcdCmd extends Command {
 				
 				object = HttpResponse.getJsonObject("https://xkcd.com/" + num + "/info.0.json");
 			} catch (NumberFormatException | IOException ex) {
+				ex.printStackTrace();
 				return;
 			}
 			builder.setTitle(object.get("title").getAsString() + " (xkcd #" + object.get("num").getAsInt() + ")");
 			builder.addField("Date", object.get("day").getAsInt() + "/" + object.get("month").getAsInt() + "/" + object.get("year").getAsInt(), true);
-			builder.setImage(object.get("img").getAsString());
+			builder.setImage(object.get("img").getAsString());			
 			sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
 		}
 	}

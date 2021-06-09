@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>HoloBot</groupId>
 	<artifactId>HoloBot</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>2.2.1</version>
 	<description>Java Discord Bot</description>
 
 	<properties>
@@ -28,15 +28,14 @@
 
 	<dependencies>
 
-		<!-- JDA Library -->
-		<!-- <dependency> <groupId>net.dv8tion</groupId> <artifactId>JDA</artifactId> 
-			<version>4.2.1_266</version> </dependency> -->
-
 		<dependency>
-			<groupId>com.github.DV8FromTheWorld</groupId>
+			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>38fb666a64386f3bed7dd41b2487113e5bee42f6</version>
+			<version>4.2.1_273</version>
 		</dependency>
+
+		<!-- <dependency> <groupId>com.github.DV8FromTheWorld</groupId> <artifactId>JDA</artifactId> 
+			<version>38fb666a64386f3bed7dd41b2487113e5bee42f6</version> </dependency> -->
 
 		<!-- Useful stuff for JDA -->
 		<dependency>

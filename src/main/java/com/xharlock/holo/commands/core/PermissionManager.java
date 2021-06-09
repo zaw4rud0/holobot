@@ -15,10 +15,13 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-// In dire need of refactoring
-
+/**
+ * Class that handles what an user is allowed to do
+ */
 public class PermissionManager {
 
+	// In dire need of refactoring
+	
 	private List<User> blacklisted;
 	private HashMap<User, Long> lastUserWarning;
 

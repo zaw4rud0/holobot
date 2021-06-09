@@ -51,15 +51,8 @@ public class InfoBotCmd extends Command {
 		String system_info = "**CPU:** `" + cpu_percentage + " on " + cores + " core(s)`\n"
 						+ "**Memory:** `" + heap / 1024 / 1024 + "MB / " + max / 1024 / 1024 + "MB (" + heap_percentage + "%)`\n"
 						+ "**Uptime:** " + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startup_time);
-				
-		String prefix = "";
-		
-		if (e.isFromGuild())
-			prefix = getPrefix(e);
-		else
-			prefix = Bootstrap.holo.getConfig().getPrefix();
 
-		String description = "Your senpai for everything :heart:\nUse `" + prefix + "help` to see all commands";
+		String description = "Your senpai for everything :heart:\nUse `" + getPrefix(e) + "help` to see all commands";
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(e.getJDA().getSelfUser().getName() + " | Informations");

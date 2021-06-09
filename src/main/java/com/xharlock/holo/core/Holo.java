@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.xharlock.holo.commands.cmds.ButtonEventListener;
 import com.xharlock.holo.commands.core.CommandListener;
 import com.xharlock.holo.commands.core.CommandManager;
 import com.xharlock.holo.commands.core.PermissionManager;
@@ -53,7 +54,7 @@ public class Holo {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.enableCache(CacheFlag.VOICE_STATE, new CacheFlag[0]);
 		builder.addEventListeners(new ReadyListener(), waiter);
-		builder.setActivity(Activity.watching(config.getPrefix() + "help"));
+		builder.setActivity(Activity.watching(config.getDefaultPrefix() + "help"));
 		jda = builder.build();
 	}
 
@@ -67,7 +68,8 @@ public class Holo {
 		jda.addEventListener(
 			new CommandListener(commandManager), 
 			new BotHandler(),
-			new Misc()
+			new Misc(),
+			new ButtonEventListener()
 		);
 	}
 	

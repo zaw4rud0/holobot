@@ -38,19 +38,19 @@ public class Config {
 		this.deepAI_key = deepAI_key;
 	}
 	
-	public String getPrefix() {
+	public String getDefaultPrefix() {
 		return this.default_prefix;
 	}
 
-	public void setPrefix(String prefix) {
+	public void setDefaultPrefix(String prefix) {
 		this.default_prefix = prefix;
 	}
 	
-	public int getColor() {
+	public int getDefaultColor() {
 		return this.default_color;
 	}
 	
-	public void setColor(int color) {
+	public void setDefaultColor(int color) {
 		this.default_color = color;
 	}
 

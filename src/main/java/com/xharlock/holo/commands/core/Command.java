@@ -55,7 +55,7 @@ public abstract class Command {
 		if (e.isFromGuild())
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
 		else
-			return Bootstrap.holo.getConfig().getPrefix();
+			return Bootstrap.holo.getConfig().getDefaultPrefix();
 	}
 
 	/**
@@ -65,7 +65,7 @@ public abstract class Command {
 		if (e.isFromGuild())
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();
 		else
-			return Bootstrap.holo.getConfig().getColor();
+			return Bootstrap.holo.getConfig().getDefaultColor();
 	}
 
 	protected boolean isValidURL(String url) {

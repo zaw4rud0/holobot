@@ -14,6 +14,7 @@ import com.xharlock.holo.config.Config;
 import com.xharlock.holo.utils.JSONReader;
 
 public class Bootstrap {
+	
 	public static Holo holo;
 	public static long startup_time;
 	
@@ -27,7 +28,7 @@ public class Bootstrap {
 	}
 
 	static void init() {
-		EventWaiter waiter = new EventWaiter();		
+		EventWaiter waiter = new EventWaiter();
 		try {
 			Config config = initializeConfig();
 			holo = new Holo(config, waiter);
@@ -37,14 +38,17 @@ public class Bootstrap {
 		}
 	}
 	
+	/**
+	 * Method to retrieve the credentials and configurations from a Json file and initialize a Config object
+	 */
 	private static Config initializeConfig() throws IOException, ParseException {
 		JSONObject object = JSONReader.readJSONObject("config.json");
 		Config config = new Config();
 		config.setDiscordToken((String) object.get("token"));
 		config.setOwnerId(Long.parseLong(object.get("owner_id").toString()));
 		config.setKeyDeepAI((String) object.get("deepAI_token"));
-		config.setPrefix((String) object.get("default_prefix"));
-		config.setColor(Integer.parseInt(object.get("default_color").toString()));
+		config.setDefaultPrefix((String) object.get("default_prefix"));
+		config.setDefaultColor(Integer.parseInt(object.get("default_color").toString()));
 		config.setVersion((String) object.get("version"));
 		return config;
 	}

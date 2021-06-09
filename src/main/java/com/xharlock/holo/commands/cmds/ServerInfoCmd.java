@@ -35,7 +35,6 @@ public class ServerInfoCmd extends Command {
 			builder.setThumbnail(e.getGuild().getIconUrl());
 		
 		builder.addField("Owner", e.getGuild().getOwner().getAsMention(), true);
-		builder.addField("Region", e.getGuild().getRegion().getName(), true);
 		builder.addField("Members", "" + e.getGuild().getMemberCount(), true);
 		
 		builder.addField("Creation Date", "`" + e.getGuild().getTimeCreated().format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT)) + "`", false);

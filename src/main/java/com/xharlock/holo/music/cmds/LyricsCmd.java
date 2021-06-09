@@ -76,7 +76,7 @@ public class LyricsCmd extends MusicCommand {
 		}
 		
 		builder.addField("", block, false);		
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);		
+		sendEmbed(e, builder, true);		
 		scanner.close();
 	}
 }

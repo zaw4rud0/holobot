@@ -1,6 +1,8 @@
-package com.xharlock.holo.anime;
+package com.xharlock.mangadex;
 
 import java.io.IOException;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,19 +30,40 @@ public class ReadCmd extends Command {
 		Message msg = sendEmbedAndGetMessage(e, builder, true);
 		
 		String title = String.join(" ", args);
-		List<String> pages = new ArrayList<>();
+		boolean dataSaver = false;
+		
+		String manga_id = "";
+		String chapter = "1";
 		
 		try {
-			String manga_id = MangaDexAPI.search(title).get(0).getAsJsonObject().getAsJsonObject("data").get("id").getAsString();
-			boolean dataSaver = false;
-			String chapter_id = MangaDexAPI.getChapterId(manga_id, "1");
-			pages = MangaDexAPI.getPages(chapter_id, dataSaver);
-		} catch (IOException | InterruptedException ex) {
+			manga_id = MangaDexAPI.search(title).get(0).getAsJsonObject().getAsJsonObject("data").get("id").getAsString();			
+		} catch (IOException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while communicating with the API. Please try again in a few minutes!");
 			msg.editMessage(builder.build()).queue();
 			return;
+		}
+		
+		List<String> pageUrls = new ArrayList<>();
+		
+		try {
+			MangaDexDatabase.connect();
+			ResultSet chapterSet = MangaDexDatabase.query("SELECT * FROM Chapters WHERE MangaId = \'" + manga_id + "\' AND Chapter = \'" + chapter + "\';");
+			if (!chapterSet.next()) {
+				System.out.println("No chapter found!");
+				return;
+			}
+			String chapterId = chapterSet.getString("ChapterId");
+			String chapterHash = chapterSet.getString("Hash");
+			ResultSet pageSet = MangaDexDatabase.query("SELECT * FROM Pages WHERE ChapterId = \'" + chapterId + "\' AND DataSaver = \'" + dataSaver + "\';");
+			String base_url = "https://uploads.mangadex.org/" + (dataSaver ? "data-saver" : "data") + "/" + chapterHash + "/";
+			while (pageSet.next()) {
+				pageUrls.add(base_url + pageSet.getString("FileName"));
+			}
+			MangaDexDatabase.disconnect();
+		} catch (SQLException ex) {
+			ex.printStackTrace();
 		}
 		
 		msg.addReaction(Emojis.ARROW_LEFT.getAsBrowser()).queue();
@@ -53,10 +76,13 @@ public class ReadCmd extends Command {
 		builder.setDescription("test");
 		
 		// Current page
-		builder.setImage(pages.get(0));
+		builder.setImage(pageUrls.get(0));
 		
 		msg.editMessage(builder.build()).queue();
 		
+		for (String s : pageUrls) {
+			e.getChannel().sendMessage(s).queue();
+		}
 	}
 
 }

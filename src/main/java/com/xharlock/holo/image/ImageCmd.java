@@ -3,10 +3,8 @@ package com.xharlock.holo.image;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
@@ -58,19 +56,40 @@ public class ImageCmd extends Command {
 		String category = args[0].toLowerCase();
 
 		switch (category) {
+		
+		case "2b": {
+			url = getImage("yorha_no._2_type_b");
+			name = "2B (NieR: Automata)";
+			break;
+		}
+		case "a2": {
+			url = getImage("yorha_type_a_no._2");
+			name = "A2 (NieR: Automata)";
+			break;
+		}		
 		case "albedo": {
 			url = getImage("albedo_(overlord)");
 			name = "Albedo (Overlord)";
 			break;
 		}
-		case "echidna": {
-			url = getImage("echidna_(re:zero)");
-			name = "Echidna (Re:Zero)";
+		case "alice": {
+			url = getImage("alice_zuberg");
+			name = "Alice Zuberg (Sword Art Online)";
 			break;
 		}
-		case "tanjiro": {
-			url = getImage("kamado_tanjirou");
-			name = "Tanjiro Kamado";
+		case "asuka": {
+			url = getImage("souryuu_asuka_langley");
+			name = "Asuka Langley Sohryu";
+			break;
+		}
+		case "asuna": {
+			url = getImage("asuna_(sao)");
+			name = "Asuna Yuuki (Sword Art Online)";
+			break;
+		}
+		case "aqua": {
+			url = getImage("aqua_(konosuba)");
+			name = "Aqua (Konosuba)";
 			break;
 		}
 		case "catboy": {
@@ -78,9 +97,54 @@ public class ImageCmd extends Command {
 			name = "Catboy";
 			break;
 		}
+		case "cerberus": {
+			url = getImage("cerberus_(helltaker)");
+			name = "Cerberus (Helltaker)";
+			break;
+		}
+		case "chika": {
+			url = getImage("fujiwara_chika");
+			name = "Chika Fujiwara";
+			break;
+		}
+		case "chitoge": {
+			url = getImage("kirisaki_chitoge");
+			name = "Chitoge Kirisaki";
+			break;
+		}
+		case "chocola": {
+			url = getImage("chocola_(nekopara)");
+			name = "Chocola (Nekopara)";
+			break;
+		}
+		case "darkness": {
+			url = getImage("darkness_(konosuba)");
+			name = "Lalatina \"Darkness\" Dustiness";
+			break;
+		}
+		case "echidna": {
+			url = getImage("echidna_(re:zero)");
+			name = "Echidna (Re:Zero)";
+			break;
+		}
 		case "emilia": {
 			url = getImage("emilia_(re:zero)");
 			name = "Emilia (Re:Zero)";
+			break;
+		}
+		case "eru": {
+			url = getImage("chitanda_eru");
+			name = "Eru Chitanda (Hyouka)";
+			break;
+		}
+		case "erza": {
+			url = getImage("erza_scarlet");
+			name = "Erza Scarlet (Fairy Tail)";
+			break;
+		}
+		case "hayasaka": {
+			url = getImage("hayasaka_ai");
+			name = "Ai Hayasaka";
 			break;
 		}
 		case "helena": {
@@ -88,9 +152,24 @@ public class ImageCmd extends Command {
 			name = "Helena (Azur Lane)";
 			break;
 		}
+		case "holo": {
+			url = getImage("holo");
+			name = "Holo (Spice & Wolf)";
+			break;
+		}
 		case "kaguya": {
 			url = getImage("shinomiya_kaguya");
 			name = "Kaguya Shinomiya";
+			break;
+		}
+		case "kanao": {
+			url = getImage("tsuyuri_kanao");
+			name = "Kanao Tsuyuri (Demon Slayer)";
+			break;
+		}
+		case "kitsune": {
+			url = getImage("fox_ears");
+			name = "Kitsune";
 			break;
 		}
 		case "kosaki": {
@@ -113,6 +192,11 @@ public class ImageCmd extends Command {
 			name = "Kyouko Hori (Horimiya)";
 			break;
 		}
+		case "lucy": {
+			url = getImage("lucy_heartfilia");
+			name = "Lucy Heartfilia (Fairy Tail)";
+			break;
+		}
 		case "marika": {
 			url = getImage("tachibana_marika");
 			name = "Marika Tachibana";
@@ -128,144 +212,14 @@ public class ImageCmd extends Command {
 			name = "Misaka Mikoto";
 			break;
 		}
+		case "mitsuri": {
+			url = getImage("kanroji_mitsuri");
+			name = "Mitsuri Kanroji (Demon Slayer)";
+			break;
+		}
 		case "modeus": {
 			url = getImage("modeus_(helltaker)");
 			name = "Modeus (Helltaker)";
-			break;
-		}
-		case "nanako": {
-			url = getImage("yukishiro_nanako");
-			name = "Nanako Yukishiro (Senryu Girl)";
-			break;
-		}
-		case "nezuko": {
-			url = getImage("kamado_nezuko");
-			name = "Nezuko Kamado";
-			break;
-		}
-		case "tsugumi": {
-			url = getImage("tsugumi_seishirou");
-			name = "Tsugumi Seishirou";
-			break;
-		}
-		case "cerberus": {
-			url = getImage("cerberus_(helltaker)");
-			name = "Cerberus (Helltaker)";
-			break;
-		}
-		case "yukina": {
-			url = getImage("himeragi_yukina");
-			name = "Yukina Himeragi";
-			break;
-		}
-		case "kitsune": {
-			url = getImage("fox_ears");
-			name = "Kitsune";
-			break;
-		}
-		case "zenitsu": {
-			url = getImage("agatsuma_zenitsu");
-			name = "Zenitsu Agatsuma";
-			break;
-		}
-		case "zerotwo": {
-			url = getImage("zero_two_(darling_in_the_franxx)");
-			name = "Zero Two";
-			break;
-		}
-		case "2b": {
-			url = getImage("yorha_no._2_type_b");
-			name = "2B (NieR: Automata)";
-			break;
-		}
-		case "a2": {
-			url = getImage("yorha_type_a_no._2");
-			name = "A2 (NieR: Automata)";
-			break;
-		}
-		case "eru": {
-			url = getImage("chitanda_eru");
-			name = "Eru Chitanda (Hyouka)";
-			break;
-		}
-		case "ram": {
-			url = getImage("ram_(re:zero)");
-			name = "Ram (Re:Zero)";
-			break;
-		}
-		case "rea": {
-			url = getImage("sanka_rea");
-			name = "Rea Sanka (Sankarea)";
-			break;
-		}
-		case "rei": {
-			url = getImage("ayanami_rei");
-			name = "Rei Ayanami";
-			break;
-		}
-		case "rem": {
-			url = getImage("rem_(re:zero)");
-			name = "Rem (Re:Zero)";
-			break;
-		}
-		case "yuu": {
-			url = getImage("ishigami_yuu");
-			name = "Yuu Ishigami";
-			break;
-		}
-		case "aqua": {
-			url = getImage("aqua_(konosuba)");
-			name = "Aqua (Konosuba)";
-			break;
-		}
-		case "erza": {
-			url = getImage("erza_scarlet");
-			name = "Erza Scarlet (Fairy Tail)";
-			break;
-		}
-		case "holo": {
-			url = getImage("holo");
-			name = "Holo (Spice & Wolf)";
-			break;
-		}
-		case "lucy": {
-			url = getImage("lucy_heartfilia");
-			name = "Lucy Heartfilia (Fairy Tail)";
-			break;
-		}
-		case "nami": {
-			url = getImage("nami_(one_piece)");
-			name = "Nami (One Piece)";
-			break;
-		}
-		case "neko": {
-			url = getImage("cat_girl");
-			name = "Neko";
-			break;
-		}
-		case "alice": {
-			url = getImage("alice_zuberg");
-			name = "Alice Zuberg (Sword Art Online)";
-			break;
-		}
-		case "asuka": {
-			url = getImage("souryuu_asuka_langley");
-			name = "Asuka Langley Sohryu";
-			break;
-		}
-		case "asuna": {
-			url = getImage("asuna_(sao)");
-			name = "Asuna Yuuki (Sword Art Online)";
-			break;
-		}
-		case "chika": {
-			url = getImage("fujiwara_chika");
-			name = "Chika Fujiwara";
-			break;
-		}
-		case "kanao": {
-			url = getImage("tsuyuri_kanao");
-			name = "Kanao Tsuyuri (Demon Slayer)";
 			break;
 		}
 		case "monika": {
@@ -278,59 +232,39 @@ public class ImageCmd extends Command {
 			name = "Myuri (Spice & Wolf)";
 			break;
 		}
-		case "reimi": {
-			url = getImage("sugimoto_reimi");
-			name = "Reimi Sugimoto";
+		case "nami": {
+			url = getImage("nami_(one_piece)");
+			name = "Nami (One Piece)";
 			break;
 		}
-		case "robin": {
-			url = getImage("nico_robin");
-			name = "Nico Robin (One Piece)";
+		case "nanako": {
+			url = getImage("yukishiro_nanako");
+			name = "Nanako Yukishiro (Senryu Girl)";
 			break;
 		}
-		case "senko": {
-			url = getImage("senko_(sewayaki_kitsune_no_senko-san)");
-			name = "Senko";
+		case "neko": {
+			url = getImage("cat_girl");
+			name = "Neko";
 			break;
 		}
-		case "taiga": {
-			url = getImage("aisaka_taiga");
-			name = "Taiga Aisaka (Toradora!)";
+		case "nezuko": {
+			url = getImage("kamado_nezuko");
+			name = "Nezuko Kamado";
 			break;
-		}
-		case "touka": {
-			url = getImage("kirishima_touka");
-			name = "Touka Kirishima (Tokyo Ghoul)";
+		}		
+		case "ram": {
+			url = getImage("ram_(re:zero)");
+			name = "Ram (Re:Zero)";
 			break;
-		}
-		case "vanilla": {
-			url = getImage("vanilla_(nekopara)");
-			name = "Vanilla (Nekopara)";
-			break;
-		}
-		case "hayasaka": {
-			url = getImage("hayasaka_ai");
-			name = "Ai Hayasaka";
-			break;
-		}
-		case "chitoge": {
-			url = getImage("kirisaki_chitoge");
-			name = "Chitoge Kirisaki";
-			break;
-		}
-		case "chocola": {
-			url = getImage("chocola_(nekopara)");
-			name = "Chocola (Nekopara)";
-			break;
-		}
+		}		
 		case "raphtalia": {
 			url = getImage("raphtalia");
 			name = "Raphtalia (Rising of the Shield Hero)";
 			break;
 		}
-		case "mitsuri": {
-			url = getImage("kanroji_mitsuri");
-			name = "Mitsuri Kanroji (Demon Slayer)";
+		case "rea": {
+			url = getImage("sanka_rea");
+			name = "Rea Sanka (Sankarea)";
 			break;
 		}
 		case "rebecca": {
@@ -338,19 +272,34 @@ public class ImageCmd extends Command {
 			name = "Rebecca Bluegarden (Eden's Zero)";
 			break;
 		}
-		case "darkness": {
-			url = getImage("darkness_(konosuba)");
-			name = "Lalatina \"Darkness\" Dustiness";
+		case "rei": {
+			url = getImage("ayanami_rei");
+			name = "Rei Ayanami";
 			break;
 		}
-		case "inosuke": {
-			url = getImage("hashibira_inosuke");
-			name = "Inosuke Hashibira (Demon Slayer)";
+		case "reimi": {
+			url = getImage("sugimoto_reimi");
+			name = "Reimi Sugimoto";
+			break;
+		}
+		case "rem": {
+			url = getImage("rem_(re:zero)");
+			name = "Rem (Re:Zero)";
+			break;
+		}
+		case "robin": {
+			url = getImage("nico_robin");
+			name = "Nico Robin (One Piece)";
 			break;
 		}
 		case "sayori": {
 			url = getImage("sayori_(doki_doki_literature_club)");
 			name = "Sayori";
+			break;
+		}
+		case "senko": {
+			url = getImage("senko_(sewayaki_kitsune_no_senko-san)");
+			name = "Senko";
 			break;
 		}
 		case "shalltear": {
@@ -362,12 +311,57 @@ public class ImageCmd extends Command {
 			url = getImage("kochou_shinobu");
 			name = "Shinobu Kochou (Demon Slayer)";
 			break;
+		}		
+		case "taiga": {
+			url = getImage("aisaka_taiga");
+			name = "Taiga Aisaka (Toradora!)";
+			break;
+		}
+		case "tanjiro": {
+			url = getImage("kamado_tanjirou");
+			name = "Tanjiro Kamado";
+			break;
 		}
 		case "tanya": {
 			url = getImage("tanya_degurechaff");
 			name = "Tanya von Degurechaff";
 			break;
 		}
+		case "touka": {
+			url = getImage("kirishima_touka");
+			name = "Touka Kirishima (Tokyo Ghoul)";
+			break;
+		}
+		case "tsugumi": {
+			url = getImage("tsugumi_seishirou");
+			name = "Tsugumi Seishirou";
+			break;
+		}
+		case "tsukasa": {
+			url = getImage("yuzaki_tsukasa");
+			name = "Tsukasa Yuzaki (Tonikawa)";
+			break;
+		}
+		case "vanilla": {
+			url = getImage("vanilla_(nekopara)");
+			name = "Vanilla (Nekopara)";
+			break;
+		}
+		case "yukina": {
+			url = getImage("himeragi_yukina");
+			name = "Yukina Himeragi";
+			break;
+		}
+		case "yuu": {
+			url = getImage("ishigami_yuu");
+			name = "Yuu Ishigami";
+			break;
+		}
+		case "zerotwo": {
+			url = getImage("zero_two_(darling_in_the_franxx)");
+			name = "Zero Two";
+			break;
+		}		
 		default:
 			url = getImage(category);
 			name = Formatter.firstLetterUp(category);
@@ -381,7 +375,7 @@ public class ImageCmd extends Command {
 		else
 			builder.setDescription("Something went wrong while retrieving the image! Please try again in a few minutes");
 		
-		sendEmbed(e, builder, true);
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
 	}
 
 	private void loadCategories() {
@@ -405,7 +399,6 @@ public class ImageCmd extends Command {
 		categories.add("hayasaka");
 		categories.add("helena");
 		categories.add("holo");
-		categories.add("inosuke");
 		categories.add("kaguya");
 		categories.add("kanao");
 		categories.add("kitsune");
@@ -441,34 +434,21 @@ public class ImageCmd extends Command {
 		categories.add("tanya");
 		categories.add("touka");
 		categories.add("tsugumi");
+		categories.add("tsukasa");
 		categories.add("vanilla");
 		categories.add("yukina");
 		categories.add("yuu");
-		categories.add("zenitsu");
 		categories.add("zerotwo");
 	}
 
 	private String getImage(String tag) {
-		
-		JsonArray array = null;
-
+		JsonObject object = null;
 		try {
-			array = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.SAFE, GelbooruAPI.Sort.SCORE_DESC, 500, tag);
+			object = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.SAFE, GelbooruAPI.Sort.RANDOM, 1, tag).get(0).getAsJsonObject();
 		} catch (IOException e) {
-			return null;
-		}
-
-		Random rand = new Random();
-		JsonObject object = (JsonObject) array.get(rand.nextInt(array.size()));
-
-		String url = "";
-		
-		if (object.has("large_file_url"))
-			url = object.get("large_file_url").getAsString();
-		else
-			url = object.get("file_url").getAsString();
-		
-		return url;
+			e.printStackTrace();
+		}		
+		return object.has("large_file_url") ? object.get("large_file_url").getAsString() : object.get("file_url").getAsString();
 	}
 
 	private String getCategoriesString() {

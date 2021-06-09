@@ -13,6 +13,7 @@ import com.xharlock.holo.games.AkinatorCmd;
 import com.xharlock.holo.games.pokemon.*;
 import com.xharlock.holo.image.*;
 import com.xharlock.holo.music.cmds.*;
+import com.xharlock.mangadex.ReadCmd;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -35,8 +36,9 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new WhoisCmd("whois"));
 		
 		// Experimental Commands
-//		addCommand(new ReadCmd("read"));
+		addCommand(new ReadCmd("read"));
 //		addCommand(new PokemonCmd("pokemon"));
+		addCommand(new ButtonCmd("button"));
 		
 		// Anime Cmds
 		addCommand(new AnimeSearchCmd("animesearch", waiter));

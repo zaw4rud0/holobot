@@ -1,4 +1,4 @@
-package com.xharlock.holo.anime;
+package com.xharlock.mangadex;
 
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
