@@ -150,7 +150,7 @@ public class AkinatorCmd extends Command {
 				false);
 		builder.addField("Other",
 				Emotes.UNDO.getAsText() + " Undo last answer\n" + Emotes.CROSS.getAsText() + " Cancel game", false);
-		msg.editMessage(builder.build()).queue();
+		msg.editMessageEmbeds(builder.build()).queue();
 		addInGameReactions(msg);
 		askQuestion(e, msg, builder);
 	}
@@ -197,7 +197,7 @@ public class AkinatorCmd extends Command {
 					&& evt.getReactionEmote().getAsReactionCode().equals(Emotes.UNDO.getAsReaction())) {
 				builder.setThumbnail(getRandomThinking());
 				builder.setDescription("**Q" + counter.decrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
-				msg.editMessage(builder.build()).queue();
+				msg.editMessageEmbeds(builder.build()).queue();
 				askQuestion(e, msg, builder);
 			}
 			// Cancel
@@ -237,7 +237,7 @@ public class AkinatorCmd extends Command {
 				builder.setThumbnail(getRandomThinking());
 				builder.setDescription(
 						"**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
-				msg.editMessage(builder.build()).queue();
+				msg.editMessageEmbeds(builder.build()).queue();
 				askQuestion(e, msg, builder);
 			}
 		}, 5, TimeUnit.MINUTES, () -> {
@@ -280,7 +280,7 @@ public class AkinatorCmd extends Command {
 		builder.addField("Answers", Emotes.TICK.getAsText() + " Correct, that was my character!\n" + 
 				Emotes.CONTINUE.getAsText() + " Wrong, continue game\n" + Emotes.CROSS.getAsText() + "Cancel game", false);
 		
-		msg.editMessage(builder.build()).queue();
+		msg.editMessageEmbeds(builder.build()).queue();
 
 		waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
 			
@@ -326,7 +326,7 @@ public class AkinatorCmd extends Command {
 		if (right.getImage() != null)
 			builder.setImage(right.getImage().toString());
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-		msg.editMessage(builder.build()).queue();
+		msg.editMessageEmbeds(builder.build()).queue();
 		cleanup();
 	}
 
@@ -339,7 +339,7 @@ public class AkinatorCmd extends Command {
 		builder.setColor(getColor(e));
 		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-		msg.editMessage(builder.build()).queue();
+		msg.editMessageEmbeds(builder.build()).queue();
 		cleanup();
 	}
 
@@ -352,7 +352,7 @@ public class AkinatorCmd extends Command {
 		builder.setThumbnail(AkinatorSprites.CANCEL.getUrl());
 		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-		msg.editMessage(builder.build()).queue();
+		msg.editMessageEmbeds(builder.build()).queue();
 		msg.delete().queueAfter(15, TimeUnit.SECONDS);
 		cleanup();
 	}

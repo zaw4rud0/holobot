@@ -30,7 +30,7 @@ public class PingCmd extends Command {
 		Message message = sendEmbedAndGetMessage(e, builder, true);
 		long ms = System.currentTimeMillis() - start;
 		builder.setDescription("Ping: `" + ms + "` ms\nHeartbeat: `" + e.getJDA().getGatewayPing() + "` ms");		
-		message.editMessage(builder.build()).queue();
+		message.editMessageEmbeds(builder.build()).queue();
 		message.delete().queueAfter(1, TimeUnit.MINUTES);
 	}
 }

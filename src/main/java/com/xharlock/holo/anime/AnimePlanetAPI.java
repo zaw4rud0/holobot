@@ -9,10 +9,8 @@ import org.jsoup.parser.Parser;
 
 import com.google.gson.JsonObject;
 
-// AnimePlanet Scraper
-
-// TODO Rework and clean up this decompiled crap :hyperkekw:
-
+/** Class to scrape AnimePlanet for a given anime or manga */
+// TODO Clean up and rewrite this decompiled code
 public class AnimePlanetAPI {
 	
 	private static final List<String> NSFWTags;

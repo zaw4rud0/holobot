@@ -31,7 +31,7 @@ public class CancelCmd extends Command {
 			builder.setTitle("Success");
 			builder.setDescription("Cancelled all requests");
 			builder.setTimestamp(Instant.now());
-			channel.sendMessage(builder.build()).queue();
+			channel.sendMessageEmbeds(builder.build()).queue();
 		});
 	}
 }

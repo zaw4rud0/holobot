@@ -47,6 +47,7 @@ public class Bootstrap {
 		config.setDiscordToken((String) object.get("token"));
 		config.setOwnerId(Long.parseLong(object.get("owner_id").toString()));
 		config.setKeyDeepAI((String) object.get("deepAI_token"));
+		config.setYoutubeToken((String) object.get("youtube_token"));
 		config.setDefaultPrefix((String) object.get("default_prefix"));
 		config.setDefaultColor(Integer.parseInt(object.get("default_color").toString()));
 		config.setVersion((String) object.get("version"));

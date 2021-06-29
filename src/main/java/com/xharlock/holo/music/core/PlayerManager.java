@@ -54,7 +54,7 @@ public class PlayerManager {
 				builder.addField("Uploader", track.getInfo().author, false);
 				builder.addField("Link", "[Youtube](" + trackUrl + ")", false);
 
-				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
 			}
 
 			@Override
@@ -67,7 +67,7 @@ public class PlayerManager {
 				builder.setDescription("`" + tracks.size() + "` tracks from playlist `" + playlist.getName() + "`");
 				builder.addField("Link", "[Youtube](" + trackUrl + ")", false);
 
-				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
+				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(1, TimeUnit.MINUTES));
 			}
 
 			@Override
@@ -75,7 +75,7 @@ public class PlayerManager {
 				builder.setTitle("No matches!");
 				builder.setDescription(
 						"Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
-				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
 			}
 
 			@Override
@@ -83,7 +83,7 @@ public class PlayerManager {
 				builder.setTitle("Load failed!");
 				builder.setDescription(
 						"Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
-				e.getChannel().sendMessage(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
 			}
 		});
 	}

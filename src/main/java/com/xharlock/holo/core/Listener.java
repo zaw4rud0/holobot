@@ -6,9 +6,9 @@ import org.slf4j.LoggerFactory;
 import net.dv8tion.jda.api.events.ReadyEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
-public class ReadyListener extends ListenerAdapter {
+public class Listener extends ListenerAdapter {
 
-	private static final Logger logger = LoggerFactory.getLogger(ReadyListener.class);
+	private static final Logger logger = LoggerFactory.getLogger(Listener.class);
 	
 	@Override
 	public void onReady(ReadyEvent e) {

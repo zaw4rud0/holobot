@@ -37,7 +37,7 @@ public class JikanAPI {
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestProperty("User-Agent",	"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
 		
-		// In case the site redirects you multiple times
+		// In case the site redirects multiple times
 		String redirect = connection.getHeaderField("Location");
 		while (redirect != null) {
 			connection = (HttpURLConnection) new URL(redirect).openConnection();
@@ -48,7 +48,6 @@ public class JikanAPI {
 		String s = reader.lines().collect(Collectors.joining("\n"));
 		reader.close();
 		connection.disconnect();
-		
 		return JsonParser.parseString(s).getAsJsonObject();
 	}
 }

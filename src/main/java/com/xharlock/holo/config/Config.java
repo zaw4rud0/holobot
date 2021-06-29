@@ -8,6 +8,7 @@ public class Config {
 
 	// External stuff
 	private String deepAI_key;
+	private String youtube_token;
 
 	// Minor bot properties
 	private String default_prefix;
@@ -38,6 +39,14 @@ public class Config {
 		this.deepAI_key = deepAI_key;
 	}
 	
+	public String getYoutubeToken() {
+		return youtube_token;
+	}
+
+	public void setYoutubeToken(String youtube_token) {
+		this.youtube_token = youtube_token;
+	}	
+	
 	public String getDefaultPrefix() {
 		return this.default_prefix;
 	}
@@ -60,5 +69,5 @@ public class Config {
 
 	public void setVersion(String version) {
 		this.version = version;
-	}	
+	}
 }

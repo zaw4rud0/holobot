@@ -64,7 +64,7 @@ public class PokemonTeamCmd extends Command {
 			builder.setImage("attachment://pokemonteam.png");		
 			if (e.isFromGuild())
 				builder.setFooter("Invoked by " + e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
-			e.getChannel().sendFile(input, "pokemonteam.png").embed(builder.build()).queue();
+			e.getChannel().sendFile(input, "pokemonteam.png").setEmbeds(builder.build()).queue();
 			return;
 		}
 		

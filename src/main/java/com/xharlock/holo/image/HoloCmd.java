@@ -24,7 +24,8 @@ public class HoloCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
+	public void onCommand(MessageReceivedEvent e) {
+		
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
@@ -32,8 +33,15 @@ public class HoloCmd extends Command {
 		String url = null;
 		
 		try {
-			url = HttpResponse.getJsonObject(api_url).get("url").getAsString();
-		} catch (IOException ex) {
+			// Keeps fetching a new url until the url isn't on the blocklist
+			boolean canSend = false;			
+			while (!canSend) {
+				url = HttpResponse.getJsonObject(api_url).get("url").getAsString();
+				if (!BlockCmd.blocked.contains(url))
+					canSend = true;
+			}
+		}		
+		catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);

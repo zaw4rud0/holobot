@@ -28,14 +28,12 @@
 
 	<dependencies>
 
+		<!-- Core of the bot -->
 		<dependency>
 			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>4.2.1_273</version>
+			<version>4.3.0_285</version>
 		</dependency>
-
-		<!-- <dependency> <groupId>com.github.DV8FromTheWorld</groupId> <artifactId>JDA</artifactId> 
-			<version>38fb666a64386f3bed7dd41b2487113e5bee42f6</version> </dependency> -->
 
 		<!-- Useful stuff for JDA -->
 		<dependency>

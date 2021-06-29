@@ -19,6 +19,7 @@ public class QueueCmd extends MusicCommand {
 		super(name);
 		setDescription("Use this command to see the current queue");
 		setUsage(name);
+		setAliases(List.of("q"));
 	}
 
 	@Override

@@ -11,9 +11,13 @@ public class Database {
 	private static final String path = "./src/main/resources/database/Holo.db";
 	private static Connection conn;
 	
-	public static void connect() throws ClassNotFoundException, SQLException {
-		Class.forName("org.sqlite.JDBC" + path);
-		String url = "jdbc:sqlite:";
+	public static void connect() throws SQLException {
+		try {
+			Class.forName("org.sqlite.JDBC");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
+		String url = "jdbc:sqlite:" + path;
 		Database.conn = DriverManager.getConnection(url);
 	}
 	
@@ -23,9 +27,9 @@ public class Database {
 		}
 	}
 	
-	public static void execute(String s) throws SQLException {
+	public static boolean execute(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
-		st.execute(s);
+		return st.execute(s);
 	}
 	
 	public static ResultSet query(String s) throws SQLException {

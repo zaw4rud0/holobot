@@ -88,7 +88,7 @@ public class ClearCmd extends MusicCommand {
 		builder.setTitle(e.getMember().getEffectiveName() + " requested to clear the queue");
 		builder.setDescription("Upvote to clear the queue\n`" + requiredVotes + "` upvotes are required");
 
-		e.getChannel().sendMessage(builder.build()).queue(msg -> {
+		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 
 			msg.addReaction(Emojis.UPVOTE.getAsBrowser()).queue(v -> {}, err -> {});
 

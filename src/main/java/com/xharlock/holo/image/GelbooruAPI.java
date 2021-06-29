@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.net.HttpURLConnection;
 
@@ -15,9 +16,12 @@ import com.google.gson.JsonObject;
 public class GelbooruAPI {
 
 	private static final String baseUrl = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&";
+	
+	/** List of Gelbooru tags that are banned */ 
+	private static final List<String> banned = new ArrayList<>();
 
-	public static JsonObject getJsonObject(Rating rating, Sort sort, int limit,	String tags) throws IOException {
-		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags;
+	public static JsonObject getJsonObject(Rating rating, Sort sort, int limit,	String tags) throws IOException {		
+		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags + "%20-" + String.join("%20-", banned);
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36");
@@ -30,7 +34,7 @@ public class GelbooruAPI {
 	}
 
 	public static JsonArray getJsonArray(Rating rating, Sort sort, int limit, String tags) throws IOException {
-		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags;		
+		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags + "%20-" + String.join("%20-", banned);
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36");

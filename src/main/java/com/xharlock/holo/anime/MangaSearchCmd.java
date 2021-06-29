@@ -77,7 +77,7 @@ public class MangaSearchCmd extends Command {
 		builder.setTitle("Manga Search Results");
 		builder.setDescription(result + "\nTo select one item, please use the according reaction");
 
-		e.getChannel().sendMessage(builder.build()).queue(msg -> {
+		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 
 			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
 			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {}, err -> {});

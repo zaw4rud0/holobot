@@ -90,7 +90,7 @@ public class SkipCmd extends MusicCommand {
 		builder.setTitle(e.getMember().getEffectiveName() + " requested a skip");
 		builder.setDescription("Upvote to skip current track\n`" + requiredVotes + "` upvotes are required");
 
-		e.getChannel().sendMessage(builder.build()).queue(msg -> {
+		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 
 			msg.addReaction(Emojis.UPVOTE.getAsBrowser()).queue(v -> {
 			}, err -> {

@@ -8,12 +8,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.xharlock.holo.commands.cmds.ButtonEventListener;
 import com.xharlock.holo.commands.core.CommandListener;
 import com.xharlock.holo.commands.core.CommandManager;
 import com.xharlock.holo.commands.core.PermissionManager;
 import com.xharlock.holo.config.Config;
 import com.xharlock.holo.config.GuildConfigManager;
+import com.xharlock.holo.experimental.ButtonEventListener;
 import com.xharlock.holo.misc.BotHandler;
 import com.xharlock.holo.misc.Misc;
 
@@ -53,7 +53,7 @@ public class Holo {
 		builder.setChunkingFilter(ChunkingFilter.ALL);
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.enableCache(CacheFlag.VOICE_STATE, new CacheFlag[0]);
-		builder.addEventListeners(new ReadyListener(), waiter);
+		builder.addEventListeners(new Listener(), waiter);
 		builder.setActivity(Activity.watching(config.getDefaultPrefix() + "help"));
 		jda = builder.build();
 	}

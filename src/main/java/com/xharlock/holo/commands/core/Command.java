@@ -95,7 +95,7 @@ public abstract class Command {
 		if (e.isFromGuild() && footer)
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		
-		e.getChannel().sendMessage(builder.build()).queue();
+		e.getChannel().sendMessageEmbeds(builder.build()).queue();
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
@@ -105,11 +105,11 @@ public abstract class Command {
 			if (footer) {
 				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
 			}	
-			e.getChannel().sendMessage(builder.build()).queue(msg -> {
+			e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
 			});
 		} else {
-			e.getChannel().sendMessage(builder.build()).queue();
+			e.getChannel().sendMessageEmbeds(builder.build()).queue();
 		}
 	}
 
@@ -119,7 +119,7 @@ public abstract class Command {
 		if (e.isFromGuild() && footer)
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		
-		e.getMessage().getReferencedMessage().reply(builder.build()).queue();
+		e.getMessage().getReferencedMessage().replyEmbeds(builder.build()).queue();
 	}
 
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
@@ -129,11 +129,11 @@ public abstract class Command {
 			if (footer) {
 				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
 			}
-			e.getMessage().getReferencedMessage().reply(builder.build()).queue(msg -> {
+			e.getMessage().getReferencedMessage().replyEmbeds(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
 			});
 		} else {
-			e.getMessage().getReferencedMessage().reply(builder.build()).queue();
+			e.getMessage().getReferencedMessage().replyEmbeds(builder.build()).queue();
 		}
 	}
 
@@ -143,11 +143,11 @@ public abstract class Command {
 		if (e.isFromGuild() && footer)
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		
-		return e.getChannel().sendMessage(builder.build()).complete();
+		return e.getChannel().sendMessageEmbeds(builder.build()).complete();
 	}
 	
 	protected void sendToOwner(MessageReceivedEvent e, EmbedBuilder builder) {
-		e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId()).openPrivateChannel().complete().sendMessage(builder.build()).queue();
+		e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId()).openPrivateChannel().complete().sendMessageEmbeds(builder.build()).queue();
 	}
 	
 	public String getName() {

@@ -14,12 +14,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class NekoCmd extends Command {
 
-	private String[] URLs = { 
-			"https://nekos.life/api/v2/img/neko",
-			"https://neko-love.xyz/api/v1/neko",
+	private String[] URLs = { "https://nekos.life/api/v2/img/neko", "https://neko-love.xyz/api/v1/neko",
 			"https://nekos.life/api/v2/img/kemonomimi",
-			//"http://api.nekos.fun:8080/api/neko" 
-			};
+			// "http://api.nekos.fun:8080/api/neko"
+	};
 
 	public NekoCmd(String name) {
 		super(name);
@@ -33,20 +31,27 @@ public class NekoCmd extends Command {
 	public void onCommand(MessageReceivedEvent e) {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
-		
+
 		Random rand = new Random();
 		EmbedBuilder builder = new EmbedBuilder();
 		String url = null;
-		
+
 		try {
-			url = HttpResponse.getJsonObject(URLs[rand.nextInt(URLs.length)]).get("url").getAsString();
-		} catch (IOException ex) {
+			// Keeps fetching a new url until the url isn't on the blocklist
+			boolean canSend = false;
+			while (!canSend) {
+				url = HttpResponse.getJsonObject(URLs[rand.nextInt(URLs.length)]).get("url").getAsString();
+				if (!BlockCmd.blocked.contains(url))
+					canSend = true;
+			}
+		}		
+		catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-		
+
 		builder.setTitle("Neko");
 		builder.setImage(url);
 		sendEmbed(e, builder, true);
