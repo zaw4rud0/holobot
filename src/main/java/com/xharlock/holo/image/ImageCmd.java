@@ -129,6 +129,11 @@ public class ImageCmd extends Command {
 			name = "Chocola (Nekopara)";
 			break;
 		}
+		case "cirno": {
+			url = getImage("cirno");
+			name = "Cirno (Touhou)";
+			break;
+		}
 		case "darkness": {
 			url = getImage("darkness_(konosuba)");
 			name = "Lalatina \"Darkness\" Dustiness";
