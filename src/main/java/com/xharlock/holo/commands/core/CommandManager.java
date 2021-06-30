@@ -64,7 +64,7 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new AvatarCmd("avatar"));
 		addCommand(new BannerCmd("banner"));
 		addCommand(new BlockCmd("block"));
-		addCommand(new CheckNSFWCmdOld("check"));
+		addCommand(new CheckNSFWCmd("check"));
 //		addCommand(new CollageCmd("collage"));
 		addCommand(new HoloCmd("holo"));
 		addCommand(new ImageCmd("image"));
