@@ -45,7 +45,7 @@ public class ImageCmd extends Command {
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		
-		// Owner added a new waifu
+		// Owner added a new waifu to the DB
 		if (isBotOwner(e) && args.length >= 4 && args[0].equals("add")) {
 			String name = args[1];
 			String tag = args[2];
@@ -72,6 +72,7 @@ public class ImageCmd extends Command {
 			return;
 		}
 
+		// Display all available tags
 		if (args.length == 0 || args[0].toLowerCase().equals("list")) {
 			builder.setTitle("Image Tags");
 			builder.setDescription(getCategoriesString());
@@ -80,6 +81,7 @@ public class ImageCmd extends Command {
 			return;
 		}
 
+		// Tag not found
 		if (!names.contains(args[0].toLowerCase())) {
 			builder.setTitle("Tag not found");
 			builder.setDescription("Use `" + getPrefix(e) + "image` to see all available tags");

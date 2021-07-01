@@ -27,11 +27,17 @@ public class Database {
 		}
 	}
 	
+	/**
+	 * Method to execute a given SQL statement
+	 */
 	public static boolean execute(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
 		return st.execute(s);
 	}
 	
+	/**
+	 * Method to query the DB using a statement
+	 */
 	public static ResultSet query(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
 		return st.executeQuery(s);

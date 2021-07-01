@@ -9,6 +9,9 @@ import net.dv8tion.jda.api.entities.User;
 
 public class DatabaseOPs {
 	
+	/**
+	 * Method to add a new image to the blocklist in the DB
+	 */
 	public static boolean addBlockedImage(String url, User user, String date) throws SQLException {
 		String s = "Insert into BlockedImages (Url, DiscordUser, Date) VALUES "
 				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
@@ -18,6 +21,9 @@ public class DatabaseOPs {
 		return success;
 	}
 	
+	/**
+	 * Method to get a list of the blocked images from the DB
+	 */
 	public static List<String> getBlockedImages() throws SQLException {
 		String s = "SELECT Url FROM BlockedImages";
 		Database.connect();
@@ -33,8 +39,8 @@ public class DatabaseOPs {
 	/**
 	 * Method to add a new waifu to the image command
 	 * 
-	 * @param name = Name to invoke
-	 * @param tag = Gelbooru tag
+	 * @param name = Name of waifu
+	 * @param tag = Gelbooru tag of waifu
 	 * @param title = Title of the embed
 	 * @throws SQLException 
 	 */
@@ -47,6 +53,9 @@ public class DatabaseOPs {
 		return success;
 	}
 	
+	/**
+	 * Method to get all the waifu names from DB
+	 */
 	public static List<String> getWaifuNames() throws SQLException {
 		String s = "SELECT Id FROM Gelbooru";
 		Database.connect();
@@ -59,6 +68,9 @@ public class DatabaseOPs {
 		return names;
 	}
 	
+	/**
+	 * Method to get the Gelbooru tag and the embed title using the name of the waifu
+	 */
 	public static ResultSet getWaifu(String name) throws SQLException {
 		String s = "SELECT * FROM Gelbooru WHERE Id = \'" + name + "\';";
 		Database.connect();
