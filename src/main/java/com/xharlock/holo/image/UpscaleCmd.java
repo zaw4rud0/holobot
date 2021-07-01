@@ -74,10 +74,6 @@ public class UpscaleCmd extends Command {
 	
 	/**
 	 * Method to send an image url to waifu2x and return the url of the upscaled
-	 * image 
-	 * @param imageUrl = Url to the image to be upscaled
-	 * @return Url to the upscaled image
-	 * @throws IOException
 	 */
 	private static String upscaleImage(String imageUrl) throws IOException {
 		String token = Bootstrap.holo.getConfig().getKeyDeepAI();

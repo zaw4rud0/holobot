@@ -77,7 +77,7 @@ public class BlockCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().getReferencedMessage().delete().queue();
 
-		builder.setTitle("Image Blocked");
+		builder.setTitle("Image has been bonked");
 		builder.setDescription("The image has been added to the blocklist and won't appear ever again");
 		sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 	}

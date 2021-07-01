@@ -34,7 +34,7 @@ public class GelbooruAPI {
 	}
 
 	public static JsonArray getJsonArray(Rating rating, Sort sort, int limit, String tags) throws IOException {
-		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags + "%20-" + String.join("%20-", banned);
+		String urlQueryString = baseUrl + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags; // + "%20-" + String.join("%20-", banned);
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36");

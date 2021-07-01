@@ -4,6 +4,7 @@ import com.xharlock.holo.music.core.MusicCommand;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+// TODO
 public class RemoveCmd extends MusicCommand {
 
 	public RemoveCmd(String name) {
@@ -14,12 +15,6 @@ public class RemoveCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
-		// Check if index is out of bounds
-		
-		
-		// Get track from the queue
-		
 		
 	}
 
