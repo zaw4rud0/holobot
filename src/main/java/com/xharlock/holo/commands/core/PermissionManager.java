@@ -57,7 +57,6 @@ public class PermissionManager {
 		blacklisted.add(user);
 	}
 
-	// Write these methods in the Command Class so you can tweak them for each command
 	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
 		
 		e.getMessage().delete().queue();

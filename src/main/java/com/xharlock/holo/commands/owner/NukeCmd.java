@@ -13,7 +13,7 @@ public class NukeCmd extends Command {
 
 	public NukeCmd(String name) {
 		super(name);
-		setDescription("(Owner-only) Use this command to indiscriminately delete a given amount of messages");
+		setDescription("(Owner-only) Use this command to indiscriminately delete a given amount of messages.");
 		setUsage(name + " <amount>");
 		setIsGuildOnlyCommand(true);
 		setIsOwnerCommand(true);

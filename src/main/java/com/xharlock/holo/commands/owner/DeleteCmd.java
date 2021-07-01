@@ -1,5 +1,7 @@
 package com.xharlock.holo.commands.owner;
 
+import java.util.List;
+
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
 
@@ -10,8 +12,9 @@ public class DeleteCmd extends Command {
 
 	public DeleteCmd(String name) {
 		super(name);
-		setDescription("(Owner-only) Use this command to delete a message");
-		setUsage(name + " <msg id>");
+		setDescription("(Owner-only) Use this command to delete a message using their id. Replying to a message also works.");
+		setUsage(name + " [msg id]");
+		setAliases(List.of("d"));
 		setIsOwnerCommand(true);
 		setCommandCategory(CommandCategory.OWNER);
 	}
@@ -22,6 +25,12 @@ public class DeleteCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder();
 
+		// Delete message user is replying to
+		if (e.getMessage().getReferencedMessage() != null) {
+			e.getMessage().getReferencedMessage().delete().queue();
+			return;
+		}
+		
 		// No argument was given
 		if (args.length != 1) {
 			builder.setTitle("Incorrect Usage");
