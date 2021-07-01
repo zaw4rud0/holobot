@@ -592,6 +592,7 @@ public class ImageCmd extends Command {
 		categories.add("chisaki");
 		categories.add("chitoge");
 		categories.add("chocola");
+		categories.add("cirno");
 		categories.add("darkness");
 		categories.add("dio");
 		categories.add("echidna");
