@@ -1,4 +1,4 @@
-package com.xharlock.holo.image;
+package com.xharlock.holo.experimental;
 
 import java.io.IOException;
 import java.net.HttpURLConnection;

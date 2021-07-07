@@ -104,7 +104,7 @@ public class CheckNSFWCmd extends Command {
 					int sizeclass = Math.max(img.getWidth(), img.getHeight()) / 1000;
 					
 					// for super small images
-					if(sizeclass == 0)
+					if (sizeclass == 0)
 						sizeclass = 1;
 					
 					// Draw the box into the image
@@ -183,7 +183,7 @@ public class CheckNSFWCmd extends Command {
 		g2d.setStroke(new BasicStroke(5*sizeclass));
 		g2d.drawRect(x, y, width, height);
 		g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25*sizeclass));
-		g2d.drawString("" + box_number, x + 12*sizeclass, y + 30*sizeclass);
+		g2d.drawString("" + box_number, x + 12 * sizeclass, y + 30 * sizeclass);
 		g2d.dispose();
 		return img;
 	}
