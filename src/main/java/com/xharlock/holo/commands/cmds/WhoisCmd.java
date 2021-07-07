@@ -40,11 +40,15 @@ public class WhoisCmd extends Command {
 			return;
 		}
 
-		User user = e.getAuthor();
+		User user = null;
 		try {
 			user = e.getJDA().getUserById(Long.parseLong(args[0].replace("<@!", "").replace(">", "")));
-		} catch (Exception ex) {
+		} catch (Exception ex) {}
+		
+		if (user == null) {
+			user = e.getAuthor();
 		}
+		
 		Member member = e.getGuild().retrieveMember(user).complete();
 
 		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");

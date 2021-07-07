@@ -23,6 +23,7 @@ public abstract class Command {
 	protected String description;
 	protected String usage;
 	protected String example;
+	protected String thumbnail_url;
 	protected List<String> aliases = new ArrayList<>();
 	protected String[] args;
 
@@ -42,7 +43,7 @@ public abstract class Command {
 	}
 
 	public abstract void onCommand(MessageReceivedEvent e);
-
+	
 	protected void addSuccessReaction(Message msg) {
 		msg.addReaction(Emojis.THUMBSUP.getAsBrowser());
 	}
@@ -190,6 +191,14 @@ public abstract class Command {
 		this.example = example;
 	}
 
+	public String getThumbnail() {
+		return this.thumbnail_url;
+	}
+	
+	protected void setThumbnail(String url) {
+		this.thumbnail_url = url;
+	}
+	
 	public List<String> getAliases() {
 		return this.aliases;
 	}

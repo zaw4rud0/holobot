@@ -42,7 +42,6 @@ public class DatabaseOPs {
 	 * @param name = Name of waifu
 	 * @param tag = Gelbooru tag of waifu
 	 * @param title = Title of the embed
-	 * @throws SQLException 
 	 */
 	public static boolean addNewWaifu(String name, String tag, String title) throws SQLException {
 		title = title.replace("'", "''");
