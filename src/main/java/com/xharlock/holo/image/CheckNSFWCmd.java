@@ -103,6 +103,10 @@ public class CheckNSFWCmd extends Command {
 					// Get 'sizeclass' of image 
 					int sizeclass = Math.max(img.getWidth(), img.getHeight()) / 1000;
 					
+					// for super small images
+					if(sizeclass == 0)
+						sizeclass = 1;
+					
 					// Draw the box into the image
 					img = drawBox(img, x, y, width, height, (i + 1), sizeclass);
 					
