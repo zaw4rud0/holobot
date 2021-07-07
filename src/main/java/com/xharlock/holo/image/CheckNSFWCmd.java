@@ -100,8 +100,15 @@ public class CheckNSFWCmd extends Command {
 					int width = bounding_box.get(2).getAsInt();
 					int height = bounding_box.get(3).getAsInt();
 					
+					// Get 'sizeclass' of image 
+					int sizeclass = Math.max(img.getWidth(), img.getHeight()) / 1000;
+					
+					// for super small images
+					if(sizeclass == 0)
+						sizeclass = 1;
+					
 					// Draw the box into the image
-					img = drawBox(img, x, y, width, height, (i + 1));
+					img = drawBox(img, x, y, width, height, (i + 1), sizeclass);
 					
 					// Display box informations 
 					builder.addField("Box " + (i + 1), 
@@ -170,13 +177,13 @@ public class CheckNSFWCmd extends Command {
 	/**
 	 * Method to draw a box into the image with the given properties
 	 */
-	private static BufferedImage drawBox(BufferedImage img, int x, int y, int width, int height, int box_number) {
+	private static BufferedImage drawBox(BufferedImage img, int x, int y, int width, int height, int box_number, int sizeclass) {
 		Graphics2D g2d = img.createGraphics();
 		g2d.setColor(Color.RED);
-		g2d.setStroke(new BasicStroke(5));
+		g2d.setStroke(new BasicStroke(5*sizeclass));
 		g2d.drawRect(x, y, width, height);
-		g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25));
-		g2d.drawString("" + box_number, x + 12, y + 30);
+		g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25*sizeclass));
+		g2d.drawString("" + box_number, x + 12*sizeclass, y + 30*sizeclass);
 		g2d.dispose();
 		return img;
 	}
