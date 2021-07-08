@@ -99,14 +99,14 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to display the current PokÃ©mon team as a BufferedImage
+	 * Method to display the current Pokémon team as a BufferedImage
 	 */
 	public BufferedImage displayTeam(boolean matchings) throws IllegalArgumentException, IOException {
 
 		// Convert team array to a List
 		List<Pokemon> team = Arrays.asList(this.team);
 
-		// Types of the PokÃ©mon in the team should match, Markbeep's code here
+		// Types of the Pokémon in the team should match, Markbeep's code here
 		// Basically reorder and rearrange the types here
 		if (matchings) {
 			team = orderPokemon(team);
@@ -115,14 +115,14 @@ public class PokemonTeam {
 		List<BufferedImage> pokemon_images = new ArrayList<>();
 
 		for (Pokemon pokemon : team) {
-			// No PokÃ©mon in this slot, draw a simple gray background
+			// No Pokémon in this slot, draw a simple gray background
 			if (pokemon == null) {
 				pokemon_images.add(drawGray());
 			} else {
 				BufferedImage img = null;
 				BufferedImage artwork = ImageIO.read(new URL(pokemon.artwork));
 
-				// If PokÃ©mon doesn't have a secondary type, fill background with only 1 color
+				// If Pokémon doesn't have a secondary type, fill background with only 1 color
 				if (pokemon.type2 == null)
 					img = draw(artwork, pokemon.type1.getColor(), pokemon.type1.getColor(),
 							"#" + pokemon.pokedexId + " " + pokemon.name);
@@ -136,18 +136,18 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to display a given PokÃ©mon team as a BufferedImage
+	 * Method to display a given Pokémon team as a BufferedImage
 	 * 
 	 * @param team      = List of Pokemon to display
-	 * @param matchings = Match the types of the PokÃ©mon
-	 * @return Reordered List of PokÃ©mon
+	 * @param matchings = Match the types of the Pokémon
+	 * @return Reordered List of Pokémon
 	 */
 	public static BufferedImage displayTeam(List<Pokemon> team, boolean matchings) throws IllegalArgumentException, IOException {
 
 		if (team.size() > 6)
-			throw new IllegalArgumentException("The list may not contain more than 6 PokÃ©mon!");
+			throw new IllegalArgumentException("The list may not contain more than 6 Pokémon!");
 
-		// Types of the PokÃ©mon in the team should match, Markbeep's code here
+		// Types of the Pokémon in the team should match, Markbeep's code here
 		// Basically reorder and rearrange the types here
 		if (matchings) {
 			team = orderPokemon(team);
@@ -156,14 +156,14 @@ public class PokemonTeam {
 		List<BufferedImage> pokemon_images = new ArrayList<>();
 
 		for (Pokemon pokemon : team) {
-			// No PokÃ©mon in this slot, draw a simple gray background
+			// No Pokémon in this slot, draw a simple gray background
 			if (pokemon == null) {
 				pokemon_images.add(drawGray());
 			} else {
 				BufferedImage img = null;
 				BufferedImage artwork = ImageIO.read(new URL(pokemon.artwork));
 
-				// If PokÃ©mon doesn't have a secondary type, fill background with only 1 color
+				// If Pokémon doesn't have a secondary type, fill background with only 1 color
 				if (pokemon.type2 == null)
 					img = draw(artwork, pokemon.type1.getColor(), null, "#" + pokemon.pokedexId + " " + pokemon.name);
 				else
@@ -176,13 +176,13 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to draw a PokÃ©mon and its name onto a background
+	 * Method to draw a Pokémon and its name onto a background
 	 * 
-	 * @param img    = Picture of the PokÃ©mon
+	 * @param img    = Picture of the Pokémon
 	 * @param color1 = Color of the first type
 	 * @param color2 = Color of the second type
-	 * @param name   = Name of the PokÃ©mon and its PokÃ©dex id
-	 * @return A BufferedImage displaying the PokÃ©mon with background and name
+	 * @param name   = Name of the Pokémon and its Pokédex id
+	 * @return A BufferedImage displaying the Pokémon with background and name
 	 */
 	private static BufferedImage draw(BufferedImage img, Color color1, Color color2, String name) {
 		int width = 500, height = 500;
@@ -210,11 +210,11 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Helper method to draw the name of the PokÃ©mon in the right position
+	 * Helper method to draw the name of the Pokémon in the right position
 	 * 
 	 * @param g2    = Graphics2D
-	 * @param text  = Name and id of the PokÃ©mon
-	 * @param rect  = A rectangle of the size of the PokÃ©mon image
+	 * @param text  = Name and id of the Pokémon
+	 * @param rect  = A rectangle of the size of the Pokémon image
 	 * @param font  = Font of the text
 	 * @param color = Color of the text
 	 */
@@ -228,7 +228,7 @@ public class PokemonTeam {
 	}
 
 	/**
-	 * Method to draw a simple gray square for when there is no PokÃ©mon in a slot
+	 * Method to draw a simple gray square for when there is no Pokémon in a slot
 	 */
 	private static BufferedImage drawGray() {
 		int width = 500, height = 500;

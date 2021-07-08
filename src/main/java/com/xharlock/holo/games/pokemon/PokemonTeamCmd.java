@@ -11,14 +11,13 @@ import com.xharlock.holo.commands.core.CommandCategory;
 import com.xharlock.holo.utils.BufferedImageOps;
 
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class PokemonTeamCmd extends Command {
 
 	public PokemonTeamCmd(String name) {
 		super(name);
-		setDescription("Use this command for every PokÃ©mon team related subcommands");
+		setDescription("Use this command for every Pokémon team related subcommands");
 		setAliases(List.of("poketeam"));
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GAMES);
@@ -28,8 +27,6 @@ public class PokemonTeamCmd extends Command {
 	public void onCommand(MessageReceivedEvent e) {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
-
-		e.getChannel().sendTyping().queue();
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(getColor(e));
@@ -41,6 +38,8 @@ public class PokemonTeamCmd extends Command {
 		
 		else if (args[0].equals("random")) {
 	
+			e.getChannel().sendTyping().queue();
+			
 			boolean matching;
 			
 			if (args.length == 1 || args[1].equals("true"))
@@ -55,12 +54,12 @@ public class PokemonTeamCmd extends Command {
 				input = BufferedImageOps.toInputStream(img);
 			} catch (IOException | InterruptedException ex) {
 				builder.setTitle("Error");
-				builder.setDescription("Something went wrong while creating a PokÃ©mon team. Please try again in a few minutes!");
+				builder.setDescription("Something went wrong while creating a Pokémon team. Please try again in a few minutes!");
 				sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 				return;
 			}
 
-			builder.setTitle("Random PokÃ©mon Team");
+			builder.setTitle("Random Pokémon Team");
 			builder.setImage("attachment://pokemonteam.png");		
 			if (e.isFromGuild())
 				builder.setFooter("Invoked by " + e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
@@ -70,12 +69,7 @@ public class PokemonTeamCmd extends Command {
 		
 		// Add more stuff in future, like the ability to create a custom team for users
 		else {
-			
+			e.getChannel().sendMessage("This feature is in development and thus not available yet. You probably meant `" + getPrefix(e) + "pokemonteam random`").queue();
 		}
 	}
-
-	public static MessageEmbed getHelp() {
-		return null;
-	}
-
 }

@@ -17,12 +17,12 @@ import com.google.gson.JsonObject;
 public class PokeAPI {
 
 	private static final String baseUrl = "https://pokeapi.co/api/v2";
-	/** Total amount of Pok√©mon */
+	/** Total amount of PokÈmon */
 	public static final int PokemonCount = 898;
 
 	/**
-	 * Method to search for a Pok√©mon by their name. <br>
-	 * Returns null if no Pok√©mon was found.
+	 * Method to search for a PokÈmon by their name. <br>
+	 * Returns null if no PokÈmon was found.
 	 */
 	public static JsonObject getPokemon(String name) throws IOException {
 		String url = baseUrl + "/pokemon/" + name + "/";
@@ -30,7 +30,7 @@ public class PokeAPI {
 	}
 
 	/**
-	 * Method to search for a Pok√©mon by their Pok√©dex id.
+	 * Method to search for a PokÈmon by their PokÈdex id.
 	 */
 	public static JsonObject getPokemon(int id) throws IOException {
 		String url = baseUrl + "/pokemon/" + id + "/";
@@ -38,8 +38,8 @@ public class PokeAPI {
 	}
 
 	/**
-	 * Method to search for a Pok√©mon species by their name. <br>
-	 * Returns null if no Pok√©mon was found.
+	 * Method to search for a PokÈmon species by their name. <br>
+	 * Returns null if no PokÈmon was found.
 	 */
 	public static JsonObject getPokemonSpecies(String name) throws IOException {
 		String url = baseUrl + "/pokemon-species/" + name + "/";
@@ -47,7 +47,7 @@ public class PokeAPI {
 	}
 
 	/**
-	 * Method to search for a Pok√©mon by their Pok√©dex id.
+	 * Method to search for a PokÈmon by their PokÈdex id.
 	 */
 	public static JsonObject getPokemonSpecies(int id) throws IOException {
 		String url = baseUrl + "/pokemon-species/" + id + "/";
@@ -55,15 +55,7 @@ public class PokeAPI {
 	}
 
 	/**
-	 * Get the total amount of Pok√©mon
-	 */
-	@Deprecated
-	public static int getPokemonCount() {
-		return PokemonCount;
-	}
-
-	/**
-	 * Get a random team of six Pok√©mon
+	 * Get a random team of six PokÈmon
 	 */
 	public static List<Pokemon> getRandomTeam() throws IOException, InterruptedException {
 		List<Pokemon> team = new ArrayList<>();
@@ -71,7 +63,7 @@ public class PokeAPI {
 		List<Thread> threads = new ArrayList<>();
 		List<PokemonFetcher> fetchers = new ArrayList<>();
 		for (int i = 0; i < 6; i++) {
-			int id = rand.nextInt(PokeAPI.getPokemonCount() + 1);
+			int id = rand.nextInt(PokemonCount + 1);
 			PokemonFetcher fetcher = new PokemonFetcher(id);
 			Thread t = new Thread(fetcher);
 			threads.add(t);
@@ -103,6 +95,9 @@ public class PokeAPI {
 	}
 }
 
+/**
+ * Class that fetches a single PokÈmon. Used to parallelize fetching a full PokÈmon team.
+ */
 class PokemonFetcher implements Runnable {
 	int id;
 	Pokemon pokemon;

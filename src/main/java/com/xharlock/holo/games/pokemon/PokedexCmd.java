@@ -13,8 +13,8 @@ public class PokedexCmd extends Command {
 
 	public PokedexCmd(String name) {
 		super(name);
-		setDescription("Use this command to look up a PokÃ©mon");
-		setUsage(name + " <PokÃ©mon name or id>");
+		setDescription("Use this command to look up a Pokémon");
+		setUsage(name + " <Pokémon name or id>");
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GAMES);
 	}
@@ -48,7 +48,7 @@ public class PokedexCmd extends Command {
 		}
 		
 		if (pokemon.name == null) {
-			builder.setTitle("PokÃ©mon not found");
+			builder.setTitle("Pokémon not found");
 			builder.setDescription("Please check for typos and try again!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
@@ -92,7 +92,7 @@ public class PokedexCmd extends Command {
 		
 		builder.addField("Height", pokemon.height, true);
 		builder.addField("Weight", pokemon.weight, true);
-		builder.addField("PokÃ©dex Entry", pokemon.pokedexEntry, false);
+		builder.addField("Pokédex Entry", pokemon.pokedexEntry, false);
 		
 		if (pokemon.evolutionChain != null)
 			builder.addField("Evolution", pokemon.evolutionChain, false);

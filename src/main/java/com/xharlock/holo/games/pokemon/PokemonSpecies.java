@@ -17,7 +17,7 @@ public class PokemonSpecies {
 	public String pokedexEntry;
 	public PokemonType type1;
 	public PokemonType type2;
-	/** The chance of this PokÃ©mon being female with -1 for genderless. */
+	/** The chance of this Pokémon being female with -1 for genderless. */
 	public double genderRate;
 	public String height;
 	public String weight;
@@ -287,7 +287,7 @@ public class PokemonSpecies {
 	}
 	
 	/**
-	 * Method to check if two PokÃ©mon share the same species (i.e. PokÃ©dex id)
+	 * Method to check if two Pokémon share the same species (i.e. Pokédex id)
 	 */
 	public boolean isSameSpecies(PokemonSpecies p) {
 		return p.pokedexId.equals(this.pokedexId);

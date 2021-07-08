@@ -14,7 +14,7 @@ public class RandomPokemonCmd extends Command {
 
 	public RandomPokemonCmd(String name) {
 		super(name);
-		setDescription("Use this command to get a random PokÃ©mon.");
+		setDescription("Use this command to get a random Pokémon.");
 		setUsage(name);
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GAMES);
@@ -33,7 +33,7 @@ public class RandomPokemonCmd extends Command {
 			pokemon = new PokemonSpecies(PokeAPI.getPokemonSpecies(rand.nextInt(898) + 1));
 		} catch (IOException e1) {
 			builder.setTitle("Error");
-			builder.setDescription("Something went wrong while retrieving PokÃ©mon data. Please try again later!");
+			builder.setDescription("Something went wrong while retrieving Pokémon data. Please try again later!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 		}
 		
