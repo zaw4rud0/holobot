@@ -25,26 +25,21 @@ public class HoloCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 		
-		EmbedBuilder builder = new EmbedBuilder();		
+		EmbedBuilder builder = new EmbedBuilder();
 		String url = null;
 		
 		try {
 			// Keeps fetching a new url until the url isn't on the blocklist
-			boolean canSend = false;			
-			while (!canSend) {
+			do {
 				url = HttpResponse.getJsonObject(api_url).get("url").getAsString();
-				if (!BlockCmd.blocked.contains(url))
-					canSend = true;
-			}
-		}		
-		catch (IOException ex) {
+			} while (BlockCmd.blocked.contains(url));
+		} catch (IOException ex) {
 			builder.setTitle("Error");
-			builder.setDescription("Something went wrong! Please try again in a few minutes.");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
 		}
 		
@@ -52,5 +47,4 @@ public class HoloCmd extends Command {
 		builder.setImage(url);
 		sendEmbed(e, builder, true);
 	}
-
 }

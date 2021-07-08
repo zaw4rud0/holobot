@@ -3,6 +3,7 @@ package com.xharlock.holo.anime;
 import java.util.ArrayList;
 
 import com.google.gson.JsonObject;
+import com.xharlock.holo.development.AnimeSeason;
 
 public class Anime {
 

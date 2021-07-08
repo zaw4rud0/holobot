@@ -13,7 +13,6 @@ import com.xharlock.holo.commands.core.CommandManager;
 import com.xharlock.holo.commands.core.PermissionManager;
 import com.xharlock.holo.config.Config;
 import com.xharlock.holo.config.GuildConfigManager;
-import com.xharlock.holo.experimental.ButtonEventListener;
 import com.xharlock.holo.misc.BotHandler;
 import com.xharlock.holo.misc.Misc;
 
@@ -68,8 +67,7 @@ public class Holo {
 		jda.addEventListener(
 			new CommandListener(commandManager), 
 			new BotHandler(),
-			new Misc(),
-			new ButtonEventListener()
+			new Misc()
 		);
 	}
 	

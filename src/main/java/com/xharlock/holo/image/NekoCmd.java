@@ -14,9 +14,10 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class NekoCmd extends Command {
 
-	private String[] URLs = { "https://nekos.life/api/v2/img/neko", "https://neko-love.xyz/api/v1/neko",
-			"https://nekos.life/api/v2/img/kemonomimi",
-			// "http://api.nekos.fun:8080/api/neko"
+	private String[] urls = { 
+			"https://nekos.life/api/v2/img/neko", 
+			"https://neko-love.xyz/api/v1/neko",
+			"https://nekos.life/api/v2/img/kemonomimi"
 	};
 
 	public NekoCmd(String name) {
@@ -32,23 +33,18 @@ public class NekoCmd extends Command {
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 
-		Random rand = new Random();
 		EmbedBuilder builder = new EmbedBuilder();
 		String url = null;
 
 		try {
 			// Keeps fetching a new url until the url isn't on the blocklist
-			boolean canSend = false;
-			while (!canSend) {
-				url = HttpResponse.getJsonObject(URLs[rand.nextInt(URLs.length)]).get("url").getAsString();
-				if (!BlockCmd.blocked.contains(url))
-					canSend = true;
-			}
-		}		
-		catch (IOException ex) {
+			do {
+				url = HttpResponse.getJsonObject(urls[new Random().nextInt(urls.length)]).get("url").getAsString();
+			} while (BlockCmd.blocked.contains(url));
+		} catch (IOException ex) {
 			builder.setTitle("Error");
-			builder.setDescription("Something went wrong! Please try again in a few minutes.");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
 		}
 
