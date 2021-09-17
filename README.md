@@ -25,6 +25,10 @@ Holo is a Discord bot based on Holo the Wisewolf from the series [Spice & Wolf](
 
 This Discord bot uses the following dependencies for its functionalities:
 
+### [NanoJikan](https://github.com/xHarlock/NanoJikan)
+
+A simple and lightweight wrapper written by me for Jikan API to fetch Anime and Manga data from MyAnimeList
+
 ### [JDA](https://github.com/DV8FromTheWorld/JDA)
 
 JDA (Java Discord API) makes up the core of this bot 
