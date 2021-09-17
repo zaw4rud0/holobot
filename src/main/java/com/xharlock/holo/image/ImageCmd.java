@@ -57,7 +57,7 @@ public class ImageCmd extends Command {
 					+ "Title: " + title + "\n");
 			
 			try {
-				DatabaseOPs.addNewWaifu(name, tag, title);
+				DatabaseOPs.insertWaifu(name, tag, title);
 				names.add(name);
 				Collections.sort(names);
 			} 
@@ -95,10 +95,12 @@ public class ImageCmd extends Command {
 			ResultSet rs = DatabaseOPs.getWaifu(name);
 			rs.next();
 			String tag = rs.getString("Tag");
-			String url = getImage(tag);
+			String url = null;
 			
-			while (BlockCmd.blocked.contains(url))
+			// Keeps fetching a new url until the url isn't on the blocklist
+			do {
 				url = getImage(tag);
+			} while (BlockCmd.blocked.contains(url) || BlockCmd.block_requests.contains(url));
 			
 			builder.setTitle(rs.getString("Title"));
 			builder.setImage(url);
@@ -114,11 +116,17 @@ public class ImageCmd extends Command {
 		sendEmbed(e, builder, true);
 	}
 
+	/**
+	 * Method to get the right image from Gelbooru
+	 */
 	private String getImage(String tag) throws IOException {		
 		JsonObject object = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.SAFE, GelbooruAPI.Sort.RANDOM, 1, tag).get(0).getAsJsonObject();		
 		return object.has("large_file_url") ? object.get("large_file_url").getAsString() : object.get("file_url").getAsString();
 	}
 
+	/**
+	 * Method to properly display all available tags as a single String
+	 */
 	private String getCategoriesString() {
 		return names.toString().replace("]", "`").replace("[", "`").replace(",", "`").replace(" ", ", `");
 	}

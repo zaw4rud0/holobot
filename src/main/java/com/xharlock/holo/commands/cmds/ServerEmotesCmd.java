@@ -12,9 +12,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class ServerEmotes extends Command {
+public class ServerEmotesCmd extends Command {
 
-	public ServerEmotes(String name) {
+	public ServerEmotesCmd(String name) {
 		super(name);
 		setDescription("Use this command to view all emotes of the server");
 		setUsage(name);

@@ -1,5 +1,9 @@
 package com.xharlock.holo.utils;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 public class Formatter {
@@ -16,14 +20,32 @@ public class Formatter {
 		long hours = timeInMillis % TimeUnit.DAYS.toMillis(1) / TimeUnit.HOURS.toMillis(1);
 		long minutes = timeInMillis % TimeUnit.HOURS.toMillis(1) / TimeUnit.MINUTES.toMillis(1);
 		long seconds = timeInMillis % TimeUnit.MINUTES.toMillis(1) / TimeUnit.SECONDS.toMillis(1);		
-		String formatted = "`";		
+		String formatted = "";		
 		if (days > 0)
 			formatted += days + " days, ";
 		if (hours > 0)
 			formatted += hours + " hours, ";
 		if (minutes > 0)
-			formatted += minutes + " minutes, ";		
-		return formatted += seconds + " seconds`";
+			formatted += minutes + " minutes and ";		
+		return formatted += seconds + " seconds";
+	}
+	
+	/**
+	 * Method to turn a given amount of milliseconds to a date and time
+	 */
+	public static String formatDateTime2(long millis) {
+		SimpleDateFormat sdf = new SimpleDateFormat("dd.MM.yy HH:mm");
+		Date date = new Date(millis);
+		return sdf.format(date);
+	}
+	
+	/**
+	 * Method to turn a given amount of milliseconds to a date and time
+	 */
+	public static String formatDateTime(long millis) {
+		DateFormat f = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.GERMANY);
+		String formattedDate = f.format(new Date(millis));
+		return formattedDate;
 	}
 
 	public static String firstLetterUp(String string) {

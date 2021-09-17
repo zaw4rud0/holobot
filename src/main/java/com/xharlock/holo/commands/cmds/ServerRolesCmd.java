@@ -10,9 +10,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class ServerRoles extends Command {
+public class ServerRolesCmd extends Command {
 
-	public ServerRoles(String name) {
+	public ServerRolesCmd(String name) {
 		super(name);
 		setDescription("Use this command to display all roles of this server");
 		setUsage(name);

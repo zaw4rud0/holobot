@@ -14,6 +14,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
+import com.xharlock.nanojikan.JikanAPI;
+import com.xharlock.nanojikan.model.Anime;
+
 public class AnimeSearchCmd extends Command {
 
 	private EventWaiter waiter;
@@ -153,7 +156,7 @@ public class AnimeSearchCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		Anime anime = null;
 		try {
-			anime = new Anime(JikanAPI.getAnime(id));
+			anime = JikanAPI.getAnime(id);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
@@ -162,39 +165,39 @@ public class AnimeSearchCmd extends Command {
 			return;
 		}
 
-		builder.setTitle(anime.title);
-		builder.setThumbnail(anime.image_url);
-		builder.setDescription(anime.synopsis);
-		if (anime.title_en != null && !anime.title_en.equals(anime.title)) {
-			builder.addField("English Title", anime.title_en, true);
+		builder.setTitle(anime.getTitle());
+		builder.setThumbnail(anime.getImageUrl());
+		builder.setDescription(anime.getSynopsis());
+		if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle())) {
+			builder.addField("English Title", anime.getTitleEnglish(), true);
+		}		
+		if (!anime.getTitleJapanese().equals("null")) {
+			builder.addField("Japanese Title", anime.getTitleJapanese(), true);
 		}
-		if (!anime.title_jp.equals("null")) {
-			builder.addField("Japanese Title", anime.title_jp, true);
-		}
-		builder.addField("Genres", anime.genres.toString().replace("[", "").replace("]", ""), false);
-		builder.addField("Type", anime.type, true);
-		if (anime.episodes != 0) {
-			builder.addField("Episodes", new StringBuilder().append(anime.episodes).toString(), true);
+		builder.addField("Genres", anime.getGenres().toString().replace("[", "").replace("]", ""), false);
+		builder.addField("Type", anime.getType(), true);
+		if (anime.getEpisodes() != 0) {
+			builder.addField("Episodes", new StringBuilder().append(anime.getEpisodes()).toString(), true);
 		} else {
 			builder.addField("Episodes", "TBA", true);
 		}
-		if (anime.season != null) {
-			builder.addField("Season", anime.season, true);
+		if (anime.getSeason() != null) {
+			builder.addField("Season", anime.getSeason(), true);
 		} else {
 			builder.addField("Season", "N/A", true);
 		}
-		if (anime.score != 0.0) {
-			builder.addField("MAL Score", new StringBuilder().append(anime.score).toString(), true);
+		if (anime.getScore() != 0.0) {
+			builder.addField("MAL Score", new StringBuilder().append(anime.getScore()).toString(), true);
 		} else {
 			builder.addField("MAL Score", "N/A", true);
 		}
-		if (anime.rank != 0) {
-			builder.addField("MAL Rank", new StringBuilder().append(anime.rank).toString(), true);
+		if (anime.getRank() != 0) {
+			builder.addField("MAL Rank", new StringBuilder().append(anime.getRank()).toString(), true);
 		} else {
 			builder.addField("MAL Rank", "N/A", true);
 		}
 		builder.addBlankField(true);
-		builder.addField("Link", "[MyAnimeList](" + anime.url + ")", false);
+		builder.addField("Link", "[MyAnimeList](" + anime.getUrl() + ")", false);
 		sendEmbed(e, builder, true);
 	}
 }

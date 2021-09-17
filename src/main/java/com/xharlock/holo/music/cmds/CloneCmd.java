@@ -47,7 +47,7 @@ public class CloneCmd extends MusicCommand {
 
 		// Re-order the queue with the cloned track on top of it
 		List<AudioTrack> queueList = new ArrayList<>();
-		queueList.add(current);
+		queueList.add(current.makeClone());
 		queueList.addAll(musicManager.scheduler.queue);
 		musicManager.scheduler.queue.clear();		
 		for (AudioTrack track : queueList)

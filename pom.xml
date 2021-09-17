@@ -28,6 +28,13 @@
 
 	<dependencies>
 
+		<!-- NanoJikan - My own package :happe: -->
+		<dependency>
+			<groupId>com.xharlock</groupId>
+			<artifactId>nanojikan</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+
 		<!-- Core of the bot -->
 		<dependency>
 			<groupId>net.dv8tion</groupId>

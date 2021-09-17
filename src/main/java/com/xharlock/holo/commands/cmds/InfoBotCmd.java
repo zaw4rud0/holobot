@@ -50,7 +50,7 @@ public class InfoBotCmd extends Command {
 		
 		String system_info = "**CPU:** `" + cpu_percentage + " on " + cores + " core(s)`\n"
 						+ "**Memory:** `" + heap / 1024 / 1024 + "MB / " + max / 1024 / 1024 + "MB (" + heap_percentage + "%)`\n"
-						+ "**Uptime:** " + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startup_time);
+						+ "**Uptime:** `" + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startup_time) + "`";
 
 		String description = "Your senpai for everything :heart:\nUse `" + getPrefix(e) + "help` to see all commands";
 		

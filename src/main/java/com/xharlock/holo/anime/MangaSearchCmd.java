@@ -15,6 +15,9 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
 
+import com.xharlock.nanojikan.JikanAPI;
+import com.xharlock.nanojikan.model.Manga;
+
 public class MangaSearchCmd extends Command {
 
 	private EventWaiter waiter;
@@ -154,7 +157,7 @@ public class MangaSearchCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		Manga manga = null;
 		try {
-			manga = new Manga(JikanAPI.getManga(id));
+			manga = JikanAPI.getManga(id);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
@@ -163,39 +166,39 @@ public class MangaSearchCmd extends Command {
 			return;
 		}
 
-		builder.setTitle(manga.title);
-		builder.setThumbnail(manga.image_url);
-		builder.setDescription(manga.synopsis);
-		if (manga.title_en != null && !manga.title_en.equals(manga.title)) {
-			builder.addField("English Title", manga.title_en, true);
+		builder.setTitle(manga.getTitle());
+		builder.setThumbnail(manga.getImageUrl());
+		builder.setDescription(manga.getSynopsis());
+		if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle())) {
+			builder.addField("English Title", manga.getTitleEnglish(), true);
 		}
-		if (!manga.title_jp.equals("null")) {
-			builder.addField("Japanese Title", manga.title_jp, true);
+		if (!manga.getTitleJapanese().equals("null")) {
+			builder.addField("Japanese Title", manga.getTitleJapanese(), true);
 		}
-		builder.addField("Genres", manga.genres.toString().replace("[", "").replace("]", ""), false);
-		builder.addField("Type", manga.type, true);
-		if (manga.chapters != 0) {
-			if (manga.volumes != 0) {
-				builder.addField("Chapters", "Vol: " + manga.volumes + "\nCh: " + manga.chapters, true);
+		builder.addField("Genres", manga.getGenres().toString().replace("[", "").replace("]", ""), false);
+		builder.addField("Type", manga.getType(), true);
+		if (manga.getChapters() != 0) {
+			if (manga.getVolumes() != 0) {
+				builder.addField("Chapters", "Vol: " + manga.getVolumes() + "\nCh: " + manga.getChapters(), true);
 			} else {
-				builder.addField("Chapters", String.valueOf(manga.chapters) + "Ch.", true);
+				builder.addField("Chapters", String.valueOf(manga.getChapters()) + "Ch.", true);
 			}
 		} else {
 			builder.addField("Chapters", "TBA", true);
 		}
 		builder.addBlankField(true);
-		if (manga.score != 0.0) {
-			builder.addField("MAL Score", new StringBuilder().append(manga.score).toString(), true);
+		if (manga.getScore() != 0.0) {
+			builder.addField("MAL Score", new StringBuilder().append(manga.getScore()).toString(), true);
 		} else {
 			builder.addField("MAL Score", "N/A", true);
 		}
-		if (manga.rank != 0) {
-			builder.addField("MAL Rank", new StringBuilder().append(manga.rank).toString(), true);
+		if (manga.getRank() != 0) {
+			builder.addField("MAL Rank", new StringBuilder().append(manga.getRank()).toString(), true);
 		} else {
 			builder.addField("MAL Rank", "N/A", true);
 		}
 		builder.addBlankField(true);
-		builder.addField("Link", "[MyAnimeList](" + manga.url + ")", false);
+		builder.addField("Link", "[MyAnimeList](" + manga.getUrl() + ")", false);
 		sendEmbed(e, builder, true);
 	}
 }

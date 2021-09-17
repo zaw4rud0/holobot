@@ -1,5 +1,6 @@
 package com.xharlock.holo.commands.owner;
 
+import java.util.Arrays;
 import java.util.List;
 
 import com.xharlock.holo.commands.core.Command;
@@ -14,14 +15,20 @@ public class NicknameCmd extends Command {
 		setDescription("(Owner-only) Use this command to set or change my nickname");
 		setUsage(name + " [nickname]");
 		setAliases(List.of("nick"));
+		setIsGuildOnlyCommand(true);
 		setIsOwnerCommand(true);
-        setCommandCategory(CommandCategory.OWNER);
+		setCommandCategory(CommandCategory.OWNER);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
-		e.getGuild().getMember(e.getJDA().getSelfUser()).modifyNickname(String.join(" ", args)).queue();
-	}
 
+		if (args.length >= 1 && args[0].equals("self")) {
+			e.getGuild().getMember(e.getJDA().getSelfUser()).modifyNickname(String.join(" ", Arrays.copyOfRange(args, 1, args.length))).queue();
+		} else {
+			long id = Long.parseLong(args[0]);
+			e.getGuild().getMemberById(id).modifyNickname(String.join(" ", Arrays.copyOfRange(args, 1, args.length))).queue();
+		}
+	}
 }

@@ -3,6 +3,7 @@ package com.xharlock.holo.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
@@ -10,10 +11,22 @@ import net.dv8tion.jda.api.entities.User;
 public class DatabaseOPs {
 	
 	/**
-	 * Method to add a new image to the blocklist in the DB
+	 * Method to add a new image to the blocklist into the DB
 	 */
 	public static boolean addBlockedImage(String url, User user, String date) throws SQLException {
 		String s = "Insert into BlockedImages (Url, DiscordUser, Date) VALUES "
+				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
+		Database.connect();
+		boolean success = Database.execute(s);
+		Database.disconnect();
+		return success;
+	}
+	
+	/**
+	 * Method to add a requested block into the DB
+	 */
+	public static boolean addBlockRequest(String url, User user, String date) throws SQLException {
+		String s = "Insert into BlockRequests (Url, DiscordUser, Date) VALUES "
 				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
 		Database.connect();
 		boolean success = Database.execute(s);
@@ -37,13 +50,28 @@ public class DatabaseOPs {
 	}
 	
 	/**
+	 * Method to get a list of requested blocks from the DB
+	 */
+	public static List<String> getBlockRequests() throws SQLException {
+		String s = "SELECT Url FROM BlockRequests";
+		Database.connect();
+		ResultSet rs = Database.query(s);
+		List<String> urls = new ArrayList<>();
+		while (rs.next()) {
+			urls.add(rs.getString("Url"));
+		}
+		Database.disconnect();
+		return urls;
+	}
+	
+	/**
 	 * Method to add a new waifu to the image command
 	 * 
 	 * @param name = Name of waifu
 	 * @param tag = Gelbooru tag of waifu
 	 * @param title = Title of the embed
 	 */
-	public static boolean addNewWaifu(String name, String tag, String title) throws SQLException {
+	public static boolean insertWaifu(String name, String tag, String title) throws SQLException {
 		title = title.replace("'", "''");
 		Database.connect();
 		String s = "INSERT into Gelbooru (Id, Tag, Title) VALUES (\'" + name + "\', \'" + tag + "\', \'" + title + "\');";
@@ -75,5 +103,34 @@ public class DatabaseOPs {
 		Database.connect();
 		ResultSet rs = Database.query(s);
 		return rs;
+	}
+	
+	/**
+	 * Method to get all exam dates from the DB
+	 */
+	public static LinkedHashMap<String, Long> getExamDates() throws SQLException {
+		String s = "SELECT * FROM ExamDates ORDER BY Date ASC";
+		Database.connect();
+		ResultSet rs = Database.query(s);
+		
+		LinkedHashMap<String, Long> exam_dates = new LinkedHashMap<>();
+		
+		while (rs.next()) {
+			exam_dates.put(rs.getString("Exam"), rs.getLong("Date"));
+		}
+		
+		Database.disconnect();
+		return exam_dates;
+	}
+	
+	/**
+	 * Method to insert a new exam date into the DB
+	 */
+	public static boolean insertExamDate(String exam, long millis) throws SQLException {
+		String s = "INSERT INTO ExamDates (Exam, Date) VALUES (\'" + exam + "\'," + millis + ");";
+		Database.connect();
+		boolean success = Database.execute(s);
+		Database.disconnect();
+		return success;
 	}
 }

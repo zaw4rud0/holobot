@@ -25,12 +25,13 @@ public class CommandManager extends ListenerAdapter {
 
 		// General Cmds
 		addCommand(new BugCmd("bug"));
+		addCommand(new ExamCmd("bp"));
 		addCommand(new HelpCmd("help", this));
 		addCommand(new InfoBotCmd("info"));
 		addCommand(new PingCmd("ping"));
-		addCommand(new ServerEmotes("serveremotes"));
+		addCommand(new ServerEmotesCmd("serveremotes"));
 		addCommand(new ServerInfoCmd("serverinfo"));
-		addCommand(new ServerRoles("serverroles"));
+		addCommand(new ServerRolesCmd("serverroles"));
 		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new WhoisCmd("whois"));
 		

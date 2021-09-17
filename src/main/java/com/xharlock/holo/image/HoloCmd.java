@@ -35,7 +35,7 @@ public class HoloCmd extends Command {
 			// Keeps fetching a new url until the url isn't on the blocklist
 			do {
 				url = HttpResponse.getJsonObject(api_url).get("url").getAsString();
-			} while (BlockCmd.blocked.contains(url));
+			} while (BlockCmd.blocked.contains(url) || BlockCmd.block_requests.contains(url));
 		} catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
