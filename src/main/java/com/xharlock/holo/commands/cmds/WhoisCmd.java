@@ -1,6 +1,7 @@
 package com.xharlock.holo.commands.cmds;
 
-import java.time.OffsetDateTime;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.List;
@@ -28,7 +29,7 @@ public class WhoisCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(MessageReceivedEvent e) {		
 		e.getMessage().delete().queue();
 
 		EmbedBuilder builder = new EmbedBuilder();
@@ -38,25 +39,21 @@ public class WhoisCmd extends Command {
 			builder.setDescription("Please only provide at most one argument");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
-		}
-
-		User user = null;
-		try {
-			user = e.getJDA().getUserById(Long.parseLong(args[0].replace("<@!", "").replace(">", "")));
-		} catch (Exception ex) {}
+		}		
 		
-		if (user == null) {
-			user = e.getAuthor();
-		}
+		User user = null;
+		try { user = e.getJDA().getUserById(Long.parseLong(args[0].replace("<@!", "").replace(">", "")));} catch (Exception ex) {}
+		if (user == null) user = e.getAuthor();
 		
 		Member member = e.getGuild().retrieveMember(user).complete();
 
 		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
 		builder.setThumbnail(user.getEffectiveAvatarUrl());
 		builder.addField("Nickname", "`" + member.getEffectiveName() + "`", false);
-
-		OffsetDateTime d = member.getTimeJoined();
-		String s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
+		
+		var localDateTime = LocalDateTime.ofInstant(member.getTimeJoined().toInstant(), ZoneId.of("Europe/Zurich"));
+		String s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
+		
 		builder.addField("Join Date", "`" + s + "`", false);
 
 		List<Role> roles = member.getRoles();
@@ -105,8 +102,8 @@ public class WhoisCmd extends Command {
 			builder.addField("Roles", rolesString, false);
 		}
 
-		d = user.getTimeCreated();
-		s = d.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
+		localDateTime = LocalDateTime.ofInstant(user.getTimeCreated().toInstant(), ZoneId.of("Europe/Zurich"));
+		s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
 		String type = user.isBot() ? "Bot" : "User";
 
 		builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);

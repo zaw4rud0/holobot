@@ -10,7 +10,7 @@ public class CollageMaker {
 	 * # # <br>
 	 * # #
 	 */
-	public static BufferedImage create2x2Collage(List<BufferedImage> images) throws IllegalArgumentException {
+	public static BufferedImage create2x2Collage(List<BufferedImage> images) {
 		if (images.size() != 4)
 			throw new IllegalArgumentException("This method requires four images!");
 		BufferedImage row1 = BufferedImageOps.join(images.get(0), images.get(1), "horizontal");
@@ -23,7 +23,7 @@ public class CollageMaker {
 	 * # # # <br>
 	 * # # #
 	 */
-	public static BufferedImage create3x2Collage(List<BufferedImage> images) throws IllegalArgumentException {
+	public static BufferedImage create3x2Collage(List<BufferedImage> images) {
 		if (images.size() != 6)
 			throw new IllegalArgumentException("This method requires six images!");
 		BufferedImage row1 = BufferedImageOps.join(images.get(0), images.get(1), images.get(2),
@@ -39,7 +39,7 @@ public class CollageMaker {
 	 * # # # <br>
 	 * # # #
 	 */
-	public static BufferedImage create3x3Collage(List<BufferedImage> images) throws IllegalArgumentException {
+	public static BufferedImage create3x3Collage(List<BufferedImage> images) {
 		if (images.size() != 9)
 			throw new IllegalArgumentException("This method requires nine images!");
 		BufferedImage row1 = BufferedImageOps.join(images.get(0), images.get(1), images.get(2),

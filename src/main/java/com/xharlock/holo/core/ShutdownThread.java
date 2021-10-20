@@ -2,11 +2,13 @@ package com.xharlock.holo.core;
 
 public class ShutdownThread extends Thread {
 
-	@SuppressWarnings("unused")
-	private Holo otakuSenpai;
+	// WIP
 	
-	public ShutdownThread(Holo otakuSenpai) {
-		this.otakuSenpai = otakuSenpai;
+	@SuppressWarnings("unused")
+	private Holo holo;
+	
+	public ShutdownThread(Holo holo) {
+		this.holo = holo;
 	}
 	
 	public void run() {

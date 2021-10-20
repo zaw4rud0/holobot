@@ -15,7 +15,6 @@ public class JoinCmd extends MusicCommand {
 		super(name);
 		setDescription("Use this command to me bring to your current voice channel");
 		setUsage(name);
-		setIsOwnerCommand(true);
 	}
 
 	@Override
@@ -33,6 +32,9 @@ public class JoinCmd extends MusicCommand {
 		}
 
 		if (!isUserInChannel(e)) {
+			builder.setTitle("Not in a voice channel!");
+			builder.setDescription("Please join a voice channel first");
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);
 			return;
 		}
 

@@ -133,9 +133,17 @@ public class BlockCmd extends Command {
 	}
 	
 	/**
+	 * Method to view the block requests
+	 */
+	@SuppressWarnings("unused")
+	private void viewRequests() {
+		
+	}
+	
+	/**
 	 * Method to get the url from a referenced message
 	 */
-	public String getUrl(Message msg) {
+	private String getUrl(Message msg) {
 		String url = null;
 		
 		// Check if image is an attachment

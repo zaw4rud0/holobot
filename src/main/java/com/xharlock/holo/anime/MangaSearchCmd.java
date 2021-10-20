@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.google.gson.JsonArray;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
@@ -17,6 +16,8 @@ import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEve
 
 import com.xharlock.nanojikan.JikanAPI;
 import com.xharlock.nanojikan.model.Manga;
+import com.xharlock.nanojikan.model.MangaResult;
+import com.xharlock.nanojikan.model.Nameable;
 
 public class MangaSearchCmd extends Command {
 
@@ -39,10 +40,11 @@ public class MangaSearchCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getChannel().sendTyping().queue();
-
+		if (e.isFromGuild())
+			e.getChannel().sendTyping().queue();
+		
 		EmbedBuilder builder = new EmbedBuilder();
-				
+
 		if (args.length == 0) {
 			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
@@ -52,10 +54,11 @@ public class MangaSearchCmd extends Command {
 		}
 
 		String search = String.join(" ", args);
-		JsonArray array;
+		List<MangaResult> results;
 
 		try {
-			array = JikanAPI.search(search, "manga");
+			System.out.println("flag 1");
+			results = JikanAPI.searchManga(search);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			addErrorReaction(e.getMessage());
@@ -64,17 +67,16 @@ public class MangaSearchCmd extends Command {
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-		
+
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
 
 		StringBuilder sb = new StringBuilder();
 
-		for (int i = 0; i < array.size(); i++) {
-			sb.append(numbers.get(i) + " " + array.get(i).getAsJsonObject().get("title").getAsString() + " ["
-					+ array.get(i).getAsJsonObject().get("type").getAsString() + "]\n");
+		for (int i = 0; i < results.size(); i++) {
+			sb.append(numbers.get(i) + " " + results.get(i).getTitle() + " [" + results.get(i).getType() + "]\n");
 		}
-		
+
 		String result = sb.toString();
 
 		builder.setTitle("Manga Search Results");
@@ -82,64 +84,84 @@ public class MangaSearchCmd extends Command {
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 
-			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.FOUR.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.FIVE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.SIX.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.SEVEN.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.EIGHT.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.NINE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.TEN.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.FOUR.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.FIVE.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.SIX.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.SEVEN.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.EIGHT.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.NINE.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
+			msg.addReaction(Emojis.TEN.getAsBrowser()).queue(v -> {
+			}, err -> {
+			});
 
 			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
-				
+
 				// So reactions on other messages are ignored
 				if (evt.getMessageIdLong() != msg.getIdLong()) {
 					return false;
 				}
-				
+
 				if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
 
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.ONE.getAsBrowser())) {
-						this.id = array.get(0).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(0).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.TWO.getAsBrowser())) {
-						this.id = array.get(1).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(1).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.THREE.getAsBrowser())) {
-						this.id = array.get(2).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(2).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.FOUR.getAsBrowser())) {
-						this.id = array.get(3).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(3).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.FIVE.getAsBrowser())) {
-						this.id = array.get(4).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(4).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.SIX.getAsBrowser())) {
-						this.id = array.get(5).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(5).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.SEVEN.getAsBrowser())) {
-						this.id = array.get(6).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(6).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.EIGHT.getAsBrowser())) {
-						this.id = array.get(7).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(7).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.NINE.getAsBrowser())) {
-						this.id = array.get(8).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(8).getId();
 						return true;
 					}
 					if (evt.getReactionEmote().getEmoji().equals(Emojis.TEN.getAsBrowser())) {
-						this.id = array.get(9).getAsJsonObject().get("mal_id").getAsInt();
+						this.id = results.get(9).getId();
 						return true;
 					}
 				}
@@ -161,7 +183,8 @@ public class MangaSearchCmd extends Command {
 		} catch (IOException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
-			builder.setDescription("Something went wrong while fetching your manga. Please try again in a few minutes!");
+			builder.setDescription(
+					"Something went wrong while fetching your manga. Please try again in a few minutes!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
@@ -175,7 +198,13 @@ public class MangaSearchCmd extends Command {
 		if (!manga.getTitleJapanese().equals("null")) {
 			builder.addField("Japanese Title", manga.getTitleJapanese(), true);
 		}
-		builder.addField("Genres", manga.getGenres().toString().replace("[", "").replace("]", ""), false);
+
+		// Append genres to a single String
+		String genres = "";
+		for (Nameable n : manga.getGenres()) genres += n.getName() + ", ";
+		genres = genres.substring(0, genres.length() - 2);
+		builder.addField("Genres", genres, false);
+
 		builder.addField("Type", manga.getType(), true);
 		if (manga.getChapters() != 0) {
 			if (manga.getVolumes() != 0) {

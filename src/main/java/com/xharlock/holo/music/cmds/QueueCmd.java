@@ -17,8 +17,9 @@ public class QueueCmd extends MusicCommand {
 
 	public QueueCmd(String name) {
 		super(name);
-		setDescription("Use this command to see the current queue");
-		setUsage(name);
+		setDescription("Use this command to see the current queue. "
+				+ "You can also use `history` as argument to view the last 10 tracks.");
+		setUsage(name + " [history]");
 		setAliases(List.of("q"));
 	}
 
@@ -26,6 +27,19 @@ public class QueueCmd extends MusicCommand {
 	public void onCommand(MessageReceivedEvent e) {
 		e.getMessage().delete().queue();
 
+		// Show queue history
+		if (args.length >= 1 && args[0].equals("history"))
+			displayHistory(e);
+
+		// Show queue
+		else
+			displayQueue(e);
+	}
+
+	/**
+	 * Method to display current queue
+	 */
+	private void displayQueue(MessageReceivedEvent e) {
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 		BlockingQueue<AudioTrack> queue = musicManager.scheduler.queue;
 
@@ -39,14 +53,14 @@ public class QueueCmd extends MusicCommand {
 		}
 
 		int trackCount = Math.min(queue.size(), 12);
-
 		List<AudioTrack> trackList = new ArrayList<AudioTrack>(queue);
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < trackCount; ++i) {
 			AudioTrack track = trackList.get(i);
 			AudioTrackInfo info = track.getInfo();
-			sb.append(String.format("`#%02d %s by %s [%s]`", i + 1, info.title, info.author, Formatter.formatTrackTime(track.getDuration()))).append("\n");
+			sb.append(String.format("`#%02d %s by %s [%s]`", i + 1, info.title, info.author,
+					Formatter.formatTrackTime(track.getDuration()))).append("\n");
 		}
 
 		if (trackList.size() > trackCount) {
@@ -54,8 +68,8 @@ public class QueueCmd extends MusicCommand {
 		}
 
 		// Get total duration of the queue + current track
-		AudioTrack current = musicManager.audioPlayer.getPlayingTrack();		
-		long duration = current != null ? current.getDuration() - current.getPosition() : 0L;		
+		AudioTrack current = musicManager.audioPlayer.getPlayingTrack();
+		long duration = current != null ? current.getDuration() - current.getPosition() : 0L;
 		for (AudioTrack track : trackList) {
 			duration += track.getDuration();
 		}
@@ -63,6 +77,37 @@ public class QueueCmd extends MusicCommand {
 		builder.setDescription(sb.toString());
 		builder.addField("Total Duration", Formatter.formatTrackTime(duration), false);
 
+		sendEmbed(e, builder, 1L, TimeUnit.MINUTES, true);
+	}
+
+	/**
+	 * Method to display the last 10 tracks
+	 */
+	private void displayHistory(MessageReceivedEvent e) {
+		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
+		BlockingQueue<AudioTrack> history = musicManager.scheduler.history;
+
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Queue History");
+
+		if (history == null || history.isEmpty()) {
+			builder.setDescription("I didn't play any tracks recently!");
+			sendEmbed(e, builder, 15L, TimeUnit.SECONDS, true);
+			return;
+		}
+
+		int trackCount = Math.min(history.size(), 10);
+		List<AudioTrack> historyList = new ArrayList<AudioTrack>(history);
+		StringBuilder sb = new StringBuilder();
+
+		for (int i = 0; i < trackCount; ++i) {
+			AudioTrack track = historyList.get(i);
+			AudioTrackInfo info = track.getInfo();
+			sb.append(String.format("`#%02d %s [%s]` [%s]", i + 1, info.title,
+					Formatter.formatTrackTime(track.getDuration()), "[link](" + info.uri + ")")).append("\n");
+		}
+
+		builder.setDescription(sb.toString());
 		sendEmbed(e, builder, 1L, TimeUnit.MINUTES, true);
 	}
 }

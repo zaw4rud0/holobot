@@ -64,12 +64,12 @@ public class CommandManager extends ListenerAdapter {
 		// Image Cmds
 		addCommand(new AvatarCmd("avatar"));
 		addCommand(new BannerCmd("banner"));
-		addCommand(new BlockCmd("block"));
+//		addCommand(new BlockCmd("block"));
 		addCommand(new CheckNSFWCmd("check"));
 //		addCommand(new CollageCmd("collage"));
-		addCommand(new HoloCmd("holo"));
-		addCommand(new ImageCmd("image"));
-		addCommand(new NekoCmd("neko"));
+//		addCommand(new HoloCmd("holo"));
+//		addCommand(new ImageCmd("image"));
+//		addCommand(new NekoCmd("neko"));
 		addCommand(new UpscaleCmd("upscale"));
 
 		// Game Cmds
@@ -111,7 +111,10 @@ public class CommandManager extends ListenerAdapter {
 	}
 
 	/**
-	 * Method to get every {@link Command} of a given {@link CommandCategory} as a List
+	 * Method to get every {@link Command} of a given {@link CommandCategory} as a {@link List}
+	 * 
+	 * @param category = The {@link CommandCategory}
+	 * @return A {@link List} of {@link Command}
 	 */
 	public List<Command> getCommands(CommandCategory category) {		
 		// LinkedHashSet so the List keeps the item insertion order

@@ -73,17 +73,15 @@ public class PlayerManager {
 			@Override
 			public void noMatches() {
 				builder.setTitle("No matches!");
-				builder.setDescription(
-						"Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
-				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+				builder.setDescription("Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
+				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
 			}
 
 			@Override
 			public void loadFailed(FriendlyException exception) {
 				builder.setTitle("Load failed!");
-				builder.setDescription(
-						"Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
-				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(15, TimeUnit.SECONDS));
+				builder.setDescription("Something went wrong! Please contact my owner and provide this track url: " + trackUrl);
+				e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
 			}
 		});
 	}

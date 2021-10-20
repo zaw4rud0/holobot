@@ -15,7 +15,7 @@ public class LyricsCmd extends MusicCommand {
 
 	public LyricsCmd(String name) {
 		super(name);
-		setDescription("Use this command to display the lyrics of the current track. Please keep in mind that the lyrics are in English regardless of the song");
+		setDescription("Use this command to display the lyrics of a given song. Please keep in mind that the lyrics are in English regardless of the song");
 		setUsage(name + " [search terms]");
 	}
 

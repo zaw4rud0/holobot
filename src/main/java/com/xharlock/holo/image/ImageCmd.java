@@ -40,8 +40,13 @@ public class ImageCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
+		
+		System.out.println("flag 1");
+		
 		if (e.isFromGuild())
 			e.getMessage().delete().queue();
+		
+		System.out.println("flag 2");
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		
@@ -58,8 +63,6 @@ public class ImageCmd extends Command {
 			
 			try {
 				DatabaseOPs.insertWaifu(name, tag, title);
-				names.add(name);
-				Collections.sort(names);
 			} 
 			// Something went wrong
 			catch (SQLException ex) {
@@ -68,10 +71,14 @@ public class ImageCmd extends Command {
 				builder.setDescription("Something went wrong while adding a new waifu to the database. Please try again in a few minutes.");
 			}
 			
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);		
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+			names.add(name);
+			Collections.sort(names);
 			return;
 		}
 
+		System.out.println("flag 3");
+		
 		// Display all available tags
 		if (args.length == 0 || args[0].toLowerCase().equals("list")) {
 			builder.setTitle("Image Tags");
@@ -81,6 +88,8 @@ public class ImageCmd extends Command {
 			return;
 		}
 
+		System.out.println("flag 4");
+		
 		// Tag not found
 		if (!names.contains(args[0].toLowerCase())) {
 			builder.setTitle("Tag not found");
@@ -113,9 +122,15 @@ public class ImageCmd extends Command {
 			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
 		}
 		
+		System.out.println("flag 5");
+		
 		sendEmbed(e, builder, true);
+		
+		System.out.println("flag 8");
 	}
 
+	
+	
 	/**
 	 * Method to get the right image from Gelbooru
 	 */

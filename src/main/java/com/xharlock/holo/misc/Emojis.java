@@ -4,18 +4,18 @@ public enum Emojis {
 
 	// https://www.emojiall.com/en
 
-	THUMBSUP("U+1F44D", ":thumbsup:", "�?"),
+	THUMBSUP("U+1F44D", ":thumbsup:", "�?"),
 	THUMBSDOWN("U+1F44E", ":thumbsdown:", "👎"),
-	HEART("U+2764", ":heart:", "�?��?"),
+	HEART("U+2764", ":heart:", "�?��?"),
 	BLUSH("U+1F633", ":blush:", "😊"), 
 	FLUSHED("", ":flushed:", "😳"),
 	ZZZ("U+1F4A4", ":zzz:", "💤"),
 
 	// Arrows and other direction signs
-	UPVOTE("U+2B06", ":arrow_up:", "⬆�?"), 
-	DOWNVOTE("U+2B07", ":arrow_down:", "⬇�?"),
-	ARROW_LEFT("U+2B05", ":arrow_left:", "⬅�?"), 
-	ARROW_RIGHT("U+27A1", ":arrow_right:", "➡�?"),
+	UPVOTE("U+2B06", ":arrow_up:", "⬆�?"),
+	DOWNVOTE("U+2B07", ":arrow_down:", "⬇�?"),
+	ARROW_LEFT("U+2B05", ":arrow_left:", "⬅�?"),
+	ARROW_RIGHT("U+27A1", ":arrow_right:", "➡�?"),
 
 	// Music and sound emojis
 	MUTED("U+1F507", ":mute:", "🔇"), 
@@ -30,30 +30,30 @@ public enum Emojis {
 	NOTE("U+1F3B5", ":musical_note:", "🎵"), 
 	NOTES("U+1F3B6", ":notes:", "🎶"),
 	MICROPHONE("U+1F3A4", ":microphone:", "🎤"), 
-	MICROPHONE2("U+1F399", ":microphone2:", "🎙�?"),
+	MICROPHONE2("U+1F399", ":microphone2:", "🎙�?"),
 	HEADPHONES("U+1F3A7", ":headphones:", "🎧"), 
 	RADIO("U+1F4FB", ":radio:", "📻"),
 
 	// Numbers
-	ZERO("U+0030", ":zero:", "0�?⃣"), 
-	ONE("U+0031", ":one:", "1�?⃣"), 
-	TWO("U+0032", ":two:", "2�?⃣"),
-	THREE("U+0033", ":three:", "3�?⃣"), 
-	FOUR("U+0034", ":four:", "4�?⃣"), 
-	FIVE("U+0035", ":five:", "5�?⃣"),
-	SIX("U+0036", ":six:", "6�?⃣"), 
-	SEVEN("U+0037", ":seven:", "7�?⃣"), 
-	EIGHT("U+0038", ":eight:", "8�?⃣"),
-	NINE("U+0039", ":nine:", "9�?⃣"), 
+	ZERO("U+0030", ":zero:", "0️⃣"), 
+	ONE("U+0031", ":one:", "1️⃣"), 
+	TWO("U+0032", ":two:", "2️⃣"),
+	THREE("U+0033", ":three:", "3️⃣"), 
+	FOUR("U+0034", ":four:", "4️⃣"), 
+	FIVE("U+0035", ":five:", "5️⃣"),
+	SIX("U+0036", ":six:", "6️⃣"), 
+	SEVEN("U+0037", ":seven:", "7️⃣"), 
+	EIGHT("U+0038", ":eight:", "8️⃣"),
+	NINE("U+0039", ":nine:", "9️⃣"), 
 	TEN("U+1F51F", ":keycap_ten:", "🔟"), 
 	HUNDRED("U+1F4AF", ":100:", "💯"),
 
 	// Signs and warnings
-	WARNING("U+26A0", ":warning", "⚠�?"), 
+	WARNING("U+26A0", ":warning", "⚠�?"), 
 	NO_ENTRY("U+26D4", ":no_entry:", "⛔"),
 	PROHIBITED("U+1F6AB", ":no_entry_sign:", "🚫"), 
-	RADIOACTIVE("U+2622", ":radioactive:", "☢�?"),
-	BIOHAZARD("U+2623", ":biohazard:", "☣�?"), 
+	RADIOACTIVE("U+2622", ":radioactive:", "☢�?"),
+	BIOHAZARD("U+2623", ":biohazard:", "☣�?"), 
 	UNDERAGE("U+1F51E", ":underage:", "🔞"),;
 
 	private String unicode;

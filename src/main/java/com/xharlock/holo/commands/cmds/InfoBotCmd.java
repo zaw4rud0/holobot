@@ -41,8 +41,8 @@ public class InfoBotCmd extends Command {
 		} else {
 			double avg = os.getSystemLoadAverage();
 			double cpu_usage = avg * 100.0 / (double) cores;
-			cpu_percentage = "" + ((cpu_usage * 100) / 100.0) + "%";
-		}	
+			cpu_percentage = "" + (cpu_usage * 100 / 100.0) + "%";
+		}
 		
 		long heap = memory.getHeapMemoryUsage().getUsed();
 		long max = memory.getHeapMemoryUsage().getMax();
@@ -52,13 +52,13 @@ public class InfoBotCmd extends Command {
 						+ "**Memory:** `" + heap / 1024 / 1024 + "MB / " + max / 1024 / 1024 + "MB (" + heap_percentage + "%)`\n"
 						+ "**Uptime:** `" + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startup_time) + "`";
 
-		String description = "Your senpai for everything :heart:\nUse `" + getPrefix(e) + "help` to see all commands";
+		String description = "Use `" + getPrefix(e) + "help` to see all commands";
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(e.getJDA().getSelfUser().getName() + " | Informations");
 		builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl());
 		builder.setDescription(description);
-		builder.addField("Creator", e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId()).getAsMention(), false);
+		builder.addField("Creator", "<@" + Bootstrap.holo.getConfig().getOwnerId() + ">", false);
 		builder.addField("Version", "`" + Bootstrap.holo.getConfig().getVersion() + "`", false);
 		builder.addField("System Informations", system_info, false);
 		builder.addField("Source", "No link yet", false);

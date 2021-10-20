@@ -1,5 +1,6 @@
 package com.xharlock.holo.music.cmds;
 
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.music.core.MusicCommand;
@@ -12,8 +13,9 @@ public class PlayCmd extends MusicCommand {
 
 	public PlayCmd(String name) {
 		super(name);
-		setDescription("Use this command to play a track. If there is already a track playing, it will be added to the queue");
+		setDescription("Use this command to play a track. If there is already a track playing, it will be added to the queue.");
 		setUsage(name + " <link>");
+		setAliases(List.of("p"));
 	}
 
 	@Override

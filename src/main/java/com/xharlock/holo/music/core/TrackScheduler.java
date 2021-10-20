@@ -13,43 +13,87 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 public class TrackScheduler extends AudioEventAdapter {
 
+	/**
+	 * The queue of tracks
+	 */
 	public BlockingQueue<AudioTrack> queue;
+	/**
+	 * The last 10 {@link AudioTrack}s from the {@link AudioPlayer}
+	 */
+	public BlockingQueue<AudioTrack> history;
 	public final AudioPlayer audioPlayer;
-	
+
 	// TODO Actually implement looping and paused
 	public boolean looping;
 	public boolean paused;
 
 	public TrackScheduler(AudioPlayer player) {
-		this.queue = new LinkedBlockingQueue<>();
-		this.audioPlayer = player;
-		this.looping = false;
-		this.paused = false;
+		queue = new LinkedBlockingQueue<>();
+		history = new LinkedBlockingQueue<>();
+		audioPlayer = player;
+		looping = false;
+		paused = false;
 	}
 
+	/**
+	 * Method to add a given {@link AudioTrack} to the queue. If the queue is empty,
+	 * it will be played by the {@link AudioPlayer}.
+	 */
 	public void enqueue(AudioTrack track) {
-		if (!this.audioPlayer.startTrack(track, true))
-			this.queue.offer(track);
+		if (queue.isEmpty() && audioPlayer.getPlayingTrack() == null)
+			addToHistory(track);
+		
+		if (!audioPlayer.startTrack(track, true))
+			queue.offer(track);
 	}
 
-	public void playNext() {
-		this.audioPlayer.startTrack(this.queue.poll(), false);
-	}
-
+	/**
+	 * Method to shuffle the queue, i.e. the order of {@link AudioTrack}s will be
+	 * randomized.
+	 */
 	public void shuffle() {
-		List<AudioTrack> queueList = new ArrayList<>(this.queue);
+		List<AudioTrack> queueList = new ArrayList<>(queue);
+		queue.clear();
 		Collections.shuffle(queueList);
-		this.queue.clear();
 		for (AudioTrack track : queueList)
-			this.queue.offer(track);
+			queue.offer(track);
 	}
 
+	/**
+	 * Method to add a given {@AudioTrack} to the history. Note that the history can
+	 * only contain 10 items, meaning the oldest ones will be removed.
+	 */
+	public void addToHistory(AudioTrack track) {
+		List<AudioTrack> historyList = new ArrayList<>(history);
+		history.clear();
+		historyList.add(0, track);
+		while (historyList.size() > 10)
+			historyList.remove(10);
+		for (AudioTrack t : historyList)
+			history.offer(t);
+	}
+
+	/**
+	 * Method which decides what happens after the current {@link AudioTrack}
+	 * finishes.
+	 */
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		if (endReason.mayStartNext) {
-			if (this.looping)
-				this.audioPlayer.startTrack(track.makeClone(), false);
+			if (looping)
+				audioPlayer.startTrack(track.makeClone(), false);
 			else
-				this.playNext();
+				playNext();
 		}
+	}
+
+	/**
+	 * Method to play the next {@link AudioTrack} in the queue. If the queue is empty, the
+	 * {@link AudioPlayer} will simply stop.
+	 */
+	public void playNext() {
+		AudioTrack track = queue.poll();
+		audioPlayer.startTrack(track, false);
+		if (track != null)
+			addToHistory(track);
 	}
 }

@@ -17,7 +17,8 @@ public class NekoCmd extends Command {
 	private String[] urls = { 
 			"https://nekos.life/api/v2/img/neko", 
 			"https://neko-love.xyz/api/v1/neko",
-			"https://nekos.life/api/v2/img/kemonomimi"
+			"https://nekos.life/api/v2/img/kemonomimi",
+			"https://nekos.best/api/v1/nekos"
 	};
 
 	public NekoCmd(String name) {

@@ -13,6 +13,14 @@ import javax.imageio.ImageIO;
 
 public class BufferedImageOps {
 
+	/**
+	 * Sticks two {@link BufferedImage} together in the given direction
+	 * 
+	 * @param img1 = First {@link BufferedImage}
+	 * @param img2 = Second {@link BufferedImage}
+	 * @param direction = Direction in which the images are sticked together, can either be <b>horizontal</b> or <b>vertical</b>
+	 * @return A new {@link BufferedImage}
+	 */
 	public static BufferedImage join(BufferedImage img1, BufferedImage img2, String direction) {
 		BufferedImage result = null;
 
@@ -51,6 +59,15 @@ public class BufferedImageOps {
 		return result;
 	}
 
+	/**
+	 * Sticks three {@link BufferedImage} together in the given direction
+	 * 
+	 * @param img1 = First {@link BufferedImage}
+	 * @param img2 = Second {@link BufferedImage}
+	 * @param img3 = Third {@link BufferedImage}
+	 * @param direction = Direction in which the images are sticked together, can either be <b>horizontal</b> or <b>vertical</b>
+	 * @return A new {@link BufferedImage}
+	 */
 	public static BufferedImage join(BufferedImage img1, BufferedImage img2, BufferedImage img3, String direction) {
 		BufferedImage result = null;
 
@@ -96,12 +113,12 @@ public class BufferedImageOps {
 	}
 
 	/**
-	 * Method to downsize, upsize, stretch, etc. a BufferedImage
+	 * Method to downsize, upsize, stretch, etc. a {@link BufferedImage}
 	 * 
-	 * @param img  = BufferedImage
+	 * @param img  = {@link BufferedImage}
 	 * @param newW = New width of the image
 	 * @param newH = New height of the image
-	 * @return new BufferedImage
+	 * @return A new {@link BufferedImage}
 	 */
 	public static BufferedImage resize(BufferedImage img, int newW, int newH) {
 		Image tmp = img.getScaledInstance(newW, newH, Image.SCALE_SMOOTH);
@@ -113,12 +130,12 @@ public class BufferedImageOps {
 	}
 
 	/**
-	 * Cuts a BufferedImage to a square. The square will be taken from the middle of
+	 * Cuts a {@link BufferedImage} to a square. The square will be taken from the middle of
 	 * the image
 	 * 
-	 * @param image  = BufferedImage to perform this method on
+	 * @param image  = {@link BufferedImage} to perform this method on
 	 * @param length = Side length of the square
-	 * @return New BufferedImage
+	 * @return A new {@link BufferedImage}
 	 */
 	public static BufferedImage squarefyCut(BufferedImage image, int length, Color color) {
 		BufferedImage temp = null;
@@ -147,13 +164,13 @@ public class BufferedImageOps {
 	}
 
 	/**
-	 * Resizes a BufferedImage to a square. If it's a rectangle, the background will
+	 * Resizes a {@link BufferedImage} to a square. If it's a rectangle, the background will
 	 * be visible on the sides
 	 * 
-	 * @param image  = BufferedImage to perform this method on
+	 * @param image  = {@link BufferedImage} to perform this method on
 	 * @param length = Side length of the square
 	 * @param color  = Background color
-	 * @return New BufferedImage
+	 * @return A new {@link BufferedImage}
 	 */
 	public static BufferedImage squarefyResize(BufferedImage image, int length, Color color) {
 		BufferedImage temp = null;
@@ -179,6 +196,12 @@ public class BufferedImageOps {
 		return res;
 	}
 	
+	/**
+	 * Converts a {@link BufferedImage} into an {@link InputStream}
+	 * 
+	 * @param img = A {@link BufferedImage}
+	 * @return An {@link InputStream}
+	 */
 	public static InputStream toInputStream(BufferedImage img) throws IOException {
         ByteArrayOutputStream os = new ByteArrayOutputStream();
         ImageIO.write(img, "png", os);
