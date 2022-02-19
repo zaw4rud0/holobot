@@ -8,24 +8,20 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
 import com.xharlock.holo.misc.Emojis;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
-
 import com.xharlock.nanojikan.JikanAPI;
 import com.xharlock.nanojikan.model.Anime;
 import com.xharlock.nanojikan.model.AnimeResult;
 import com.xharlock.nanojikan.model.Nameable;
 
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
+
 public class AnimeSearchCmd extends Command {
 
 	private EventWaiter waiter;
-	private List<String> numbers = Arrays.asList(Emojis.ONE.getAsNormal(), Emojis.TWO.getAsNormal(),
-			Emojis.THREE.getAsNormal(), Emojis.FOUR.getAsNormal(), Emojis.FIVE.getAsNormal(), Emojis.SIX.getAsNormal(),
-			Emojis.SEVEN.getAsNormal(), Emojis.EIGHT.getAsNormal(), Emojis.NINE.getAsNormal(),
-			Emojis.TEN.getAsNormal());
-	private int id = -1;
+	private List<String> numbers;
+	private int id;
 
 	public AnimeSearchCmd(String name, EventWaiter waiter) {
 		super(name);
@@ -35,19 +31,33 @@ public class AnimeSearchCmd extends Command {
 		setAliases(List.of("as", "anisearch", "anime"));
 		setCommandCategory(CommandCategory.ANIME);
 		this.waiter = waiter;
+		
+		numbers = Arrays.asList(
+				Emojis.ONE.getAsNormal(), 
+				Emojis.TWO.getAsNormal(), 
+				Emojis.THREE.getAsNormal(), 
+				Emojis.FOUR.getAsNormal(), 
+				Emojis.FIVE.getAsNormal(), 
+				Emojis.SIX.getAsNormal(), 
+				Emojis.SEVEN.getAsNormal(), 
+				Emojis.EIGHT.getAsNormal(), 
+				Emojis.NINE.getAsNormal(), 
+				Emojis.TEN.getAsNormal());
+		id = -1;
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			e.getChannel().sendTyping().queue();
-		
+		}
+
 		EmbedBuilder builder = new EmbedBuilder();
-		
+
 		if (args.length == 0) {
 			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
-			builder.setDescription("Please provide an anime name!");
+			builder.setDescription("Please provide a title!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
@@ -65,23 +75,21 @@ public class AnimeSearchCmd extends Command {
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-		
-		if (e.isFromGuild())
+
+		if (e.isFromGuild()) {
 			e.getMessage().delete().queue();
+		}
 
 		StringBuilder sb = new StringBuilder();
-	
 		for (int i = 0; i < results.size(); i++) {
 			sb.append(numbers.get(i) + " " + results.get(i).getTitle() + " [" + results.get(i).getType() + "]\n");
 		}
-		
 		String result = sb.toString();
 
 		builder.setTitle("Anime Search Results");
 		builder.setDescription(result + "\nTo select one item, please use the according reaction");
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
-
 			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
 			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {}, err -> {});
 			msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {}, err -> {});
@@ -93,56 +101,59 @@ public class AnimeSearchCmd extends Command {
 			msg.addReaction(Emojis.NINE.getAsBrowser()).queue(v -> {}, err -> {});
 			msg.addReaction(Emojis.TEN.getAsBrowser()).queue(v -> {}, err -> {});
 
-			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
-				
-				// So reactions on other messages are ignored
+			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
+				// Ignore reactions on other messages
 				if (evt.getMessageIdLong() != msg.getIdLong()) {
 					return false;
 				}
-				
-				if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
 
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.ONE.getAsBrowser())) {
-						this.id = results.get(0).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.TWO.getAsBrowser())) {
-						this.id = results.get(1).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.THREE.getAsBrowser())) {
-						this.id = results.get(2).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.FOUR.getAsBrowser())) {
-						this.id = results.get(3).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.FIVE.getAsBrowser())) {
-						this.id = results.get(4).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.SIX.getAsBrowser())) {
-						this.id = results.get(5).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.SEVEN.getAsBrowser())) {
-						this.id = results.get(6).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.EIGHT.getAsBrowser())) {
-						this.id = results.get(7).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.NINE.getAsBrowser())) {
-						this.id = results.get(8).getId();
-						return true;
-					}
-					if (evt.getReactionEmote().getEmoji().equals(Emojis.TEN.getAsBrowser())) {
-						this.id = results.get(9).getId();
-						return true;
-					}
+				// Ignore reactions from bots and people who didn't call this command
+				if (evt.retrieveUser().complete().isBot() || !e.getAuthor().equals(evt.retrieveUser().complete())) {
+					return false;
 				}
+
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.ONE.getAsBrowser())) {
+					id = results.get(0).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.TWO.getAsBrowser())) {
+					id = results.get(1).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.THREE.getAsBrowser())) {
+					id = results.get(2).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.FOUR.getAsBrowser())) {
+					id = results.get(3).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.FIVE.getAsBrowser())) {
+					id = results.get(4).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.SIX.getAsBrowser())) {
+					id = results.get(5).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.SEVEN.getAsBrowser())) {
+					id = results.get(6).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.EIGHT.getAsBrowser())) {
+					id = results.get(7).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.NINE.getAsBrowser())) {
+					id = results.get(8).getId();
+					return true;
+				}
+				if (evt.getReactionEmote().getEmoji().equals(Emojis.TEN.getAsBrowser())) {
+					id = results.get(9).getId();
+					return true;
+				}
+
+				// Wrong reaction
 				return false;
 			}, evt -> {
 				msg.delete().queue();
@@ -166,43 +177,31 @@ public class AnimeSearchCmd extends Command {
 			return;
 		}
 
+		// Prepare fields
+		String genres = "";
+		for (Nameable n : anime.getGenres()) {
+			genres += n.getName() + ", ";
+		}
+		genres = genres.substring(0, genres.length() - 2);
+		String episodes = anime.getEpisodes() != 0 ? String.valueOf(anime.getEpisodes()) : "TBA";
+		String season = anime.getSeason() != null ? anime.getSeason() : "TBA";
+		String malScore = anime.getScore() != 0.0 ? String.valueOf(anime.getScore()) : "N/A";
+		String malRank = anime.getRank() != 0 ? String.valueOf(anime.getRank()) : "N/A";
+
+		// Set embed
 		builder.setTitle(anime.getTitle());
 		builder.setThumbnail(anime.getImageUrl());
 		builder.setDescription(anime.getSynopsis());
-		if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle())) {
+		if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle()))
 			builder.addField("English Title", anime.getTitleEnglish(), true);
-		}		
-		if (!anime.getTitleJapanese().equals("null")) {
+		if (anime.getTitleJapanese() != null)
 			builder.addField("Japanese Title", anime.getTitleJapanese(), true);
-		}
-		
-		// Append genres to a single String
-		String genres = "";
-		for (Nameable n : anime.getGenres()) genres += n.getName() + ", ";
-		genres = genres.substring(0, genres.length() - 2);
 		builder.addField("Genres", genres, false);
-		
 		builder.addField("Type", anime.getType(), true);
-		if (anime.getEpisodes() != 0) {
-			builder.addField("Episodes", new StringBuilder().append(anime.getEpisodes()).toString(), true);
-		} else {
-			builder.addField("Episodes", "TBA", true);
-		}
-		if (anime.getSeason() != null) {
-			builder.addField("Season", anime.getSeason(), true);
-		} else {
-			builder.addField("Season", "N/A", true);
-		}
-		if (anime.getScore() != 0.0) {
-			builder.addField("MAL Score", new StringBuilder().append(anime.getScore()).toString(), true);
-		} else {
-			builder.addField("MAL Score", "N/A", true);
-		}
-		if (anime.getRank() != 0) {
-			builder.addField("MAL Rank", new StringBuilder().append(anime.getRank()).toString(), true);
-		} else {
-			builder.addField("MAL Rank", "N/A", true);
-		}
+		builder.addField("Episodes", episodes, true);
+		builder.addField("Season", season, true);
+		builder.addField("MAL Score", malScore, true);
+		builder.addField("MAL Rank", malRank, true);
 		builder.addBlankField(true);
 		builder.addField("Link", "[MyAnimeList](" + anime.getUrl() + ")", false);
 		sendEmbed(e, builder, true);
