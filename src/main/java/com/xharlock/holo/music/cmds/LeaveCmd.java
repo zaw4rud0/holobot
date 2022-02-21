@@ -2,7 +2,9 @@ package com.xharlock.holo.music.cmds;
 
 import java.util.concurrent.TimeUnit;
 
-import com.xharlock.holo.music.core.*;
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.MusicCommand;
+import com.xharlock.holo.music.core.PlayerManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -19,7 +21,7 @@ public class LeaveCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 

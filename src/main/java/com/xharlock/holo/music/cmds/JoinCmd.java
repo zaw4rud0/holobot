@@ -19,7 +19,7 @@ public class JoinCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		AudioManager audioManager = e.getGuild().getAudioManager();

@@ -25,10 +25,8 @@ public class UpscaleCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {		
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
-		
-		e.getChannel().sendTyping().queue();
+		deleteInvoke(e);
+		sendTyping(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		String oldUrl = "";
@@ -50,7 +48,6 @@ public class UpscaleCmd extends Command {
 				sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
 				return;
 			}
-
 			oldUrl = args[0].replace("<", "").replace(">", "");
 		}
 

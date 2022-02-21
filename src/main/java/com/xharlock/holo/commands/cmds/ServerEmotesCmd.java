@@ -3,6 +3,7 @@ package com.xharlock.holo.commands.cmds;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.commands.core.Command;
@@ -24,53 +25,75 @@ public class ServerEmotesCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
-		
+		deleteInvoke(e);
+
 		List<Emote> emotes = e.getGuild().getEmotes();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Emotes of " + e.getGuild().getName());
 
-		// 0 optimization :kekhands:
-		
-		if (emotes.size() == 0) {
-			builder.setDescription("This server doesn't have any emotes");
-		} else {
-			List<String> normal = new ArrayList<>();
-			List<String> animated = new ArrayList<>();
+		if (emotes.isEmpty()) {
+			builder.setDescription("This server doesn't have any emotes.");
+			sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+			return;
+		}
 
-			for (Emote em : emotes) {
-				if (em.isAnimated())
-					animated.add(em.getAsMention().toLowerCase());
-				else
-					normal.add(em.getAsMention().toLowerCase());
+		List<String> normal = new ArrayList<>();
+		List<String> animated = new ArrayList<>();
+
+		for (Emote em : emotes) {
+			if (em.isAnimated()) {
+				animated.add(em.getAsMention().toLowerCase(Locale.UK));
+			} else {
+				normal.add(em.getAsMention().toLowerCase(Locale.UK));
 			}
+		}
 
+		int charCount = 0;
+
+		if (!normal.isEmpty()) {
 			Collections.sort(normal);
-			Collections.sort(animated);
-
-			String normal_string = "";
-			String animated_string = "";
+			String normalString = "";
 
 			for (String s : normal) {
-				if (normal_string.length() + s.length() > 1024) {
-					builder.addField("", normal_string, false);
-					normal_string = s;
-				} else {
-					normal_string += s;
+				// A single embed has a char limit of 6000
+				if (charCount + s.length() > 6000) {
+					sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+					builder.clearFields();
+					charCount = 0;
 				}
+				// A field has a char limit of 1024
+				if (normalString.length() + s.length() > 1024) {
+					builder.addField("", normalString, false);
+					normalString = s;
+				} else {
+					normalString += s;
+				}
+				charCount += s.length();
 			}
+			builder.addField("", normalString, false);
+		}
 
-			builder.addField("", normal_string, false);
+		if (!animated.isEmpty()) {
+			Collections.sort(animated);
+			String animatedString = "";
 
 			for (String s : animated) {
-				if (animated_string.length() + s.length() > 1024) {
-					builder.addField("", animated_string, false);
-					animated_string = s;
-				} else {
-					animated_string += s;
+				// A single embed has a char limit of 6000
+				if (charCount + s.length() > 6000) {
+					sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+					builder.clearFields();
+					charCount = 0;
 				}
+				// A field has a char limit of 1024
+				if (animatedString.length() + s.length() > 1024) {
+					builder.addField("", animatedString, false);
+					animatedString = s;
+				} else {
+					animatedString += s;
+				}
+				charCount += s.length();
 			}
-			builder.addField("", animated_string, false);
+			builder.addField("", animatedString, false);
 		}
 		sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
 	}

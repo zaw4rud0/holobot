@@ -12,7 +12,9 @@ public class Listener extends ListenerAdapter {
 	
 	@Override
 	public void onReady(ReadyEvent e) {
-		logger.info(String.format("%s is ready!", e.getJDA().getSelfUser().getAsTag()));
+		if (logger.isInfoEnabled()) {
+			logger.info(String.format("%s is ready!", e.getJDA().getSelfUser().getAsTag()));
+		}
 		Bootstrap.holo.registerManagers();
 		Bootstrap.holo.registerListeners();
 	}

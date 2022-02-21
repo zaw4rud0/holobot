@@ -27,7 +27,6 @@ import net.dv8tion.jda.api.utils.cache.CacheFlag;
 public class Holo {
 
 	private JDA jda;
-
 	private Config config;
 	private GuildConfigManager guildConfigManager;
 	private CommandManager commandManager;

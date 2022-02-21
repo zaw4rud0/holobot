@@ -11,8 +11,11 @@ import java.io.InputStream;
 
 import javax.imageio.ImageIO;
 
-public class BufferedImageOps {
+public final class BufferedImageOps {
 
+	private BufferedImageOps() {
+	}
+	
 	/**
 	 * Sticks two {@link BufferedImage} together in the given direction
 	 * 
@@ -21,10 +24,14 @@ public class BufferedImageOps {
 	 * @param direction = Direction in which the images are sticked together, can either be <b>horizontal</b> or <b>vertical</b>
 	 * @return A new {@link BufferedImage}
 	 */
-	public static BufferedImage join(BufferedImage img1, BufferedImage img2, String direction) {
+	public static BufferedImage join(BufferedImage img1, BufferedImage img2, Direction direction) {
 		BufferedImage result = null;
 
-		if (direction.equals("horizontal")) {
+		if (direction == null) {
+			throw new IllegalArgumentException();
+		}
+		
+		if (direction == Direction.HORIZONTAL) {
 			int width = img1.getWidth() + img2.getWidth();
 			int height = Math.min(img1.getHeight(), img2.getHeight());
 			result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -38,7 +45,7 @@ public class BufferedImageOps {
 			g2.dispose();
 		}
 
-		else if (direction.equals("vertical")) {
+		else if (direction == Direction.VERTICAL) {
 			int height = img1.getHeight() + img2.getHeight();
 			int width = Math.min(img1.getWidth(), img2.getWidth());
 			result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -68,10 +75,10 @@ public class BufferedImageOps {
 	 * @param direction = Direction in which the images are sticked together, can either be <b>horizontal</b> or <b>vertical</b>
 	 * @return A new {@link BufferedImage}
 	 */
-	public static BufferedImage join(BufferedImage img1, BufferedImage img2, BufferedImage img3, String direction) {
+	public static BufferedImage join(BufferedImage img1, BufferedImage img2, BufferedImage img3, Direction direction) {
 		BufferedImage result = null;
 
-		if (direction.equals("horizontal")) {
+		if (direction == Direction.HORIZONTAL) {
 			int width = img1.getWidth() + img2.getWidth() + img3.getWidth();
 			int height = Math.min(Math.min(img1.getHeight(), img2.getHeight()), img3.getHeight());
 
@@ -89,7 +96,7 @@ public class BufferedImageOps {
 			g2.dispose();
 		}
 
-		else if (direction.equals("vertical")) {
+		else if (direction == Direction.VERTICAL) {
 			int height = img1.getHeight() + img2.getHeight() + img3.getHeight();
 			int width = Math.min(Math.min(img1.getWidth(), img2.getWidth()), img3.getWidth());
 
@@ -228,5 +235,13 @@ public class BufferedImageOps {
             }
         }
         return img;
+    }
+    
+    /**
+     * The direction in which {@link BufferedImage}s should be joined.
+     */
+    public enum Direction {
+    	VERTICAL(),
+    	HORIZONTAL();
     }
 }

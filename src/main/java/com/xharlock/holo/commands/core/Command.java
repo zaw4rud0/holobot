@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.core.Bootstrap;
@@ -34,7 +35,7 @@ public abstract class Command {
 
 	/** Cooldown in seconds */
 	protected int cooldownDuration = 0;
-	protected HashMap<User, Long> onTimeout = new HashMap<>();
+	protected Map<User, Long> onTimeout = new HashMap<>();
 
 	protected CommandCategory category = CommandCategory.BLANK;
 
@@ -43,7 +44,7 @@ public abstract class Command {
 	}
 
 	public abstract void onCommand(MessageReceivedEvent e);
-	
+
 	protected void addSuccessReaction(Message msg) {
 		msg.addReaction(Emojis.THUMBSUP.getAsBrowser());
 	}
@@ -53,59 +54,66 @@ public abstract class Command {
 	}
 
 	protected String getPrefix(MessageReceivedEvent e) {
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
-		else
+		} else {
 			return Bootstrap.holo.getConfig().getDefaultPrefix();
+		}
 	}
 
 	/**
-	 * Method to get the embed color of a guild or the default bot embed color if it's in a private channel
+	 * Method to get the embed color of a guild or the default bot embed color if
+	 * it's in a private channel
 	 */
 	protected int getColor(MessageReceivedEvent e) {
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();
-		else
+		} else {
 			return Bootstrap.holo.getConfig().getDefaultColor();
-	}
-
-	protected boolean isValidURL(String url) {
-		try {
-			new URL(url).openStream().close();
-			return true;
-		} catch (Exception ex) {
-			return false;
 		}
 	}
-	
+
 	// TODO
 	protected boolean isGuildAdmin(MessageReceivedEvent e) {
 		return false;
 	}
-	
+
+	/**
+	 * Checks if the user is the owner of this bot instance
+	 */
 	protected boolean isBotOwner(MessageReceivedEvent e) {
-		if (e.getAuthor().getIdLong() == Bootstrap.holo.getConfig().getOwnerId())
-			return true;
-		else
-			return false;
+		return e.getAuthor().getIdLong() == Bootstrap.holo.getConfig().getOwnerId();
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
 		builder.setColor(getColor(e));
-		
-		if (e.isFromGuild() && footer)
+
+		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-		
+		}
+
+		e.getChannel().sendMessageEmbeds(builder.build()).queue();
+	}
+
+	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer, boolean color) {
+		if (!color) {
+			builder.setColor(getColor(e));
+		}
+
+		if (e.isFromGuild() && footer) {
+			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+		}
+
 		e.getChannel().sendMessageEmbeds(builder.build()).queue();
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
 		builder.setColor(getColor(e));
-		
+
 		if (e.isFromGuild()) {
 			if (footer) {
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
-			}	
+				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
+			}
 			e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
 			});
@@ -116,19 +124,20 @@ public abstract class Command {
 
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
 		builder.setColor(getColor(e));
-		
-		if (e.isFromGuild() && footer)
+
+		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-		
+		}
+
 		e.getMessage().getReferencedMessage().replyEmbeds(builder.build()).queue();
 	}
 
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
 		builder.setColor(getColor(e));
-		
+
 		if (e.isFromGuild()) {
 			if (footer) {
-				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
+				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 			}
 			e.getMessage().getReferencedMessage().replyEmbeds(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
@@ -140,19 +149,33 @@ public abstract class Command {
 
 	protected Message sendEmbedAndGetMessage(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
 		builder.setColor(getColor(e));
-		
-		if (e.isFromGuild() && footer)
+
+		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
-		
+		}
+			
 		return e.getChannel().sendMessageEmbeds(builder.build()).complete();
 	}
-	
+
 	protected void sendToOwner(MessageReceivedEvent e, EmbedBuilder builder) {
 		e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId()).openPrivateChannel().complete().sendMessageEmbeds(builder.build()).queue();
 	}
+
+	/**
+	 * Deletes the message that invoked this command, if possible.
+	 */
+	protected void deleteInvoke(MessageReceivedEvent e) {
+		if (e.isFromGuild()) {
+			e.getMessage().delete().queue();
+		}
+	}
+	
+	protected void sendTyping(MessageReceivedEvent e) {
+		e.getChannel().sendTyping().queue();
+	}
 	
 	public String getName() {
-		return this.name;
+		return name;
 	}
 
 	protected void setName(String name) {
@@ -160,7 +183,7 @@ public abstract class Command {
 	}
 
 	public CommandCategory getCommandCategory() {
-		return this.category;
+		return category;
 	}
 
 	public void setCommandCategory(CommandCategory category) {
@@ -168,7 +191,7 @@ public abstract class Command {
 	}
 
 	public String getDescription() {
-		return this.description;
+		return description;
 	}
 
 	protected void setDescription(String description) {
@@ -176,7 +199,7 @@ public abstract class Command {
 	}
 
 	public String getUsage() {
-		return this.usage;
+		return usage;
 	}
 
 	protected void setUsage(String usage) {
@@ -184,7 +207,7 @@ public abstract class Command {
 	}
 
 	public String getExample() {
-		return this.example;
+		return example;
 	}
 
 	protected void setExample(String example) {
@@ -192,15 +215,15 @@ public abstract class Command {
 	}
 
 	public String getThumbnail() {
-		return this.thumbnail_url;
+		return thumbnail_url;
 	}
-	
+
 	protected void setThumbnail(String url) {
 		this.thumbnail_url = url;
 	}
-	
+
 	public List<String> getAliases() {
-		return this.aliases;
+		return aliases;
 	}
 
 	protected void setAliases(List<String> aliases) {
@@ -208,7 +231,7 @@ public abstract class Command {
 	}
 
 	public boolean isOwnerCommand() {
-		return this.isOwnerCommand;
+		return isOwnerCommand;
 	}
 
 	protected void setIsOwnerCommand(boolean isOwnerCommand) {
@@ -216,7 +239,7 @@ public abstract class Command {
 	}
 
 	public boolean isAdminCommand() {
-		return this.isAdminCommand;
+		return isAdminCommand;
 	}
 
 	protected void setIsAdminCommand(boolean isAdminCommand) {
@@ -224,7 +247,7 @@ public abstract class Command {
 	}
 
 	public boolean isNSFW() {
-		return this.isNSFW;
+		return isNSFW;
 	}
 
 	protected void setIsNSFW(boolean isNSFW) {
@@ -232,7 +255,7 @@ public abstract class Command {
 	}
 
 	public boolean isGuildOnlyCommand() {
-		return this.isGuildOnly;
+		return isGuildOnly;
 	}
 
 	protected void setIsGuildOnlyCommand(boolean isGuildOnlyCommand) {
@@ -240,11 +263,11 @@ public abstract class Command {
 	}
 
 	public boolean hasCmdCooldown() {
-		return this.cooldownDuration != 0;
+		return cooldownDuration != 0;
 	}
 
 	public int getCmdCooldown() {
-		return this.cooldownDuration;
+		return cooldownDuration;
 	}
 
 	protected void setCmdCooldown(int seconds) {
@@ -252,6 +275,30 @@ public abstract class Command {
 	}
 
 	protected String[] getArgs() {
-		return this.args;
+		return args;
+	}
+
+	/**
+	 * Checks whether a String is a numeric
+	 */
+	protected boolean isNumber(String s) {
+		if (s == null) {
+			return false;
+		}
+		try {
+			Integer.parseInt(s);
+		} catch (NumberFormatException ex) {
+			return false;
+		}
+		return true;
+	}
+
+	protected boolean isValidURL(String url) {
+		try {
+			new URL(url).openStream().close();
+			return true;
+		} catch (Exception ex) {
+			return false;
+		}
 	}
 }

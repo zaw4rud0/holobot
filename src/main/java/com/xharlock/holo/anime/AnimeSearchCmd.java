@@ -48,9 +48,7 @@ public class AnimeSearchCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild()) {
-			e.getChannel().sendTyping().queue();
-		}
+		sendTyping(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 
@@ -76,9 +74,7 @@ public class AnimeSearchCmd extends Command {
 			return;
 		}
 
-		if (e.isFromGuild()) {
-			e.getMessage().delete().queue();
-		}
+		deleteInvoke(e);
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < results.size(); i++) {
@@ -192,10 +188,12 @@ public class AnimeSearchCmd extends Command {
 		builder.setTitle(anime.getTitle());
 		builder.setThumbnail(anime.getImageUrl());
 		builder.setDescription(anime.getSynopsis());
-		if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle()))
+		if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle())) {
 			builder.addField("English Title", anime.getTitleEnglish(), true);
-		if (anime.getTitleJapanese() != null)
+		}
+		if (anime.getTitleJapanese() != null) {
 			builder.addField("Japanese Title", anime.getTitleJapanese(), true);
+		}
 		builder.addField("Genres", genres, false);
 		builder.addField("Type", anime.getType(), true);
 		builder.addField("Episodes", episodes, true);

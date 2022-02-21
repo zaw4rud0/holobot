@@ -15,8 +15,6 @@ public class PauseCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
-		
+		e.getChannel().sendMessage("This feature is not implemented yet!").queue();
 	}
-
 }

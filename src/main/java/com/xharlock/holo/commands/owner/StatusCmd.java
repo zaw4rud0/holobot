@@ -20,7 +20,7 @@ public class StatusCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		if (args.length == 0) {
 			int guilds = e.getJDA().getGuilds().size();
@@ -36,17 +36,14 @@ public class StatusCmd extends Command {
 
 		String status = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
 
-		if (args[0].equals("listening"))
+		if (args[0].equals("listening")) {
 			e.getJDA().getPresence().setActivity(Activity.listening(status));
-		
-		else if (args[0].equals("playing"))
+		} else if (args[0].equals("playing")) {
 			e.getJDA().getPresence().setActivity(Activity.playing(status));
-		
-		else if (args[0].equals("watching"))
+		} else if (args[0].equals("watching")) {
 			e.getJDA().getPresence().setActivity(Activity.watching(status));
-		
-		else if (args[0].equals("competing"))
+		} else if (args[0].equals("competing")) {
 			e.getJDA().getPresence().setActivity(Activity.competing(status));
+		}
 	}
-
 }

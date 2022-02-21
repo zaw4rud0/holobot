@@ -16,8 +16,7 @@ public class UwuCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		// Uwuify a referenced message
 		if (e.getMessage().getReferencedMessage() != null) {

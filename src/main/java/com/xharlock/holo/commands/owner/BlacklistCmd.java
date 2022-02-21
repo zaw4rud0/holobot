@@ -23,8 +23,7 @@ public class BlacklistCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTimestamp(Instant.now());
@@ -70,7 +69,6 @@ public class BlacklistCmd extends Command {
 						+ "**Tag:** " + toBlacklist.getAsTag() + "\n"
 						+ "**Id:** " + toBlacklist.getIdLong() + "\n"
 						+ "**Reason:** " + reason);
-		builder.setTimestamp(Instant.now());
 		
 		sendToOwner(e, builder);
 		Bootstrap.holo.getPermissionManager().blacklist(toBlacklist);

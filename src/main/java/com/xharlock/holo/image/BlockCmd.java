@@ -15,7 +15,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class BlockCmd extends Command {
 
 	public static List<String> blocked;	
-	public static List<String> block_requests;
+	public static List<String> blockRequests;
 
 	public BlockCmd(String name) {
 		super(name);
@@ -27,7 +27,7 @@ public class BlockCmd extends Command {
 		// Get the blocked images from the DB
 		try {
 			blocked = DatabaseOPs.getBlockedImages();
-			block_requests = DatabaseOPs.getBlockRequests();
+			blockRequests = DatabaseOPs.getBlockRequests();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -35,14 +35,8 @@ public class BlockCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		// TODO Code part to call the block request list so that it can be reviewed by the owner
 
-		
-		// Code part to call the block request list so that it can be reviewed by the owner
-		
-		
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		if (e.getMessage().getReferencedMessage() == null) {
@@ -53,18 +47,21 @@ public class BlockCmd extends Command {
 		}
 		
 		// Bot owner can directly block the image
-		if (isBotOwner(e))
+		if (isBotOwner(e)) {
 			block(e);
+		}
 		
 		// Everyone else can only request a block
-		else
+		else {
 			requestBlock(e);
+		}
 	}
 	
 	/**
 	 * Effectively block the image, can only be done by the owner
 	 */
 	public void block(MessageReceivedEvent e) {
+		deleteInvoke(e);
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		String url = getUrl(e.getMessage().getReferencedMessage());
@@ -88,8 +85,9 @@ public class BlockCmd extends Command {
 		
 		blocked.add(url);
 		
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			e.getMessage().getReferencedMessage().delete().queue();
+		}
 
 		builder.setTitle("Image has been bonked");
 		builder.setDescription("The image has been added to the blocklist and won't appear ever again");
@@ -100,7 +98,6 @@ public class BlockCmd extends Command {
 	 * Adds it to the list of requested blocks
 	 */
 	public void requestBlock(MessageReceivedEvent e) {
-	
 		EmbedBuilder builder = new EmbedBuilder();
 
 		String url = getUrl(e.getMessage().getReferencedMessage());
@@ -122,10 +119,9 @@ public class BlockCmd extends Command {
 			return;
 		}
 		
-		block_requests.add(url);
+		blockRequests.add(url);
 		
-		if (e.isFromGuild())
-			e.getMessage().getReferencedMessage().delete().queue();
+		deleteInvoke(e);
 
 		builder.setTitle("Block request has been sent");
 		builder.setDescription("The block request will be reviewed as soon as possible");
@@ -133,11 +129,11 @@ public class BlockCmd extends Command {
 	}
 	
 	/**
-	 * Method to view the block requests
+	 * TODO: Method to view the block requests
 	 */
 	@SuppressWarnings("unused")
 	private void viewRequests() {
-		
+		System.out.println("This method is not implemented yet!");
 	}
 	
 	/**
@@ -147,16 +143,19 @@ public class BlockCmd extends Command {
 		String url = null;
 		
 		// Check if image is an attachment
-		if (msg.getAttachments().size() != 0)
+		if (msg.getAttachments().size() != 0) {
 			url = msg.getAttachments().get(0).getUrl();
+		}
 
-		// Check if image is in a embed
-		else if (msg.getEmbeds().size() > 0)
+		// Check if image is in embed
+		else if (msg.getEmbeds().size() > 0) {
 			url = msg.getEmbeds().get(0).getImage().getUrl();
+		}
 
-		// Image url is most likely just the text of the message
-		else if (isValidURL(msg.getContentRaw()))
+		// Image url is likely text of message
+		else if (isValidURL(msg.getContentRaw())) {
 			url = msg.getContentRaw();
+		}
 		
 		return url;
 	}

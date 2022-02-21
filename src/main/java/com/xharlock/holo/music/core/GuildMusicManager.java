@@ -15,20 +15,20 @@ public class GuildMusicManager {
 	private AtomicInteger counter;
 
 	public GuildMusicManager(AudioPlayerManager manager) {
-		this.audioPlayer = manager.createPlayer();
-		this.scheduler = new TrackScheduler(this.audioPlayer);
-		this.audioPlayer.addListener((AudioEventListener) this.scheduler);
-		this.audioPlayerHandler = new AudioPlayerSendHandler(this.audioPlayer);		
-		this.voting = false;
-		this.counter = new AtomicInteger(0);
+		audioPlayer = manager.createPlayer();
+		scheduler = new TrackScheduler(audioPlayer);
+		audioPlayer.addListener((AudioEventListener) scheduler);
+		audioPlayerHandler = new AudioPlayerSendHandler(audioPlayer);		
+		voting = false;
+		counter = new AtomicInteger(0);
 	}
 
 	public AudioPlayerSendHandler getAudioPlayerHandler() {
-		return this.audioPlayerHandler;
+		return audioPlayerHandler;
 	}
 
 	public void setVoting(boolean isVoting) {
-		this.voting = isVoting;
+		voting = isVoting;
 	}
 
 	public boolean isVoting() {
@@ -36,6 +36,6 @@ public class GuildMusicManager {
 	}
 
 	public AtomicInteger getCounter() {
-		return this.counter;
+		return counter;
 	}
 }

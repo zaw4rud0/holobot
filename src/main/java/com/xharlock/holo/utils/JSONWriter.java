@@ -6,10 +6,13 @@ import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public class JSONWriter {
+public final class JSONWriter {
 
-	public static void writeJSONObject(JSONObject obj, String filepath) throws IOException {
-		FileWriter writer = new FileWriter(filepath);
+	private JSONWriter() {
+	}
+	
+	public static void writeJSONObject(JSONObject obj, String filePath) throws IOException {
+		FileWriter writer = new FileWriter(filePath);
 		writer.write(obj.toJSONString());
 		writer.close();
 	}

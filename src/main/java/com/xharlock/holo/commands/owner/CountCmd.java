@@ -17,17 +17,15 @@ public class CountCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
-		
+		deleteInvoke(e);
 		int amount = 0;
 		
 		try {
 			amount = Integer.parseInt(args[0]);
-		} catch (NumberFormatException ex) {return;};
+		} catch (NumberFormatException ex) {return;}
 		
-		for (int i = 0; i < amount; i++) {
-			e.getChannel().sendMessage("This is message #" + (i + 1)).queue();
+		for (int i = 1; i <= amount; i++) {
+			e.getChannel().sendMessage("This is message #" + i).queue();
 		}
 	}
 }

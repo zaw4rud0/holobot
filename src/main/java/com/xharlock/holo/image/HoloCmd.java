@@ -13,29 +13,29 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class HoloCmd extends Command {
 
-	private final String api_url = "https://nekos.life/api/v2/img/holo";
+	private static final String apiUrl = "https://nekos.life/api/v2/img/holo";
 	
 	public HoloCmd(String name) {
 		super(name);
 		setDescription("Use this command to get a picture of Holo");
 		setAliases(List.of("bestgirl", "waifu", "wisewolf"));
 		setUsage(name);
+		setIsNSFW(true);
 		setCommandCategory(CommandCategory.IMAGE);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		String url = null;
 		
 		try {
-			// Keeps fetching a new url until the url isn't on the blocklist
+			// Keeps fetching a new url until url isn't on blocklist
 			do {
-				url = HttpResponse.getJsonObject(api_url).get("url").getAsString();
-			} while (BlockCmd.blocked.contains(url) || BlockCmd.block_requests.contains(url));
+				url = HttpResponse.getJsonObject(apiUrl).get("url").getAsString();
+			} while (BlockCmd.blocked.contains(url) || BlockCmd.blockRequests.contains(url));
 		} catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");

@@ -39,7 +39,7 @@ public class PlayerManager {
 
 	public void loadAndPlay(MessageReceivedEvent e, EmbedBuilder builder, String trackUrl) {
 		GuildMusicManager musicManager = getMusicManager(e.getGuild());
-		this.audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
+		audioPlayerManager.loadItemOrdered(musicManager, trackUrl, new AudioLoadResultHandler() {
 
 			@Override
 			public void trackLoaded(AudioTrack track) {
@@ -60,9 +60,9 @@ public class PlayerManager {
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
 				List<AudioTrack> tracks = (List<AudioTrack>) playlist.getTracks();
-				for (AudioTrack track : tracks)
+				for (AudioTrack track : tracks) {
 					musicManager.scheduler.enqueue(track);
-
+				}
 				builder.setTitle("Added to the queue");
 				builder.setDescription("`" + tracks.size() + "` tracks from playlist `" + playlist.getName() + "`");
 				builder.addField("Link", "[Youtube](" + trackUrl + ")", false);
@@ -87,8 +87,9 @@ public class PlayerManager {
 	}
 
 	public static PlayerManager getInstance() {
-		if (PlayerManager.INSTANCE == null)
+		if (PlayerManager.INSTANCE == null) {
 			PlayerManager.INSTANCE = new PlayerManager();
+		}
 		return PlayerManager.INSTANCE;
 	}
 }

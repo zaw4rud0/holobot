@@ -4,16 +4,16 @@ public enum Emojis {
 
 	// https://www.emojiall.com/en
 
-	THUMBSUP("U+1F44D", ":thumbsup:", "�?"),
+	THUMBSUP("U+1F44D", ":thumbsup:", "👍"),
 	THUMBSDOWN("U+1F44E", ":thumbsdown:", "👎"),
-	HEART("U+2764", ":heart:", "�?��?"),
+	HEART("U+2764", ":heart:", "❤️"),
 	BLUSH("U+1F633", ":blush:", "😊"), 
 	FLUSHED("", ":flushed:", "😳"),
 	ZZZ("U+1F4A4", ":zzz:", "💤"),
 
 	// Arrows and other direction signs
-	UPVOTE("U+2B06", ":arrow_up:", "⬆�?"),
-	DOWNVOTE("U+2B07", ":arrow_down:", "⬇�?"),
+	UPVOTE("U+2B06", ":arrow_up:", "⬆"),
+	DOWNVOTE("U+2B07", ":arrow_down:", "⬇"),
 	ARROW_LEFT("U+2B05", ":arrow_left:", "⬅�?"),
 	ARROW_RIGHT("U+27A1", ":arrow_right:", "➡�?"),
 
@@ -57,33 +57,33 @@ public enum Emojis {
 	UNDERAGE("U+1F51E", ":underage:", "🔞"),;
 
 	private String unicode;
-	private String normal_version;
-	private String browser_version;
+	private String normalVersion;
+	private String browserVersion;
 
 	Emojis(String unicode, String normal, String browser) {
 		this.unicode = unicode;
-		this.normal_version = normal;
-		this.browser_version = browser;
+		normalVersion = normal;
+		browserVersion = browser;
 	}
 
 	/**
 	 * The emoji as reaction
 	 */
 	public String getAsUnicode() {
-		return this.unicode;
+		return unicode;
 	}
 
 	/**
 	 * The discord version of this emoji
 	 */
 	public String getAsNormal() {
-		return this.normal_version;
+		return normalVersion;
 	}
 
 	/**
 	 * The browser version of this emoji
 	 */
 	public String getAsBrowser() {
-		return this.browser_version;
+		return browserVersion;
 	}
 }

@@ -5,40 +5,43 @@ import com.xharlock.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.VoiceChannel;
 
+/**
+ * Represents the configuration of Holo inside a single {@link Guild}
+ */
 public class GuildConfig {
 	
-	private Role admin_role;
-	private VoiceChannel music_channel;
-	private Role dj_role;
+	private Role adminRole;
+	private VoiceChannel musicChannel;
+	private Role djRole;
 	private String prefix;
-	private int embed_color;
+	private int embedColor;
 	
 	public Role getAdminRole() {
-		return this.admin_role;
+		return adminRole;
 	}
 
-	public void setAdminRole(Role admin_role) {
-		this.admin_role = admin_role;
+	public void setAdminRole(Role adminRole) {
+		this.adminRole = adminRole;
 	}
 	
 	public VoiceChannel getMusicChannel() {
-		return this.music_channel;
+		return musicChannel;
 	}
 	
 	public void setMusicChannel(VoiceChannel channel) {
-		this.music_channel = channel;
+		this.musicChannel = channel;
 	}
 	
 	public Role getDJRole() {
-		return this.dj_role;
+		return djRole;
 	}
 	
-	public void setDJRole(Role dj_role) {
-		this.dj_role = dj_role;
+	public void setDJRole(Role djRole) {
+		this.djRole = djRole;
 	}
 	
 	public String getGuildPrefix() {
-		return this.prefix;
+		return prefix;
 	}
 	
 	public void setGuildPrefix(String prefix) {
@@ -46,11 +49,11 @@ public class GuildConfig {
 	}
 	
 	public int getEmbedColor() {
-		return this.embed_color;
+		return embedColor;
 	}
 	
-	public void setEmbedColor(int embed_color) {
-		this.embed_color = embed_color;
+	public void setEmbedColor(int embedColor) {
+		this.embedColor = embedColor;
 	}
 	
 	public void setDefaultPrefix() {
@@ -58,6 +61,6 @@ public class GuildConfig {
 	}
 	
 	public void setDefaultColor() {
-		this.embed_color = Bootstrap.holo.getConfig().getDefaultColor();
+		this.embedColor = Bootstrap.holo.getConfig().getDefaultColor();
 	}
 }

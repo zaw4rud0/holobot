@@ -20,7 +20,7 @@ public class BannerCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();		
 		

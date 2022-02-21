@@ -4,7 +4,7 @@ import com.xharlock.holo.music.core.MusicCommand;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-// TODO
+// TODO Command that lets an user remove tracks at a specific position. Helpful to remove rickrolls or other unwanted songs.
 public class RemoveCmd extends MusicCommand {
 
 	public RemoveCmd(String name) {
@@ -15,7 +15,6 @@ public class RemoveCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
+		e.getChannel().sendMessage("This feature is not implemented yet!").queue();
 	}
-
 }

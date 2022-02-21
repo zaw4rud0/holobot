@@ -7,7 +7,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.xharlock.holo.music.core.*;
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.MusicCommand;
+import com.xharlock.holo.music.core.PlayerManager;
 import com.xharlock.holo.utils.Formatter;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -25,15 +27,17 @@ public class QueueCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		// Show queue history
-		if (args.length >= 1 && args[0].equals("history"))
+		if (args.length >= 1 && args[0].equals("history")) {
 			displayHistory(e);
+		}
 
 		// Show queue
-		else
+		else {
 			displayQueue(e);
+		}
 	}
 
 	/**

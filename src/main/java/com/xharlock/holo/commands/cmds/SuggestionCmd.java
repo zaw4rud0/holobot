@@ -18,7 +18,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SuggestionCmd extends Command {
 
-	private final String filepath = "./src/main/resources/misc/suggestions.json";
+	private static final String filepath = "./src/main/resources/misc/suggestions.json";
 	
 	public SuggestionCmd(String name) {
 		super(name);
@@ -32,12 +32,11 @@ public class SuggestionCmd extends Command {
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 
-		if (this.getArgs().length == 0) {
+		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a description of your suggestion");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -62,8 +61,9 @@ public class SuggestionCmd extends Command {
 		JSONObject author = new JSONObject();
 		author.put("Id", e.getAuthor().getIdLong());
 		author.put("Tag", e.getAuthor().getAsTag());
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			author.put("Nickname", e.getMember().getEffectiveName());
+		}
 		obj.put("Author", author);
 		obj.put("Suggestion", text);
 
@@ -80,7 +80,7 @@ public class SuggestionCmd extends Command {
 		
 		builder.setTitle("Message Sent");
 		builder.setDescription("Thank you for your suggestion!");
-		this.sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
+		sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 	}
 
 }

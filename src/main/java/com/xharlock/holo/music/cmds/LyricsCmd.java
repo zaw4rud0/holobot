@@ -20,16 +20,15 @@ public class LyricsCmd extends MusicCommand {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
-		e.getMessage().delete().queue();
-		
-		e.getChannel().sendTyping().queue();
-		
+	public void onCommand(MessageReceivedEvent e) {
+		deleteInvoke(e);
+		sendTyping(e);
+
 		EmbedBuilder builder = new EmbedBuilder();
-		
+
 		LyricsClient client = new LyricsClient();
 		Lyrics lyrics = null;
-		
+
 		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a song name");
@@ -45,20 +44,20 @@ public class LyricsCmd extends MusicCommand {
 				return;
 			}
 		}
-		
+
 		if (lyrics == null || lyrics.getContent() == null || lyrics.getContent().equals("")) {
 			builder.setTitle("Error");
 			builder.setDescription("Couldn't find any lyrics for `" + String.join(" ", args) + "`");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
 		}
-		
-		String text = lyrics.getContent();		
+
+		String text = lyrics.getContent();
 		builder.setTitle("Lyrics | " + lyrics.getTitle() + " by " + lyrics.getAuthor().replace("Lyrics", ""));
-		
+
 		Scanner scanner = new Scanner(text);
 		String block = "";
-		
+
 		while (scanner.hasNextLine()) {
 			String line = scanner.nextLine();
 			if (line.isBlank()) {
@@ -70,13 +69,14 @@ public class LyricsCmd extends MusicCommand {
 					builder.addField("", block, false);
 					builder.addField("", line, false);
 					block = "";
-				} else
-					block += line + "\n";				
+				} else {
+					block += line + "\n";
+				}
 			}
 		}
-		
-		builder.addField("", block, false);		
-		sendEmbed(e, builder, true);		
+
+		builder.addField("", block, false);
+		sendEmbed(e, builder, true);
 		scanner.close();
 	}
 }

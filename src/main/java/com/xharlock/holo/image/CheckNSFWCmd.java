@@ -41,21 +41,20 @@ public class CheckNSFWCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
-
-		e.getChannel().sendTyping().queue();
+		deleteInvoke(e);
+		sendTyping(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setColor(getColor(e));
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			builder.setFooter("Invoked by " + e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
+		}
 
 		Message referenced = e.getMessage().getReferencedMessage();
-		String old_url = referenced != null ? getImageUrl(referenced) : getImageUrl(e.getMessage());
+		String oldUrl = referenced != null ? getImageUrl(referenced) : getImageUrl(e.getMessage());
 		
 		// Most likely incorrect usage
-		if (old_url == null) {
+		if (oldUrl == null) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Use `" + getPrefix(e) + "help check` to see the correct usage of this command");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
@@ -65,7 +64,7 @@ public class CheckNSFWCmd extends Command {
 		JsonObject obj = null;
 
 		try {
-			obj = getJsonObject(old_url);
+			obj = getJsonObject(oldUrl);
 		} catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while communicating with the API");
@@ -85,30 +84,31 @@ public class CheckNSFWCmd extends Command {
 				builder.setImage("attachment://check.png");
 				
 				// Get the url as a BufferedImage to draw the boxes into it
-				BufferedImage img = ImageIO.read(new URL(old_url));
+				BufferedImage img = ImageIO.read(new URL(oldUrl));
 				
 				int boxes = obj.getAsJsonObject("output").getAsJsonArray("detections").size();
 				
 				// Draw the nsfw boxes
 				for (int i = 0; i < boxes; i++) {
 					JsonObject detection = obj.getAsJsonObject("output").getAsJsonArray("detections").get(i).getAsJsonObject();
-					JsonArray bounding_box = detection.getAsJsonArray("bounding_box");
+					JsonArray boundingBox = detection.getAsJsonArray("bounding_box");
 					
 					// Values of the box
-					int x = bounding_box.get(0).getAsInt();
-					int y = bounding_box.get(1).getAsInt();
-					int width = bounding_box.get(2).getAsInt();
-					int height = bounding_box.get(3).getAsInt();
+					int x = boundingBox.get(0).getAsInt();
+					int y = boundingBox.get(1).getAsInt();
+					int width = boundingBox.get(2).getAsInt();
+					int height = boundingBox.get(3).getAsInt();
 					
 					// Get 'sizeclass' of image 
-					int sizeclass = Math.max(img.getWidth(), img.getHeight()) / 1000;
+					int sizeClass = Math.max(img.getWidth(), img.getHeight()) / 1000;
 					
-					// for super small images
-					if (sizeclass == 0)
-						sizeclass = 1;
+					// For super small images
+					if (sizeClass == 0) {
+						sizeClass = 1;
+					}
 					
 					// Draw the box into the image
-					img = drawBox(img, x, y, width, height, (i + 1), sizeclass);
+					img = drawBox(img, x, y, width, height, i + 1, sizeClass);
 					
 					// Display box informations 
 					builder.addField("Box " + (i + 1), 
@@ -117,11 +117,12 @@ public class CheckNSFWCmd extends Command {
 				}
 				
 				InputStream input = BufferedImageOps.toInputStream(img);
-				
-				if (referenced != null)
+				if (referenced != null) {
 					referenced.reply(input, "check.png").setEmbeds(builder.build()).queue();
-				else
+				} else {
 					e.getChannel().sendFile(input, "check.png").setEmbeds(builder.build()).queue();
+				}
+				input.close();
 			} 
 			
 			// Something went wrong
@@ -142,10 +143,11 @@ public class CheckNSFWCmd extends Command {
 			builder.setTitle("NSFW Check");
 			builder.setDescription("Your image is " + scoreString + " likely to contain NSFW elements");
 
-			if (referenced != null)
+			if (referenced != null) {
 				referenced.replyEmbeds(builder.build()).queue();
-			else
+			} else {
 				e.getChannel().sendMessageEmbeds(builder.build()).queue();
+			}
 		}
 	}
 
@@ -157,14 +159,16 @@ public class CheckNSFWCmd extends Command {
 		
 		// Embed Image
 		if (msg.getEmbeds().size() != 0) {
-			if (msg.getEmbeds().get(0).getImage() != null)
+			if (msg.getEmbeds().get(0).getImage() != null) {
 				url = msg.getEmbeds().get(0).getImage().getUrl();
+			}
 		}
 		
 		// Attachment Image
 		else if (msg.getAttachments().size() != 0) {
-			if (msg.getAttachments().get(0).isImage())
+			if (msg.getAttachments().get(0).isImage()) {
 				url = msg.getAttachments().get(0).getUrl();
+			}
 		}
 		
 		// Url Image
@@ -177,13 +181,13 @@ public class CheckNSFWCmd extends Command {
 	/**
 	 * Method to draw a box into the image with the given properties
 	 */
-	private static BufferedImage drawBox(BufferedImage img, int x, int y, int width, int height, int box_number, int sizeclass) {
+	private static BufferedImage drawBox(BufferedImage img, int x, int y, int width, int height, int boxNumber, int sizeClass) {
 		Graphics2D g2d = img.createGraphics();
 		g2d.setColor(Color.RED);
-		g2d.setStroke(new BasicStroke(5*sizeclass));
+		g2d.setStroke(new BasicStroke(5*sizeClass));
 		g2d.drawRect(x, y, width, height);
-		g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25*sizeclass));
-		g2d.drawString("" + box_number, x + 12 * sizeclass, y + 30 * sizeclass);
+		g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25*sizeClass));
+		g2d.drawString("" + boxNumber, x + 12 * sizeClass, y + 30 * sizeClass);
 		g2d.dispose();
 		return img;
 	}

@@ -13,13 +13,9 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrackEndReason;
 
 public class TrackScheduler extends AudioEventAdapter {
 
-	/**
-	 * The queue of tracks
-	 */
+	/** The queue of tracks */
 	public BlockingQueue<AudioTrack> queue;
-	/**
-	 * The last 10 {@link AudioTrack}s from the {@link AudioPlayer}
-	 */
+	/** The last 10 {@link AudioTrack}s from the {@link AudioPlayer} */
 	public BlockingQueue<AudioTrack> history;
 	public final AudioPlayer audioPlayer;
 
@@ -40,11 +36,12 @@ public class TrackScheduler extends AudioEventAdapter {
 	 * it will be played by the {@link AudioPlayer}.
 	 */
 	public void enqueue(AudioTrack track) {
-		if (queue.isEmpty() && audioPlayer.getPlayingTrack() == null)
+		if (queue.isEmpty() && audioPlayer.getPlayingTrack() == null) {
 			addToHistory(track);
-		
-		if (!audioPlayer.startTrack(track, true))
+		}
+		if (!audioPlayer.startTrack(track, true)) {
 			queue.offer(track);
+		}
 	}
 
 	/**
@@ -55,8 +52,9 @@ public class TrackScheduler extends AudioEventAdapter {
 		List<AudioTrack> queueList = new ArrayList<>(queue);
 		queue.clear();
 		Collections.shuffle(queueList);
-		for (AudioTrack track : queueList)
+		for (AudioTrack track : queueList) {
 			queue.offer(track);
+		}
 	}
 
 	/**
@@ -67,10 +65,12 @@ public class TrackScheduler extends AudioEventAdapter {
 		List<AudioTrack> historyList = new ArrayList<>(history);
 		history.clear();
 		historyList.add(0, track);
-		while (historyList.size() > 10)
+		while (historyList.size() > 10) {
 			historyList.remove(10);
-		for (AudioTrack t : historyList)
+		}
+		for (AudioTrack t : historyList) {
 			history.offer(t);
+		}
 	}
 
 	/**
@@ -79,10 +79,11 @@ public class TrackScheduler extends AudioEventAdapter {
 	 */
 	public void onTrackEnd(AudioPlayer player, AudioTrack track, AudioTrackEndReason endReason) {
 		if (endReason.mayStartNext) {
-			if (looping)
+			if (looping) {
 				audioPlayer.startTrack(track.makeClone(), false);
-			else
+			} else {
 				playNext();
+			}
 		}
 	}
 
@@ -93,7 +94,8 @@ public class TrackScheduler extends AudioEventAdapter {
 	public void playNext() {
 		AudioTrack track = queue.poll();
 		audioPlayer.startTrack(track, false);
-		if (track != null)
+		if (track != null) {
 			addToHistory(track);
+		}
 	}
 }

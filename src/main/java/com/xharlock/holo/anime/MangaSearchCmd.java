@@ -49,9 +49,7 @@ public class MangaSearchCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild()) {
-			e.getChannel().sendTyping().queue();
-		}
+		sendTyping(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 
@@ -77,10 +75,8 @@ public class MangaSearchCmd extends Command {
 			return;
 		}
 
-		if (e.isFromGuild()) {
-			e.getMessage().delete().queue();
-		}
-
+		deleteInvoke(e);
+		
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < results.size(); i++) {
 			sb.append(numbers.get(i) + " " + results.get(i).getTitle() + " [" + results.get(i).getType() + "]\n");
@@ -194,10 +190,12 @@ public class MangaSearchCmd extends Command {
 		builder.setTitle(manga.getTitle());
 		builder.setThumbnail(manga.getImageUrl());
 		builder.setDescription(manga.getSynopsis());
-		if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle()))
+		if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle())) {
 			builder.addField("English Title", manga.getTitleEnglish(), true);
-		if (manga.getTitleJapanese() != null)
+		}
+		if (manga.getTitleJapanese() != null) {
 			builder.addField("Japanese Title", manga.getTitleJapanese(), true);
+		}
 		builder.addField("Genres", genres, false);
 		builder.addField("Type", manga.getType(), true);
 		builder.addField("Chapters", chapters, true);

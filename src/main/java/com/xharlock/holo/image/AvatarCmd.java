@@ -24,7 +24,7 @@ public class AvatarCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 
@@ -35,16 +35,36 @@ public class AvatarCmd extends Command {
 			return;
 		}
 
-		User user = e.getAuthor();
-		try {
-			user = e.getJDA().getUserById(Long.parseLong(args[0].replace("<@!", "").replace(">", "")));
-		} catch (Exception ex) {}
-		Member member = e.getGuild().retrieveMember(user).complete();
-
+		User user = getUser(e);
+		Member member = getMember(e, user);
+		
+		String name = member != null ? member.getEffectiveName() : user.getName();
 		String url = user.getEffectiveAvatarUrl() + "?size=512";
-
-		builder.setTitle(member.getEffectiveName() + "'s Avatar", url);
+		builder.setTitle(name + "'s Avatar", url);
 		builder.setImage(url);
 		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
+	}
+	
+	/**
+	 * Returns the given user, either as mention or as id. If the argument is
+	 * invalid, simply return the author of the message.
+	 */
+	private User getUser(MessageReceivedEvent e) {
+		try {
+			return e.getJDA().getUserById(Long.parseLong(args[0].replace("<", "").replace(">", "").replace("!", "").replace("@", "")));
+		} catch (Exception ex) {
+			return e.getAuthor();
+		}
+	}
+
+	/**
+	 * Returns the user as a member of the guild. If the user isn't a member, the
+	 */
+	private Member getMember(MessageReceivedEvent e, User user) {
+		try {
+			return e.getGuild().retrieveMember(user).complete();
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 }

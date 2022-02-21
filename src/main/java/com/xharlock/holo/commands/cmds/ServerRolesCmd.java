@@ -22,13 +22,13 @@ public class ServerRolesCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		List<Role> roles = e.getGuild().getRoles();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Roles of " + e.getGuild().getName());
 
-		if (roles.size() == 0) {
+		if (roles.isEmpty()) {
 			builder.setDescription("This server doesn't have any roles");
 		} else {
 			String s = "";

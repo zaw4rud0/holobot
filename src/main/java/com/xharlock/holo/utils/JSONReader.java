@@ -8,17 +8,18 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
-public class JSONReader {
+public final class JSONReader {
 
+	private JSONReader() {
+	}
+	
 	public static JSONObject readJSONObject(String filepath) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
-		JSONObject object = (JSONObject) parser.parse(new FileReader(filepath));
-		return object;
+		return (JSONObject) parser.parse(new FileReader(filepath));
 	}
 
 	public static JSONArray readJSONArray(String filepath) throws IOException, ParseException {
 		JSONParser parser = new JSONParser();
-		JSONArray array = (JSONArray) parser.parse(new FileReader(filepath));
-		return array;
+		return (JSONArray) parser.parse(new FileReader(filepath));
 	}
 }

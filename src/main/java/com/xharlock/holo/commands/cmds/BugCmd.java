@@ -17,25 +17,24 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class BugCmd extends Command {
 
-	private final String filepath = "./src/main/resources/misc/bugs.json";
+	private static final String filepath = "./src/main/resources/misc/bugs.json";
 
 	public BugCmd(String name) {
 		super(name);
 		setDescription("Use this command to report a bug. Please provide a description of the bug and how it happened");
 		setUsage(name + " <text>");
-		setExample(name + " something went wrong");
+		setExample(name + " Something went wrong");
 		setCommandCategory(CommandCategory.GENERAL);
 	}
 	
 	@SuppressWarnings("unchecked")
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 
-		if (this.getArgs().length == 0) {
+		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please provide a description of the bug");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -60,10 +59,9 @@ public class BugCmd extends Command {
 		JSONObject author = new JSONObject();
 		author.put("Id", e.getAuthor().getIdLong());
 		author.put("Tag", e.getAuthor().getAsTag());
-		
-		if (e.isFromGuild())
+		if (e.isFromGuild()) {
 			author.put("Nickname", e.getMember().getEffectiveName());
-		
+		}
 		obj.put("Author", author);
 		obj.put("Bug", text);
 

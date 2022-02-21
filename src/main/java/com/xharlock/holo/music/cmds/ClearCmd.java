@@ -6,14 +6,16 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import com.xharlock.holo.core.*;
-import com.xharlock.holo.misc.*;
-import com.xharlock.holo.music.core.*;
+import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.misc.Emojis;
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.MusicCommand;
+import com.xharlock.holo.music.core.PlayerManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class ClearCmd extends MusicCommand {
 
@@ -89,18 +91,16 @@ public class ClearCmd extends MusicCommand {
 		builder.setDescription("Upvote to clear the queue\n`" + requiredVotes + "` upvotes are required");
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
-
 			msg.addReaction(Emojis.UPVOTE.getAsBrowser()).queue(v -> {}, err -> {});
 
-			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
+			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
 
 				// So reactions on other messages and bot reactions are ignored
 				if (evt.getMessageIdLong() != msg.getIdLong() && !evt.getUser().isBot()) {
 					return false;
 				}
 
-				if (listeners.contains(evt.getMember())	&& 
-						evt.getReactionEmote().getEmoji().equals(Emojis.UPVOTE.getAsBrowser())) {
+				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emojis.UPVOTE.getAsBrowser())) {
 					if (musicManager.getCounter().incrementAndGet() == requiredVotes) {
 						return true;
 					}

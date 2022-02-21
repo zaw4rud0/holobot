@@ -16,7 +16,7 @@ public class LoopCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 		boolean repeating = !musicManager.scheduler.looping;

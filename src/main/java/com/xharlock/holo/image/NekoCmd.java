@@ -26,13 +26,13 @@ public class NekoCmd extends Command {
 		setDescription("Use this command to get a picture of a catgirl (neko)");
 		setAliases(List.of("catgirl", "kemonomimi"));
 		setUsage(name);
+		setIsNSFW(true);
 		setCommandCategory(CommandCategory.IMAGE);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		String url = null;

@@ -22,7 +22,7 @@ public class NicknameCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		if (args.length >= 1 && args[0].equals("self")) {
 			e.getGuild().getMember(e.getJDA().getSelfUser()).modifyNickname(String.join(" ", Arrays.copyOfRange(args, 1, args.length))).queue();

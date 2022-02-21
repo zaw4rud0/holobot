@@ -13,19 +13,28 @@ public abstract class MusicCommand extends Command {
 		setCommandCategory(CommandCategory.MUSIC);
 	}
 
+	/**
+	 * Checks if the bot is in a voice channel of the guild
+	 */
 	protected boolean isBotInChannel(MessageReceivedEvent e) {
-		return e.getGuild().getSelfMember().getVoiceState().inVoiceChannel();
+		return e.getGuild().getSelfMember().getVoiceState().inAudioChannel();
 	}
 	
+	/**
+	 * Checks if the user who invoked the command is in a voice channel
+	 */
 	protected boolean isUserInChannel(MessageReceivedEvent e) {
-		return e.getMember().getVoiceState().inVoiceChannel();
+		return e.getMember().getVoiceState().inAudioChannel();
 	}
 
+	/**
+	 * Checks if the user and the bot are in the same voice channel
+	 */
 	protected boolean isUserInSameChannel(MessageReceivedEvent e) {
-		if (!e.getMember().getVoiceState().inVoiceChannel() || !e.getGuild().getSelfMember().getVoiceState().inVoiceChannel())
+		if (!isUserInChannel(e) || !isBotInChannel(e)) {
 			return false;
-		else
-			return e.getGuild().getSelfMember().getVoiceState().getChannel()
-					.equals(e.getMember().getVoiceState().getChannel());
+		} else {
+			return e.getGuild().getSelfMember().getVoiceState().getChannel().equals(e.getMember().getVoiceState().getChannel());
+		}
 	}
 }

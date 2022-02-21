@@ -2,13 +2,16 @@ package com.xharlock.holo.core;
 
 public class ShutdownThread extends Thread {
 
-	// WIP
+	// TODO Define behaviour when the bot shuts down
 	
-	@SuppressWarnings("unused")
 	private Holo holo;
 	
 	public ShutdownThread(Holo holo) {
 		this.holo = holo;
+	}
+	
+	public Holo getHolo() {
+		return holo;
 	}
 	
 	public void run() {

@@ -3,64 +3,64 @@ package com.xharlock.holo.config;
 public class Config {
 
 	// Discord Properties
-	private String discord_token;
-	private long owner_id;
+	private String discordToken;
+	private long ownerId;
 
 	// External stuff
-	private String deepAI_key;
-	private String youtube_token;
+	private String deepAIKey;
+	private String youtubeToken;
 
 	// Minor bot properties
-	private String default_prefix;
-	private int default_color;
+	private String defaultPrefix;
+	private int defaultColor;
 	private String version;
 
 	public String getDiscordToken() {
-		return this.discord_token;
+		return discordToken;
 	}
 
 	public void setDiscordToken(String token) {
-		this.discord_token = token;
+		this.discordToken = token;
 	}
 	
 	public long getOwnerId() {
-		return owner_id;
+		return ownerId;
 	}
 
-	public void setOwnerId(long owner_id) {
-		this.owner_id = owner_id;
+	public void setOwnerId(long ownerId) {
+		this.ownerId = ownerId;
 	}
 	
 	public String getKeyDeepAI() {
-		return deepAI_key;
+		return deepAIKey;
 	}
 
-	public void setKeyDeepAI(String deepAI_key) {
-		this.deepAI_key = deepAI_key;
+	public void setKeyDeepAI(String deepAIKey) {
+		this.deepAIKey = deepAIKey;
 	}
 	
 	public String getYoutubeToken() {
-		return youtube_token;
+		return youtubeToken;
 	}
 
-	public void setYoutubeToken(String youtube_token) {
-		this.youtube_token = youtube_token;
+	public void setYoutubeToken(String youtubeToken) {
+		this.youtubeToken = youtubeToken;
 	}	
 	
 	public String getDefaultPrefix() {
-		return this.default_prefix;
+		return defaultPrefix;
 	}
 
 	public void setDefaultPrefix(String prefix) {
-		this.default_prefix = prefix;
+		this.defaultPrefix = prefix;
 	}
 	
 	public int getDefaultColor() {
-		return this.default_color;
+		return defaultColor;
 	}
 	
 	public void setDefaultColor(int color) {
-		this.default_color = color;
+		this.defaultColor = color;
 	}
 
 	public String getVersion() {

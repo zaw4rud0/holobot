@@ -1,33 +1,29 @@
 package com.xharlock.holo.config;
 
 import java.util.HashMap;
+import java.util.Map;
 
 import net.dv8tion.jda.api.entities.Guild;
 
 public class GuildConfigManager {
 
-	private HashMap<Long, GuildConfig> guild_configs;
+	private Map<Long, GuildConfig> guildConfigs;
 	
 	public GuildConfigManager() {
-		guild_configs = new HashMap<>();
+		guildConfigs = new HashMap<>();
 	}
 	
 	public GuildConfig getGuildConfig(Guild guild) {
 		if (!hasConfig(guild)) {
-			GuildConfig guild_config = new GuildConfig();
-			guild_config.setDefaultPrefix();
-			guild_config.setDefaultColor();
-			this.guild_configs.put(guild.getIdLong(), guild_config);
+			GuildConfig guildConfig = new GuildConfig();
+			guildConfig.setDefaultPrefix();
+			guildConfig.setDefaultColor();
+			guildConfigs.put(guild.getIdLong(), guildConfig);
 		}		
-		return this.guild_configs.get(guild.getIdLong());
+		return guildConfigs.get(guild.getIdLong());
 	}
 	
 	public boolean hasConfig(Guild guild) {
-		return this.guild_configs.containsKey(guild.getIdLong());
-	}
-	
-	@Deprecated
-	public void setGuildConfigs(HashMap<Long, GuildConfig> guild_configs) {
-		this.guild_configs = guild_configs;
+		return guildConfigs.containsKey(guild.getIdLong());
 	}
 }

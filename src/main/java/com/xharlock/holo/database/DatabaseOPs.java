@@ -3,12 +3,14 @@ package com.xharlock.holo.database;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
 
-public class DatabaseOPs {
+public final class DatabaseOPs {
+	
+	private DatabaseOPs() {
+	}
 	
 	/**
 	 * Method to add a new image to the blocklist into the DB
@@ -103,34 +105,5 @@ public class DatabaseOPs {
 		Database.connect();
 		ResultSet rs = Database.query(s);
 		return rs;
-	}
-	
-	/**
-	 * Method to get all exam dates from the DB
-	 */
-	public static LinkedHashMap<String, Long> getExamDates() throws SQLException {
-		String s = "SELECT * FROM ExamDates ORDER BY Date ASC";
-		Database.connect();
-		ResultSet rs = Database.query(s);
-		
-		LinkedHashMap<String, Long> exam_dates = new LinkedHashMap<>();
-		
-		while (rs.next()) {
-			exam_dates.put(rs.getString("Exam"), rs.getLong("Date"));
-		}
-		
-		Database.disconnect();
-		return exam_dates;
-	}
-	
-	/**
-	 * Method to insert a new exam date into the DB
-	 */
-	public static boolean insertExamDate(String exam, long millis) throws SQLException {
-		String s = "INSERT INTO ExamDates (Exam, Date) VALUES (\'" + exam + "\'," + millis + ");";
-		Database.connect();
-		boolean success = Database.execute(s);
-		Database.disconnect();
-		return success;
 	}
 }

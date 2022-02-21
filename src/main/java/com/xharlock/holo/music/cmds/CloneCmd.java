@@ -22,13 +22,13 @@ public class CloneCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
-		
+		deleteInvoke(e);
+
 		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 
 		AudioTrack current = musicManager.audioPlayer.getPlayingTrack();
-		
+
 		// Check if there are any tracks playing
 		if (current == null) {
 			builder.setTitle("Error");
@@ -49,22 +49,22 @@ public class CloneCmd extends MusicCommand {
 		List<AudioTrack> queueList = new ArrayList<>();
 		queueList.add(current.makeClone());
 		queueList.addAll(musicManager.scheduler.queue);
-		musicManager.scheduler.queue.clear();		
-		for (AudioTrack track : queueList)
+		musicManager.scheduler.queue.clear();
+		for (AudioTrack track : queueList) {
 			musicManager.scheduler.queue.offer(track);
-		
+		}
+
 		// Get thumbnail
 		String uri = musicManager.audioPlayer.getPlayingTrack().getInfo().uri.split("v=")[1].split("&")[0];
 		String thumbnail = "https://img.youtube.com/vi/" + uri + "/hqdefault.jpg";
-		
+
 		// Display informations of the cloned track
 		builder.setTitle("Cloned track");
 		builder.setThumbnail(thumbnail);
 		builder.addField("Title", current.getInfo().title, false);
 		builder.addField("Uploader", current.getInfo().author, false);
 		builder.addField("Link", "[Youtube](" + current.getInfo().uri + ")", false);
-		
+
 		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 	}
-
 }

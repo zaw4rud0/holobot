@@ -23,8 +23,7 @@ public enum PokemonType {
 	BUG("Bug", Emotes.TYPE_BUG, new Color(168, 184, 32)),
 	DRAGON("Dragon", Emotes.TYPE_DRAGON, new Color(112, 56, 248)),
 	GHOST("Ghost", Emotes.TYPE_GHOST, new Color(112, 88, 152)),
-	ICE("Ice", Emotes.TYPE_ICE, new Color(152, 216, 216))	
-	;
+	ICE("Ice", Emotes.TYPE_ICE, new Color(152, 216, 216));
 
 	private String name;
 	private Emotes emote;

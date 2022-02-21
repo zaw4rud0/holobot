@@ -33,10 +33,13 @@ public class PurgeCmd extends Command {
 		
 		c.getIterableHistory().takeAsync(limit).thenApply(list -> list.stream().filter(m -> m.getAuthor().getIdLong() == id).limit(n).collect(Collectors.toList())).thenAccept(msgs -> c.deleteMessages(msgs).queue());
 		
-		
 		int amount = 0;
 		
-		try { amount = Integer.parseInt(args[0]); } catch (NumberFormatException ex) {}
+		try { 
+			amount = Integer.parseInt(args[0]); 
+		} catch (NumberFormatException ex) {
+			return;
+		}
 		
 		if (amount > 100) {
 			e.getAuthor().openPrivateChannel().complete().sendMessage("You can't purge more than 100 messages at once!").queue();

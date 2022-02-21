@@ -40,15 +40,15 @@ public enum Emotes {
     
     private String id;
     
-    private Emotes(String id) {
+    Emotes(String id) {
         this.id = id;
     }
     
     public String getAsReaction() {
-        return this.id;
+        return id;
     }
     
     public String getAsText() {
-        return "<:" + this.id + ">";
+        return "<:" + id + ">";
     }
 }

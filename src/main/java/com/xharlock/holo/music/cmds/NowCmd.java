@@ -5,7 +5,9 @@ import java.util.concurrent.TimeUnit;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import com.xharlock.holo.misc.Emojis;
-import com.xharlock.holo.music.core.*;
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.MusicCommand;
+import com.xharlock.holo.music.core.PlayerManager;
 import com.xharlock.holo.utils.Formatter;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,7 +23,7 @@ public class NowCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 		AudioPlayer audioPlayer = musicManager.audioPlayer;

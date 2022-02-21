@@ -15,7 +15,7 @@ import com.xharlock.holo.music.core.PlayerManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.guild.react.GuildMessageReactionAddEvent;
+import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class SkipCmd extends MusicCommand {
 
@@ -32,7 +32,7 @@ public class SkipCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
@@ -45,8 +45,8 @@ public class SkipCmd extends MusicCommand {
 			return;
 		}
 
-		// Owner can always skip
-		if (e.getAuthor().getIdLong() == Bootstrap.holo.getConfig().getOwnerId()) {
+		// Bot owner can always skip
+		if (isBotOwner(e)) {
 			musicManager.setVoting(false);
 			musicManager.getCounter().set(0);
 			skip(e);
@@ -78,7 +78,7 @@ public class SkipCmd extends MusicCommand {
 				.filter(m -> !m.getUser().isBot() && !m.getVoiceState().isDeafened()).collect(Collectors.toList()));
 
 		int requiredVotes = (int) Math.floor(listeners.size() / 2.0);
-
+		
 		// User can skip without voting
 		if (requiredVotes == 0) {
 			musicManager.setVoting(false);
@@ -89,22 +89,19 @@ public class SkipCmd extends MusicCommand {
 
 		builder.setTitle(e.getMember().getEffectiveName() + " requested a skip");
 		builder.setDescription("Upvote to skip current track\n`" + requiredVotes + "` upvotes are required");
+		builder.setColor(Bootstrap.holo.getConfig().getDefaultColor());
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 
-			msg.addReaction(Emojis.UPVOTE.getAsBrowser()).queue(v -> {
-			}, err -> {
-			});
+			msg.addReaction(Emojis.UPVOTE.getAsUnicode()).queue();
 
-			waiter.waitForEvent(GuildMessageReactionAddEvent.class, evt -> {
-
+			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
 				// So reactions on other messages and bot reactions are ignored
 				if (evt.getMessageIdLong() != msg.getIdLong() && !evt.getUser().isBot()) {
 					return false;
 				}
 
-				if (listeners.contains(evt.getMember())
-						&& evt.getReactionEmote().getEmoji().equals(Emojis.UPVOTE.getAsBrowser())) {
+				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emojis.UPVOTE.getAsBrowser())) {
 					if (musicManager.getCounter().incrementAndGet() == requiredVotes) {
 						return true;
 					}

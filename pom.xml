@@ -39,7 +39,7 @@
 		<dependency>
 			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>4.3.0_334</version>
+			<version>5.0.0-alpha.5</version>
 		</dependency>
 
 		<!-- Useful stuff for JDA -->
@@ -128,7 +128,7 @@
 			<url>https://jcenter.bintray.com</url>
 		</repository>
 
-		<!-- To test experimental JDA builds -->
+		<!-- Required to test experimental JDA builds -->
 		<repository>
 			<id>jitpack</id>
 			<url>https://jitpack.io</url>

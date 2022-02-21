@@ -21,8 +21,7 @@ public class DeleteCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
-
+		deleteInvoke(e);
 		EmbedBuilder builder = new EmbedBuilder();
 
 		// Delete message user is replying to
@@ -51,7 +50,6 @@ public class DeleteCmd extends Command {
 			return;
 		}
 
-		// Couldn't find message		
 		e.getChannel().retrieveMessageById(id).complete().delete().queue(v -> {}, err -> {});
 	}
 }

@@ -20,12 +20,12 @@ public class StopCmd extends MusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		e.getMessage().delete().queue();
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
 
-		if (musicManager.scheduler.audioPlayer.getPlayingTrack() == null && musicManager.scheduler.queue.size() == 0) {
+		if (musicManager.scheduler.audioPlayer.getPlayingTrack() == null && musicManager.scheduler.queue.isEmpty()) {
 			builder.setTitle("Error");
 			builder.setDescription("I'm currently idle!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);

@@ -65,7 +65,7 @@ public class ActionCmd extends Command {
 		private boolean directed;
 		private List<String> urls;
 
-		private Action(String name, boolean directed, List<String> urls) {
+		Action(String name, boolean directed, List<String> urls) {
 			this.urls = urls;
 		}
 

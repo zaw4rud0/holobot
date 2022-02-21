@@ -6,10 +6,13 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-public class Database {
+public final class Database {
 
 	private static final String path = "./src/main/resources/database/Holo.db";
 	private static Connection conn;
+
+	private Database() {
+	}
 	
 	public static void connect() throws SQLException {
 		try {
@@ -28,18 +31,22 @@ public class Database {
 	}
 	
 	/**
-	 * Method to execute a given SQL statement
+	 * Executes a given SQL statement
 	 */
 	public static boolean execute(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
-		return st.execute(s);
+		boolean success = st.execute(s);
+		st.close();
+		return success;
 	}
 	
 	/**
-	 * Method to query the DB using a statement
+	 * Querys the DB using a statement
 	 */
 	public static ResultSet query(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
-		return st.executeQuery(s);
+		ResultSet rs = st.executeQuery(s);
+		st.close();
+		return rs;
 	}
 }

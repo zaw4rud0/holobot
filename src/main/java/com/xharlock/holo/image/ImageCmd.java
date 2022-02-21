@@ -6,6 +6,7 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import com.google.gson.JsonObject;
@@ -39,14 +40,8 @@ public class ImageCmd extends Command {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		
-		System.out.println("flag 1");
-		
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
-		
-		System.out.println("flag 2");
+	public void onCommand(MessageReceivedEvent e) {		
+		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		
@@ -76,29 +71,25 @@ public class ImageCmd extends Command {
 			Collections.sort(names);
 			return;
 		}
-
-		System.out.println("flag 3");
 		
 		// Display all available tags
-		if (args.length == 0 || args[0].toLowerCase().equals("list")) {
+		if (args.length == 0 || args[0].toLowerCase(Locale.UK).equals("list")) {
 			builder.setTitle("Image Tags");
 			builder.setDescription(getCategoriesString());
 			builder.addField("Usage", "`" + getPrefix(e) + "image <tag>`", false);
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 			return;
 		}
-
-		System.out.println("flag 4");
 		
 		// Tag not found
-		if (!names.contains(args[0].toLowerCase())) {
+		if (!names.contains(args[0].toLowerCase(Locale.UK))) {
 			builder.setTitle("Tag not found");
 			builder.setDescription("Use `" + getPrefix(e) + "image` to see all available tags");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
 		}
 	
-		String name = args[0].toLowerCase();
+		String name = args[0].toLowerCase(Locale.UK);
 		
 		try {
 			ResultSet rs = DatabaseOPs.getWaifu(name);
@@ -109,27 +100,20 @@ public class ImageCmd extends Command {
 			// Keeps fetching a new url until the url isn't on the blocklist
 			do {
 				url = getImage(tag);
-			} while (BlockCmd.blocked.contains(url) || BlockCmd.block_requests.contains(url));
+			} while (BlockCmd.blocked.contains(url) || BlockCmd.blockRequests.contains(url));
 			
 			builder.setTitle(rs.getString("Title"));
 			builder.setImage(url);
 			
 			Database.disconnect();
-			
 		} catch (SQLException | IOException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
 		}
 		
-		System.out.println("flag 5");
-		
 		sendEmbed(e, builder, true);
-		
-		System.out.println("flag 8");
-	}
-
-	
+	}	
 	
 	/**
 	 * Method to get the right image from Gelbooru

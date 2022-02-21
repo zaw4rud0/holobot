@@ -4,6 +4,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.core.Bootstrap;
@@ -16,14 +17,14 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
- * Class that handles what an user is allowed to do
+ * Handles what an user is allowed to do
  */
 public class PermissionManager {
 
 	// In dire need of refactoring
-	
+
 	private List<User> blacklisted;
-	private HashMap<User, Long> lastUserWarning;
+	private Map<User, Long> lastUserWarning;
 
 	public PermissionManager() {
 		blacklisted = new ArrayList<>();
@@ -31,18 +32,21 @@ public class PermissionManager {
 	}
 
 	public boolean check(MessageReceivedEvent e, Command cmd) {
-		if (isBlacklisted(e.getAuthor()))
+		if (isBlacklisted(e.getAuthor())) {
 			return false;
+		}
 
-		if (!hasChannelPermission(e, cmd))
+		if (!hasChannelPermission(e, cmd)) {
 			return false;
+		}
 
-		if (!hasUserPermission(e, cmd))
+		if (!hasUserPermission(e, cmd)) {
 			return false;
-
-		if (cmd.hasCmdCooldown())
-			if (isUserOnCooldown(e, cmd))
-				return false;
+		}
+		
+		if (cmd.hasCmdCooldown() && isUserOnCooldown(e, cmd)) {
+			return false;
+		}
 
 		return true;
 	}
@@ -58,28 +62,30 @@ public class PermissionManager {
 	}
 
 	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
-		
-		e.getMessage().delete().queue();
-		
 		EmbedBuilder builder = new EmbedBuilder();
+
 		long now = Instant.now().getEpochSecond();
-		if (cmd.onTimeout.containsKey(e.getAuthor())) {			
-			boolean warned = this.lastUserWarning.containsKey(e.getAuthor());			
-			if (warned && now - this.lastUserWarning.get(e.getAuthor()) < 10L)
-				return true;			
+
+		if (cmd.onTimeout.containsKey(e.getAuthor())) {
+			boolean warned = this.lastUserWarning.containsKey(e.getAuthor());
+
+			if (warned && now - this.lastUserWarning.get(e.getAuthor()) < 10L) {
+				return true;
+			}
 			if (now - cmd.onTimeout.get(e.getAuthor()) < cmd.getCmdCooldown()) {
-				if (e.isFromGuild())
+				if (e.isFromGuild()) {
 					e.getMessage().delete().queue();
+				}
 				builder.setTitle("On Cooldown!");
 				int remaining = cmd.getCmdCooldown() - (int) (now - cmd.onTimeout.get(e.getAuthor()));
 				builder.setDescription(String.format("%s, you are on cooldown!\nPlease wait `%d` seconds before using this command again.", e.getAuthor().getAsMention(), remaining));
 				cmd.sendEmbed(e, builder, 10, TimeUnit.SECONDS, false);
-				
-				if (warned) 
+
+				if (warned) {
 					this.lastUserWarning.replace(e.getAuthor(), now);
-				else 
+				} else {
 					this.lastUserWarning.put(e.getAuthor(), now);
-				
+				}
 				return true;
 			} else {
 				cmd.onTimeout.replace(e.getAuthor(), now);
@@ -138,8 +144,7 @@ public class PermissionManager {
 					return false;
 				}
 			} else {
-				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor())
-						&& !e.getGuild().getMember(e.getAuthor()).getRoles().contains(admin)) {
+				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor()) && !e.getGuild().getMember(e.getAuthor()).getRoles().contains(admin)) {
 					cmd.addErrorReaction(e.getMessage());
 					builder.setTitle("No Permission");
 					builder.setDescription("This command is admin-only");

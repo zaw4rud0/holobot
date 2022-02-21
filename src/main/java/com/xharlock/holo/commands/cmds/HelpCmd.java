@@ -28,7 +28,7 @@ public class HelpCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		// Given command doesn't exist
-		if (args.length == 1 && !this.manager.isValidName(args[0])) {
+		if (args.length >= 1 && !manager.isValidName(args[0])) {
 			addErrorReaction(e.getMessage());
 			builder.setTitle("Command not found");
 			builder.setDescription("Please check for typos and try again!");
@@ -36,29 +36,32 @@ public class HelpCmd extends Command {
 			return;
 		}
 
-		if (e.isFromGuild())
-			e.getMessage().delete().queue();
+		deleteInvoke(e);
 
 		// Help page for given command
-		if (args.length == 1 && this.manager.isValidName(args[0])) {
-			Command cmd = this.manager.getCommand(args[0]);
+		if (args.length >= 1 && manager.isValidName(args[0])) {
+			Command cmd = manager.getCommand(args[0]);
 			builder.setTitle("Command Help");
 			builder.addField("Name", cmd.getName(), false);
 			builder.addField("Description", cmd.getDescription(), false);
 			
-			if (cmd.getUsage() != null)
+			if (cmd.getUsage() != null) {
 				builder.addField("Usage", "`" + getPrefix(e) + cmd.getUsage() + "`", false);
+			}
 
-			if (cmd.getExample() != null)
+			if (cmd.getExample() != null) {
 				builder.addField("Example", "`" + getPrefix(e) + cmd.getExample() + "`", false);
+			}
 
-			if (cmd.getThumbnail() != null)
+			if (cmd.getThumbnail() != null) {
 				builder.setThumbnail(cmd.getThumbnail());
+			}
 			
 			if (cmd.getAliases().size() != 0) {
 				String aliases = "`" + cmd.getAliases().get(0) + "`";
-				for (int i = 1; i < cmd.getAliases().size(); i++)
+				for (int i = 1; i < cmd.getAliases().size(); i++) {
 					aliases += ", `" + cmd.getAliases().get(i) + "`";
+				}
 				builder.addField("Aliases", aliases, false);
 			}
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
@@ -73,20 +76,22 @@ public class HelpCmd extends Command {
 					+ "For more information on a certain command, use `" + getPrefix(e) + "help <command>`");
 
 			for (CommandCategory category : CommandCategory.values()) {
-
 				// Only show admin commands to guild admins (guild owner included) and bot-owner
-				if (category.equals(CommandCategory.ADMIN) && !isGuildAdmin(e) && !isBotOwner(e))
+				if (category.equals(CommandCategory.ADMIN) && !isGuildAdmin(e) && !isBotOwner(e)) {
 					continue;
+				}
 
-				// Only show bot-owner commands to the bot-owner
-				if (category.equals(CommandCategory.OWNER) && !isBotOwner(e))
+				// Only show bot-owner commands to bot-owner
+				if (category.equals(CommandCategory.OWNER) && !isBotOwner(e)) {
 					continue;
+				}
 
-				List<Command> cmds = this.manager.getCommands(category);
+				List<Command> cmds = manager.getCommands(category);
 
 				// Command category is empty, nothing to display
-				if (cmds.isEmpty())
+				if (cmds.isEmpty()) {
 					continue;
+				}
 
 				String cmdsString = "`" + cmds.get(0).getName() + "`";
 				for (int i = 1; i < cmds.size(); i++) {

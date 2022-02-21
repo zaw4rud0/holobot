@@ -1,7 +1,6 @@
 package com.xharlock.holo.games.pokemon;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -11,92 +10,106 @@ import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonParser;
+import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class PokeAPI {
 
-	private static final String baseUrl = "https://pokeapi.co/api/v2";
-	/** Total amount of Pokémon */
-	public static final int PokemonCount = 898;
+	private static final String baseUrl = "https://pokeapi.co/api/v2/";
+	/** The number of PokÃ©mon */
+	public static final int pokemonCount = 898;
 
-	/**
-	 * Method to search for a Pokémon by their name. <br>
-	 * Returns null if no Pokémon was found.
-	 */
-	public static JsonObject getPokemon(String name) throws IOException {
-		String url = baseUrl + "/pokemon/" + name + "/";
-		return getJsonObject(url);
+	private PokeAPI() {
+	}
+
+	public static PokemonSpecies getPokemonSpecies(int id) throws IOException {
+		String url = baseUrl + "pokemon-species/" + id + "/";
+		JsonObject obj = getJsonObject(url);
+		return new Gson().fromJson(obj, PokemonSpecies.class);
+	}
+
+	public static PokemonSpecies getPokemonSpecies(String name) throws IOException {
+		String url = baseUrl + "pokemon-species/" + escape(name) + "/";
+		JsonObject obj = getJsonObject(url);
+		return new Gson().fromJson(obj, PokemonSpecies.class);
+	}
+
+	public static Pokemon getPokemon(int id) throws IOException {
+		String url = baseUrl + "pokemon/" + id + "/";
+		JsonObject obj = getJsonObject(url);
+		return new Gson().fromJson(obj, Pokemon.class);
+	}
+
+	public static Pokemon getPokemon(String name) throws IOException {
+		String url = baseUrl + "pokemon/" + escape(name) + "/";
+		JsonObject obj = getJsonObject(url);
+		return new Gson().fromJson(obj, Pokemon.class);
+	}
+
+	public static PokemonSpecies getRandomPokemonSpecies() throws IOException {
+		int id = new Random().nextInt(pokemonCount) + 1;
+		return getPokemonSpecies(id);
+	}
+
+	public static Pokemon getRandomPokemon() throws IOException {
+		int id = new Random().nextInt(pokemonCount) + 1;
+		return getPokemon(id);
 	}
 
 	/**
-	 * Method to search for a Pokémon by their Pokédex id.
+	 * Fetches all the given ids and returns a list of {@link Pokemon}. Uses
+	 * parallelization to be as quick as possible.
 	 */
-	public static JsonObject getPokemon(int id) throws IOException {
-		String url = baseUrl + "/pokemon/" + id + "/";
-		return getJsonObject(url);
-	}
-
-	/**
-	 * Method to search for a Pokémon species by their name. <br>
-	 * Returns null if no Pokémon was found.
-	 */
-	public static JsonObject getPokemonSpecies(String name) throws IOException {
-		String url = baseUrl + "/pokemon-species/" + name + "/";
-		return getJsonObject(url);
-	}
-
-	/**
-	 * Method to search for a Pokémon by their Pokédex id.
-	 */
-	public static JsonObject getPokemonSpecies(int id) throws IOException {
-		String url = baseUrl + "/pokemon-species/" + id + "/";
-		return getJsonObject(url);
-	}
-
-	/**
-	 * Get a random team of six Pokémon
-	 */
-	public static List<Pokemon> getRandomTeam() throws IOException, InterruptedException {
-		List<Pokemon> team = new ArrayList<>();
-		Random rand = new Random();
+	public static List<Pokemon> getPokemons(int... ids) throws InterruptedException {
+		List<Pokemon> pokes = new ArrayList<>();
 		List<Thread> threads = new ArrayList<>();
 		List<PokemonFetcher> fetchers = new ArrayList<>();
-		for (int i = 0; i < 6; i++) {
-			int id = rand.nextInt(PokemonCount + 1);
+
+		// Start all threads
+		for (int id : ids) {
 			PokemonFetcher fetcher = new PokemonFetcher(id);
 			Thread t = new Thread(fetcher);
 			threads.add(t);
 			fetchers.add(fetcher);
 			t.start();
-		}		
-		for (int i = 0; i < 6; i++) {
+		}
+
+		// Wait for all threads to finish
+		for (int i = 0; i < ids.length; i++) {
 			threads.get(i).join();
-			team.add(fetchers.get(i).pokemon);
-		}		
-		return team;
+			pokes.add(fetchers.get(i).pokemon);
+		}
+		return pokes;
 	}
 
-	private static JsonObject getJsonObject(String urlQueryString) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
-		connection.setRequestProperty("User-Agent",
-				"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+	private static JsonObject getJsonObject(String url) throws IOException {
+		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
 		connection.setRequestMethod("GET");
-		BufferedReader reader = null;
-		try {
-			reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		} catch (FileNotFoundException ex) {
-			return null;
-		}
-		String s = reader.lines().collect(Collectors.joining("\n"));
-		reader.close();
-		connection.disconnect();
-		return JsonParser.parseString(s).getAsJsonObject();
+		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+		String raw = reader.lines().collect(Collectors.joining("\n"));
+		return JsonParser.parseString(raw).getAsJsonObject();
+	}
+	
+	/**
+	 * Replaces weird characters
+	 */
+	private static String escape(String name) {
+		return name.replace(" ", "-")
+				.replace(".", "")
+				.replace(":", "-")
+				.replace("'", "")
+				.replace("\u2640", "-f")
+				.replace("\u2642", "-m")
+				.replace(":female_sign:", "-f")
+				.replace(":male_sign:",	"-m");
 	}
 }
 
 /**
- * Class that fetches a single Pokémon. Used to parallelize fetching a full Pokémon team.
+ * Class to fetch a single PokÃ©mon. Used to parallize fetching multiple
+ * PokÃ©mons.
  */
 class PokemonFetcher implements Runnable {
 	int id;
@@ -109,7 +122,7 @@ class PokemonFetcher implements Runnable {
 	@Override
 	public void run() {
 		try {
-			this.pokemon = new Pokemon(PokeAPI.getPokemonSpecies(id));
+			pokemon = PokeAPI.getPokemon(id);
 		} catch (IOException ex) {
 			ex.printStackTrace();
 		}
