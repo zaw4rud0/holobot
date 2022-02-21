@@ -1,4 +1,4 @@
-package com.xharlock.holo.games.pokemon.cmds;
+package com.xharlock.holo.games.pokemon;
 
 import com.xharlock.holo.commands.core.Command;
 

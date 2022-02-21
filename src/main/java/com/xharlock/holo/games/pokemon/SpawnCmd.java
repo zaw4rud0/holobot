@@ -1,13 +1,13 @@
-package com.xharlock.holo.games.pokemon.cmds;
+package com.xharlock.holo.games.pokemon;
 
 import java.awt.Color;
 import java.io.IOException;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.games.pokemon.PokeAPI;
-import com.xharlock.holo.games.pokemon.Pokemon;
-import com.xharlock.holo.games.pokemon.PokemonSpecies;
+import com.xharlock.pokeapi4java.PokeAPI;
+import com.xharlock.pokeapi4java.model.Pokemon;
+import com.xharlock.pokeapi4java.model.PokemonSpecies;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

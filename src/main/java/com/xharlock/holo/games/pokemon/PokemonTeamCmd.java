@@ -1,4 +1,4 @@
-package com.xharlock.holo.games.pokemon.cmds;
+package com.xharlock.holo.games.pokemon;
 
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -10,10 +10,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.games.pokemon.PokeAPI;
-import com.xharlock.holo.games.pokemon.Pokemon;
-import com.xharlock.holo.games.pokemon.PokemonTeam;
 import com.xharlock.holo.utils.BufferedImageOps;
+import com.xharlock.pokeapi4java.PokeAPI;
+import com.xharlock.pokeapi4java.model.Pokemon;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

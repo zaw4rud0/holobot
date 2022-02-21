@@ -32,19 +32,21 @@ public class Holo {
 	private CommandManager commandManager;
 	private PermissionManager permissionManager;
 	private EventWaiter waiter;
-	
+
 	private static final Logger logger = LoggerFactory.getLogger(Holo.class);
 
-	public Holo(Config config, EventWaiter waiter) throws LoginException {		
+	public Holo(Config config, EventWaiter waiter) throws LoginException {
 		this.config = config;
 		this.waiter = waiter;
 		init();
 	}
 
-	private void init() throws LoginException {		
-		logger.info("Starting bot...");
+	private void init() throws LoginException {
+		if (logger.isInfoEnabled()) {
+			logger.info("Starting bot...");
+		}
 		Runtime.getRuntime().addShutdownHook(new ShutdownThread(this));
-		
+
 		// Create new JDA instance
 		JDABuilder builder = JDABuilder.createDefault(getConfig().getDiscordToken());
 		builder.enableIntents(EnumSet.allOf(GatewayIntent.class));
@@ -63,13 +65,9 @@ public class Holo {
 	}
 
 	public void registerListeners() {
-		jda.addEventListener(
-			new CommandListener(commandManager), 
-			new BotHandler(),
-			new Misc()
-		);
+		jda.addEventListener(new CommandListener(commandManager), new BotHandler(), new Misc());
 	}
-	
+
 	public Config getConfig() {
 		return config;
 	}
@@ -77,7 +75,7 @@ public class Holo {
 	public JDA getJDA() {
 		return jda;
 	}
-	
+
 	public GuildConfigManager getGuildConfigManager() {
 		return guildConfigManager;
 	}

@@ -17,6 +17,7 @@ import javax.imageio.ImageIO;
 import com.xharlock.holo.utils.BufferedImageOps;
 import com.xharlock.holo.utils.CollageMaker;
 import com.xharlock.holo.utils.Formatter;
+import com.xharlock.pokeapi4java.model.Pokemon;
 
 public final class PokemonTeam {
 
