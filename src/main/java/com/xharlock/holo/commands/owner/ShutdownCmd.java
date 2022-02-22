@@ -9,7 +9,7 @@ public class ShutdownCmd extends Command {
 
 	public ShutdownCmd(String name) {
 		super(name);
-		setDescription("(Owner-only) Use this command to shutdown the bot");
+		setDescription("(Owner-only) Use this command to shut down the bot");
 		setUsage(name);
 		setIsOwnerCommand(true);
 		setCommandCategory(CommandCategory.OWNER);
@@ -17,8 +17,7 @@ public class ShutdownCmd extends Command {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		// Leaves all voice channels so bot doesn't get stuck after restarting
-		e.getJDA().getGuilds().stream().filter(g -> g.getSelfMember().getVoiceState().inAudioChannel()).forEach(g -> g.getAudioManager().closeAudioConnection());
+		deleteInvoke(e);		
 		Runtime.getRuntime().exit(0);
 	}
 }

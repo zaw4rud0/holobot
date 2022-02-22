@@ -19,13 +19,16 @@ public class PokedexCmd extends Command {
 	public PokedexCmd(String name) {
 		super(name);
 		setDescription("Use this command to look up a Pokémon");
-		setUsage(name + " <Pokémon name or id> [<form name>]");
+		setUsage(name + " <pokémon name or id>");
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GAMES);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
+		deleteInvoke(e);
+		sendTyping(e);
+		
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length == 0) {
@@ -34,8 +37,6 @@ public class PokedexCmd extends Command {
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-
-		sendTyping(e);
 
 		String search = String.join(" ", args);
 		PokemonSpecies species = null;
@@ -58,8 +59,6 @@ public class PokedexCmd extends Command {
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
-
-		deleteInvoke(e);
 
 		// Prepare embed fields
 		String name = species.getName("en");

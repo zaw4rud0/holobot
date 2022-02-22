@@ -241,7 +241,7 @@ public final class BufferedImageOps {
      * The direction in which {@link BufferedImage}s should be joined.
      */
     public enum Direction {
-    	VERTICAL(),
-    	HORIZONTAL();
+    	VERTICAL,
+    	HORIZONTAL;
     }
 }

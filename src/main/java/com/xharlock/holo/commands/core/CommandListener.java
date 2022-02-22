@@ -29,6 +29,7 @@ public class CommandListener extends ListenerAdapter {
 			return;
 		}
 
+		// Ignore messages without the set prefix
 		if (!e.getMessage().getContentRaw().startsWith(getPrefix(e))) {
 			return;
 		}

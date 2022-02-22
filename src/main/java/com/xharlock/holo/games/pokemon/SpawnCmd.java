@@ -1,10 +1,10 @@
 package com.xharlock.holo.games.pokemon;
 
-import java.awt.Color;
 import java.io.IOException;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
+import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.pokeapi4java.PokeAPI;
 import com.xharlock.pokeapi4java.model.Pokemon;
 import com.xharlock.pokeapi4java.model.PokemonSpecies;
@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SpawnCmd extends Command {
 
+	PokemonSpawnManager manager;
+
 	public SpawnCmd(String name) {
 		super(name);
 		setDescription("(Owner-only) Use this command to spawn a Pokémon");
@@ -21,37 +23,45 @@ public class SpawnCmd extends Command {
 		setIsGuildOnlyCommand(true);
 		setIsOwnerCommand(true);
 		setCommandCategory(CommandCategory.OWNER);
+
+		manager = Bootstrap.holo.getPokemonSpawnManager();
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
 
-		EmbedBuilder embed = new EmbedBuilder();
-		
+		EmbedBuilder builder = new EmbedBuilder();
+
 		PokemonSpecies species = null;
 		Pokemon pokemon = null;
 
 		try {
+			// Spawn random Pokémon
 			if (args.length == 0 || args.length == 1 && args[0].equals("random")) {
 				species = PokeAPI.getRandomPokemonSpecies();
-			} else {
+			}
+
+			// Make Pokémons spawn in the TextChannel
+			else if (args[0].equals("add")) {
+				
+				// TODO				
+				
+			}
+
+			// Spawn specific Pokémon
+			else {
 				species = PokeAPI.getPokemonSpecies(args[0]);
 			}
 			pokemon = species.getPokemon();
 		} catch (IOException ex) {
-			embed.setTitle("Error");
-			embed.setDescription("Pokémon not found or API error. Please check for typos or try again later");
-			sendToOwner(e, embed);
+			builder.setTitle("Error");
+			builder.setDescription("Pokémon not found or API error. Please check for typos or try again later");
+			sendToOwner(e, builder);
 			return;
 		}
 
-		embed.setTitle("A wild Pokémon appeared!");
-		embed.setColor(Color.RED);
-		embed.setDescription("Type `" + getPrefix(e) + "catch <Pokémon Name>` to catch it!");
-		embed.setImage(pokemon.sprites.other.artwork.frontDefault);
-		embed.setFooter("The next Pokémon replaces this one");
-		
-		sendEmbed(e, embed, false, true);
+		manager.messages.get(e.getTextChannel().getIdLong()).delete().queue();
+		manager.spawnNewPokemon(e.getTextChannel().getIdLong(), pokemon);
 	}
 }

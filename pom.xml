@@ -37,14 +37,14 @@
 		<dependency>
 			<groupId>com.xharlock</groupId>
 			<artifactId>pokeapi4java</artifactId>
-			<version>0.0.1</version>
+			<version>0.0.2</version>
 		</dependency>
 
 		<!-- Core of the bot -->
 		<dependency>
 			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>5.0.0-alpha.5</version>
+			<version>5.0.0-alpha.6</version>
 		</dependency>
 
 		<!-- Useful stuff for JDA -->

@@ -32,6 +32,7 @@ import com.xharlock.holo.commands.owner.SayCmd;
 import com.xharlock.holo.commands.owner.ShutdownCmd;
 import com.xharlock.holo.commands.owner.StatusCmd;
 import com.xharlock.holo.games.AkinatorCmd;
+import com.xharlock.holo.games.pokemon.CatchCmd;
 import com.xharlock.holo.games.pokemon.PokedexCmd;
 import com.xharlock.holo.games.pokemon.PokemonTeamCmd;
 import com.xharlock.holo.games.pokemon.SpawnCmd;
@@ -57,6 +58,9 @@ import com.xharlock.holo.music.cmds.StopCmd;
 
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
+/**
+ * Creates instances of all the commands and manages them
+ */
 public class CommandManager extends ListenerAdapter {
 
 	private Map<String, Command> commands;
@@ -109,8 +113,10 @@ public class CommandManager extends ListenerAdapter {
 
 		// Game Cmds
 		addCommand(new AkinatorCmd("akinator", waiter));
+		addCommand(new CatchCmd("catch"));
 		addCommand(new PokedexCmd("pokedex"));
 		addCommand(new PokemonTeamCmd("pokemonteam"));
+		addCommand(new SpawnCmd("spawn"));
 		
 		// Misc Cmds
 		addCommand(new InspiroCmd("inspiro"));
