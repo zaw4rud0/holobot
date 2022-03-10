@@ -9,15 +9,15 @@ import org.json.simple.parser.ParseException;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.utils.JSONReader;
-import com.xharlock.holo.utils.JSONWriter;
+import com.xharlock.holo.utils.Writer;
+import com.xharlock.holo.utils.Reader;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class BugCmd extends Command {
 
-	private static final String filepath = "./src/main/resources/misc/bugs.json";
+	private static final String filePath = "./src/main/resources/misc/bugs.json";
 
 	public BugCmd(String name) {
 		super(name);
@@ -66,9 +66,9 @@ public class BugCmd extends Command {
 		obj.put("Bug", text);
 
 		try {
-			JSONArray array = JSONReader.readJSONArray(filepath);
+			JSONArray array = Reader.readJSONArray(filePath);
 			array.add(obj);
-			JSONWriter.writeJSONArray(array, filepath);
+			Writer.writeJSONArray(array, filePath);
 		} catch (IOException | ParseException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");

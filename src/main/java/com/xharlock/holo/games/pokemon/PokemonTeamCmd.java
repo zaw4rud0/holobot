@@ -32,7 +32,6 @@ public class PokemonTeamCmd extends Command {
 		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(getColor(e));
 		
 		// Display help page
 		if (args.length == 0) {

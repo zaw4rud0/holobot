@@ -2,12 +2,15 @@ package com.xharlock.holo.games.pokemon;
 
 import java.awt.Color;
 import java.io.IOException;
+import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
 import com.xharlock.pokeapi4java.PokeAPI;
+import com.xharlock.pokeapi4java.exception.InvalidPokedexIdException;
+import com.xharlock.pokeapi4java.exception.PokemonNotFoundException;
 import com.xharlock.pokeapi4java.model.Pokemon;
 import com.xharlock.pokeapi4java.model.PokemonSpecies;
 
@@ -20,6 +23,7 @@ public class PokedexCmd extends Command {
 		super(name);
 		setDescription("Use this command to look up a Pokémon");
 		setUsage(name + " <pokémon name or id>");
+		setAliases(List.of("dex"));
 		setIsGuildOnlyCommand(false);
 		setCommandCategory(CommandCategory.GAMES);
 	}
@@ -33,7 +37,7 @@ public class PokedexCmd extends Command {
 
 		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
-			builder.setDescription("Please provide a name!");
+			builder.setDescription("Please provide a name or a Pokédex id!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
 		}
@@ -50,14 +54,11 @@ public class PokedexCmd extends Command {
 			builder.setDescription("Something went wrong. Please try again in a few minutes!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return;
-		}
-
-		// No results, probably a typo
-		if (species.name == null) {
-			builder.setTitle("Pokémon not found");
-			builder.setDescription("Please check for typos and try again!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			return;
+		} catch (PokemonNotFoundException | InvalidPokedexIdException ex) {
+			builder.setTitle("Error");
+			builder.setDescription("Pokémon not found. Please check for typos or that you used the right Pokédex id!");
+			sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
+			return;	
 		}
 
 		// Prepare embed fields
@@ -67,8 +68,7 @@ public class PokedexCmd extends Command {
 		if (pokemon.getTypes().size() != 2) {
 			type = getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0);
 		} else {
-			type = getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0) + "\n" + getType(pokemon.getTypes().get(1)).getEmote().getAsText() + " "
-					+ pokemon.getTypes().get(1);
+			type = getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0) + "\n" + getType(pokemon.getTypes().get(1)).getEmote().getAsText() + " "	+ pokemon.getTypes().get(1);
 		}
 		String abilities = String.join("\n", pokemon.getAbilities());
 		String genderRatio = species.genderRate == -1.0 ? "100% \u26b2" : 100 - species.genderRate / 8.0 * 100 + "% \\\u2642 | " + species.genderRate / 8.0 * 100 + "% \\\u2640";
@@ -78,7 +78,6 @@ public class PokedexCmd extends Command {
 		// Set embed
 		builder.setTitle(name + " | " + "#" + species.pokedexId + " | " + gen);
 		builder.setThumbnail(pokemon.sprites.other.artwork.frontDefault);
-		builder.setColor(getColor(species.color.name));
 		builder.setDescription(species.getGenus("en"));
 		builder.addField("Type", type, true);
 		builder.addField("Ability", abilities, true);
@@ -98,7 +97,8 @@ public class PokedexCmd extends Command {
 		if (evolutionChain != null) {
 			builder.addField("Evolution", evolutionChain, false);
 		}
-		sendEmbed(e, builder, true, true);
+		
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, getColor(species.color.name));
 	}
 
 	private Color getColor(String color) {

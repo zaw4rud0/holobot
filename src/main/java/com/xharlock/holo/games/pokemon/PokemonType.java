@@ -36,14 +36,14 @@ public enum PokemonType {
 	}
 	
 	public String getName() {
-		return this.name;
+		return name;
 	}
 	
 	public Emotes getEmote() {
-		return this.emote;
+		return emote;
 	}
 	
 	public Color getColor() {
-		return this.color;
+		return color;
 	}
 }

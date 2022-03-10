@@ -14,7 +14,6 @@ public class GuildConfig {
 	private VoiceChannel musicChannel;
 	private Role djRole;
 	private String prefix;
-	private int embedColor;
 	
 	public Role getAdminRole() {
 		return adminRole;
@@ -48,19 +47,7 @@ public class GuildConfig {
 		this.prefix = prefix;
 	}
 	
-	public int getEmbedColor() {
-		return embedColor;
-	}
-	
-	public void setEmbedColor(int embedColor) {
-		this.embedColor = embedColor;
-	}
-	
 	public void setDefaultPrefix() {
 		this.prefix = Bootstrap.holo.getConfig().getDefaultPrefix();
-	}
-	
-	public void setDefaultColor() {
-		this.embedColor = Bootstrap.holo.getConfig().getDefaultColor();
 	}
 }

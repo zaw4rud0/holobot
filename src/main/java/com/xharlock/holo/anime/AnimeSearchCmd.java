@@ -1,7 +1,9 @@
 package com.xharlock.holo.anime;
 
+import java.awt.Color;
 import java.io.IOException;
-import java.util.*;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
@@ -25,13 +27,16 @@ public class AnimeSearchCmd extends Command {
 
 	public AnimeSearchCmd(String name, EventWaiter waiter) {
 		super(name);
-		setDescription("Use this command to search for an anime");
+		setDescription("Use this command to search for an anime in the database of MyAnimeList.");
 		setUsage(name + " <anime title>");
 		setExample(name + " one piece");
 		setAliases(List.of("as", "anisearch", "anime"));
+		setThumbnail("https://upload.wikimedia.org/wikipedia/commons/7/7a/MyAnimeList_Logo.png");
+		setEmbedColor(new Color(46, 81, 162));
 		setCommandCategory(CommandCategory.ANIME);
 		this.waiter = waiter;
 		
+		// TODO Refactor it into a class EventWaiter
 		numbers = Arrays.asList(
 				Emojis.ONE.getAsNormal(), 
 				Emojis.TWO.getAsNormal(), 
@@ -53,10 +58,9 @@ public class AnimeSearchCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length == 0) {
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
 			builder.setDescription("Please provide a title!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -66,11 +70,9 @@ public class AnimeSearchCmd extends Command {
 		try {
 			results = JikanAPI.searchAnime(search);
 		} catch (IOException ex) {
-			ex.printStackTrace();
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching data from the API. Please try again in a few minutes!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -84,6 +86,7 @@ public class AnimeSearchCmd extends Command {
 
 		builder.setTitle("Anime Search Results");
 		builder.setDescription(result + "\nTo select one item, please use the according reaction");
+		builder.setColor(embedColor);
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
@@ -162,6 +165,7 @@ public class AnimeSearchCmd extends Command {
 
 	private void displayAnime(MessageReceivedEvent e) {
 		EmbedBuilder builder = new EmbedBuilder();
+		
 		Anime anime = null;
 		try {
 			anime = JikanAPI.getAnime(id);
@@ -169,7 +173,7 @@ public class AnimeSearchCmd extends Command {
 			ex.printStackTrace();
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching your anime. Please try again in a few minutes!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -202,6 +206,6 @@ public class AnimeSearchCmd extends Command {
 		builder.addField("MAL Rank", malRank, true);
 		builder.addBlankField(true);
 		builder.addField("Link", "[MyAnimeList](" + anime.getUrl() + ")", false);
-		sendEmbed(e, builder, true);
+		sendEmbed(e, builder, true, embedColor);
 	}
 }

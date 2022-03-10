@@ -104,14 +104,12 @@ public class PermissionManager {
 	public boolean hasChannelPermission(MessageReceivedEvent e, Command cmd) {
 		EmbedBuilder builder = new EmbedBuilder();
 		if (e.isFromType(ChannelType.PRIVATE) && cmd.isGuildOnlyCommand()) {
-			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("No Permission");
 			builder.setDescription("You are not allowed to use this command in a private chat!");
 			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return false;
 		}
 		if (e.isFromGuild() && !e.getTextChannel().isNSFW() && cmd.isNSFW()) {
-			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("NSFW Command");
 			builder.setDescription("You can't use a NSFW command in a non-NSFW channel, p-pervert!");
 			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -125,7 +123,6 @@ public class PermissionManager {
 
 		// Checks if user is bot-owner and can use owner-only commands
 		if (cmd.isOwnerCommand() && e.getAuthor().getIdLong() != Bootstrap.holo.getConfig().getOwnerId()) {
-			cmd.addErrorReaction(e.getMessage());
 			builder.setTitle("No Permission");
 			builder.setDescription("This command is owner-only");
 			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -137,7 +134,6 @@ public class PermissionManager {
 			Role admin = Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getAdminRole();
 			if (admin == null) {
 				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor())) {
-					cmd.addErrorReaction(e.getMessage());
 					builder.setTitle("No Permission");
 					builder.setDescription("This command is admin-only");
 					cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -145,7 +141,6 @@ public class PermissionManager {
 				}
 			} else {
 				if (cmd.isAdminCommand() && !e.getGuild().getOwner().getUser().equals(e.getAuthor()) && !e.getGuild().getMember(e.getAuthor()).getRoles().contains(admin)) {
-					cmd.addErrorReaction(e.getMessage());
 					builder.setTitle("No Permission");
 					builder.setDescription("This command is admin-only");
 					cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);

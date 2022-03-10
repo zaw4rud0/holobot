@@ -5,7 +5,6 @@ import com.google.gson.annotations.SerializedName;
 import net.dv8tion.jda.api.entities.Message;
 
 public class MessageToDelete {
-
 	@SerializedName("channel_id")
 	long channelId;
 	@SerializedName("message_id")

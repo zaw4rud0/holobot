@@ -22,7 +22,6 @@ import com.xharlock.pokeapi4java.model.Pokemon;
 public final class PokemonTeam {
 
 	private PokemonTeam() {
-		
 	}
 	
 	/**

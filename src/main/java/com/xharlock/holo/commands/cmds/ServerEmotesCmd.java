@@ -17,7 +17,7 @@ public class ServerEmotesCmd extends Command {
 
 	public ServerEmotesCmd(String name) {
 		super(name);
-		setDescription("Use this command to view all emotes of the server");
+		setDescription("Use this command to view all emotes of the server.");
 		setUsage(name);
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GENERAL);
@@ -41,7 +41,9 @@ public class ServerEmotesCmd extends Command {
 		List<String> animated = new ArrayList<>();
 
 		for (Emote em : emotes) {
-			if (em.isAnimated()) {
+			if (!em.canInteract(e.getGuild().getSelfMember())) {
+				continue;
+			} else if (em.isAnimated()) {
 				animated.add(em.getAsMention().toLowerCase(Locale.UK));
 			} else {
 				normal.add(em.getAsMention().toLowerCase(Locale.UK));

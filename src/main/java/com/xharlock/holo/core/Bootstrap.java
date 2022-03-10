@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.xharlock.holo.config.Config;
-import com.xharlock.holo.utils.JSONReader;
+import com.xharlock.holo.utils.Reader;
 
 public final class Bootstrap {
 
@@ -49,7 +49,7 @@ public final class Bootstrap {
 	 * Deserializes the config file to a {@link Config} object.
 	 */
 	private static Config initializeConfig() throws IOException, ParseException {
-		String json = JSONReader.readJSONObject("config.json").toJSONString();
+		String json = Reader.readJSONObject("config.json").toJSONString();
 		return new Gson().fromJson(json, Config.class);
 	}
 }

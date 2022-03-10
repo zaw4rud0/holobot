@@ -24,14 +24,14 @@ public class JoinCmd extends MusicCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 		AudioManager audioManager = e.getGuild().getAudioManager();
 		
-		if (isBotInChannel(e)) {
+		if (isBotInAudioChannel(e)) {
 			builder.setTitle("Error");
 			builder.setDescription("I'm already in a voice channel!\nJoin me in <#" + e.getGuild().getSelfMember().getVoiceState().getChannel().getIdLong() + ">");
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);
 			return;
 		}
 
-		if (!isUserInChannel(e)) {
+		if (!isUserInAudioChannel(e)) {
 			builder.setTitle("Not in a voice channel!");
 			builder.setDescription("Please join a voice channel first");
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);

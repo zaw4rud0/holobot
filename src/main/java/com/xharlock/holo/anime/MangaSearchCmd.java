@@ -1,5 +1,6 @@
 package com.xharlock.holo.anime;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +27,16 @@ public class MangaSearchCmd extends Command {
 
 	public MangaSearchCmd(String name, EventWaiter waiter) {
 		super(name);
-		setDescription("Use this command to search for a manga");
+		setDescription("Use this command to search for a manga in the database of MyAnimeList.");
 		setUsage(name + " <manga title>");
 		setExample(name + " black clover");
 		setAliases(List.of("ms", "manga"));
+		setThumbnail("https://upload.wikimedia.org/wikipedia/commons/7/7a/MyAnimeList_Logo.png");
+		setEmbedColor(new Color(46, 81, 162));
 		setCommandCategory(CommandCategory.ANIME);
 		this.waiter = waiter;
 		
+		// TODO Refactor it into a class EventWaiter
 		numbers = Arrays.asList(
 				Emojis.ONE.getAsNormal(), 
 				Emojis.TWO.getAsNormal(), 
@@ -54,10 +58,9 @@ public class MangaSearchCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length == 0) {
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
 			builder.setDescription("Please provide a title!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -68,10 +71,9 @@ public class MangaSearchCmd extends Command {
 			results = JikanAPI.searchManga(search);
 		} catch (IOException ex) {
 			ex.printStackTrace();
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching data from the API. Please try again in a few minutes!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -85,7 +87,8 @@ public class MangaSearchCmd extends Command {
 
 		builder.setTitle("Manga Search Results");
 		builder.setDescription(result + "\nTo select one item, please use the according reaction");
-
+		builder.setColor(embedColor);
+		
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
 			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {}, err -> {});
@@ -170,7 +173,7 @@ public class MangaSearchCmd extends Command {
 			ex.printStackTrace();
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching your manga. Please try again in a few minutes!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -204,6 +207,6 @@ public class MangaSearchCmd extends Command {
 		builder.addField("MAL Rank", malRank, true);
 		builder.addBlankField(true);
 		builder.addField("Link", "[MyAnimeList](" + manga.getUrl() + ")", false);
-		sendEmbed(e, builder, true);
+		sendEmbed(e, builder, true, embedColor);
 	}
 }

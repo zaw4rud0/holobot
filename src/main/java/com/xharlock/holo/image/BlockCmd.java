@@ -1,15 +1,18 @@
 package com.xharlock.holo.image;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.database.DatabaseOPs;
+import com.xharlock.holo.database.Database;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class BlockCmd extends Command {
@@ -26,8 +29,8 @@ public class BlockCmd extends Command {
 		
 		// Get the blocked images from the DB
 		try {
-			blocked = DatabaseOPs.getBlockedImages();
-			blockRequests = DatabaseOPs.getBlockRequests();
+			blocked = getBlockedImages();
+			blockRequests = getBlockRequests();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
@@ -74,7 +77,7 @@ public class BlockCmd extends Command {
 		}
 
 		try {
-			DatabaseOPs.addBlockedImage(url, e.getAuthor(), e.getMessage().getTimeCreated().toString());
+			addBlockedImage(url, e.getAuthor(), e.getMessage().getTimeCreated().toString());
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
@@ -110,7 +113,7 @@ public class BlockCmd extends Command {
 		}
 		
 		try {
-			DatabaseOPs.addBlockRequest(url, e.getAuthor(), e.getMessage().getTimeCreated().toString());
+			addBlockRequest(url, e.getAuthor(), e.getMessage().getTimeCreated().toString());
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
@@ -129,7 +132,7 @@ public class BlockCmd extends Command {
 	}
 	
 	/**
-	 * TODO: Method to view the block requests
+	 * TODO: View the block requests
 	 */
 	@SuppressWarnings("unused")
 	private void viewRequests() {
@@ -137,26 +140,76 @@ public class BlockCmd extends Command {
 	}
 	
 	/**
-	 * Method to get the url from a referenced message
+	 * Add a new image to the blocklist into the DB
+	 */
+	public boolean addBlockedImage(String url, User user, String date) throws SQLException {
+		String s = "Insert into BlockedImages (Url, DiscordUser, Date) VALUES "
+				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
+		Database.connect();
+		boolean success = Database.execute(s);
+		Database.disconnect();
+		return success;
+	}
+	
+	/**
+	 * Get a list of the blocked images from the DB
+	 */
+	public static List<String> getBlockedImages() throws SQLException {
+		String s = "SELECT Url FROM BlockedImages";
+		Database.connect();
+		ResultSet rs = Database.query(s);
+		List<String> urls = new ArrayList<>();
+		while (rs.next()) {
+			urls.add(rs.getString("Url"));
+		}
+		Database.disconnect();	
+		return urls;
+	}
+	
+	/**
+	 * Add a requested block into the DB
+	 */
+	public static boolean addBlockRequest(String url, User user, String date) throws SQLException {
+		String s = "Insert into BlockRequests (Url, DiscordUser, Date) VALUES "
+				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
+		Database.connect();
+		boolean success = Database.execute(s);
+		Database.disconnect();
+		return success;
+	}
+	
+	/**
+	 * Get a list of requested blocks from the DB
+	 */
+	public static List<String> getBlockRequests() throws SQLException {
+		String s = "SELECT Url FROM BlockRequests";
+		Database.connect();
+		ResultSet rs = Database.query(s);
+		List<String> urls = new ArrayList<>();
+		while (rs.next()) {
+			urls.add(rs.getString("Url"));
+		}
+		Database.disconnect();
+		return urls;
+	}
+	
+	/**
+	 * Get the url from a referenced message
 	 */
 	private String getUrl(Message msg) {
 		String url = null;
-		
 		// Check if image is an attachment
 		if (msg.getAttachments().size() != 0) {
 			url = msg.getAttachments().get(0).getUrl();
 		}
-
 		// Check if image is in embed
 		else if (msg.getEmbeds().size() > 0) {
 			url = msg.getEmbeds().get(0).getImage().getUrl();
 		}
-
 		// Image url is likely text of message
 		else if (isValidURL(msg.getContentRaw())) {
 			url = msg.getContentRaw();
 		}
-		
 		return url;
 	}
 }

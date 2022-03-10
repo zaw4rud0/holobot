@@ -20,6 +20,7 @@ import com.xharlock.holo.config.Config;
 import com.xharlock.holo.config.GuildConfigManager;
 import com.xharlock.holo.games.pokemon.PokemonSpawnManager;
 import com.xharlock.holo.misc.BotHandler;
+import com.xharlock.holo.misc.GuildListener;
 import com.xharlock.holo.misc.Misc;
 
 import net.dv8tion.jda.api.JDA;
@@ -80,7 +81,7 @@ public class Holo {
 	}
 
 	public void registerListeners() {
-		jda.addEventListener(new CommandListener(commandManager), new BotHandler(), new Misc());
+		jda.addEventListener(new CommandListener(commandManager), new BotHandler(), new Misc(), new GuildListener());
 	}
 
 	public JDA getJDA() {
@@ -136,7 +137,11 @@ class Listener extends ListenerAdapter {
 		MessageToDelete[] msgs = new Gson().fromJson(s, MessageToDelete[].class);
 
 		for (MessageToDelete msg : msgs) {
-			Bootstrap.holo.getJDA().getTextChannelById(msg.channelId).retrieveMessageById(msg.messageId).complete().delete().queue();
+			try {
+				Bootstrap.holo.getJDA().getTextChannelById(msg.channelId).retrieveMessageById(msg.messageId).complete().delete().queue();
+			} catch (Exception ex) {
+				continue;
+			}
 		}
 	}
 }

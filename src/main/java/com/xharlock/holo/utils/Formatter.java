@@ -36,13 +36,16 @@ public final class Formatter {
 	}
 
 	/**
-	 * Method to turn a given amount of milliseconds to a date and time
+	 * Turns a given amount of milliseconds to a date and time
 	 */
 	public static String formatDateTime(long millis) {
 		DateFormat f = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.GERMANY);
 		return f.format(new Date(millis));
 	}
 
+	/**
+	 * Returns the same String but with the first letter in uppercase
+	 */
 	public static String capitalize(String string) {
 		return string.substring(0, 1).toUpperCase(Locale.UK) + string.substring(1);
 	}

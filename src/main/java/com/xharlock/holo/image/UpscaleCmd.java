@@ -26,7 +26,6 @@ public class UpscaleCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {		
 		deleteInvoke(e);
-		sendTyping(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		String oldUrl = "";
@@ -51,6 +50,8 @@ public class UpscaleCmd extends Command {
 			oldUrl = args[0].replace("<", "").replace(">", "");
 		}
 
+		sendTyping(e);
+		
 		String imgUrl = "";
 
 		try {
@@ -80,5 +81,4 @@ public class UpscaleCmd extends Command {
 		reader.close();
 		return JsonParser.parseString(result).getAsJsonObject().get("output_url").getAsString();
 	}
-
 }

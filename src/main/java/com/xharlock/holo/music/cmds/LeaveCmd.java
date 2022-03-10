@@ -25,7 +25,7 @@ public class LeaveCmd extends MusicCommand {
 		
 		EmbedBuilder builder = new EmbedBuilder();
 
-		if (!isBotInChannel(e)) {
+		if (!isBotInAudioChannel(e)) {
 			builder.setTitle("Error");
 			builder.setDescription("I'm not in any voice channel!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);

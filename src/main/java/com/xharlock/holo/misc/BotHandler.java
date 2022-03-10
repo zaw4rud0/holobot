@@ -1,6 +1,7 @@
 package com.xharlock.holo.misc;
 
 import java.util.Locale;
+import java.util.Random;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -17,9 +18,11 @@ public class BotHandler extends ListenerAdapter {
 			return;
 		}
 
+		// General Kenobi meme
+		String[] replies = {"General Kenobi", "Genewal Kenowi UwU", "General Kenobi-chan", "OwO"};
+		
 		if (e.getMessage().getContentRaw().toLowerCase(Locale.UK).contains("hello there")) {
-			e.getMessage().reply("General Kenobi").queue();
-			return;
+			e.getMessage().reply(replies[new Random().nextInt(replies.length)]).queue();
 		}
 	}
 }

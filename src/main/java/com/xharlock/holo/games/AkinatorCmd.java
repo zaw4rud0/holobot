@@ -1,5 +1,6 @@
 package com.xharlock.holo.games;
 
+import java.awt.Color;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
@@ -41,6 +42,7 @@ public class AkinatorCmd extends Command {
 				+ "After some questions Akinator will try to guess your character.");
 		setUsage(name);
 		setCmdCooldown(300);
+		setEmbedColor(new Color(112,28,84));
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GAMES);
 
@@ -65,7 +67,7 @@ public class AkinatorCmd extends Command {
 		if (busy) {
 			builder.setTitle("Busy");
 			builder.setDescription("I'm currently busy, please wait until I'm done!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
@@ -74,7 +76,7 @@ public class AkinatorCmd extends Command {
 		} catch (ServerNotFoundException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Failed to connect. Please try again later!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 		busy = true;
@@ -86,10 +88,11 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprite.DEFAULT.getUrl());
+		builder.setColor(embedColor);
 		builder.setDescription("To start the game, please think about a real or fictional character. I will try to guess who it is by asking some questions." + "\nIf you are ready, please react with "
 				+ Emotes.TICK.getAsText() + ", or if you want to cancel the game, react with " + Emotes.CROSS.getAsText() + ".");
 
-		Message msg = sendEmbedAndGetMessage(e, builder, true);
+		Message msg = e.getChannel().sendMessageEmbeds(builder.build()).complete();
 		addStartReactions(msg);
 
 		waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
@@ -124,7 +127,6 @@ public class AkinatorCmd extends Command {
 			msg.delete().queue();
 			cleanup();
 		});
-
 	}
 
 	private void inGame(MessageReceivedEvent e, Message msg) {
@@ -136,9 +138,9 @@ public class AkinatorCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(getColor(e));
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		builder.setThumbnail(AkinatorSprite.START.getUrl());
+		builder.setColor(embedColor);
 		builder.setDescription("**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
 		builder.addField("Answers", ":one: Yes\n" + ":two: No\n" + ":three: I don't know\n" + ":four: Probably\n" + ":five: Probably not", false);
 		builder.addField("Other", Emotes.UNDO.getAsText() + " Undo last answer\n" + Emotes.CROSS.getAsText() + " Cancel game", false);
@@ -256,8 +258,8 @@ public class AkinatorCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(getColor(e));
 		builder.setThumbnail(AkinatorSprite.GUESSING.getUrl());
+		builder.setColor(embedColor);
 		builder.setFooter(e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
 
 		if (guess.getDescription() == null || guess.getDescription().equals("null")) {
@@ -312,7 +314,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprite.VICTORY.getUrl());
-		builder.setColor(getColor(e));
+		builder.setColor(embedColor);
 		builder.setDescription("Great, guessed right one more time!\n" + "It took me `" + counter.get() + "` questions to correctly guess " + right.getName());
 		if (right.getImage() != null) {
 			builder.setImage(right.getImage().toString());
@@ -328,7 +330,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprite.DEFEAT.getUrl());
-		builder.setColor(getColor(e));
+		builder.setColor(embedColor);
 		builder.setDescription("Congratulations " + e.getAuthor().getAsMention() + ", you managed to defeat me!");
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		msg.editMessageEmbeds(builder.build()).queue();
@@ -340,8 +342,8 @@ public class AkinatorCmd extends Command {
 		msg.clearReactions().queue();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
-		builder.setColor(getColor(e));
 		builder.setThumbnail(AkinatorSprite.CANCEL.getUrl());
+		builder.setColor(embedColor);
 		builder.setDescription(e.getAuthor().getAsMention() + " cancelled the game.\nSee you soon!");
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		msg.editMessageEmbeds(builder.build()).queue();
@@ -361,7 +363,7 @@ public class AkinatorCmd extends Command {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Error");
 		builder.setDescription("Something went wrong");
-		sendEmbed(e, builder, 15, TimeUnit.MINUTES, false);
+		sendEmbed(e, builder, 15, TimeUnit.MINUTES, false, embedColor);
 	}
 
 	private void addStartReactions(Message msg) {
@@ -439,5 +441,32 @@ class Reaction {
 	public Reaction(String emote, Answer answer) {
 		this.emote = emote;
 		this.answer = answer;
+	}
+}
+
+@Deprecated
+enum AkinatorSprite {
+	DEFAULT("https://media.discordapp.net/attachments/824916413139124254/824917438062919740/akinator_default.png"),
+	START("https://media.discordapp.net/attachments/824916413139124254/824927512827527178/akinator_start.png"),	
+	THINKING_1("https://media.discordapp.net/attachments/824916413139124254/824917445125865472/akinator_thinking_1.png"),
+	THINKING_2("https://media.discordapp.net/attachments/824916413139124254/824917445629575168/akinator_thinking_2.png"),
+	THINKING_3("https://media.discordapp.net/attachments/824916413139124254/824917447999750144/akinator_thinking_3.png"),
+	THINKING_4("https://media.discordapp.net/attachments/824916413139124254/824927627483545610/akinator_thinking_4.png"),
+	THINKING_5("https://media.discordapp.net/attachments/824916413139124254/824927631589376010/akinator_thinking_5.png"),
+	THINKING_6("https://media.discordapp.net/attachments/824916413139124254/824927633992581130/akinator_thinking_6.png"),
+	SHOCKED("https://media.discordapp.net/attachments/824916413139124254/824927453982097418/akinator_shocked.png"),
+	DEFEAT("https://media.discordapp.net/attachments/824916413139124254/824917439242043412/akinator_defeat.png"),
+	GUESSING("https://media.discordapp.net/attachments/824916413139124254/824917441557299220/akinator_guessing.png"),
+	VICTORY("https://media.discordapp.net/attachments/824916413139124254/824917454647721984/akinator_victory.png"),
+	CANCEL("https://media.discordapp.net/attachments/824916413139124254/824927268140089415/akinator_cancel.png");
+	
+	private String url;
+	
+	AkinatorSprite(String url) {
+		this.url = url;
+	}
+	
+	public String getUrl() {
+		return this.url;
 	}
 }

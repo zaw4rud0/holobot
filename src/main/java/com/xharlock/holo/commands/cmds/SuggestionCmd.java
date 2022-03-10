@@ -10,15 +10,15 @@ import org.json.simple.parser.ParseException;
 
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.utils.JSONReader;
-import com.xharlock.holo.utils.JSONWriter;
+import com.xharlock.holo.utils.Writer;
+import com.xharlock.holo.utils.Reader;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 public class SuggestionCmd extends Command {
 
-	private static final String filepath = "./src/main/resources/misc/suggestions.json";
+	private static final String filePath = "./src/main/resources/misc/suggestions.json";
 	
 	public SuggestionCmd(String name) {
 		super(name);
@@ -68,9 +68,9 @@ public class SuggestionCmd extends Command {
 		obj.put("Suggestion", text);
 
 		try {
-			JSONArray array = JSONReader.readJSONArray(filepath);
+			JSONArray array = Reader.readJSONArray(filePath);
 			array.add(obj);
-			JSONWriter.writeJSONArray(array, filepath);
+			Writer.writeJSONArray(array, filePath);
 		} catch (IOException | ParseException e1) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
@@ -82,5 +82,4 @@ public class SuggestionCmd extends Command {
 		builder.setDescription("Thank you for your suggestion!");
 		sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 	}
-
 }

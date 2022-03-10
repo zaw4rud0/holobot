@@ -54,7 +54,7 @@ public class SkipCmd extends MusicCommand {
 		}
 
 		// Check vc conditions (user and bot in same vc, etc.)
-		if (!isUserInSameChannel(e)) {
+		if (!isUserInSameAudioChannel(e)) {
 			builder.setTitle("Not in same voice channel!");
 			builder.setDescription("You need to be in the same voice channel as me!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);

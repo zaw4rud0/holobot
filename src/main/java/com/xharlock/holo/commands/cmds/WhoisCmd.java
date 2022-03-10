@@ -1,5 +1,6 @@
 package com.xharlock.holo.commands.cmds;
 
+import java.awt.Color;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
@@ -63,17 +64,19 @@ public class WhoisCmd extends Command {
 			String type = user.isBot() ? "Bot" : "User";
 			builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
 
-			sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
+			sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, null);
 			return;
 		}
 
-		builder.addField("Nickname", "`" + member.getEffectiveName() + "`", false);
+		builder.setDescription("`" + member.getEffectiveName() + "` " + member.getAsMention());
 
 		var localDateTime = LocalDateTime.ofInstant(member.getTimeJoined().toInstant(), ZoneId.of("Europe/Zurich"));
 		String s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
 
 		builder.addField("Join Date", "`" + s + "`", false);
 
+		Color embedColor = member.getColor();
+		
 		List<Role> roles = member.getRoles();
 
 		// Member has no roles in this guild
@@ -124,13 +127,13 @@ public class WhoisCmd extends Command {
 			}
 			builder.addField("Roles", rolesString, false);
 		}
-
+		
 		localDateTime = LocalDateTime.ofInstant(user.getTimeCreated().toInstant(), ZoneId.of("Europe/Zurich"));
 		s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
 		String type = user.isBot() ? "Bot" : "User";
 
 		builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, embedColor);
 	}
 
 	/**

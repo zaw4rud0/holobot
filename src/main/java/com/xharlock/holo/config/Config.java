@@ -1,5 +1,6 @@
 package com.xharlock.holo.config;
 
+import java.awt.Color;
 import java.util.List;
 
 import com.google.gson.annotations.SerializedName;
@@ -79,8 +80,8 @@ public class Config {
 		this.defaultPrefix = prefix;
 	}
 
-	public int getDefaultColor() {
-		return defaultColor;
+	public Color getDefaultColor() {
+		return new Color(defaultColor);
 	}
 
 	public void setDefaultColor(int color) {

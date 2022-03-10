@@ -23,10 +23,9 @@ public class PlayCmd extends MusicCommand {
 		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(getColor(e));
 		builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()),	e.getAuthor().getEffectiveAvatarUrl());
 		
-		if (!isUserInSameChannel(e)) {
+		if (!isUserInSameAudioChannel(e)) {
 			builder.setTitle("Not in same voice channel!");
 			builder.setDescription("You need to be in the same voice channel as me!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);

@@ -17,7 +17,6 @@ public class GuildConfigManager {
 		if (!hasConfig(guild)) {
 			GuildConfig guildConfig = new GuildConfig();
 			guildConfig.setDefaultPrefix();
-			guildConfig.setDefaultColor();
 			guildConfigs.put(guild.getIdLong(), guildConfig);
 		}		
 		return guildConfigs.get(guild.getIdLong());

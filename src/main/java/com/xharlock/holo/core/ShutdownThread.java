@@ -29,6 +29,7 @@ public class ShutdownThread extends Thread {
 		// Adds msgs to be deleted when the bot is online again
 		List<Message> toDelete = new ArrayList<>();
 		toDelete.addAll(holo.getPokemonSpawnManager().messages.values());
+		
 		writeToFile(toDelete);
 	}
 	

@@ -8,6 +8,7 @@ import java.util.concurrent.TimeUnit;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.pokeapi4java.exception.PokemonNotFoundException;
 import com.xharlock.pokeapi4java.model.Pokemon;
 import com.xharlock.pokeapi4java.model.PokemonSpecies;
 
@@ -39,6 +40,7 @@ public class CatchCmd extends Command {
 		
 		Pokemon pokemon = getCurrentPokemon(e.getTextChannel().getIdLong());
 		PokemonSpecies species = null;
+		
 		try {
 			species = pokemon.getPokemonSpecies();
 		} catch (IOException ex) {
@@ -47,15 +49,12 @@ public class CatchCmd extends Command {
 			builder.setDescription("API error. Please try again later");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
 			return;
-		}
-		
-		// No Pokémon in this channel
-		if (species == null) {
+		} catch (PokemonNotFoundException ex) {
+			ex.printStackTrace();
 			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Error");
-			builder.setDescription("This channel doesn't have a Pokémon");
+			builder.setTitle("Internal Error");
+			builder.setDescription("Uh-oh! This wasn't supposed to happen. Please submit a bug report with the name of this Pokémon and the id of the channel where this happened.");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
-			return;
 		}
 		
 		String guessed = String.join(" ", args).toLowerCase(Locale.UK);

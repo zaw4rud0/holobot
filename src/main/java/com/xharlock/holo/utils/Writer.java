@@ -6,9 +6,9 @@ import java.io.IOException;
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 
-public final class JSONWriter {
+public final class Writer {
 
-	private JSONWriter() {
+	private Writer() {
 	}
 	
 	public static void writeJSONObject(JSONObject obj, String filePath) throws IOException {

@@ -45,7 +45,7 @@ public class CheckNSFWCmd extends Command {
 		sendTyping(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setColor(getColor(e));
+		
 		if (e.isFromGuild()) {
 			builder.setFooter("Invoked by " + e.getMember().getEffectiveName(), e.getAuthor().getEffectiveAvatarUrl());
 		}

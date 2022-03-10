@@ -29,7 +29,6 @@ public class HelpCmd extends Command {
 
 		// Given command doesn't exist
 		if (args.length >= 1 && !manager.isValidName(args[0])) {
-			addErrorReaction(e.getMessage());
 			builder.setTitle("Command not found");
 			builder.setDescription("Please check for typos and try again!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
@@ -64,7 +63,7 @@ public class HelpCmd extends Command {
 				}
 				builder.addField("Aliases", aliases, false);
 			}
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true, cmd.getEmbedColor());
 			return;
 		}
 

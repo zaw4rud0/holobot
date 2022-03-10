@@ -14,6 +14,7 @@ import com.xharlock.holo.commands.cmds.BugCmd;
 import com.xharlock.holo.commands.cmds.HelpCmd;
 import com.xharlock.holo.commands.cmds.InfoBotCmd;
 import com.xharlock.holo.commands.cmds.InspiroCmd;
+import com.xharlock.holo.commands.cmds.Magic8BallCmd;
 import com.xharlock.holo.commands.cmds.PingCmd;
 import com.xharlock.holo.commands.cmds.ServerEmotesCmd;
 import com.xharlock.holo.commands.cmds.ServerInfoCmd;
@@ -119,6 +120,7 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new SpawnCmd("spawn"));
 		
 		// Misc Cmds
+		addCommand(new Magic8BallCmd("8ball"));
 		addCommand(new InspiroCmd("inspiro"));
 		addCommand(new UwuCmd("uwu"));
 		addCommand(new XkcdCmd("xkcd"));

@@ -8,6 +8,7 @@ import java.util.Map;
 
 import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.pokeapi4java.PokeAPI;
+import com.xharlock.pokeapi4java.exception.InvalidPokedexIdException;
 import com.xharlock.pokeapi4java.model.Pokemon;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -47,7 +48,7 @@ public class PokemonSpawnManager {
 			Pokemon pokemon = null;
 			try {
 				pokemon = PokeAPI.getRandomPokemon();
-			} catch (IOException e) {
+			} catch (IOException | InvalidPokedexIdException e) {
 				e.printStackTrace();
 			}
 
@@ -64,7 +65,7 @@ public class PokemonSpawnManager {
 		Pokemon pokemon = null;
 		try {
 			pokemon = PokeAPI.getRandomPokemon();
-		} catch (IOException e) {
+		} catch (IOException | InvalidPokedexIdException e) {
 			e.printStackTrace();
 		}
 

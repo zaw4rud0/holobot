@@ -1,5 +1,6 @@
 package com.xharlock.holo.image;
 
+import java.awt.Color;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -40,9 +41,11 @@ public class AvatarCmd extends Command {
 		
 		String name = member != null ? member.getEffectiveName() : user.getName();
 		String url = user.getEffectiveAvatarUrl() + "?size=512";
-		builder.setTitle(name + "'s Avatar", url);
+		Color embedColor = member != null ? member.getColor() : null;
+		
+		builder.setTitle("Avatar of " + name, url);
 		builder.setImage(url);
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true);
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, embedColor);
 	}
 	
 	/**

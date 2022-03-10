@@ -53,5 +53,4 @@ public class NowCmd extends MusicCommand {
 		
 		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 	}
-
 }

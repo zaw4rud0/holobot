@@ -1,5 +1,6 @@
 package com.xharlock.holo.commands.core;
 
+import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -8,7 +9,6 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.core.Bootstrap;
-import com.xharlock.holo.misc.Emojis;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,14 +24,15 @@ public abstract class Command {
 	protected String description;
 	protected String usage;
 	protected String example;
-	protected String thumbnail_url;
 	protected List<String> aliases = new ArrayList<>();
-	protected String[] args;
-
+	protected String thumbnailUrl;
+	protected Color embedColor = getDefaultColor();
 	protected boolean isOwnerCommand = false;
 	protected boolean isAdminCommand = false;
 	protected boolean isNSFW = false;
 	protected boolean isGuildOnly = false;
+
+	protected String[] args;
 
 	/** Cooldown in seconds */
 	protected int cooldownDuration = 0;
@@ -45,14 +46,6 @@ public abstract class Command {
 
 	public abstract void onCommand(MessageReceivedEvent e);
 
-	protected void addSuccessReaction(Message msg) {
-		msg.addReaction(Emojis.THUMBSUP.getAsBrowser());
-	}
-
-	protected void addErrorReaction(Message msg) {
-		msg.addReaction(Emojis.THUMBSDOWN.getAsBrowser());
-	}
-
 	protected String getPrefix(MessageReceivedEvent e) {
 		if (e.isFromGuild()) {
 			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getGuildPrefix();
@@ -61,16 +54,9 @@ public abstract class Command {
 		}
 	}
 
-	/**
-	 * Method to get the embed color of a guild or the default bot embed color if
-	 * it's in a private channel
-	 */
-	protected int getColor(MessageReceivedEvent e) {
-		if (e.isFromGuild()) {
-			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getEmbedColor();
-		} else {
-			return Bootstrap.holo.getConfig().getDefaultColor();
-		}
+	/** Returns the default color of the bot */
+	protected Color getDefaultColor() {
+		return Bootstrap.holo.getConfig().getDefaultColor();
 	}
 
 	// TODO
@@ -86,29 +72,23 @@ public abstract class Command {
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		builder.setColor(getColor(e));
-
+		builder.setColor(getDefaultColor());
 		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		}
-
 		e.getChannel().sendMessageEmbeds(builder.build()).queue();
 	}
 
-	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer, boolean color) {
-		if (!color) {
-			builder.setColor(getColor(e));
-		}
-
+	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer, Color color) {
+		builder.setColor(color);
 		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		}
-
 		e.getChannel().sendMessageEmbeds(builder.build()).queue();
 	}
 
 	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
-		builder.setColor(getColor(e));
+		builder.setColor(getDefaultColor());
 
 		if (e.isFromGuild()) {
 			if (footer) {
@@ -122,18 +102,31 @@ public abstract class Command {
 		}
 	}
 
-	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		builder.setColor(getColor(e));
+	protected void sendEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer, Color color) {
+		builder.setColor(color);
 
+		if (e.isFromGuild()) {
+			if (footer) {
+
+			}
+			e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
+				msg.delete().queueAfter(delay, unit);
+			});
+		} else {
+			e.getChannel().sendMessageEmbeds(builder.build()).queue();
+		}
+	}
+
+	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
+		builder.setColor(getDefaultColor());
 		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		}
-
 		e.getMessage().getReferencedMessage().replyEmbeds(builder.build()).queue();
 	}
 
 	protected void sendReplyEmbed(MessageReceivedEvent e, EmbedBuilder builder, long delay, TimeUnit unit, boolean footer) {
-		builder.setColor(getColor(e));
+		builder.setColor(getDefaultColor());
 
 		if (e.isFromGuild()) {
 			if (footer) {
@@ -148,12 +141,10 @@ public abstract class Command {
 	}
 
 	protected Message sendEmbedAndGetMessage(MessageReceivedEvent e, EmbedBuilder builder, boolean footer) {
-		builder.setColor(getColor(e));
-
+		builder.setColor(getDefaultColor());
 		if (e.isFromGuild() && footer) {
 			builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 		}
-			
 		return e.getChannel().sendMessageEmbeds(builder.build()).complete();
 	}
 
@@ -169,19 +160,15 @@ public abstract class Command {
 			e.getMessage().delete().queue();
 		}
 	}
-	
+
 	protected void sendTyping(MessageReceivedEvent e) {
 		e.getChannel().sendTyping().queue();
 	}
-	
+
 	public String getName() {
 		return name;
 	}
-
-	protected void setName(String name) {
-		this.name = name;
-	}
-
+	
 	public CommandCategory getCommandCategory() {
 		return category;
 	}
@@ -215,11 +202,19 @@ public abstract class Command {
 	}
 
 	public String getThumbnail() {
-		return thumbnail_url;
+		return thumbnailUrl;
 	}
 
 	protected void setThumbnail(String url) {
-		this.thumbnail_url = url;
+		thumbnailUrl = url;
+	}
+
+	public Color getEmbedColor() {
+		return embedColor;
+	}
+
+	protected void setEmbedColor(Color color) {
+		embedColor = color;
 	}
 
 	public List<String> getAliases() {

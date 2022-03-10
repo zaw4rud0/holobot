@@ -6,6 +6,8 @@ import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.pokeapi4java.PokeAPI;
+import com.xharlock.pokeapi4java.exception.InvalidPokedexIdException;
+import com.xharlock.pokeapi4java.exception.PokemonNotFoundException;
 import com.xharlock.pokeapi4java.model.Pokemon;
 import com.xharlock.pokeapi4java.model.PokemonSpecies;
 
@@ -40,28 +42,29 @@ public class SpawnCmd extends Command {
 			// Spawn random Pokémon
 			if (args.length == 0 || args.length == 1 && args[0].equals("random")) {
 				species = PokeAPI.getRandomPokemonSpecies();
+				manager.messages.get(e.getTextChannel().getIdLong()).delete().queue();
 			}
-
-			// Make Pokémons spawn in the TextChannel
+			// Make Pokémons spawn in a new text channel
 			else if (args[0].equals("add")) {
-				
-				// TODO				
-				
+				species = PokeAPI.getRandomPokemonSpecies();
 			}
-
 			// Spawn specific Pokémon
 			else {
 				species = PokeAPI.getPokemonSpecies(args[0]);
+				manager.messages.get(e.getTextChannel().getIdLong()).delete().queue();
 			}
 			pokemon = species.getPokemon();
 		} catch (IOException ex) {
 			builder.setTitle("Error");
-			builder.setDescription("Pokémon not found or API error. Please check for typos or try again later");
+			builder.setDescription("API error. Please try again later.");
+			sendToOwner(e, builder);
+			return;
+		} catch (InvalidPokedexIdException | PokemonNotFoundException ex) {
+			builder.setTitle("Error");
+			builder.setDescription("Pokémon not found. Please check for typos.");
 			sendToOwner(e, builder);
 			return;
 		}
-
-		manager.messages.get(e.getTextChannel().getIdLong()).delete().queue();
 		manager.spawnNewPokemon(e.getTextChannel().getIdLong(), pokemon);
 	}
 }

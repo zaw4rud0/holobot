@@ -3,6 +3,7 @@ package com.xharlock.holo.image;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -13,7 +14,6 @@ import com.google.gson.JsonObject;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
 import com.xharlock.holo.database.Database;
-import com.xharlock.holo.database.DatabaseOPs;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -32,7 +32,7 @@ public class ImageCmd extends Command {
 
 		// Get waifus from DB
 		try {
-			names = DatabaseOPs.getWaifuNames();
+			names = getWaifuNames();
 			Collections.sort(names);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -57,10 +57,8 @@ public class ImageCmd extends Command {
 					+ "Title: " + title + "\n");
 			
 			try {
-				DatabaseOPs.insertWaifu(name, tag, title);
-			} 
-			// Something went wrong
-			catch (SQLException ex) {
+				insertWaifu(name, tag, title);
+			} catch (SQLException ex) {
 				ex.printStackTrace();
 				builder.setTitle("Error");
 				builder.setDescription("Something went wrong while adding a new waifu to the database. Please try again in a few minutes.");
@@ -92,7 +90,7 @@ public class ImageCmd extends Command {
 		String name = args[0].toLowerCase(Locale.UK);
 		
 		try {
-			ResultSet rs = DatabaseOPs.getWaifu(name);
+			ResultSet rs = getWaifu(name);
 			rs.next();
 			String tag = rs.getString("Tag");
 			String url = null;
@@ -114,6 +112,47 @@ public class ImageCmd extends Command {
 		
 		sendEmbed(e, builder, true);
 	}	
+	
+	/**
+	 * Get all the waifu names from DB
+	 */
+	public static List<String> getWaifuNames() throws SQLException {
+		String s = "SELECT Id FROM Gelbooru";
+		Database.connect();
+		ResultSet rs = Database.query(s);
+		List<String> names = new ArrayList<>();
+		while (rs.next()) {
+			names.add(rs.getString("Id"));
+		}
+		Database.disconnect();
+		return names;
+	}
+	
+	/**
+	 * Add a new waifu to the image command
+	 * 
+	 * @param name = Name of waifu
+	 * @param tag = Gelbooru tag of waifu
+	 * @param title = Title of the embed
+	 */
+	public static boolean insertWaifu(String name, String tag, String title) throws SQLException {
+		title = title.replace("'", "''");
+		Database.connect();
+		String s = "INSERT into Gelbooru (Id, Tag, Title) VALUES (\'" + name + "\', \'" + tag + "\', \'" + title + "\');";
+		boolean success = Database.execute(s);
+		Database.disconnect();
+		return success;
+	}
+	
+	/**
+	 * Get the Gelbooru tag and the embed title using the name of the waifu
+	 */
+	public static ResultSet getWaifu(String name) throws SQLException {
+		String s = "SELECT * FROM Gelbooru WHERE Id = \'" + name + "\';";
+		Database.connect();
+		ResultSet rs = Database.query(s);
+		return rs;
+	}
 	
 	/**
 	 * Method to get the right image from Gelbooru
