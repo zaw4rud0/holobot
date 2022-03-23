@@ -43,7 +43,6 @@ import com.xharlock.holo.image.AvatarCmd;
 import com.xharlock.holo.image.BannerCmd;
 import com.xharlock.holo.image.BlockCmd;
 import com.xharlock.holo.image.CheckNSFWCmd;
-import com.xharlock.holo.image.ImageCmd;
 import com.xharlock.holo.image.UpscaleCmd;
 import com.xharlock.holo.image.XkcdCmd;
 import com.xharlock.holo.music.cmds.ClearCmd;
@@ -112,7 +111,7 @@ public class CommandManager extends ListenerAdapter {
 //		addCommand(new CollageCmd("collage"));
 //		addCommand(new GenerateCmd("generate"));
 //		addCommand(new HoloCmd("holo"));
-		addCommand(new ImageCmd("image"));
+//		addCommand(new ImageCmd("image"));
 //		addCommand(new NekoCmd("neko"));
 		addCommand(new UpscaleCmd("upscale"));
 
