@@ -39,7 +39,7 @@ public class InspiroCmd extends Command {
 		} catch (IOException ex) {
 			builder.setTitle("API Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 			return;
 		}
 

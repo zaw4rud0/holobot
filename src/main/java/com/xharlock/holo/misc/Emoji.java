@@ -1,6 +1,6 @@
 package com.xharlock.holo.misc;
 
-public enum Emojis {
+public enum Emoji {
 
 	// https://www.emojiall.com/en
 
@@ -60,7 +60,7 @@ public enum Emojis {
 	private String normalVersion;
 	private String browserVersion;
 
-	Emojis(String unicode, String normal, String browser) {
+	Emoji(String unicode, String normal, String browser) {
 		this.unicode = unicode;
 		normalVersion = normal;
 		browserVersion = browser;

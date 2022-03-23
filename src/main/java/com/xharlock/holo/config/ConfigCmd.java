@@ -17,5 +17,7 @@ public class ConfigCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
+		
+		// TODO Implement
 	}
 }

@@ -4,7 +4,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.xharlock.holo.misc.Emojis;
+import com.xharlock.holo.misc.Emoji;
 import com.xharlock.holo.music.core.GuildMusicManager;
 import com.xharlock.holo.music.core.MusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
@@ -29,7 +29,7 @@ public class NowCmd extends MusicCommand {
 		AudioPlayer audioPlayer = musicManager.audioPlayer;
 		
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle(Emojis.SPEAKER_LOUD.getAsNormal() + " Track Information");
+		builder.setTitle(Emoji.SPEAKER_LOUD.getAsNormal() + " Track Information");
 		
 		if (audioPlayer.getPlayingTrack() == null) {
 			builder.setDescription("I'm not playing any tracks right now");

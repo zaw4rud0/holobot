@@ -30,7 +30,8 @@ public class BlockCmd extends Command {
 		// Get the blocked images from the DB
 		try {
 			blocked = getBlockedImages();
-			blockRequests = getBlockRequests();
+			//blockRequests = getBlockRequests();
+			blockRequests = new ArrayList<>();
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}

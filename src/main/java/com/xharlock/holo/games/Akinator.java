@@ -8,6 +8,9 @@ import com.markozajc.akiwrapper.core.entities.Server.GuessType;
 import com.markozajc.akiwrapper.core.exceptions.ServerNotFoundException;
 import com.xharlock.holo.exceptions.APIException;
 
+/**
+ * An instance of Akinator with its sprites and questions/answers
+ */
 public class Akinator {
 	
 	private Akiwrapper instance;

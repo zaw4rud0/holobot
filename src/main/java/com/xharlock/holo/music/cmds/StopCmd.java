@@ -32,12 +32,10 @@ public class StopCmd extends MusicCommand {
 			return;
 		}
 
-		musicManager.scheduler.audioPlayer.stopTrack();
-		musicManager.scheduler.queue.clear();
+		musicManager.clear();
 		
 		builder.setTitle("Success");
 		builder.setDescription("Stopped current track and cleared queue!");
 		sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 	}
-
 }

@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.core.Bootstrap;
-import com.xharlock.holo.misc.Emojis;
+import com.xharlock.holo.misc.Emoji;
 import com.xharlock.holo.music.core.GuildMusicManager;
 import com.xharlock.holo.music.core.MusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
@@ -91,7 +91,7 @@ public class ClearCmd extends MusicCommand {
 		builder.setDescription("Upvote to clear the queue\n`" + requiredVotes + "` upvotes are required");
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
-			msg.addReaction(Emojis.UPVOTE.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emoji.UPVOTE.getAsBrowser()).queue(v -> {}, err -> {});
 
 			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
 
@@ -100,7 +100,7 @@ public class ClearCmd extends MusicCommand {
 					return false;
 				}
 
-				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emojis.UPVOTE.getAsBrowser())) {
+				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emoji.UPVOTE.getAsBrowser())) {
 					if (musicManager.getCounter().incrementAndGet() == requiredVotes) {
 						return true;
 					}

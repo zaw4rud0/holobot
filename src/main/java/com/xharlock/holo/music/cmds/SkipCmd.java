@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.core.Bootstrap;
-import com.xharlock.holo.misc.Emojis;
+import com.xharlock.holo.misc.Emoji;
 import com.xharlock.holo.music.core.GuildMusicManager;
 import com.xharlock.holo.music.core.MusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
@@ -93,7 +93,7 @@ public class SkipCmd extends MusicCommand {
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 
-			msg.addReaction(Emojis.UPVOTE.getAsUnicode()).queue();
+			msg.addReaction(Emoji.UPVOTE.getAsUnicode()).queue();
 
 			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
 				// So reactions on other messages and bot reactions are ignored
@@ -101,7 +101,7 @@ public class SkipCmd extends MusicCommand {
 					return false;
 				}
 
-				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emojis.UPVOTE.getAsBrowser())) {
+				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emoji.UPVOTE.getAsBrowser())) {
 					if (musicManager.getCounter().incrementAndGet() == requiredVotes) {
 						return true;
 					}

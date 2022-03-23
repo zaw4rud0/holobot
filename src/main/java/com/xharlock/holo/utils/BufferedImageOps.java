@@ -1,8 +1,11 @@
 package com.xharlock.holo.utils;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.RenderingHints;
+import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -17,21 +20,37 @@ public final class BufferedImageOps {
 	}
 	
 	/**
+	 * Crops an image to a circle
+	 */
+	public static BufferedImage cropToCircle(BufferedImage img) {
+		int w = img.getWidth();
+        int h = img.getHeight();
+        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+		
+        Graphics2D g2 = output.createGraphics();
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        g2.fill(new Ellipse2D.Double(0, 0, w, h));
+        g2.setComposite(AlphaComposite.SrcAtop);
+        g2.drawImage(img, 0, 0, null);
+        g2.dispose();
+        
+        return output;
+	}
+	
+	/**
 	 * Sticks two {@link BufferedImage} together in the given direction
 	 * 
 	 * @param img1 = First {@link BufferedImage}
 	 * @param img2 = Second {@link BufferedImage}
 	 * @param direction = Direction in which the images are sticked together, can either be <b>horizontal</b> or <b>vertical</b>
-	 * @return A new {@link BufferedImage}
+	 * @return The joined images
 	 */
 	public static BufferedImage join(BufferedImage img1, BufferedImage img2, Direction direction) {
 		BufferedImage result = null;
 
 		if (direction == null) {
 			throw new IllegalArgumentException();
-		}
-		
-		if (direction == Direction.HORIZONTAL) {
+		} else if (direction == Direction.HORIZONTAL) {
 			int width = img1.getWidth() + img2.getWidth();
 			int height = Math.min(img1.getHeight(), img2.getHeight());
 			result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -43,9 +62,7 @@ public final class BufferedImageOps {
 			g2.drawImage(img1, null, 0, 0);
 			g2.drawImage(img2, null, img1.getWidth(), 0);
 			g2.dispose();
-		}
-
-		else if (direction == Direction.VERTICAL) {
+		} else if (direction == Direction.VERTICAL) {
 			int height = img1.getHeight() + img2.getHeight();
 			int width = Math.min(img1.getWidth(), img2.getWidth());
 			result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -57,12 +74,9 @@ public final class BufferedImageOps {
 			g2.drawImage(img1, null, 0, 0);
 			g2.drawImage(img2, null, 0, img1.getHeight());
 			g2.dispose();
-		}
-
-		else {
+		} else {
 			throw new IllegalArgumentException("Direction can only be either horizontal or vertical!");
 		}
-
 		return result;
 	}
 

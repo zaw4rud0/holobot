@@ -15,11 +15,12 @@ import com.xharlock.holo.commands.cmds.HelpCmd;
 import com.xharlock.holo.commands.cmds.InfoBotCmd;
 import com.xharlock.holo.commands.cmds.InspiroCmd;
 import com.xharlock.holo.commands.cmds.Magic8BallCmd;
+import com.xharlock.holo.commands.cmds.MockCmd;
+import com.xharlock.holo.commands.cmds.PermCmd;
 import com.xharlock.holo.commands.cmds.PingCmd;
 import com.xharlock.holo.commands.cmds.ServerEmotesCmd;
 import com.xharlock.holo.commands.cmds.ServerInfoCmd;
 import com.xharlock.holo.commands.cmds.ServerRolesCmd;
-import com.xharlock.holo.commands.cmds.ServerVoiceChannelsCmd;
 import com.xharlock.holo.commands.cmds.SuggestionCmd;
 import com.xharlock.holo.commands.cmds.UwuCmd;
 import com.xharlock.holo.commands.cmds.WhoisCmd;
@@ -37,12 +38,12 @@ import com.xharlock.holo.games.pokemon.CatchCmd;
 import com.xharlock.holo.games.pokemon.PokedexCmd;
 import com.xharlock.holo.games.pokemon.PokemonTeamCmd;
 import com.xharlock.holo.games.pokemon.SpawnCmd;
+import com.xharlock.holo.image.ActionCmd;
 import com.xharlock.holo.image.AvatarCmd;
 import com.xharlock.holo.image.BannerCmd;
 import com.xharlock.holo.image.BlockCmd;
 import com.xharlock.holo.image.CheckNSFWCmd;
-import com.xharlock.holo.image.HoloCmd;
-import com.xharlock.holo.image.NekoCmd;
+import com.xharlock.holo.image.ImageCmd;
 import com.xharlock.holo.image.UpscaleCmd;
 import com.xharlock.holo.image.XkcdCmd;
 import com.xharlock.holo.music.cmds.ClearCmd;
@@ -73,11 +74,12 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new BugCmd("bug"));
 		addCommand(new HelpCmd("help", this));
 		addCommand(new InfoBotCmd("info"));
+		addCommand(new PermCmd("perm"));
 		addCommand(new PingCmd("ping"));
 		addCommand(new ServerEmotesCmd("serveremotes"));
 		addCommand(new ServerInfoCmd("serverinfo"));
 		addCommand(new ServerRolesCmd("serverroles"));
-		addCommand(new ServerVoiceChannelsCmd("servervcs"));
+//		addCommand(new ServerVoiceChannelsCmd("servervcs"));
 		addCommand(new SuggestionCmd("suggestion"));
 		addCommand(new WhoisCmd("whois"));
 		
@@ -102,14 +104,16 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new StopCmd("stop"));
 
 		// Image Cmds
+		addCommand(new ActionCmd("action"));
 		addCommand(new AvatarCmd("avatar"));
 		addCommand(new BannerCmd("banner"));
 		addCommand(new BlockCmd("block"));
 		addCommand(new CheckNSFWCmd("check"));
 //		addCommand(new CollageCmd("collage"));
-		addCommand(new HoloCmd("holo"));
-//		addCommand(new ImageCmd("image"));
-		addCommand(new NekoCmd("neko"));
+//		addCommand(new GenerateCmd("generate"));
+//		addCommand(new HoloCmd("holo"));
+		addCommand(new ImageCmd("image"));
+//		addCommand(new NekoCmd("neko"));
 		addCommand(new UpscaleCmd("upscale"));
 
 		// Game Cmds
@@ -122,6 +126,7 @@ public class CommandManager extends ListenerAdapter {
 		// Misc Cmds
 		addCommand(new Magic8BallCmd("8ball"));
 		addCommand(new InspiroCmd("inspiro"));
+		addCommand(new MockCmd("mock"));
 		addCommand(new UwuCmd("uwu"));
 		addCommand(new XkcdCmd("xkcd"));
 

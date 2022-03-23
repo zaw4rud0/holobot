@@ -8,14 +8,10 @@ public class FakeCmd extends Command {
 
 	public FakeCmd(String name) {
 		super(name);
-		
-		
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
-		
-		
-		
+		// TODO Implement
 	}
 }

@@ -31,7 +31,6 @@ public class Magic8BallCmd extends Command {
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		sendTyping(e);
-		
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		if (args.length == 0) {
@@ -74,11 +73,11 @@ public class Magic8BallCmd extends Command {
 		}
 		return new Gson().fromJson(obj, Answer.class);
 	}
-}
-
-class Answer {
-	@SerializedName("response")
-	String response;
-	@SerializedName("url")
-	String url;
+	
+	private class Answer {
+		@SerializedName("response")
+		String response;
+		@SerializedName("url")
+		String url;
+	}
 }

@@ -35,9 +35,7 @@ public final class Database {
 	 */
 	public static boolean execute(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
-		boolean success = st.execute(s);
-		st.close();
-		return success;
+		return st.execute(s);
 	}
 	
 	/**
@@ -45,8 +43,6 @@ public final class Database {
 	 */
 	public static ResultSet query(String s) throws SQLException {
 		Statement st = Database.conn.createStatement();
-		ResultSet rs = st.executeQuery(s);
-		st.close();
-		return rs;
+		return st.executeQuery(s);
 	}
 }

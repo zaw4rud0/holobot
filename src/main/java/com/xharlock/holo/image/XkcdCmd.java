@@ -64,7 +64,6 @@ public class XkcdCmd extends Command {
 			builder.setTitle(object.get("title").getAsString() + " (xkcd #" + issueNr + ")");
 			builder.setDescription("[Explained](" + explainedUrl + issueNr + ")");
 			builder.setImage(object.get("img").getAsString());
-			
 			newestIssue = issueNr;
 		} 
 		

@@ -45,10 +45,11 @@ public final class GelbooruAPI {
 		String s = reader.lines().collect(Collectors.joining("\n"));
 		reader.close();
 		connection.disconnect();
+		
 		if (s.toString() == null || s.toString().equals("null") || s.toString().equals("")) {
 			return null;
 		}		
-		return JsonParser.parseString(s).getAsJsonArray();
+		return JsonParser.parseString(s).getAsJsonObject().getAsJsonArray("post");
 	}
 	
 	public enum Rating {

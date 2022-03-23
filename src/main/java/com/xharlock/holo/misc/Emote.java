@@ -1,6 +1,7 @@
 package com.xharlock.holo.misc;
 
-public enum Emotes {
+/** Represents a Discord emote which is different to an {@link Emoji} */
+public enum Emote {
 	PEPELOVE("pepelove:806641947292860466"),
 	HOLOSMUG(""),
 	
@@ -40,7 +41,7 @@ public enum Emotes {
     
     private String id;
     
-    Emotes(String id) {
+    Emote(String id) {
         this.id = id;
     }
     

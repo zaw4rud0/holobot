@@ -3,23 +3,19 @@ package com.xharlock.holo.commands.core;
 import java.awt.Color;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.core.Bootstrap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
  * Abstract class representing a bot command
  */
 public abstract class Command {
-
 	protected String name;
 	protected String description;
 	protected String usage;
@@ -33,10 +29,6 @@ public abstract class Command {
 	protected boolean isGuildOnly = false;
 
 	protected String[] args;
-
-	/** Cooldown in seconds */
-	protected int cooldownDuration = 0;
-	protected Map<User, Long> onTimeout = new HashMap<>();
 
 	protected CommandCategory category = CommandCategory.BLANK;
 
@@ -107,7 +99,7 @@ public abstract class Command {
 
 		if (e.isFromGuild()) {
 			if (footer) {
-
+				builder.setFooter(String.format("Invoked by %s", e.getMember().getEffectiveName()), e.getAuthor().getEffectiveAvatarUrl());
 			}
 			e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
 				msg.delete().queueAfter(delay, unit);
@@ -255,18 +247,6 @@ public abstract class Command {
 
 	protected void setIsGuildOnlyCommand(boolean isGuildOnlyCommand) {
 		this.isGuildOnly = isGuildOnlyCommand;
-	}
-
-	public boolean hasCmdCooldown() {
-		return cooldownDuration != 0;
-	}
-
-	public int getCmdCooldown() {
-		return cooldownDuration;
-	}
-
-	protected void setCmdCooldown(int seconds) {
-		this.cooldownDuration = seconds;
 	}
 
 	protected String[] getArgs() {

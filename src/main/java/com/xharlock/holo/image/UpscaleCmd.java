@@ -71,7 +71,7 @@ public class UpscaleCmd extends Command {
 	private static final String url = "https://api.deepai.org/api/waifu2x";
 	
 	/**
-	 * Method to send an image url to waifu2x and return the url of the upscaled
+	 * Send an image url to waifu2x and return the url of the upscaled img
 	 */
 	private static String upscaleImage(String imageUrl) throws IOException {
 		String token = Bootstrap.holo.getConfig().getKeyDeepAI();

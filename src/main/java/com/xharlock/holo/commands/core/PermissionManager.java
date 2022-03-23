@@ -1,17 +1,13 @@
 package com.xharlock.holo.commands.core;
 
-import java.time.Instant;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.core.Bootstrap;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
-import net.dv8tion.jda.api.entities.Invite.Channel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -24,30 +20,21 @@ public class PermissionManager {
 	// In dire need of refactoring
 
 	private List<User> blacklisted;
-	private Map<User, Long> lastUserWarning;
 
 	public PermissionManager() {
 		blacklisted = new ArrayList<>();
-		lastUserWarning = new HashMap<>();
 	}
 
 	public boolean check(MessageReceivedEvent e, Command cmd) {
 		if (isBlacklisted(e.getAuthor())) {
 			return false;
 		}
-
 		if (!hasChannelPermission(e, cmd)) {
 			return false;
 		}
-
 		if (!hasUserPermission(e, cmd)) {
 			return false;
 		}
-		
-		if (cmd.hasCmdCooldown() && isUserOnCooldown(e, cmd)) {
-			return false;
-		}
-
 		return true;
 	}
 
@@ -59,46 +46,6 @@ public class PermissionManager {
 	// TODO Write blacklisted user to db
 	public void blacklist(User user) {
 		blacklisted.add(user);
-	}
-
-	public boolean isUserOnCooldown(MessageReceivedEvent e, Command cmd) {
-		EmbedBuilder builder = new EmbedBuilder();
-
-		long now = Instant.now().getEpochSecond();
-
-		if (cmd.onTimeout.containsKey(e.getAuthor())) {
-			boolean warned = this.lastUserWarning.containsKey(e.getAuthor());
-
-			if (warned && now - this.lastUserWarning.get(e.getAuthor()) < 10L) {
-				return true;
-			}
-			if (now - cmd.onTimeout.get(e.getAuthor()) < cmd.getCmdCooldown()) {
-				if (e.isFromGuild()) {
-					e.getMessage().delete().queue();
-				}
-				builder.setTitle("On Cooldown!");
-				int remaining = cmd.getCmdCooldown() - (int) (now - cmd.onTimeout.get(e.getAuthor()));
-				builder.setDescription(String.format("%s, you are on cooldown!\nPlease wait `%d` seconds before using this command again.", e.getAuthor().getAsMention(), remaining));
-				cmd.sendEmbed(e, builder, 10, TimeUnit.SECONDS, false);
-
-				if (warned) {
-					this.lastUserWarning.replace(e.getAuthor(), now);
-				} else {
-					this.lastUserWarning.put(e.getAuthor(), now);
-				}
-				return true;
-			} else {
-				cmd.onTimeout.replace(e.getAuthor(), now);
-				return false;
-			}
-		} else {
-			cmd.onTimeout.put(e.getAuthor(), now);
-			return false;
-		}
-	}
-
-	public boolean onChannelOnCooldown(Channel channel, Command cmd) {
-		return false;
 	}
 
 	public boolean hasChannelPermission(MessageReceivedEvent e, Command cmd) {

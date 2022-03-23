@@ -30,7 +30,7 @@
 		<dependency>
 			<groupId>com.xharlock</groupId>
 			<artifactId>nanojikan</artifactId>
-			<version>0.0.7</version>
+			<version>0.0.10</version>
 		</dependency>
 
 		<!-- PokeAPI4Java - A lightweight package for using the PokéAPI written by me :happe: -->

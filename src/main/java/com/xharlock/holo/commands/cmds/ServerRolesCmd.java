@@ -24,26 +24,30 @@ public class ServerRolesCmd extends Command {
 	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
 		
-		List<Role> roles = e.getGuild().getRoles();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Roles of " + e.getGuild().getName());
+		
+		List<Role> roles = e.getGuild().getRoles();
 
 		if (roles.isEmpty()) {
 			builder.setDescription("This server doesn't have any roles");
-		} else {
-			String s = "";
-			int counter = 0;
-			for (Role r : roles) {
-				String role = r.getAsMention() + "\n(" + r.getId() + ")";
-				if (s.length() + role.length() > 1024) {
-					builder.addField("" + counter++, s, true);
-					s = role + "\n";
-				} else {
-					s += role + "\n";
-				}
-			}
-			builder.addField("" + counter++, s, true);
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+			return;
 		}
+		
+		String s = "";
+		int counter = 0;
+		
+		for (Role r : roles) {
+			String role = r.getAsMention() + "\n(" + r.getId() + ")";
+			if (s.length() + role.length() > 1024) {
+				builder.addField("" + counter++, s, true);
+				s = role + "\n";
+			} else {
+				s += role + "\n";
+			}
+		}
+		builder.addField("" + counter++, s, true);
 		sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
 	}
 }

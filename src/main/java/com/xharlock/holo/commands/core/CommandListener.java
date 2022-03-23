@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.image.ActionCmd;
 
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -15,7 +16,6 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 public class CommandListener extends ListenerAdapter {
 
 	private CommandManager manager;
-
 	private static final Logger logger = LoggerFactory.getLogger(CommandListener.class);
 
 	public CommandListener(CommandManager manager) {
@@ -38,6 +38,16 @@ public class CommandListener extends ListenerAdapter {
 		String invoke = split[0].toLowerCase(Locale.UK);
 
 		if (!manager.isValidName(invoke)) {
+			// Check if it's an action
+			ActionCmd actionCmd = (ActionCmd) manager.getCommand("action");
+			if (actionCmd.isAction(invoke)) {
+				actionCmd.args = Arrays.copyOfRange(split, 1, split.length);
+				actionCmd.displayAction(e, actionCmd.getAction(invoke));
+				
+				if (logger.isInfoEnabled()) {
+					logger.info(e.getAuthor() + " has called action");
+				}
+			}
 			return;
 		}
 

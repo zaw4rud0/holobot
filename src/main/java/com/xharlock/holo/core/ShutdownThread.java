@@ -11,7 +11,7 @@ import com.google.gson.Gson;
 import net.dv8tion.jda.api.entities.Message;
 
 /**
- * A thread that defines the behaviour of the bot when it shuts down
+ * Defines the behaviour of the bot when it shuts down
  */
 public class ShutdownThread extends Thread {
 	

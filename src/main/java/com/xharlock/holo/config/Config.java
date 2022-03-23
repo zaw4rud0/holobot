@@ -52,6 +52,7 @@ public class Config {
 		return deepAIKey;
 	}
 
+	@Deprecated
 	public void setKeyDeepAI(String deepAIKey) {
 		this.deepAIKey = deepAIKey;
 	}
@@ -60,6 +61,7 @@ public class Config {
 		return youtubeToken;
 	}
 
+	@Deprecated
 	public void setYoutubeToken(String youtubeToken) {
 		this.youtubeToken = youtubeToken;
 	}
@@ -68,6 +70,7 @@ public class Config {
 		return aocToken;
 	}
 	
+	@Deprecated
 	public void setAoCToken(String aocToken) {
 		this.aocToken = aocToken;
 	}

@@ -15,8 +15,8 @@ import com.markozajc.akiwrapper.core.entities.Guess;
 import com.markozajc.akiwrapper.core.exceptions.ServerNotFoundException;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.misc.Emojis;
-import com.xharlock.holo.misc.Emotes;
+import com.xharlock.holo.misc.Emoji;
+import com.xharlock.holo.misc.Emote;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -38,11 +38,11 @@ public class AkinatorCmd extends Command {
 	public AkinatorCmd(String name, EventWaiter waiter) {
 		super(name);
 		setDescription("Use this command to start a new game of Akinator." + "\nIn a nutshell, you have to think of a character, real or fictional, and answer the "
-				+ "questions by using the according reaction. " + "Possible answers are 'yes', 'no', 'don't know', 'probably' and 'probably not'."
-				+ "After some questions Akinator will try to guess your character.");
+				+ "questions by using the according reaction. Possible answers are 'yes', 'no', 'don't know', 'probably' and 'probably not'. After some questions "
+				+ "Akinator will try to guess your character.");
 		setUsage(name);
-		setCmdCooldown(300);
-		setEmbedColor(new Color(112,28,84));
+		setThumbnail(AkinatorSprite.DEFAULT.getUrl());
+		setEmbedColor(new Color(112, 28, 84));
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.GAMES);
 
@@ -51,8 +51,8 @@ public class AkinatorCmd extends Command {
 		counter = new AtomicInteger();
 		wrong = new ArrayList<>();
 
-		reactions = new Reaction[] { new Reaction(Emojis.ONE.getAsBrowser(), Answer.YES), new Reaction(Emojis.TWO.getAsBrowser(), Answer.NO),
-				new Reaction(Emojis.THREE.getAsBrowser(), Answer.DONT_KNOW), new Reaction(Emojis.FOUR.getAsBrowser(), Answer.PROBABLY), new Reaction(Emojis.FIVE.getAsBrowser(), Answer.PROBABLY_NOT) };
+		reactions = new Reaction[] { new Reaction(Emoji.ONE.getAsBrowser(), Answer.YES), new Reaction(Emoji.TWO.getAsBrowser(), Answer.NO), new Reaction(Emoji.THREE.getAsBrowser(), Answer.DONT_KNOW),
+				new Reaction(Emoji.FOUR.getAsBrowser(), Answer.PROBABLY), new Reaction(Emoji.FIVE.getAsBrowser(), Answer.PROBABLY_NOT) };
 	}
 
 	// TODO Clean up
@@ -83,14 +83,13 @@ public class AkinatorCmd extends Command {
 		start(e);
 	}
 
-	
 	private void start(MessageReceivedEvent e) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Akinator");
 		builder.setThumbnail(AkinatorSprite.DEFAULT.getUrl());
 		builder.setColor(embedColor);
 		builder.setDescription("To start the game, please think about a real or fictional character. I will try to guess who it is by asking some questions." + "\nIf you are ready, please react with "
-				+ Emotes.TICK.getAsText() + ", or if you want to cancel the game, react with " + Emotes.CROSS.getAsText() + ".");
+				+ Emote.TICK.getAsText() + ", or if you want to cancel the game, react with " + Emote.CROSS.getAsText() + ".");
 
 		Message msg = e.getChannel().sendMessageEmbeds(builder.build()).complete();
 		addStartReactions(msg);
@@ -103,7 +102,7 @@ public class AkinatorCmd extends Command {
 			}
 
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction()) || evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+				if (evt.getReactionEmote().getAsReactionCode().equals(Emote.TICK.getAsReaction()) || evt.getReactionEmote().getAsReactionCode().equals(Emote.CROSS.getAsReaction())) {
 					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
 					msg.clearReactions().queue();
 					try {
@@ -116,14 +115,14 @@ public class AkinatorCmd extends Command {
 			}
 			return false;
 		}, evt -> {
-			if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())) {
+			if (evt.getReactionEmote().getAsReactionCode().equals(Emote.TICK.getAsReaction())) {
 				inGame(e, msg);
-			} else if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+			} else if (evt.getReactionEmote().getAsReactionCode().equals(Emote.CROSS.getAsReaction())) {
 				cancel(e, msg);
 			} else {
 				error(e, msg);
 			}
-		}, 5, TimeUnit.MINUTES, () -> {
+		}, 2, TimeUnit.MINUTES, () -> {
 			msg.delete().queue();
 			cleanup();
 		});
@@ -143,7 +142,7 @@ public class AkinatorCmd extends Command {
 		builder.setColor(embedColor);
 		builder.setDescription("**Q" + counter.incrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
 		builder.addField("Answers", ":one: Yes\n" + ":two: No\n" + ":three: I don't know\n" + ":four: Probably\n" + ":five: Probably not", false);
-		builder.addField("Other", Emotes.UNDO.getAsText() + " Undo last answer\n" + Emotes.CROSS.getAsText() + " Cancel game", false);
+		builder.addField("Other", Emote.UNDO.getAsText() + " Undo last answer\n" + Emote.CROSS.getAsText() + " Cancel game", false);
 		msg.editMessageEmbeds(builder.build()).queue();
 		addInGameReactions(msg);
 		askQuestion(e, msg, builder);
@@ -169,7 +168,7 @@ public class AkinatorCmd extends Command {
 						}
 					}
 				} else {
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.UNDO.getAsReaction())) {
+					if (evt.getReactionEmote().getAsReactionCode().equals(Emote.UNDO.getAsReaction())) {
 						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
 						if (counter.get() > 1) {
 							akinator.undoAnswer();
@@ -178,7 +177,7 @@ public class AkinatorCmd extends Command {
 							return false;
 						}
 					}
-					if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+					if (evt.getReactionEmote().getAsReactionCode().equals(Emote.CROSS.getAsReaction())) {
 						evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
 						msg.clearReactions().queue();
 						return true;
@@ -188,14 +187,14 @@ public class AkinatorCmd extends Command {
 			return false;
 		}, evt -> {
 			// Undo
-			if (!evt.getReactionEmote().isEmoji() && evt.getReactionEmote().getAsReactionCode().equals(Emotes.UNDO.getAsReaction())) {
+			if (!evt.getReactionEmote().isEmoji() && evt.getReactionEmote().getAsReactionCode().equals(Emote.UNDO.getAsReaction())) {
 				builder.setThumbnail(getRandomThinking());
 				builder.setDescription("**Q" + counter.decrementAndGet() + ":** " + akinator.getCurrentQuestion().getQuestion());
 				msg.editMessageEmbeds(builder.build()).queue();
 				askQuestion(e, msg, builder);
 			}
 			// Cancel
-			else if (!evt.getReactionEmote().isEmoji() && evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+			else if (!evt.getReactionEmote().isEmoji() && evt.getReactionEmote().getAsReactionCode().equals(Emote.CROSS.getAsReaction())) {
 				cancel(e, msg);
 			}
 			// Any answer
@@ -272,7 +271,7 @@ public class AkinatorCmd extends Command {
 			builder.setImage(guess.getImage().toString());
 		}
 
-		builder.addField("Answers", Emotes.TICK.getAsText() + " Correct, that was my character!\n" + Emotes.CONTINUE.getAsText() + " Wrong, continue game\n" + Emotes.CROSS.getAsText() + "Cancel game",
+		builder.addField("Answers", Emote.TICK.getAsText() + " Correct, that was my character!\n" + Emote.CONTINUE.getAsText() + " Wrong, continue game\n" + Emote.CROSS.getAsText() + "Cancel game",
 				false);
 
 		msg.editMessageEmbeds(builder.build()).queue();
@@ -285,8 +284,8 @@ public class AkinatorCmd extends Command {
 			}
 
 			if (!evt.retrieveUser().complete().isBot() && e.getAuthor().equals(evt.retrieveUser().complete())) {
-				if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction()) || evt.getReactionEmote().getAsReactionCode().equals(Emotes.CONTINUE.getAsReaction())
-						|| evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+				if (evt.getReactionEmote().getAsReactionCode().equals(Emote.TICK.getAsReaction()) || evt.getReactionEmote().getAsReactionCode().equals(Emote.CONTINUE.getAsReaction())
+						|| evt.getReactionEmote().getAsReactionCode().equals(Emote.CROSS.getAsReaction())) {
 					evt.getReaction().removeReaction(evt.retrieveUser().complete()).queue();
 					msg.clearReactions().queue();
 					return true;
@@ -294,9 +293,9 @@ public class AkinatorCmd extends Command {
 			}
 			return false;
 		}, evt -> {
-			if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.TICK.getAsReaction())) {
+			if (evt.getReactionEmote().getAsReactionCode().equals(Emote.TICK.getAsReaction())) {
 				victory(e, msg, guess);
-			} else if (evt.getReactionEmote().getAsReactionCode().equals(Emotes.CROSS.getAsReaction())) {
+			} else if (evt.getReactionEmote().getAsReactionCode().equals(Emote.CROSS.getAsReaction())) {
 				cancel(e, msg);
 			} else {
 				wrong.add(guess.getName());
@@ -367,46 +366,46 @@ public class AkinatorCmd extends Command {
 	}
 
 	private void addStartReactions(Message msg) {
-		msg.addReaction(Emotes.TICK.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.TICK.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.CROSS.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
 	}
 
 	private void addInGameReactions(Message msg) {
-		msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {
+		msg.addReaction(Emoji.ONE.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {
+		msg.addReaction(Emoji.TWO.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {
+		msg.addReaction(Emoji.THREE.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.FOUR.getAsBrowser()).queue(v -> {
+		msg.addReaction(Emoji.FOUR.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emojis.FIVE.getAsBrowser()).queue(v -> {
+		msg.addReaction(Emoji.FIVE.getAsBrowser()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.UNDO.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.UNDO.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.CROSS.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
 	}
 
 	private void addGuessReactions(Message msg) {
-		msg.addReaction(Emotes.TICK.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.TICK.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.CONTINUE.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.CONTINUE.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
-		msg.addReaction(Emotes.CROSS.getAsReaction()).queue(v -> {
+		msg.addReaction(Emote.CROSS.getAsReaction()).queue(v -> {
 		}, err -> {
 		});
 	}
@@ -414,7 +413,7 @@ public class AkinatorCmd extends Command {
 	public String getRandomThinking() {
 		Random rand = new Random();
 		int index = rand.nextInt(7);
-		
+
 		switch (index) {
 		case 0:
 			return AkinatorSprite.THINKING_1.getUrl();
@@ -447,7 +446,7 @@ class Reaction {
 @Deprecated
 enum AkinatorSprite {
 	DEFAULT("https://media.discordapp.net/attachments/824916413139124254/824917438062919740/akinator_default.png"),
-	START("https://media.discordapp.net/attachments/824916413139124254/824927512827527178/akinator_start.png"),	
+	START("https://media.discordapp.net/attachments/824916413139124254/824927512827527178/akinator_start.png"),
 	THINKING_1("https://media.discordapp.net/attachments/824916413139124254/824917445125865472/akinator_thinking_1.png"),
 	THINKING_2("https://media.discordapp.net/attachments/824916413139124254/824917445629575168/akinator_thinking_2.png"),
 	THINKING_3("https://media.discordapp.net/attachments/824916413139124254/824917447999750144/akinator_thinking_3.png"),
@@ -459,13 +458,13 @@ enum AkinatorSprite {
 	GUESSING("https://media.discordapp.net/attachments/824916413139124254/824917441557299220/akinator_guessing.png"),
 	VICTORY("https://media.discordapp.net/attachments/824916413139124254/824917454647721984/akinator_victory.png"),
 	CANCEL("https://media.discordapp.net/attachments/824916413139124254/824927268140089415/akinator_cancel.png");
-	
+
 	private String url;
-	
+
 	AkinatorSprite(String url) {
 		this.url = url;
 	}
-	
+
 	public String getUrl() {
 		return this.url;
 	}

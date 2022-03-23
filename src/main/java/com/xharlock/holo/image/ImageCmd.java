@@ -1,5 +1,6 @@
 package com.xharlock.holo.image;
 
+import java.awt.Color;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -28,6 +29,7 @@ public class ImageCmd extends Command {
 		setAliases(List.of("img"));
 		setUsage(name + " [tag]");
 		setIsNSFW(true);
+		setEmbedColor(new Color(0, 100, 225));
 		setCommandCategory(CommandCategory.IMAGE);
 
 		// Get waifus from DB
@@ -64,7 +66,7 @@ public class ImageCmd extends Command {
 				builder.setDescription("Something went wrong while adding a new waifu to the database. Please try again in a few minutes.");
 			}
 			
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true, embedColor);
 			names.add(name);
 			Collections.sort(names);
 			return;
@@ -75,7 +77,7 @@ public class ImageCmd extends Command {
 			builder.setTitle("Image Tags");
 			builder.setDescription(getCategoriesString());
 			builder.addField("Usage", "`" + getPrefix(e) + "image <tag>`", false);
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true, embedColor);
 			return;
 		}
 		
@@ -83,7 +85,7 @@ public class ImageCmd extends Command {
 		if (!names.contains(args[0].toLowerCase(Locale.UK))) {
 			builder.setTitle("Tag not found");
 			builder.setDescription("Use `" + getPrefix(e) + "image` to see all available tags");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true, embedColor);
 			return;
 		}
 	
@@ -110,7 +112,7 @@ public class ImageCmd extends Command {
 			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
 		}
 		
-		sendEmbed(e, builder, true);
+		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, embedColor);
 	}	
 	
 	/**
@@ -121,7 +123,7 @@ public class ImageCmd extends Command {
 		Database.connect();
 		ResultSet rs = Database.query(s);
 		List<String> names = new ArrayList<>();
-		while (rs.next()) {
+		while (rs.next()) {			
 			names.add(rs.getString("Id"));
 		}
 		Database.disconnect();
@@ -155,7 +157,7 @@ public class ImageCmd extends Command {
 	}
 	
 	/**
-	 * Method to get the right image from Gelbooru
+	 * Get the right image from Gelbooru
 	 */
 	private String getImage(String tag) throws IOException {		
 		JsonObject object = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.SAFE, GelbooruAPI.Sort.RANDOM, 1, tag).get(0).getAsJsonObject();		
@@ -163,7 +165,7 @@ public class ImageCmd extends Command {
 	}
 
 	/**
-	 * Method to properly display all available tags as a single String
+	 * Properly display all available tags as a single String
 	 */
 	private String getCategoriesString() {
 		return names.toString().replace("]", "`").replace("[", "`").replace(",", "`").replace(" ", ", `");

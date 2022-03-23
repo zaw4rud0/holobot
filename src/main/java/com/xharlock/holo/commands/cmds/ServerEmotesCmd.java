@@ -3,7 +3,6 @@ package com.xharlock.holo.commands.cmds;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import com.xharlock.holo.commands.core.Command;
@@ -27,28 +26,22 @@ public class ServerEmotesCmd extends Command {
 	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
 
-		List<Emote> emotes = e.getGuild().getEmotes();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Emotes of " + e.getGuild().getName());
 
+		List<Emote> emotes = e.getGuild().getEmotes().stream().filter(em -> em.canInteract(e.getGuild().getSelfMember())).toList();
+		
 		if (emotes.isEmpty()) {
 			builder.setDescription("This server doesn't have any emotes.");
 			sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
 			return;
 		}
 
+		// Separate normal emotes from animated onese
 		List<String> normal = new ArrayList<>();
 		List<String> animated = new ArrayList<>();
-
-		for (Emote em : emotes) {
-			if (!em.canInteract(e.getGuild().getSelfMember())) {
-				continue;
-			} else if (em.isAnimated()) {
-				animated.add(em.getAsMention().toLowerCase(Locale.UK));
-			} else {
-				normal.add(em.getAsMention().toLowerCase(Locale.UK));
-			}
-		}
+		emotes.stream().filter(em -> em.isAnimated()).map(Emote::getAsMention).map(String::toLowerCase).forEach(animated::add);
+		emotes.stream().filter(em -> !em.isAnimated()).map(Emote::getAsMention).map(String::toLowerCase).forEach(animated::add);
 
 		int charCount = 0;
 

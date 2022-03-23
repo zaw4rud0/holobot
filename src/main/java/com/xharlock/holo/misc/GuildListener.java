@@ -1,5 +1,8 @@
 package com.xharlock.holo.misc;
 
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.PlayerManager;
+
 import net.dv8tion.jda.api.entities.AudioChannel;
 import net.dv8tion.jda.api.events.emote.EmoteAddedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -81,6 +84,8 @@ public class GuildListener extends ListenerAdapter {
 		// Member left voice channel of the bot
 		if (e.getChannelLeft().equals(botVoice)) {
 			if (botVoice.getMembers().size() <= 1) {
+				GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
+				musicManager.clear();
 				e.getGuild().getAudioManager().closeAudioConnection();
 			}
 		}

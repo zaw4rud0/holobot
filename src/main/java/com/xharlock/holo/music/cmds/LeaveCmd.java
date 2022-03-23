@@ -8,7 +8,6 @@ import com.xharlock.holo.music.core.PlayerManager;
 
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.managers.AudioManager;
 
 public class LeaveCmd extends MusicCommand {
 
@@ -33,17 +32,11 @@ public class LeaveCmd extends MusicCommand {
 		}
 
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
-
-		musicManager.scheduler.looping = false;
-		musicManager.scheduler.queue.clear();
-		musicManager.audioPlayer.stopTrack();
-
-		AudioManager audioManager = e.getGuild().getAudioManager();
-		audioManager.closeAudioConnection();
+		musicManager.clear();
+		e.getGuild().getAudioManager().closeAudioConnection();
 
 		builder.setTitle("Disconnected");
 		builder.setDescription("See you soon!");
 		sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 	}
-
 }

@@ -2,7 +2,7 @@ package com.xharlock.holo.music.cmds;
 
 import java.util.concurrent.TimeUnit;
 
-import com.xharlock.holo.misc.Emojis;
+import com.xharlock.holo.misc.Emoji;
 import com.xharlock.holo.music.core.MusicCommand;
 
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -40,7 +40,7 @@ public class JoinCmd extends MusicCommand {
 
 		audioManager.openAudioConnection(e.getMember().getVoiceState().getChannel());
 
-		builder.setTitle("Connected " + Emojis.NOTE.getAsNormal());
+		builder.setTitle("Connected " + Emoji.NOTE.getAsNormal());
 		builder.setDescription("Join me in <#" + e.getMember().getVoiceState().getChannel().getIdLong() + ">");
 		
 		sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);

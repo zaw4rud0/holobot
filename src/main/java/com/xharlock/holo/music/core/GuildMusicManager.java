@@ -38,4 +38,13 @@ public class GuildMusicManager {
 	public AtomicInteger getCounter() {
 		return counter;
 	}
+	
+	/**
+	 * Resets the GuildMusicManager
+	 */
+	public void clear() {
+		scheduler.looping = false;
+		scheduler.queue.clear();
+		audioPlayer.stopTrack();
+	}
 }

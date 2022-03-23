@@ -18,7 +18,7 @@ public class AvatarCmd extends Command {
 		super(name);
 		setDescription("Use this command to get your own avatar or the avatar of a given user inside the guild. Tip: Use the id of the user if you don't want to ping them.");
 		setUsage(name + " [user id]");
-		setAliases(List.of("av"));
+		setAliases(List.of("av", "pfp"));
 		setIsGuildOnlyCommand(true);
 		setCommandCategory(CommandCategory.IMAGE);
 	}
@@ -54,7 +54,11 @@ public class AvatarCmd extends Command {
 	 */
 	private User getUser(MessageReceivedEvent e) {
 		try {
-			return e.getJDA().getUserById(Long.parseLong(args[0].replace("<", "").replace(">", "").replace("!", "").replace("@", "")));
+			return e.getJDA().getUserById(Long.parseLong(args[0]
+					.replace("<", "")
+					.replace(">", "")
+					.replace("!", "")
+					.replace("@", "")));
 		} catch (Exception ex) {
 			return e.getAuthor();
 		}

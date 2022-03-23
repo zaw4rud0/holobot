@@ -24,7 +24,7 @@ public class SpawnCmd extends Command {
 		setUsage(name + " [<Pokémon name or id> | random]");
 		setIsGuildOnlyCommand(true);
 		setIsOwnerCommand(true);
-		setCommandCategory(CommandCategory.OWNER);
+		setCommandCategory(CommandCategory.GAMES);
 
 		manager = Bootstrap.holo.getPokemonSpawnManager();
 	}

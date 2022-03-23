@@ -11,7 +11,7 @@ public class Misc extends ListenerAdapter {
 
 		// Add :heart:
 		if (content.contains(":heart:") || content.contains("<3") || content.contains("❤️")) {
-			e.getMessage().addReaction(Emojis.HEART.getAsBrowser()).queue();
+			e.getMessage().addReaction(Emoji.HEART.getAsBrowser()).queue();
 		}
 	}
 }

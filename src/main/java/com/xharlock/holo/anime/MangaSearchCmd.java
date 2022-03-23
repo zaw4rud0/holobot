@@ -1,7 +1,6 @@
 package com.xharlock.holo.anime;
 
 import java.awt.Color;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -9,21 +8,22 @@ import java.util.concurrent.TimeUnit;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.commands.core.Command;
 import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.misc.Emojis;
+import com.xharlock.holo.misc.Emoji;
 import com.xharlock.nanojikan.JikanAPI;
+import com.xharlock.nanojikan.exception.APIException;
+import com.xharlock.nanojikan.exception.InvalidRequestException;
 import com.xharlock.nanojikan.model.Manga;
-import com.xharlock.nanojikan.model.MangaResult;
 import com.xharlock.nanojikan.model.Nameable;
 
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
 public class MangaSearchCmd extends Command {
 
 	private EventWaiter waiter;
-	private List<String> numbers;
-	private int id;
+	private List<Emoji> numbers;
 
 	public MangaSearchCmd(String name, EventWaiter waiter) {
 		super(name);
@@ -35,20 +35,8 @@ public class MangaSearchCmd extends Command {
 		setEmbedColor(new Color(46, 81, 162));
 		setCommandCategory(CommandCategory.ANIME);
 		this.waiter = waiter;
-		
-		// TODO Refactor it into a class EventWaiter
-		numbers = Arrays.asList(
-				Emojis.ONE.getAsNormal(), 
-				Emojis.TWO.getAsNormal(), 
-				Emojis.THREE.getAsNormal(), 
-				Emojis.FOUR.getAsNormal(), 
-				Emojis.FIVE.getAsNormal(), 
-				Emojis.SIX.getAsNormal(), 
-				Emojis.SEVEN.getAsNormal(), 
-				Emojis.EIGHT.getAsNormal(), 
-				Emojis.NINE.getAsNormal(), 
-				Emojis.TEN.getAsNormal());
-		id = -1;
+
+		numbers = Arrays.asList(Emoji.ONE, Emoji.TWO, Emoji.THREE, Emoji.FOUR, Emoji.FIVE, Emoji.SIX, Emoji.SEVEN, Emoji.EIGHT, Emoji.NINE, Emoji.TEN);
 	}
 
 	@Override
@@ -65,117 +53,78 @@ public class MangaSearchCmd extends Command {
 		}
 
 		String search = String.join(" ", args);
-		List<MangaResult> results;
+		List<Manga> results;
 
 		try {
 			results = JikanAPI.searchManga(search);
-		} catch (IOException ex) {
-			ex.printStackTrace();
+		} catch (InvalidRequestException ex) {
+			System.out.println("This shouldn't have happened!");
+			return;
+		} catch (APIException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong while fetching data from the API. Please try again in a few minutes!");
 			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
 			return;
 		}
 
+		// No results found
+		if (results.isEmpty()) {
+			builder.setTitle("Error");
+			builder.setDescription("Couldn't find any mangas with your given search terms!");
+			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
+			return;
+		}
+
 		deleteInvoke(e);
-		
+
 		StringBuilder sb = new StringBuilder();
 		for (int i = 0; i < results.size(); i++) {
-			sb.append(numbers.get(i) + " " + results.get(i).getTitle() + " [" + results.get(i).getType() + "]\n");
+			sb.append(numbers.get(i).getAsNormal() + " " + results.get(i).getTitle() + " [" + results.get(i).getType() + "]\n");
 		}
 		String result = sb.toString();
 
 		builder.setTitle("Manga Search Results");
 		builder.setDescription(result + "\nTo select one item, please use the according reaction");
 		builder.setColor(embedColor);
-		
-		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
-			msg.addReaction(Emojis.ONE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.TWO.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.THREE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.FOUR.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.FIVE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.SIX.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.SEVEN.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.EIGHT.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.NINE.getAsBrowser()).queue(v -> {}, err -> {});
-			msg.addReaction(Emojis.TEN.getAsBrowser()).queue(v -> {}, err -> {});
 
-			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
-				// Ignore reactions on other messages
-				if (evt.getMessageIdLong() != msg.getIdLong()) {
-					return false;
-				}
+		Message msg = e.getChannel().sendMessageEmbeds(builder.build()).complete();
+		addReactions(results.size(), msg);
 
-				// Ignore reactions from bots and people who didn't call this command
-				if (evt.retrieveUser().complete().isBot() || !e.getAuthor().equals(evt.retrieveUser().complete())) {
-					return false;
-				}
-
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.ONE.getAsBrowser())) {
-					id = results.get(0).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.TWO.getAsBrowser())) {
-					id = results.get(1).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.THREE.getAsBrowser())) {
-					id = results.get(2).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.FOUR.getAsBrowser())) {
-					id = results.get(3).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.FIVE.getAsBrowser())) {
-					id = results.get(4).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.SIX.getAsBrowser())) {
-					id = results.get(5).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.SEVEN.getAsBrowser())) {
-					id = results.get(6).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.EIGHT.getAsBrowser())) {
-					id = results.get(7).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.NINE.getAsBrowser())) {
-					id = results.get(8).getId();
-					return true;
-				}
-				if (evt.getReactionEmote().getEmoji().equals(Emojis.TEN.getAsBrowser())) {
-					id = results.get(9).getId();
-					return true;
-				}
-
-				// Wrong reaction
+		waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
+			// Ignore reactions on other messages
+			if (evt.getMessageIdLong() != msg.getIdLong()) {
 				return false;
-			}, evt -> {
-				msg.delete().queue();
-				displayManga(e);
-			}, 5, TimeUnit.MINUTES, () -> {
-				msg.delete().queue();
-			});
+			}
+
+			// Ignore reactions from bots and people who didn't call this command
+			if (evt.retrieveUser().complete().isBot() || !e.getAuthor().equals(evt.retrieveUser().complete())) {
+				return false;
+			}
+
+			for (int i = 0; i < results.size(); i++) {
+				if (evt.getReactionEmote().getEmoji().equals(numbers.get(i).getAsBrowser())) {
+					displayManga(results.get(i), e);
+					return true;
+				}
+			}
+			// Wrong reaction
+			return false;
+		}, evt -> {
+			msg.delete().queue();
+		}, 5, TimeUnit.MINUTES, () -> {
+			msg.delete().queue();
 		});
 	}
 
-	private void displayManga(MessageReceivedEvent e) {
-		EmbedBuilder builder = new EmbedBuilder();
-		Manga manga = null;
-		try {
-			manga = JikanAPI.getManga(id);
-		} catch (IOException ex) {
-			ex.printStackTrace();
-			builder.setTitle("Error");
-			builder.setDescription("Something went wrong while fetching your manga. Please try again in a few minutes!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false, embedColor);
-			return;
+	/** Adds as many number emojis as there are results */
+	private void addReactions(int count, Message msg) {
+		for (int i = 0; i < count; i++) {
+			msg.addReaction(numbers.get(i).getAsBrowser()).queue(v -> {}, err -> {});
 		}
+	}
+
+	private void displayManga(Manga manga, MessageReceivedEvent e) {
+		EmbedBuilder builder = new EmbedBuilder();
 
 		// Prepare fields
 		String genres = "";
@@ -191,7 +140,7 @@ public class MangaSearchCmd extends Command {
 
 		// Set embed
 		builder.setTitle(manga.getTitle());
-		builder.setThumbnail(manga.getImageUrl());
+		builder.setThumbnail(manga.getImages().jpg.largeImageUrl);
 		builder.setDescription(manga.getSynopsis());
 		if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle())) {
 			builder.addField("English Title", manga.getTitleEnglish(), true);

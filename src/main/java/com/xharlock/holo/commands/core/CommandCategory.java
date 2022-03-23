@@ -1,7 +1,9 @@
 package com.xharlock.holo.commands.core;
 
+/**
+ * Category of a {@link Command}
+ */
 public enum CommandCategory {
-
 	GENERAL("General Commands"),
 	ANIME("Anime Commands"),
 	MUSIC("Music Commands"),

@@ -17,12 +17,12 @@ public class PingCmd extends Command {
 		setDescription("Use this command to see my latency.");
 		setUsage(name);
 		setAliases(List.of("pong"));
-		setCmdCooldown(10);
 		setCommandCategory(CommandCategory.GENERAL);
 	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
+		deleteInvoke(e);
 		EmbedBuilder builder = new EmbedBuilder();		
 		builder.setTitle("Pong!");
 		builder.setDescription("Ping: `...` ms\nHeartbeat: `...` ms");

@@ -47,15 +47,12 @@ public class HelpCmd extends Command {
 			if (cmd.getUsage() != null) {
 				builder.addField("Usage", "`" + getPrefix(e) + cmd.getUsage() + "`", false);
 			}
-
 			if (cmd.getExample() != null) {
 				builder.addField("Example", "`" + getPrefix(e) + cmd.getExample() + "`", false);
 			}
-
 			if (cmd.getThumbnail() != null) {
 				builder.setThumbnail(cmd.getThumbnail());
 			}
-			
 			if (cmd.getAliases().size() != 0) {
 				String aliases = "`" + cmd.getAliases().get(0) + "`";
 				for (int i = 1; i < cmd.getAliases().size(); i++) {

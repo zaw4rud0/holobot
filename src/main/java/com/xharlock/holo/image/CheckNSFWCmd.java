@@ -152,7 +152,7 @@ public class CheckNSFWCmd extends Command {
 	}
 
 	/**
-	 * Method to get the image url out of a message (embed, attachment, etc.)
+	 * Get the image url out of a message (embed, attachment, etc.)
 	 */
 	private static String getImageUrl(Message msg) {
 		String url = null;
@@ -163,14 +163,12 @@ public class CheckNSFWCmd extends Command {
 				url = msg.getEmbeds().get(0).getImage().getUrl();
 			}
 		}
-		
 		// Attachment Image
 		else if (msg.getAttachments().size() != 0) {
 			if (msg.getAttachments().get(0).isImage()) {
 				url = msg.getAttachments().get(0).getUrl();
 			}
 		}
-		
 		// Url Image
 		else {
 			url = msg.getContentRaw();
@@ -179,7 +177,7 @@ public class CheckNSFWCmd extends Command {
 	}
 
 	/**
-	 * Method to draw a box into the image with the given properties
+	 * Draw a box into the image with the given properties
 	 */
 	private static BufferedImage drawBox(BufferedImage img, int x, int y, int width, int height, int boxNumber, int sizeClass) {
 		Graphics2D g2d = img.createGraphics();
@@ -193,7 +191,7 @@ public class CheckNSFWCmd extends Command {
 	}
 
 	/**
-	 * Method that makes an API request to evaluate the image
+	 * Makes an API request to evaluate the image
 	 */
 	private static JsonObject getJsonObject(String imageUrl) throws IOException {
 		String url = "https://api.deepai.org/api/nsfw-detector";
@@ -202,5 +200,4 @@ public class CheckNSFWCmd extends Command {
 		String result = new BufferedReader(new InputStreamReader(pr.getInputStream())).lines().collect(Collectors.joining("\n"));
 		return JsonParser.parseString(result).getAsJsonObject();
 	}
-
 }
