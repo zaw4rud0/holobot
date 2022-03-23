@@ -29,7 +29,7 @@ This Discord bot uses the following dependencies for its functionalities:
 
 A simple and lightweight wrapper written by myself for Jikan API to fetch Anime and Manga data from MyAnimeList
 
-### [PokeAPI4Java](https://github.com/xHarlock/NanoJikan)
+### [PokeAPI4Java](https://github.com/xHarlock/PokeAPI4Java)
 
 Another lightweight wrapper written by myself to simplify the usage of PokeAPI
 
