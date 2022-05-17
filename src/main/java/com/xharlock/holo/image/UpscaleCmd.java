@@ -1,84 +1,81 @@
 package com.xharlock.holo.image;
 
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.misc.EmbedColor;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import com.google.gson.JsonParser;
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.core.Bootstrap;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-public class UpscaleCmd extends Command {
-
-	public UpscaleCmd(String name) {
-		super(name);
-		setDescription("Use this command to upscale an image. You can also use an image as attachment or a link to it.");
-		setUsage(name + " <image link>");
-		setCommandCategory(CommandCategory.IMAGE);
-	}
+@Command(name = "upscale",
+		description = "Upscales a given image with Waifu2x. Please provide an image as an attachment " +
+					  "or a link to process it. Alternatively, you can reply to a message with an image.",
+		embedColor = EmbedColor.NONE,
+		category = CommandCategory.IMAGE)
+public class UpscaleCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
+	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
-		
-		EmbedBuilder builder = new EmbedBuilder();
-		String oldUrl = "";
+		EmbedBuilder eb = new EmbedBuilder();
 
-		if (args.length == 0) {
-			if (e.getMessage().getAttachments().size() == 0) {
-				builder.setTitle("Incorrect Usage");
-				builder.setDescription("You need to provide an image either as an attachment or as a link!");
-				sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
-				return;
-			}
-			oldUrl = e.getMessage().getAttachments().get(0).getUrl();
-		}
+		Message referenced = e.getMessage().getReferencedMessage();
+		String url = referenced != null ? getImage(referenced) : getImage(e.getMessage());
 
-		else {
-			if (args.length != 1) {
-				builder.setTitle("Incorrect Usage");
-				builder.setDescription("You need to provide an image either as an attachment or as a link!");
-				sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
-				return;
-			}
-			oldUrl = args[0].replace("<", "").replace(">", "");
+		// User didn't provide an image
+		if (url == null) {
+			eb.setTitle("Error");
+			eb.setDescription("You need to provide an image to upscale!");
+			sendEmbed(e, eb, 30, TimeUnit.SECONDS, true, getEmbedColor());
+			return;
 		}
 
 		sendTyping(e);
-		
-		String imgUrl = "";
 
 		try {
-			imgUrl = upscaleImage(oldUrl);
+			url = process(url);
 		} catch (IOException ex) {
-			builder.setTitle("Error");
-			builder.setDescription("Something went wrong while communicating with the API");
-			sendEmbed(e, builder, 15L, TimeUnit.SECONDS, false);
+			eb.setTitle("Error");
+			eb.setDescription("Something went wrong while processing your image! Please try again later.");
+			sendEmbed(e, eb, 30, TimeUnit.SECONDS, true, getEmbedColor());
 			return;
 		}
-		
-		builder.setTitle("Upscaled Image");
-		builder.setImage(imgUrl);
-		sendEmbed(e, builder, 2L, TimeUnit.MINUTES, true);
+
+		eb.setTitle("Upscaled Image");
+		eb.setImage(url);
+		sendEmbed(e, eb, 5, TimeUnit.MINUTES, true, getEmbedColor());
 	}
-	
-	private static final String url = "https://api.deepai.org/api/waifu2x";
-	
+
 	/**
-	 * Send an image url to waifu2x and return the url of the upscaled img
+	 * The URL of the Waifu2x API.
 	 */
-	private static String upscaleImage(String imageUrl) throws IOException {
+	public static final String apiUrl = "https://api.deepai.org/api/waifu2x";
+
+	/**
+	 * Sends a given image URL to the Waifu2x API where it is upscaled. The processed image is then returned.
+	 *
+	 * @param url The URL of the image to upscale.
+	 * @return The URL of the upscaled image.
+	 */
+	public static String process(String url) throws IOException {
 		String token = Bootstrap.holo.getConfig().getKeyDeepAI();
-		Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + url);
+		Process pr = Runtime.getRuntime().exec("curl -F image=" + url + " -H api-key:" + token + " " + apiUrl);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
 		String result = reader.lines().collect(Collectors.joining("\n"));
-		reader.close();
-		return JsonParser.parseString(result).getAsJsonObject().get("output_url").getAsString();
+		JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
+		if (obj == null || obj.get("err") != null) {
+			throw new IOException("No result!");
+		}
+		return obj.get("output_url").getAsString();
 	}
 }

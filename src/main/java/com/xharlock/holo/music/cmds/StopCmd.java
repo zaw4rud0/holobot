@@ -1,22 +1,20 @@
 package com.xharlock.holo.music.cmds;
 
-import java.util.concurrent.TimeUnit;
-
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
 import com.xharlock.holo.music.core.GuildMusicManager;
-import com.xharlock.holo.music.core.MusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class StopCmd extends MusicCommand {
+import java.util.concurrent.TimeUnit;
 
-	public StopCmd(String name) {
-		super(name);
-		setDescription("Use this command to stop my current track and to clear the queue");
-		setUsage(name);
-		setIsOwnerCommand(true);
-	}
+@Command(name = "stop",
+		description = "Stops the current song and clears the queue.",
+		ownerOnly = true,
+		category = CommandCategory.MUSIC)
+public class StopCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {

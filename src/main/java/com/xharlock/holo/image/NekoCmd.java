@@ -1,41 +1,38 @@
 package com.xharlock.holo.image;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.Random;
-import java.util.concurrent.TimeUnit;
-
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.annotations.Deactivated;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.utils.HttpResponse;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class NekoCmd extends Command {
+import java.io.IOException;
+import java.util.Random;
+import java.util.concurrent.TimeUnit;
 
-	private String[] urls = { 
+@Deactivated
+@Command(name = "neko",
+		description = "Sends a random catgirl (neko) image.",
+		alias = {"catgirl", "kemonomimi"},
+		isNSFW = true,
+		category = CommandCategory.IMAGE)
+public class NekoCmd extends AbstractCommand {
+
+	private final String[] urls = {
 			"https://nekos.life/api/v2/img/neko", 
 			"https://neko-love.xyz/api/v1/neko",
 			"https://nekos.life/api/v2/img/kemonomimi",
 			"https://nekos.best/api/v1/nekos"
 	};
 
-	public NekoCmd(String name) {
-		super(name);
-		setDescription("Use this command to get a picture of a catgirl (neko)");
-		setAliases(List.of("catgirl", "kemonomimi"));
-		setUsage(name);
-		setIsNSFW(true);
-		setCommandCategory(CommandCategory.IMAGE);
-	}
-
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
-		String url = null;
+		String url;
 
 		try {
 			// Keeps fetching a new url until the url isn't on the blocklist

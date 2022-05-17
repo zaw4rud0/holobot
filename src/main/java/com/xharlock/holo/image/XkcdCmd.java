@@ -1,93 +1,154 @@
 package com.xharlock.holo.image;
 
-import java.io.IOException;
-import java.util.Random;
-
-import com.google.gson.JsonObject;
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.utils.HttpResponse;
-
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.apis.XkcdAPI;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.database.DBOperations;
+import com.xharlock.holo.exceptions.APIException;
+import com.xharlock.holo.exceptions.InvalidRequestException;
+import com.xharlock.holo.misc.EmbedColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class XkcdCmd extends Command {
+import java.awt.*;
+import java.sql.SQLException;
+import java.util.*;
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-	private int newestIssue;
-	private static final String explainedUrl = "https://www.explainxkcd.com/";
-	
-	public XkcdCmd(String name) {
-		super(name);
-		setDescription("Use this command to access the comics of xkcd");
-		setUsage(name + " [new|issue_nr]");
-		setCommandCategory(CommandCategory.MISC);
+@Command(name = "xkcd",
+        description = "Use this command to access the comics of xkcd.",
+        usage = "[new | <issue nr> | <title>]",
+        thumbnail = "https://xkcd.com/s/0b7742.png",
+        embedColor = EmbedColor.WHITE,
+        category = CommandCategory.IMAGE)
+public class XkcdCmd extends AbstractCommand {
 
-		try {
-			newestIssue = HttpResponse.getJsonObject("https://xkcd.com/info.0.json").get("num").getAsInt();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
+    /* TODO: Retrieve issues from the DB instead of storing them in a map */
+    private final Map<Integer, XkcdAPI.Comic> comics;
+    private int newestIssue;
 
-	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		deleteInvoke(e);
-		EmbedBuilder builder = new EmbedBuilder();
-		
-		// Random issue
-		if (args.length == 0) {
-			Random random = new Random();
-			JsonObject object = null;
-			try {
-				object = HttpResponse.getJsonObject("https://xkcd.com/" + (random.nextInt(newestIssue) + 1) + "/info.0.json");
-			} catch (IOException ex) {
-				return;
-			}
-			
-			int issueNr = object.get("num").getAsInt();
-			builder.setTitle(object.get("title").getAsString() + " (xkcd #" + issueNr + ")");
-			builder.setDescription("[Explained](" + explainedUrl + issueNr + ")");
-			builder.setImage(object.get("img").getAsString());
-		}
-		
-		// Newest issue
-		else if (args[0].equals("new")) {
-			JsonObject object = null;
-			try {
-				object = HttpResponse.getJsonObject("https://xkcd.com/info.0.json");
-			} catch (IOException ex) {
-				ex.printStackTrace();
-				return;
-			}
-			
-			int issueNr = object.get("num").getAsInt();
-			builder.setTitle(object.get("title").getAsString() + " (xkcd #" + issueNr + ")");
-			builder.setDescription("[Explained](" + explainedUrl + issueNr + ")");
-			builder.setImage(object.get("img").getAsString());
-			newestIssue = issueNr;
-		} 
-		
-		// Specific issue
-		else {
-			int num;
-			JsonObject object = null;
-			try {
-				num = Integer.parseInt(args[0]);
-				if (num > newestIssue || num < 1) {
-					return;
-				}
-				object = HttpResponse.getJsonObject("https://xkcd.com/" + num + "/info.0.json");
-			} catch (NumberFormatException | IOException ex) {
-				ex.printStackTrace();
-				return;
-			}
-			
-			int issueNr = object.get("num").getAsInt();
-			builder.setTitle(object.get("title").getAsString() + " (xkcd #" + issueNr + ")");
-			builder.setDescription("[Explained](" + explainedUrl + issueNr + ")");
-			builder.addField("Date", object.get("day").getAsInt() + "/" + object.get("month").getAsInt() + "/" + object.get("year").getAsInt(), true);
-			builder.setImage(object.get("img").getAsString());	
-		}
-		sendEmbed(e, builder, true);
-	}
+    public XkcdCmd() {
+        comics = new HashMap<>();
+
+        try {
+            List<XkcdAPI.Comic> list = DBOperations.getXkcdComics();
+            Collections.sort(list);
+
+            // Get the newest issue
+            newestIssue = list.get(list.size() - 1).getIssueNr();
+
+            for (XkcdAPI.Comic comic : list) {
+                comics.put(comic.getIssueNr(), comic);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        }
+    }
+
+    @Override
+    public void onCommand(MessageReceivedEvent e) {
+        deleteInvoke(e);
+        EmbedBuilder builder = new EmbedBuilder();
+        XkcdAPI.Comic comic = null;
+
+        // Random issue
+        if (args.length == 0) {
+            try {
+                comic = XkcdAPI.getComic(new Random().nextInt(newestIssue) + 1);
+                storeIfNew(comic);
+            } catch (APIException | InvalidRequestException | SQLException ex) {
+                sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
+                return;
+            }
+        }
+
+        // Newest issue
+        else if (args[0].equals("new")) {
+            try {
+                comic = XkcdAPI.getLatest();
+                storeIfNew(comic);
+            } catch (APIException | SQLException ex) {
+                sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
+                return;
+            }
+        }
+
+        // Specific issue by number
+        else if (isInteger(args[0])) {
+            int num = Integer.parseInt(args[0]);
+
+            if (num > newestIssue || num < 1) {
+                sendErrorMessage(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
+                return;
+            }
+
+            try {
+                comic = XkcdAPI.getComic(num);
+            } catch (APIException | InvalidRequestException ex) {
+                sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
+                return;
+            }
+        }
+
+        // Specific issue by title
+        else {
+            String title = String.join(" ", args).toLowerCase(Locale.UK);
+
+            for (XkcdAPI.Comic c : comics.values()) {
+                if (c.getTitle().toLowerCase(Locale.UK).equals(title)) {
+                    comic = c;
+                    break;
+                }
+            }
+
+            // Couldn't find the comic
+            if (comic == null) {
+                sendErrorMessage(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
+                return;
+            }
+        }
+
+        // Builds the embed and sends it
+        builder.setTitle("xkcd " + comic.getIssueNr() + ": " + comic.getTitle());
+        builder.setDescription(comic.getAlt() + "\n\n[Explanation](" + comic.getExplainedUrl() + ")");
+        builder.setImage(comic.getImg());
+        sendEmbed(e, builder, true, getEmbedColor());
+    }
+
+    private void sendErrorMessage(MessageReceivedEvent e, String message) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("Error");
+        builder.setDescription(message);
+        sendEmbed(e, builder, 30, TimeUnit.SECONDS, true, Color.RED);
+    }
+
+    private void storeIfNew(XkcdAPI.Comic comic) throws SQLException {
+        int num = comic.getIssueNr();
+
+        // Not new
+        if (num <= newestIssue) {
+            return;
+        }
+
+        List<XkcdAPI.Comic> newComics = new ArrayList<>();
+
+        // Store all comics up to the newest issue
+        for (int i = newestIssue + 1; i <= num; i++) {
+            XkcdAPI.Comic newComic;
+            try {
+                newComic = XkcdAPI.getComic(i);
+            } catch (APIException | InvalidRequestException ex) {
+                ex.printStackTrace();
+                return;
+            }
+            comics.put(newComic.getIssueNr(), newComic);
+            newComics.add(newComic);
+        }
+        newestIssue = num;
+
+        // Store new comics in the database
+        DBOperations.insertXkcdComics(newComics);
+    }
 }

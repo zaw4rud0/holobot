@@ -32,7 +32,7 @@ public final class Formatter {
 		if (minutes > 0) {
 			formatted += minutes + " minutes and ";
 		}
-		return formatted += seconds + " seconds";
+		return formatted + (seconds + " seconds");
 	}
 
 	/**
@@ -50,8 +50,21 @@ public final class Formatter {
 		return string.substring(0, 1).toUpperCase(Locale.UK) + string.substring(1);
 	}
 
-	public static String escapeCharacters(String raw) {
-		return raw.replace(" ", "%20").replace("“", "%22").replace("#", "%23").replace("$", "%24").replace("&", "%26").replace("‘", "%27").replace("@", "%40").replace("`", "%60")
-				.replace("/", "%2F").replace("?", "%3F").replace(",", "%2C").replace(":", "%3A").replace(";", "%3B").replace("+", "%2B").replace("~", "%7E");
+	public static String escape(String raw) {
+		return raw.replace(" ", "%20")
+				.replace("“", "%22")
+				.replace("#", "%23")
+				.replace("$", "%24")
+				.replace("&", "%26")
+				.replace("‘", "%27")
+				.replace("@", "%40")
+				.replace("`", "%60")
+				.replace("/", "%2F")
+				.replace("?", "%3F")
+				.replace(",", "%2C")
+				.replace(":", "%3A")
+				.replace(";", "%3B")
+				.replace("+", "%2B")
+				.replace("~", "%7E");
 	}
 }

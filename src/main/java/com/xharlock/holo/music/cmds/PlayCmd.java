@@ -1,22 +1,20 @@
 package com.xharlock.holo.music.cmds;
 
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.xharlock.holo.music.core.MusicCommand;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class PlayCmd extends MusicCommand {
+import java.util.concurrent.TimeUnit;
 
-	public PlayCmd(String name) {
-		super(name);
-		setDescription("Use this command to play a track. If there is already a track playing, it will be added to the queue.");
-		setUsage(name + " <link>");
-		setAliases(List.of("p"));
-	}
+@Command(name = "play",
+		description = "Plays a given YouTube video or playlist. If there is already a track playing, it will be queued.",
+		usage = "<url>",
+		alias = {"p"},
+		category = CommandCategory.MUSIC)
+public class PlayCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {

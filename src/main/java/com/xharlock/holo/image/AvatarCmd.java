@@ -1,27 +1,23 @@
 package com.xharlock.holo.image;
 
-import java.awt.Color;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
-
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.Nullable;
 
-public class AvatarCmd extends Command {
+import java.awt.*;
+import java.util.concurrent.TimeUnit;
 
-	public AvatarCmd(String name) {
-		super(name);
-		setDescription("Use this command to get your own avatar or the avatar of a given user inside the guild. Tip: Use the id of the user if you don't want to ping them.");
-		setUsage(name + " [user id]");
-		setAliases(List.of("av", "pfp"));
-		setIsGuildOnlyCommand(true);
-		setCommandCategory(CommandCategory.IMAGE);
-	}
+@Command(name = "avatar",
+		description = "Retrieves the avatar of a specified user. Tip: Use the id of the user if you don't want to ping them.",
+		usage = "[<user id>]",
+		alias = {"av", "pfp"},
+		category = CommandCategory.IMAGE)
+public class AvatarCmd extends AbstractCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
@@ -65,8 +61,9 @@ public class AvatarCmd extends Command {
 	}
 
 	/**
-	 * Returns the user as a member of the guild. If the user isn't a member, the
+	 * Returns the user as a member of the guild. If the user isn't a member, it returns null
 	 */
+	@Nullable
 	private Member getMember(MessageReceivedEvent e, User user) {
 		try {
 			return e.getGuild().retrieveMember(user).complete();

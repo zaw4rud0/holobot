@@ -1,35 +1,32 @@
 package com.xharlock.holo.image;
 
-import java.io.IOException;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.annotations.Deactivated;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.utils.HttpResponse;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class HoloCmd extends Command {
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+
+@Deactivated
+@Command(name = "holo",
+		description = "Sends a random image of Holo from Spice & Wolf.",
+		alias = {"bestgirl", "waifu", "wisewolf"},
+		isNSFW = true,
+		category = CommandCategory.IMAGE)
+public class HoloCmd extends AbstractCommand {
 
 	private static final String apiUrl = "https://nekos.life/api/v2/img/holo";
-	
-	public HoloCmd(String name) {
-		super(name);
-		setDescription("Use this command to get a picture of Holo");
-		setAliases(List.of("bestgirl", "waifu", "wisewolf"));
-		setUsage(name);
-		setIsNSFW(true);
-		setCommandCategory(CommandCategory.IMAGE);
-	}
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
 		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
-		String url = null;
+		String url;
 		
 		try {
 			// Keeps fetching a new url until url isn't on blocklist

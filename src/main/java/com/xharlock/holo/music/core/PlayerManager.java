@@ -1,10 +1,5 @@
 package com.xharlock.holo.music.core;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.DefaultAudioPlayerManager;
@@ -12,19 +7,23 @@ import com.sedmelluq.discord.lavaplayer.source.AudioSourceManagers;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
+
 public class PlayerManager {
 
 	private static PlayerManager INSTANCE;
-	private Map<Long, GuildMusicManager> musicManagers;
-	private AudioPlayerManager audioPlayerManager;
+	private final Map<Long, GuildMusicManager> musicManagers;
+	private final AudioPlayerManager audioPlayerManager;
 
 	public PlayerManager() {
-		musicManagers = new HashMap<Long, GuildMusicManager>();
+		musicManagers = new HashMap<>();
 		AudioSourceManagers.registerRemoteSources(audioPlayerManager = new DefaultAudioPlayerManager());
 		AudioSourceManagers.registerLocalSource(audioPlayerManager);
 	}
@@ -59,7 +58,7 @@ public class PlayerManager {
 
 			@Override
 			public void playlistLoaded(AudioPlaylist playlist) {
-				List<AudioTrack> tracks = (List<AudioTrack>) playlist.getTracks();
+				List<AudioTrack> tracks = playlist.getTracks();
 				for (AudioTrack track : tracks) {
 					musicManager.scheduler.enqueue(track);
 				}

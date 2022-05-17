@@ -1,24 +1,22 @@
 package com.xharlock.holo.music.cmds;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.PlayerManager;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.xharlock.holo.music.core.GuildMusicManager;
-import com.xharlock.holo.music.core.MusicCommand;
-import com.xharlock.holo.music.core.PlayerManager;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-public class CloneCmd extends MusicCommand {
-
-	public CloneCmd(String name) {
-		super(name);
-		setDescription("Use this command to duplicate the currently playing track and add it on top of the queue");
-		setUsage(name);
-	}
+@Command(name = "clone",
+		description = "Duplicates the currently playing track and adds it on top of the queue.",
+		category = CommandCategory.MUSIC)
+public class CloneCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
@@ -58,7 +56,7 @@ public class CloneCmd extends MusicCommand {
 		String uri = musicManager.audioPlayer.getPlayingTrack().getInfo().uri.split("v=")[1].split("&")[0];
 		String thumbnail = "https://img.youtube.com/vi/" + uri + "/hqdefault.jpg";
 
-		// Display informations of the cloned track
+		// Display information of the cloned track
 		builder.setTitle("Cloned track");
 		builder.setThumbnail(thumbnail);
 		builder.addField("Title", current.getInfo().title, false);

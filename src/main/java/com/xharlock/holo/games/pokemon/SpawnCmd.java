@@ -1,31 +1,34 @@
 package com.xharlock.holo.games.pokemon;
 
-import java.io.IOException;
-
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.annotations.Deactivated;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.utils.ImageOperations;
 import com.xharlock.pokeapi4java.PokeAPI;
 import com.xharlock.pokeapi4java.exception.InvalidPokedexIdException;
 import com.xharlock.pokeapi4java.exception.PokemonNotFoundException;
 import com.xharlock.pokeapi4java.model.Pokemon;
 import com.xharlock.pokeapi4java.model.PokemonSpecies;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class SpawnCmd extends Command {
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
 
-	PokemonSpawnManager manager;
+@Deactivated
+@Command(name = "spawn",
+		description = "Spawns a Pokémon",
+		usage = "[<Pokémon name or id> | random]",
+		ownerOnly = true,
+		category = CommandCategory.GENERAL)
+public class SpawnCmd extends AbstractCommand {
 
-	public SpawnCmd(String name) {
-		super(name);
-		setDescription("(Owner-only) Use this command to spawn a Pokémon");
-		setUsage(name + " [<Pokémon name or id> | random]");
-		setIsGuildOnlyCommand(true);
-		setIsOwnerCommand(true);
-		setCommandCategory(CommandCategory.GAMES);
+	private final PokemonSpawnManager manager;
 
+	public SpawnCmd() {
 		manager = Bootstrap.holo.getPokemonSpawnManager();
 	}
 
@@ -35,23 +38,23 @@ public class SpawnCmd extends Command {
 
 		EmbedBuilder builder = new EmbedBuilder();
 
-		PokemonSpecies species = null;
-		Pokemon pokemon = null;
+		PokemonSpecies species;
+		Pokemon pokemon;
 
 		try {
 			// Spawn random Pokémon
 			if (args.length == 0 || args.length == 1 && args[0].equals("random")) {
 				species = PokeAPI.getRandomPokemonSpecies();
-				manager.messages.get(e.getTextChannel().getIdLong()).delete().queue();
+				manager.deleteMessage(e.getTextChannel().getIdLong());
 			}
-			// Make Pokémons spawn in a new text channel
+			// Make Pokémon spawn in a new text channel
 			else if (args[0].equals("add")) {
 				species = PokeAPI.getRandomPokemonSpecies();
 			}
 			// Spawn specific Pokémon
 			else {
 				species = PokeAPI.getPokemonSpecies(args[0]);
-				manager.messages.get(e.getTextChannel().getIdLong()).delete().queue();
+				manager.deleteMessage(e.getTextChannel().getIdLong());
 			}
 			pokemon = species.getPokemon();
 		} catch (IOException ex) {
@@ -66,5 +69,21 @@ public class SpawnCmd extends Command {
 			return;
 		}
 		manager.spawnNewPokemon(e.getTextChannel().getIdLong(), pokemon);
+	}
+
+	/**
+	 * Creates a Pokémon scene with the Pokémon silhouette and the background.
+	 *
+	 * @param pokemon = A BufferedImage of the Pokémon sprite.
+	 * @param background = A BufferedImage of the background.
+	 * @return A BufferedImage of the Pokémon scene.
+	 */
+	public static BufferedImage createPokemonScene(BufferedImage pokemon, BufferedImage background) {
+		Graphics2D g2 = background.createGraphics();
+		BufferedImage silhouette = ImageOperations.turnBlack(pokemon);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+		g2.drawImage(silhouette, 200, 50, 400, 400, null);
+		g2.dispose();
+		return background;
 	}
 }

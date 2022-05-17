@@ -1,18 +1,18 @@
 package com.xharlock.holo.music.cmds;
 
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.annotations.Deactivated;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
 import com.xharlock.holo.music.core.GuildMusicManager;
-import com.xharlock.holo.music.core.MusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
-
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class LoopCmd extends MusicCommand {
-
-	public LoopCmd(String name) {
-		super(name);
-		setDescription("Use this command to loop the current track");
-		setUsage(name);
-	}
+@Deactivated
+@Command(name = "loop",
+		description = "Loops the current song",
+		category = CommandCategory.MUSIC)
+public class LoopCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {

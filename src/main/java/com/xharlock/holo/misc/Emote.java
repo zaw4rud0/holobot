@@ -2,8 +2,10 @@ package com.xharlock.holo.misc;
 
 /** Represents a Discord emote which is different to an {@link Emoji} */
 public enum Emote {
+    PINGED("pinged:975678737205063721"),
 	PEPELOVE("pepelove:806641947292860466"),
 	HOLOSMUG(""),
+    HOLOSMILE(":HoloSmile:975684803523403787"),
 	
 	HOLOSMASH1("HoloSmash1:841655527796244500"),
 	HOLOSMASH2("HoloSmash2:841655571064553523"),
@@ -12,12 +14,6 @@ public enum Emote {
 	CROSS("cross:824297739377573910"),
 	UNDO("undo:824289332688060416"),
 	CONTINUE("continue:824749379842998283"),
-	
-	// Pokémon Balls
-	POKE_BALL("Poké_Ball:847677146116915260"),
-	GREAT_BALL("Great_Ball:847677175931076679"),
-	ULTRA_BALL("Ultra_Ball:847677210898071562"),
-	MASTER_BALL("Master_Ball:847677098034069514"),
 	
 	// Pokémon Types
 	TYPE_NORMAL("type_normal:805109990393905192"), 
@@ -39,7 +35,7 @@ public enum Emote {
     TYPE_GHOST("type_ghost:805109990754222111"),
     TYPE_ICE("type_ice:805109990394298398");
     
-    private String id;
+    private final String id;
     
     Emote(String id) {
         this.id = id;

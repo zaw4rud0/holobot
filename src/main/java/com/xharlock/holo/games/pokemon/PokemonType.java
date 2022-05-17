@@ -1,8 +1,8 @@
 package com.xharlock.holo.games.pokemon;
 
-import java.awt.Color;
-
 import com.xharlock.holo.misc.Emote;
+
+import java.awt.*;
 
 public enum PokemonType {
 	
@@ -25,9 +25,9 @@ public enum PokemonType {
 	GHOST("Ghost", Emote.TYPE_GHOST, new Color(112, 88, 152)),
 	ICE("Ice", Emote.TYPE_ICE, new Color(152, 216, 216));
 
-	private String name;
-	private Emote emote;
-	private Color color;
+	private final String name;
+	private final Emote emote;
+	private final Color color;
 	
 	PokemonType(String name, Emote emote, Color color) {
 		this.name = name;

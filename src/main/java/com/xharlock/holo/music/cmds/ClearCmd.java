@@ -1,32 +1,31 @@
 package com.xharlock.holo.music.cmds;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.stream.Collectors;
-
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
 import com.xharlock.holo.misc.Emoji;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
 import com.xharlock.holo.music.core.GuildMusicManager;
-import com.xharlock.holo.music.core.MusicCommand;
 import com.xharlock.holo.music.core.PlayerManager;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 
-public class ClearCmd extends MusicCommand {
+import java.util.List;
+import java.util.concurrent.TimeUnit;
 
-	private EventWaiter waiter;
+@Command(name = "clear",
+		description = """
+					Requests to clear the queue. About half of the members in the voice channel (bot excluded) that are actively listening (i.e. not deafened) have to react with an upvote in order to clear the queue.
+					""",
+		category = CommandCategory.MUSIC)
+public class ClearCmd extends AbstractMusicCommand {
 
-	public ClearCmd(String name, EventWaiter waiter) {
-		super(name);
-		setDescription("Use this command to request a queue clear. About half of the members "
-				+ "in the voice channel (bot excluded) that actively listening (i.e. not deafened) "
-				+ "have to react with an upvote in order to skip the track.");
-		setUsage(name);
+	private final EventWaiter waiter;
+
+	public ClearCmd(EventWaiter waiter) {
 		this.waiter = waiter;
 	}
 
@@ -73,9 +72,8 @@ public class ClearCmd extends MusicCommand {
 
 		// Add all members in the voice channel that are not deafened to the list of
 		// active listeners
-		List<Member> listeners = new ArrayList<Member>();
-		listeners.addAll(e.getGuild().getSelfMember().getVoiceState().getChannel().getMembers().stream()
-				.filter(m -> !m.getUser().isBot() && !m.getVoiceState().isDeafened()).collect(Collectors.toList()));
+		List<Member> listeners = e.getGuild().getSelfMember().getVoiceState().getChannel()
+				.getMembers().stream().filter(m -> !m.getUser().isBot() && !m.getVoiceState().isDeafened()).toList();
 
 		int requiredVotes = (int) Math.floor(listeners.size() / 2.0);
 
@@ -91,7 +89,7 @@ public class ClearCmd extends MusicCommand {
 		builder.setDescription("Upvote to clear the queue\n`" + requiredVotes + "` upvotes are required");
 
 		e.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> {
-			msg.addReaction(Emoji.UPVOTE.getAsBrowser()).queue(v -> {}, err -> {});
+			msg.addReaction(Emoji.UPVOTE.getAsDisplay()).queue(v -> {}, err -> {});
 
 			waiter.waitForEvent(MessageReactionAddEvent.class, evt -> {
 
@@ -100,7 +98,7 @@ public class ClearCmd extends MusicCommand {
 					return false;
 				}
 
-				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emoji.UPVOTE.getAsBrowser())) {
+				if (listeners.contains(evt.getMember())	&& evt.getReactionEmote().getEmoji().equals(Emoji.UPVOTE.getAsDisplay())) {
 					if (musicManager.getCounter().incrementAndGet() == requiredVotes) {
 						return true;
 					}

@@ -1,9 +1,6 @@
 /target/
-/config.json
-/.classpath
-/.project
+/botConfig.json
 /.dbeaver
-/.settings
 /builds
 /bin/
 /output/
@@ -15,5 +12,8 @@
 /cookie.txt
 /rulesets/
 /.eclipse-pmd
-/delete.json
+/src/main/resources/misc/delete.json
 /src/main/java/com/xharlock/holo/development/
+/.idea/
+/TODO.md
+/config.json

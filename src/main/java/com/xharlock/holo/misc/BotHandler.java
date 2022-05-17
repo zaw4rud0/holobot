@@ -1,10 +1,10 @@
 package com.xharlock.holo.misc;
 
-import java.util.Locale;
-import java.util.Random;
-
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+
+import java.util.Locale;
+import java.util.Random;
 
 /**
  * Class that handles everything related to other fellow bots in a guild

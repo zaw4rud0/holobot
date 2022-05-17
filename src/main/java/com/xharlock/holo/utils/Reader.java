@@ -1,15 +1,15 @@
 package com.xharlock.holo.utils;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+import com.google.gson.stream.JsonReader;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Scanner;
-
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-import org.json.simple.parser.ParseException;
 
 public final class Reader {
 
@@ -23,18 +23,16 @@ public final class Reader {
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
 		}
-		String s = scanner.nextLine();
-		scanner.close();
-		return s;
-	}
-	
-	public static JSONObject readJSONObject(String filepath) throws IOException, ParseException {
-		JSONParser parser = new JSONParser();
-		return (JSONObject) parser.parse(new FileReader(filepath));
+		return scanner != null ? scanner.nextLine() : null;
 	}
 
-	public static JSONArray readJSONArray(String filepath) throws IOException, ParseException {
-		JSONParser parser = new JSONParser();
-		return (JSONArray) parser.parse(new FileReader(filepath));
+	public static JsonObject readJsonObject(String filepath) throws IOException {
+		JsonReader reader = new JsonReader(new FileReader(filepath));
+		return new Gson().fromJson(reader, JsonObject.class);
+	}
+
+	public static JsonArray readJsonArray(String filepath) throws IOException {
+		JsonReader reader = new JsonReader(new FileReader(filepath));
+		return new Gson().fromJson(reader, JsonArray.class);
 	}
 }

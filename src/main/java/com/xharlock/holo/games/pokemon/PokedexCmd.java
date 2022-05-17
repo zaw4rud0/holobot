@@ -1,32 +1,28 @@
 package com.xharlock.holo.games.pokemon;
 
-import java.awt.Color;
-import java.io.IOException;
-import java.util.List;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
-
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.pokeapi4java.PokeAPI;
 import com.xharlock.pokeapi4java.exception.InvalidPokedexIdException;
 import com.xharlock.pokeapi4java.exception.PokemonNotFoundException;
 import com.xharlock.pokeapi4java.model.Pokemon;
 import com.xharlock.pokeapi4java.model.PokemonSpecies;
-
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
-public class PokedexCmd extends Command {
+import java.awt.*;
+import java.io.IOException;
+import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
-	public PokedexCmd(String name) {
-		super(name);
-		setDescription("Use this command to look up a Pokémon");
-		setUsage(name + " <pokémon name or id>");
-		setAliases(List.of("dex"));
-		setIsGuildOnlyCommand(false);
-		setCommandCategory(CommandCategory.GAMES);
-	}
+@Command(name = "pokedex",
+		description = "Looks up a Pokémon and returns its information.",
+		usage = "<Pokémon name or id>",
+		alias = {"dex"},
+		guildOnly = false,
+		category = CommandCategory.GAMES)
+public class PokedexCmd extends AbstractCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
@@ -43,8 +39,8 @@ public class PokedexCmd extends Command {
 		}
 
 		String search = String.join(" ", args);
-		PokemonSpecies species = null;
-		Pokemon pokemon = null;
+		PokemonSpecies species;
+		Pokemon pokemon;
 
 		try {
 			species = PokeAPI.getPokemonSpecies(search);
@@ -52,7 +48,7 @@ public class PokedexCmd extends Command {
 		} catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong. Please try again in a few minutes!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, 30, TimeUnit.SECONDS, false);
 			return;
 		} catch (PokemonNotFoundException | InvalidPokedexIdException ex) {
 			builder.setTitle("Error");
@@ -63,21 +59,21 @@ public class PokedexCmd extends Command {
 
 		// Prepare embed fields
 		String name = species.getName("en");
-		String gen = species.generation.name.toUpperCase(Locale.UK).replace("GENERATION-", "Gen ");
-		String type = "";
+		String gen = species.getGeneration().getName().toUpperCase(Locale.UK).replace("GENERATION-", "Gen ");
+		String type;
 		if (pokemon.getTypes().size() != 2) {
-			type = getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0);
+			type = PokemonUtils.getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0);
 		} else {
-			type = getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0) + "\n" + getType(pokemon.getTypes().get(1)).getEmote().getAsText() + " "	+ pokemon.getTypes().get(1);
+			type = PokemonUtils.getType(pokemon.getTypes().get(0)).getEmote().getAsText() + " " + pokemon.getTypes().get(0) + "\n" + PokemonUtils.getType(pokemon.getTypes().get(1)).getEmote().getAsText() + " "	+ pokemon.getTypes().get(1);
 		}
 		String abilities = String.join("\n", pokemon.getAbilities());
-		String genderRatio = species.genderRate == -1.0 ? "100% \u26b2" : 100 - species.genderRate / 8.0 * 100 + "% \\\u2642 | " + species.genderRate / 8.0 * 100 + "% \\\u2640";
+		String genderRatio = species.getGenderRate() == -1.0 ? "Genderless" : 100 - species.getGenderRate() / 8.0 * 100 + "% \\\u2642 | " + species.getGenderRate() / 8.0 * 100 + "% \\\u2640";
 		String entry = species.getPokedexEntry("en");
 		String evolutionChain = species.getEvolutionChainString().equals(name) ? null : species.getEvolutionChainString().replace(name, "*" + name + "*");
 
 		// Set embed
-		builder.setTitle(name + " | " + "#" + species.pokedexId + " | " + gen);
-		builder.setThumbnail(pokemon.sprites.other.artwork.frontDefault);
+		builder.setTitle(name + " | " + "#" + species.getPokedexId() + " | " + gen);
+		builder.setThumbnail(pokemon.getSprites().getOther().getArtwork().getFrontDefault());
 		builder.setDescription(species.getGenus("en"));
 		builder.addField("Type", type, true);
 		builder.addField("Ability", abilities, true);
@@ -91,83 +87,29 @@ public class PokedexCmd extends Command {
 			builder.addBlankField(true);
 		}
 		builder.addField("Gender Ratio", genderRatio, true);
-		builder.addField("Height", pokemon.height / 10.0 + " m", true);
-		builder.addField("Weight", pokemon.weight / 10.0 + " kg", true);
+		builder.addField("Height", pokemon.getHeight() / 100.0 + " m", true);
+		builder.addField("Weight", pokemon.getWeight() / 1000.0 + " kg", true);
 		builder.addField("Pokédex Entry", entry, false);
 		if (evolutionChain != null) {
 			builder.addField("Evolution", evolutionChain, false);
 		}
 		
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, getColor(species.color.name));
+		sendEmbed(e, builder, 2, TimeUnit.MINUTES, true, getColor(species.getColor().getName()));
 	}
 
 	private Color getColor(String color) {
-		switch (color) {
-		case "red":
-			return Color.RED;
-		case "blue":
-			return new Color(148, 219, 238);
-		case "yellow":
-			return Color.YELLOW;
-		case "green":
-			return Color.GREEN;
-		case "black":
-			return Color.BLACK;
-		case "brown":
-			return new Color(204, 153, 102);
-		case "purple":
-			return new Color(193, 131, 193);
-		case "gray":
-			return Color.GRAY;
-		case "white":
-			return Color.WHITE;
-		case "pink":
-			return Color.PINK;
-		default:
-			return null;
-		}
-	}
-
-	private static PokemonType getType(String type) {
-		switch (type.toLowerCase(Locale.UK)) {
-		case "normal":
-			return PokemonType.NORMAL;
-		case "fire":
-			return PokemonType.FIRE;
-		case "fighting":
-			return PokemonType.FIGHTING;
-		case "flying":
-			return PokemonType.FLYING;
-		case "water":
-			return PokemonType.WATER;
-		case "grass":
-			return PokemonType.GRASS;
-		case "electric":
-			return PokemonType.ELECTRIC;
-		case "poison":
-			return PokemonType.POISON;
-		case "dark":
-			return PokemonType.DARK;
-		case "fairy":
-			return PokemonType.FAIRY;
-		case "psychic":
-			return PokemonType.PSYCHIC;
-		case "steel":
-			return PokemonType.STEEL;
-		case "rock":
-			return PokemonType.ROCK;
-		case "ground":
-			return PokemonType.GROUND;
-		case "bug":
-			return PokemonType.BUG;
-		case "dragon":
-			return PokemonType.DRAGON;
-		case "ghost":
-			return PokemonType.GHOST;
-		case "ice":
-			return PokemonType.ICE;
-		default:
-			return null;
-		}
+		return switch (color) {
+			case "red" -> Color.RED;
+			case "blue" -> new Color(148, 219, 238);
+			case "yellow" -> Color.YELLOW;
+			case "green" -> Color.GREEN;
+			case "black" -> Color.BLACK;
+			case "brown" -> new Color(204, 153, 102);
+			case "purple" -> new Color(193, 131, 193);
+			case "gray" -> Color.GRAY;
+			case "white" -> Color.WHITE;
+			case "pink" -> Color.PINK;
+			default -> null;
+		};
 	}
 }

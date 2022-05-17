@@ -1,29 +1,27 @@
 package com.xharlock.holo.music.cmds;
 
+import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
+import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
+import com.xharlock.holo.music.core.GuildMusicManager;
+import com.xharlock.holo.music.core.PlayerManager;
+import com.xharlock.holo.utils.Formatter;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 
-import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
-import com.xharlock.holo.music.core.GuildMusicManager;
-import com.xharlock.holo.music.core.MusicCommand;
-import com.xharlock.holo.music.core.PlayerManager;
-import com.xharlock.holo.utils.Formatter;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-public class QueueCmd extends MusicCommand {
-
-	public QueueCmd(String name) {
-		super(name);
-		setDescription("Use this command to see the current queue. "
-				+ "You can also use `history` as argument to view the last 10 tracks.");
-		setUsage(name + " [history]");
-		setAliases(List.of("q"));
-	}
+@Command(name = "queue",
+		description = "Shows the current queue. You can also use `history` as an additional argument to view the last 10 tracks that was played.",
+		usage = "[history]",
+		alias = {"q"},
+		category = CommandCategory.MUSIC)
+public class QueueCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
@@ -57,7 +55,7 @@ public class QueueCmd extends MusicCommand {
 		}
 
 		int trackCount = Math.min(queue.size(), 12);
-		List<AudioTrack> trackList = new ArrayList<AudioTrack>(queue);
+		List<AudioTrack> trackList = new ArrayList<>(queue);
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < trackCount; ++i) {
@@ -101,7 +99,7 @@ public class QueueCmd extends MusicCommand {
 		}
 
 		int trackCount = Math.min(history.size(), 10);
-		List<AudioTrack> historyList = new ArrayList<AudioTrack>(history);
+		List<AudioTrack> historyList = new ArrayList<>(history);
 		StringBuilder sb = new StringBuilder();
 
 		for (int i = 0; i < trackCount; ++i) {

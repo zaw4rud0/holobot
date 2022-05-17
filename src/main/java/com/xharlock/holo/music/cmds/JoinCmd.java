@@ -1,21 +1,19 @@
 package com.xharlock.holo.music.cmds;
 
-import java.util.concurrent.TimeUnit;
-
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.misc.Emoji;
-import com.xharlock.holo.music.core.MusicCommand;
-
+import com.xharlock.holo.music.core.AbstractMusicCommand;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.managers.AudioManager;
 
-public class JoinCmd extends MusicCommand {
+import java.util.concurrent.TimeUnit;
 
-	public JoinCmd(String name) {
-		super(name);
-		setDescription("Use this command to me bring to your current voice channel");
-		setUsage(name);
-	}
+@Command(name = "join",
+		description = "Makes me join the voice channel you are currently in.",
+		category = CommandCategory.MUSIC)
+public class JoinCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
@@ -31,7 +29,7 @@ public class JoinCmd extends MusicCommand {
 			return;
 		}
 
-		if (!isUserInAudioChannel(e)) {
+		if (!isUserInAudioChannel(e.getMember())) {
 			builder.setTitle("Not in a voice channel!");
 			builder.setDescription("Please join a voice channel first");
 			sendEmbed(e, builder, 1, TimeUnit.MINUTES, false);
@@ -40,7 +38,7 @@ public class JoinCmd extends MusicCommand {
 
 		audioManager.openAudioConnection(e.getMember().getVoiceState().getChannel());
 
-		builder.setTitle("Connected " + Emoji.NOTE.getAsNormal());
+		builder.setTitle("Connected " + Emoji.NOTE.getAsText());
 		builder.setDescription("Join me in <#" + e.getMember().getVoiceState().getChannel().getIdLong() + ">");
 		
 		sendEmbed(e, builder, 5, TimeUnit.MINUTES, false);

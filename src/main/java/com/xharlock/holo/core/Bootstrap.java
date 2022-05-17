@@ -1,17 +1,18 @@
 package com.xharlock.holo.core;
 
-import java.io.IOException;
-
-import javax.security.auth.login.LoginException;
-
-import org.json.simple.parser.ParseException;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
+import com.xharlock.holo.config.BotConfig;
+import com.xharlock.holo.utils.Reader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.gson.Gson;
-import com.xharlock.holo.config.Config;
-import com.xharlock.holo.utils.Reader;
+import javax.security.auth.login.LoginException;
+import java.io.IOException;
 
+/**
+ * Main class of the application.
+ */
 public final class Bootstrap {
 
 	public static Holo holo;
@@ -24,8 +25,22 @@ public final class Bootstrap {
 	}
 
 	public static void main(String[] args) {
-		startupTime = System.currentTimeMillis();
 		init();
+	}
+
+	private static void init() {
+		startupTime = System.currentTimeMillis();
+
+		try {
+			BotConfig botConfig = initializeConfig();
+			holo = new Holo(botConfig);
+		} catch (IOException | LoginException ex) {
+			if (logger.isErrorEnabled()) {
+				logger.error(ex.getMessage());
+			}
+			ex.printStackTrace();
+		}
+
 		long totalTime = System.currentTimeMillis() - startupTime;
 
 		if (logger.isInfoEnabled()) {
@@ -33,23 +48,21 @@ public final class Bootstrap {
 		}
 	}
 
-	static void init() {
-		try {
-			Config config = initializeConfig();
-			holo = new Holo(config);
-		} catch (IOException | LoginException | ParseException ex) {
-			if (logger.isErrorEnabled()) {
-				logger.error(ex.getMessage());
-			}
-			ex.printStackTrace();
-		}
+	/**
+	 * Deserializes the config file to a {@link BotConfig} object.
+	 */
+	private static BotConfig initializeConfig() throws IOException {
+		JsonObject obj = Reader.readJsonObject("config.json");
+		return new Gson().fromJson(obj, BotConfig.class);
 	}
 
 	/**
-	 * Deserializes the config file to a {@link Config} object.
+	 * Restarts the bot.
 	 */
-	private static Config initializeConfig() throws IOException, ParseException {
-		String json = Reader.readJSONObject("config.json").toJSONString();
-		return new Gson().fromJson(json, Config.class);
+	public static void restart() {
+		if (logger.isInfoEnabled()) {
+			logger.info("Restarting...");
+		}
+		init();
 	}
 }

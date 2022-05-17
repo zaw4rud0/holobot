@@ -1,18 +1,18 @@
 package com.xharlock.holo.music.core;
 
-import java.util.concurrent.atomic.AtomicInteger;
-
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;
 import com.sedmelluq.discord.lavaplayer.player.event.AudioEventListener;
+
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class GuildMusicManager {
 
 	public AudioPlayer audioPlayer;
 	public TrackScheduler scheduler;
-	private AudioPlayerSendHandler audioPlayerHandler;
+	private final AudioPlayerSendHandler audioPlayerHandler;
 	private boolean voting;
-	private AtomicInteger counter;
+	private final AtomicInteger counter;
 
 	public GuildMusicManager(AudioPlayerManager manager) {
 		audioPlayer = manager.createPlayer();

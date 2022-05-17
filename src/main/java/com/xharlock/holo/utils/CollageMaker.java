@@ -1,9 +1,9 @@
 package com.xharlock.holo.utils;
 
+import com.xharlock.holo.utils.ImageOperations.Direction;
+
 import java.awt.image.BufferedImage;
 import java.util.List;
-
-import com.xharlock.holo.utils.BufferedImageOps.Direction;
 
 public final class CollageMaker {
 
@@ -19,9 +19,9 @@ public final class CollageMaker {
 		if (images.size() != 4) {
 			throw new IllegalArgumentException("This method requires four images!");
 		}
-		BufferedImage row1 = BufferedImageOps.join(images.get(0), images.get(1), Direction.HORIZONTAL);
-		BufferedImage row2 = BufferedImageOps.join(images.get(2), images.get(3), Direction.HORIZONTAL);
-		return BufferedImageOps.join(row1, row2, Direction.VERTICAL);
+		BufferedImage row1 = ImageOperations.join(images.get(0), images.get(1), Direction.HORIZONTAL);
+		BufferedImage row2 = ImageOperations.join(images.get(2), images.get(3), Direction.HORIZONTAL);
+		return ImageOperations.join(row1, row2, Direction.VERTICAL);
 	}
 
 	/**
@@ -33,9 +33,9 @@ public final class CollageMaker {
 		if (images.size() != 6) {
 			throw new IllegalArgumentException("This method requires six images!");
 		}
-		BufferedImage row1 = BufferedImageOps.join(images.get(0), images.get(1), images.get(2), Direction.HORIZONTAL);
-		BufferedImage row2 = BufferedImageOps.join(images.get(3), images.get(4), images.get(5),	Direction.HORIZONTAL);
-		return BufferedImageOps.join(row1, row2, Direction.VERTICAL);
+		BufferedImage row1 = ImageOperations.join(images.get(0), images.get(1), images.get(2), Direction.HORIZONTAL);
+		BufferedImage row2 = ImageOperations.join(images.get(3), images.get(4), images.get(5),	Direction.HORIZONTAL);
+		return ImageOperations.join(row1, row2, Direction.VERTICAL);
 	}
 
 	/**
@@ -48,10 +48,10 @@ public final class CollageMaker {
 		if (images.size() != 9) {
 			throw new IllegalArgumentException("This method requires nine images!");
 		}
-		BufferedImage row1 = BufferedImageOps.join(images.get(0), images.get(1), images.get(2),	Direction.HORIZONTAL);
-		BufferedImage row2 = BufferedImageOps.join(images.get(3), images.get(4), images.get(5),	Direction.HORIZONTAL);
-		BufferedImage row3 = BufferedImageOps.join(images.get(6), images.get(7), images.get(8),	Direction.HORIZONTAL);
-		return BufferedImageOps.join(row1, row2, row3, Direction.VERTICAL);
+		BufferedImage row1 = ImageOperations.join(images.get(0), images.get(1), images.get(2),	Direction.HORIZONTAL);
+		BufferedImage row2 = ImageOperations.join(images.get(3), images.get(4), images.get(5),	Direction.HORIZONTAL);
+		BufferedImage row3 = ImageOperations.join(images.get(6), images.get(7), images.get(8),	Direction.HORIZONTAL);
+		return ImageOperations.join(row1, row2, row3, Direction.VERTICAL);
 	}
 
 }

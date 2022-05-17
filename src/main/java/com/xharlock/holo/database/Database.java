@@ -1,48 +1,30 @@
 package com.xharlock.holo.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+import java.sql.*;
 
+/**
+ * Core class for database connection and operations.
+ */
 public final class Database {
 
-	private static final String path = "./src/main/resources/database/Holo.db";
-	private static Connection conn;
+	/** The path to the database file. */
+	//public static final String PATH_DB = "./src/main/resources/database/Holo.db";
+	public static final String PATH_DB = "./src/main/resources/database/HoloTest.db";
 
 	private Database() {
 	}
-	
-	public static void connect() throws SQLException {
+
+	/**
+	 * Creates a connection to the database.
+	 */
+	public static Connection getConnection() throws SQLException {
 		try {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
+			// This error should never occur.
+			throw new RuntimeException("Could not find SQLite JDBC driver.");
 		}
-		String url = "jdbc:sqlite:" + path;
-		Database.conn = DriverManager.getConnection(url);
-	}
-	
-	public static void disconnect() throws SQLException {
-		if (conn != null) {
-			conn.close();
-		}
-	}
-	
-	/**
-	 * Executes a given SQL statement
-	 */
-	public static boolean execute(String s) throws SQLException {
-		Statement st = Database.conn.createStatement();
-		return st.execute(s);
-	}
-	
-	/**
-	 * Querys the DB using a statement
-	 */
-	public static ResultSet query(String s) throws SQLException {
-		Statement st = Database.conn.createStatement();
-		return st.executeQuery(s);
+		String url = "jdbc:sqlite:" + PATH_DB;
+		return DriverManager.getConnection(url);
 	}
 }

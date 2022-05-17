@@ -1,35 +1,32 @@
 package com.xharlock.holo.image;
 
-import java.sql.ResultSet;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.AbstractCommand;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.database.DBOperations;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import com.xharlock.holo.commands.core.Command;
-import com.xharlock.holo.commands.core.CommandCategory;
-import com.xharlock.holo.database.Database;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-public class BlockCmd extends Command {
+@Command(name = "block",
+		description = "Requests to block an image. Simply reply to a message containing the image you want to block. Note that this command is intended for NSFW (not safe for work) images and that you will be blacklisted if you abuse it.",
+		alias = {"bonk"},
+		category = CommandCategory.IMAGE)
+public class BlockCmd extends AbstractCommand {
 
 	public static List<String> blocked;	
 	public static List<String> blockRequests;
 
-	public BlockCmd(String name) {
-		super(name);
-		setDescription("Use this command to request a block of an image. Simply reply to a message containing the image. Note that this command is intended for NSFW images, and that you will be blacklisted if you abuse it.");
-		setUsage(name);
-		setAliases(List.of("bonk"));
-		setCommandCategory(CommandCategory.IMAGE);
-		
+	public BlockCmd() {
 		// Get the blocked images from the DB
 		try {
-			blocked = getBlockedImages();
+			blocked = DBOperations.getBlockedImages();
 			//blockRequests = getBlockRequests();
 			blockRequests = new ArrayList<>();
 		} catch (SQLException e) {
@@ -54,11 +51,6 @@ public class BlockCmd extends Command {
 		if (isBotOwner(e)) {
 			block(e);
 		}
-		
-		// Everyone else can only request a block
-		else {
-			requestBlock(e);
-		}
 	}
 	
 	/**
@@ -67,7 +59,12 @@ public class BlockCmd extends Command {
 	public void block(MessageReceivedEvent e) {
 		deleteInvoke(e);
 		EmbedBuilder builder = new EmbedBuilder();
-		
+
+		if (e.getMessage().getReferencedMessage() == null) {
+			// TODO: Add error message
+			return;
+		}
+
 		String url = getUrl(e.getMessage().getReferencedMessage());
 		
 		if (url == null) {
@@ -78,7 +75,7 @@ public class BlockCmd extends Command {
 		}
 
 		try {
-			addBlockedImage(url, e.getAuthor(), e.getMessage().getTimeCreated().toString());
+			DBOperations.insertBlockedImage(url, e.getAuthor().getIdLong(), e.getMessage().getTimeCreated().toString(), "None given");
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 			builder.setTitle("Error");
@@ -99,104 +96,9 @@ public class BlockCmd extends Command {
 	}
 	
 	/**
-	 * Adds it to the list of requested blocks
-	 */
-	public void requestBlock(MessageReceivedEvent e) {
-		EmbedBuilder builder = new EmbedBuilder();
-
-		String url = getUrl(e.getMessage().getReferencedMessage());
-		
-		if (url == null) {
-			builder.setTitle("Image not found");
-			builder.setDescription("Please make sure the message you replied to contains an image");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			return;
-		}
-		
-		try {
-			addBlockRequest(url, e.getAuthor(), e.getMessage().getTimeCreated().toString());
-		} catch (SQLException ex) {
-			ex.printStackTrace();
-			builder.setTitle("Error");
-			builder.setDescription("Something went wrong. Please try again later");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-			return;
-		}
-		
-		blockRequests.add(url);
-		
-		deleteInvoke(e);
-
-		builder.setTitle("Block request has been sent");
-		builder.setDescription("The block request will be reviewed as soon as possible");
-		sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
-	}
-	
-	/**
-	 * TODO: View the block requests
-	 */
-	@SuppressWarnings("unused")
-	private void viewRequests() {
-		System.out.println("This method is not implemented yet!");
-	}
-	
-	/**
-	 * Add a new image to the blocklist into the DB
-	 */
-	public boolean addBlockedImage(String url, User user, String date) throws SQLException {
-		String s = "Insert into BlockedImages (Url, DiscordUser, Date) VALUES "
-				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
-		Database.connect();
-		boolean success = Database.execute(s);
-		Database.disconnect();
-		return success;
-	}
-	
-	/**
-	 * Get a list of the blocked images from the DB
-	 */
-	public static List<String> getBlockedImages() throws SQLException {
-		String s = "SELECT Url FROM BlockedImages";
-		Database.connect();
-		ResultSet rs = Database.query(s);
-		List<String> urls = new ArrayList<>();
-		while (rs.next()) {
-			urls.add(rs.getString("Url"));
-		}
-		Database.disconnect();	
-		return urls;
-	}
-	
-	/**
-	 * Add a requested block into the DB
-	 */
-	public static boolean addBlockRequest(String url, User user, String date) throws SQLException {
-		String s = "Insert into BlockRequests (Url, DiscordUser, Date) VALUES "
-				+ "(\'" + url + "\', " + user.getIdLong() + ", \'" + date + "\');";
-		Database.connect();
-		boolean success = Database.execute(s);
-		Database.disconnect();
-		return success;
-	}
-	
-	/**
-	 * Get a list of requested blocks from the DB
-	 */
-	public static List<String> getBlockRequests() throws SQLException {
-		String s = "SELECT Url FROM BlockRequests";
-		Database.connect();
-		ResultSet rs = Database.query(s);
-		List<String> urls = new ArrayList<>();
-		while (rs.next()) {
-			urls.add(rs.getString("Url"));
-		}
-		Database.disconnect();
-		return urls;
-	}
-	
-	/**
 	 * Get the url from a referenced message
 	 */
+	// TODO: Use method of super class
 	private String getUrl(Message msg) {
 		String url = null;
 		// Check if image is an attachment
@@ -205,7 +107,10 @@ public class BlockCmd extends Command {
 		}
 		// Check if image is in embed
 		else if (msg.getEmbeds().size() > 0) {
-			url = msg.getEmbeds().get(0).getImage().getUrl();
+			MessageEmbed embed = msg.getEmbeds().get(0);
+			if (embed.getImage() != null) {
+				url = embed.getImage().getUrl();
+			}
 		}
 		// Image url is likely text of message
 		else if (isValidURL(msg.getContentRaw())) {

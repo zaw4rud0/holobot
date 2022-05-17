@@ -1,23 +1,22 @@
 package com.xharlock.holo.music.cmds;
 
+import com.jagrosh.jlyrics.Lyrics;
+import com.jagrosh.jlyrics.LyricsClient;
+import com.xharlock.holo.annotations.Command;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.music.core.AbstractMusicCommand;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+
 import java.util.Scanner;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-import com.jagrosh.jlyrics.Lyrics;
-import com.jagrosh.jlyrics.LyricsClient;
-import com.xharlock.holo.music.core.MusicCommand;
-
-import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-
-public class LyricsCmd extends MusicCommand {
-
-	public LyricsCmd(String name) {
-		super(name);
-		setDescription("Use this command to display the lyrics of a given song. Please keep in mind that the lyrics are in English regardless of the song");
-		setUsage(name + " [search terms]");
-	}
+@Command(name = "lyrics",
+		description = "Displays the lyrics of a given song.",
+		usage = "<search terms>",
+		category = CommandCategory.MUSIC)
+public class LyricsCmd extends AbstractMusicCommand {
 
 	@Override
 	public void onCommand(MessageReceivedEvent e) {
@@ -27,7 +26,7 @@ public class LyricsCmd extends MusicCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		LyricsClient client = new LyricsClient();
-		Lyrics lyrics = null;
+		Lyrics lyrics;
 
 		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");

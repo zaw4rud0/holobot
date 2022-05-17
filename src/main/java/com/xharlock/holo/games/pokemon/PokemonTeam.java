@@ -1,23 +1,17 @@
 package com.xharlock.holo.games.pokemon;
 
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import com.xharlock.holo.utils.CollageMaker;
+import com.xharlock.holo.utils.Formatter;
+import com.xharlock.holo.utils.ImageOperations;
+import com.xharlock.pokeapi4java.model.Pokemon;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
-
-import javax.imageio.ImageIO;
-
-import com.xharlock.holo.utils.BufferedImageOps;
-import com.xharlock.holo.utils.CollageMaker;
-import com.xharlock.holo.utils.Formatter;
-import com.xharlock.pokeapi4java.model.Pokemon;
 
 public final class PokemonTeam {
 
@@ -37,14 +31,14 @@ public final class PokemonTeam {
 				continue;
 			}
 
-			BufferedImage img = null;
-			BufferedImage artwork = ImageIO.read(new URL(pokemon.sprites.other.artwork.frontDefault));
+			BufferedImage img;
+			BufferedImage artwork = ImageIO.read(new URL(pokemon.getSprites().getOther().getArtwork().getFrontDefault()));
 
 			// If Pokémon doesn't have a secondary type, fill background with only 1 color
 			if (pokemon.getTypes().size() != 2) {
-				img = draw(artwork, getType(pokemon.getTypes().get(0)).getColor(), null, "#" + pokemon.pokedexId + " " + Formatter.capitalize(pokemon.name));
+				img = draw(artwork, PokemonUtils.getType(pokemon.getTypes().get(0)).getColor(), null, "#" + pokemon.getPokedexId() + " " + Formatter.capitalize(pokemon.getName()));
 			} else {
-				img = draw(artwork, getType(pokemon.getTypes().get(0)).getColor(), getType(pokemon.getTypes().get(1)).getColor(), "#" + pokemon.pokedexId + " " + Formatter.capitalize(pokemon.name));
+				img = draw(artwork, PokemonUtils.getType(pokemon.getTypes().get(0)).getColor(), PokemonUtils.getType(pokemon.getTypes().get(1)).getColor(), "#" + pokemon.getPokedexId() + " " + Formatter.capitalize(pokemon.getName()));
 			}
 			pokemonImages.add(img);
 
@@ -64,7 +58,7 @@ public final class PokemonTeam {
 	private static BufferedImage draw(BufferedImage img, Color color1, Color color2, String name) {
 		int width = 500;
 		int height = 500;
-		BufferedImage temp = null;
+		BufferedImage temp;
 		BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
 		Graphics2D g2 = res.createGraphics();
 		Color oldColor = g2.getColor();
@@ -80,9 +74,9 @@ public final class PokemonTeam {
 		}
 
 		g2.setColor(oldColor);
-		temp = BufferedImageOps.resize(img, 420, 420);
+		temp = ImageOperations.resize(img, 420, 420);
 		g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
-		drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30), Color.BLACK);
+		drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30));
 		g2.dispose();
 		return res;
 	}
@@ -94,13 +88,12 @@ public final class PokemonTeam {
 	 * @param text  = Name and id of the Pok�mon
 	 * @param rect  = A rectangle of the size of the Pok�mon image
 	 * @param font  = Font of the text
-	 * @param color = Color of the text
 	 */
-	private static void drawName(Graphics2D g2, String text, Rectangle rect, Font font, Color color) {
+	private static void drawName(Graphics2D g2, String text, Rectangle rect, Font font) {
 		FontMetrics metrics = g2.getFontMetrics(font);
 		int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
 		int y = rect.height - 20;
-		g2.setColor(color);
+		g2.setColor(Color.BLACK);
 		g2.setFont(font);
 		g2.drawString(text, x, y);
 	}
@@ -117,48 +110,5 @@ public final class PokemonTeam {
 		g2.fillRect(0, 0, width, height);
 		g2.dispose();
 		return res;
-	}
-
-	private static PokemonType getType(String type) {
-		switch (type.toLowerCase(Locale.UK)) {
-		case "normal":
-			return PokemonType.NORMAL;
-		case "fire":
-			return PokemonType.FIRE;
-		case "fighting":
-			return PokemonType.FIGHTING;
-		case "flying":
-			return PokemonType.FLYING;
-		case "water":
-			return PokemonType.WATER;
-		case "grass":
-			return PokemonType.GRASS;
-		case "electric":
-			return PokemonType.ELECTRIC;
-		case "poison":
-			return PokemonType.POISON;
-		case "dark":
-			return PokemonType.DARK;
-		case "fairy":
-			return PokemonType.FAIRY;
-		case "psychic":
-			return PokemonType.PSYCHIC;
-		case "steel":
-			return PokemonType.STEEL;
-		case "rock":
-			return PokemonType.ROCK;
-		case "ground":
-			return PokemonType.GROUND;
-		case "bug":
-			return PokemonType.BUG;
-		case "dragon":
-			return PokemonType.DRAGON;
-		case "ghost":
-			return PokemonType.GHOST;
-		case "ice":
-			return PokemonType.ICE;
-		default:
-			return null;
-		}
 	}
 }
