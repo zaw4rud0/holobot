@@ -1,4 +1,4 @@
-<img align="right" src="https://github.com/xHarlock/HoloBot/blob/master/src/main/resources/logo.png" height="220" width="220">
+<img align="right" src="https://github.com/xHarlock/HoloBot/blob/master/src/main/resources/logo.png?raw=true" height="220" width="220">
 
 # HoloBot (Java Discord Bot)
 
@@ -27,7 +27,11 @@ This Discord bot uses the following dependencies for its functionalities:
 
 ### [NanoJikan](https://github.com/xHarlock/NanoJikan)
 
-A simple and lightweight wrapper written by me for Jikan API to fetch Anime and Manga data from MyAnimeList
+A simple and lightweight wrapper written by myself for Jikan API to fetch Anime and Manga data from MyAnimeList
+
+### [PokeAPI4Java](https://github.com/xHarlock/PokeAPI4Java)
+
+Another lightweight wrapper written by myself to simplify the usage of PokeAPI
 
 ### [JDA](https://github.com/DV8FromTheWorld/JDA)
 
