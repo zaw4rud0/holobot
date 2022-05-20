@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.util.concurrent.TimeUnit;
 
-@Deactivated
 @Command(name = "perm",
 		description = "Shows my permissions in this channel",
 		category = CommandCategory.GENERAL)

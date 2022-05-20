@@ -2,13 +2,15 @@ package com.xharlock.holo.general;
 
 import com.xharlock.holo.annotations.Command;
 import com.xharlock.holo.core.AbstractCommand;
-import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.core.CommandCategory;
+import com.xharlock.holo.database.Database;
 import com.xharlock.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDAInfo;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
 import java.lang.management.OperatingSystemMXBean;
@@ -56,6 +58,7 @@ public class InfoBotCmd extends AbstractCommand {
 		builder.addField("Bot Version", "`" + Bootstrap.holo.getConfig().getVersion() + "`", false);
 		builder.addField("JDA Version", "`" + JDAInfo.VERSION.replace("_" + JDAInfo.COMMIT_HASH, "") + "`", false);
 		builder.addField("System Information", systemInfo, false);
+		builder.addField("Database Size", "`" + new File(Database.PATH_DB).length() / 1024 / 1024 + "MB`", false);
 		builder.addField("Source", "[GitHub](https://github.com/xHarlock/HoloBot)", false);
 		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
 	}

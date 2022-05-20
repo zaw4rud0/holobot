@@ -1,6 +1,6 @@
 package com.xharlock.holo.database;
 
-import com.xharlock.holo.apis.XkcdAPI;
+import dev.zawarudo.apis.xkcd.XkcdComic;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -296,13 +296,13 @@ public final class DBOperations {
     }
 
     /** Returns a list of xkcd comics from the DB. */
-    public static List<XkcdAPI.Comic> getXkcdComics() throws SQLException {
+    public static List<XkcdComic> getXkcdComics() throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(SELECT_XKCD_COMICS_SQL);
-        List<XkcdAPI.Comic> result = new ArrayList<>();
+        List<XkcdComic> result = new ArrayList<>();
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
-            XkcdAPI.Comic comic = new XkcdAPI.Comic();
+            XkcdComic comic = new XkcdComic();
             comic.setIssueNr(rs.getInt("id"));
             comic.setTitle(rs.getString("title"));
             comic.setImg(rs.getString("img"));
@@ -315,12 +315,12 @@ public final class DBOperations {
     }
 
     /** Inserts a list of xkcd comics into the DB. */
-    public static void insertXkcdComics(List<XkcdAPI.Comic> comics) throws SQLException {
+    public static void insertXkcdComics(List<XkcdComic> comics) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_XKCD_COMICS_SQL);
         conn.setAutoCommit(false);
 
-        for (XkcdAPI.Comic comic : comics) {
+        for (XkcdComic comic : comics) {
             ps.setInt(1, comic.getIssueNr());
             ps.setString(2, comic.getTitle());
             ps.setString(3, comic.getAlt());

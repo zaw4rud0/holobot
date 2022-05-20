@@ -1,7 +1,6 @@
 package com.xharlock.holo.core;
 
 import com.xharlock.holo.image.ActionCmd;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -13,11 +12,13 @@ import java.util.regex.Pattern;
 
 public class CommandListener extends ListenerAdapter {
 
-	private final CommandManager manager;
+	private final CommandManager cmdManager;
+	private final PermissionManager permManager;
 	private static final Logger logger = LoggerFactory.getLogger(CommandListener.class);
 
-	public CommandListener(CommandManager manager) {
-		this.manager = manager;
+	public CommandListener(CommandManager cmdManager, PermissionManager permManager) {
+		this.cmdManager = cmdManager;
+		this.permManager = permManager;
 	}
 
 	@Override
@@ -35,9 +36,9 @@ public class CommandListener extends ListenerAdapter {
 		String[] split = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(e)), "").split("\\s+");
 		String invoke = split[0].toLowerCase(Locale.UK);
 
-		if (!manager.isValidName(invoke)) {
+		if (!cmdManager.isValidName(invoke)) {
 			// Check if it's an action
-			ActionCmd actionCmd = (ActionCmd) manager.getCommand("action");
+			ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
 			if (actionCmd.isAction(invoke)) {
 				actionCmd.args = Arrays.copyOfRange(split, 1, split.length);
 				actionCmd.displayAction(e, actionCmd.getAction(invoke));
@@ -49,10 +50,10 @@ public class CommandListener extends ListenerAdapter {
 			return;
 		}
 
-		AbstractCommand cmd = manager.getCommand(invoke);
+		AbstractCommand cmd = cmdManager.getCommand(invoke);
 
 		// Check if user can do anything
-		if (!Bootstrap.holo.getPermissionManager().check(e, cmd)) {
+		if (!permManager.check(e, cmd)) {
 			return;
 		}
 
@@ -62,11 +63,6 @@ public class CommandListener extends ListenerAdapter {
 
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
 		cmd.onCommand(e);
-	}
-
-	@Override
-	public void onSlashCommandInteraction(SlashCommandInteractionEvent e) {
-		e.reply("This command is still in WIP and thus not available yet.").setEphemeral(true).queue();
 	}
 
 	private String getPrefix(MessageReceivedEvent e) {

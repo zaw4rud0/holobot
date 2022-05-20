@@ -5,8 +5,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.xharlock.holo.annotations.Command;
 import com.xharlock.holo.core.AbstractCommand;
-import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.utils.ImageOperations;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -95,7 +95,7 @@ public class CheckNSFWCmd extends AbstractCommand {
                     }
 
                     // Draw the box into the image
-                    img = drawBox(img, x, y, width, height, i + 1, sizeClass);
+                    drawBox(img, x, y, width, height, i + 1, sizeClass);
 
                     // Display box information
                     String reason = detection.get("name").getAsString();
@@ -138,7 +138,7 @@ public class CheckNSFWCmd extends AbstractCommand {
     /**
      * Draw a box into the image with the given properties
      */
-    private static BufferedImage drawBox(BufferedImage img, int x, int y, int width, int height, int boxNumber, int sizeClass) {
+    private static void drawBox(BufferedImage img, int x, int y, int width, int height, int boxNumber, int sizeClass) {
         Graphics2D g2d = img.createGraphics();
         g2d.setColor(Color.RED);
         g2d.setStroke(new BasicStroke(5 * sizeClass));
@@ -146,7 +146,6 @@ public class CheckNSFWCmd extends AbstractCommand {
         g2d.setFont(new Font("Comic Sans MS", Font.BOLD, 25 * sizeClass));
         g2d.drawString("" + boxNumber, x + 12 * sizeClass, y + 30 * sizeClass);
         g2d.dispose();
-        return img;
     }
 
     /**

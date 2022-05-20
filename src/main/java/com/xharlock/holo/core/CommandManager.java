@@ -89,10 +89,12 @@ public class CommandManager extends ListenerAdapter {
 		addCommand(new GelbooruCmd());
 		addCommand(new GenerateCmd());
 		addCommand(new HoloCmd());
+		addCommand(new InspiroCmd());
 		addCommand(new WaifuCmd());
 		addCommand(new NekoCmd());
 		addCommand(new PixelateCmd());
 		addCommand(new UpscaleCmd());
+		addCommand(new XkcdCmd());
 
 		// Game Cmds
 		addCommand(new AkinatorCmd());
@@ -104,10 +106,8 @@ public class CommandManager extends ListenerAdapter {
 		// Misc Cmds
 		addCommand(new Magic8BallCmd());
 		addCommand(new CoinFlipCmd());
-		addCommand(new InspiroCmd());
 		addCommand(new MockCmd());
 		addCommand(new UwuCmd());
-		addCommand(new XkcdCmd());
 
 		// Owner Cmds
 		addCommand(new BlacklistCmd());

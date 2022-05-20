@@ -11,9 +11,9 @@
 
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-		<maven.compiler.source>16</maven.compiler.source>
-		<maven.compiler.target>16</maven.compiler.target>
-		<java.version>16</java.version>
+		<maven.compiler.source>17</maven.compiler.source>
+		<maven.compiler.target>17</maven.compiler.target>
+		<java.version>17</java.version>
 	</properties>
 
 	<build>
@@ -28,7 +28,7 @@
 					</descriptorRefs>
 					<archive>
 						<manifest>
-							<mainClass>Bootstrap</mainClass>
+							<mainClass>com.xharlock.holo.core.Bootstrap</mainClass>
 						</manifest>
 					</archive>
 				</configuration>
@@ -62,7 +62,7 @@
 		<dependency>
 			<groupId>com.xharlock</groupId>
 			<artifactId>nanojikan</artifactId>
-			<version>0.0.12</version>
+			<version>0.0.13</version>
 		</dependency>
 
 		<!-- PokeAPI4Java - A lightweight package for using the PokeAPI -->
@@ -72,11 +72,17 @@
 			<version>0.0.5</version>
 		</dependency>
 
+		<dependency>
+			<groupId>dev.zawarudo</groupId>
+			<artifactId>wikijava</artifactId>
+			<version>0.0.2</version>
+		</dependency>
+
 		<!-- Core of the bot -->
 		<dependency>
 			<groupId>net.dv8tion</groupId>
 			<artifactId>JDA</artifactId>
-			<version>5.0.0-alpha.11</version>
+			<version>5.0.0-alpha.12</version>
 		</dependency>
 
 		<!-- Useful stuff for JDA -->
@@ -101,7 +107,6 @@
 			<artifactId>guava</artifactId>
 			<version>31.1-jre</version>
 		</dependency>
-
 
 		<!-- Akinator API wrapper -->
 		<dependency>
@@ -150,7 +155,7 @@
 			<version>3.8.2</version>
 		</dependency>
 
-		<!-- Library used to validate url and email -->
+		<!-- Library used to validate url and email (Has vulnerabilities!) -->
 		<dependency>
 			<groupId>commons-validator</groupId>
 			<artifactId>commons-validator</artifactId>

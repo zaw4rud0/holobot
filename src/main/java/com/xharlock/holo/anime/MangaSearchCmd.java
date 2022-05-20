@@ -153,7 +153,7 @@ public class MangaSearchCmd extends AbstractCommand {
 		}
 		builder.addField("Type", manga.getType(), true);
 		builder.addField("Chapters", chapters, true);
-		builder.addBlankField(true);
+		builder.addField("Status", manga.getStatus(), true);
 		builder.addField("MAL Score", malScore, true);
 		builder.addField("MAL Rank", malRank, true);
 		builder.addBlankField(true);

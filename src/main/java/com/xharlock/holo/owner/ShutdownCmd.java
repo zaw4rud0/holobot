@@ -2,8 +2,8 @@ package com.xharlock.holo.owner;
 
 import com.xharlock.holo.annotations.Command;
 import com.xharlock.holo.core.AbstractCommand;
-import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.core.CommandCategory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 @Command(name = "shutdown",

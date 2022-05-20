@@ -1,0 +1,40 @@
+*{
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background: #36393F;
+}
+
+.header {
+    padding: 20px;
+}
+
+.header__inner {
+    text-decoration: none;
+}
+
+.logo {
+
+}
+
+.navbar-start {
+
+}
+
+.navbar-end {
+
+}
+
+.button:hover {
+    cursor: pointer;
+}
+
+.is-primary {
+    background-color: aqua;
+}
+
+.is-rounded {
+    border-radius: 50%;
+}

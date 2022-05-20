@@ -2,8 +2,8 @@ package com.xharlock.holo.music.cmds;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import com.xharlock.holo.annotations.Command;
-import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.core.Bootstrap;
+import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.misc.Emoji;
 import com.xharlock.holo.music.core.AbstractMusicCommand;
 import com.xharlock.holo.music.core.GuildMusicManager;

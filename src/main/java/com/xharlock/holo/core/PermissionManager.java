@@ -3,6 +3,7 @@ package com.xharlock.holo.core;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
@@ -51,11 +52,12 @@ public class PermissionManager {
 		EmbedBuilder builder = new EmbedBuilder();
 		if (e.isFromType(ChannelType.PRIVATE) && cmd.isGuildOnly()) {
 			builder.setTitle("No Permission");
-			builder.setDescription("You are not allowed to use this command in a private chat!");
+			builder.setDescription("You are not allowed to use this command in a direct chat!");
 			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
 			return false;
 		}
-		if (e.isFromGuild() && !e.getTextChannel().isNSFW() && cmd.isNSFW()) {
+
+		if (!nsfwCheck(e, cmd)) {
 			builder.setTitle("NSFW Command");
 			builder.setDescription("You can't use a NSFW command in a non-NSFW channel, p-pervert!");
 			cmd.sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
@@ -96,5 +98,29 @@ public class PermissionManager {
 			}
 		}
 		return true;
+	}
+
+	/** Checks if a command can be used in terms of NSFW */
+	private boolean nsfwCheck(MessageReceivedEvent e, AbstractCommand cmd) {
+		// Command is SFW, no need to check further
+		if (!cmd.isNSFW()) {
+			return true;
+		}
+
+		// Check if parent channel of thread is marked as NSFW
+		if (e.isFromThread()) {
+			TextChannel channel = (TextChannel) e.getThreadChannel().getParentChannel();
+			return channel.isNSFW();
+		}
+
+		// Check if channel is marked as NSFW
+		if (e.isFromGuild()) {
+			return e.getTextChannel().isNSFW();
+		}
+
+		// Private channel
+		else {
+			return true;
+		}
 	}
 }

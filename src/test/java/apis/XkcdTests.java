@@ -1,8 +1,9 @@
 package apis;
 
-import com.xharlock.holo.apis.XkcdAPI;
 import com.xharlock.holo.exceptions.APIException;
 import com.xharlock.holo.exceptions.InvalidRequestException;
+import dev.zawarudo.apis.xkcd.XkcdAPI;
+import dev.zawarudo.apis.xkcd.XkcdComic;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -11,20 +12,19 @@ public class XkcdTests {
 
     @Test
     public void testLatest() throws APIException {
-        XkcdAPI.Comic latest = XkcdAPI.getLatest();
+        XkcdComic latest = XkcdAPI.getLatest();
         assertNotNull(latest);
         assertNotNull(latest.getTitle());
         assertNotEquals(0, latest.getIssueNr());
-        System.out.println(latest);
     }
 
     @Test
     public void testNum() throws APIException, InvalidRequestException {
-        XkcdAPI.Comic comic = XkcdAPI.getComic(1234);
+        XkcdComic comic = XkcdAPI.getComic(1234);
         assertNotNull(comic);
         assertNotNull(comic.getTitle());
         assertNotEquals(0, comic.getIssueNr());
-        System.out.println(comic);
+        assertEquals("5/7/2013", comic.getDate());
     }
 
     @Test

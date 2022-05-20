@@ -1,6 +1,8 @@
 package com.xharlock.holo.database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 
 /**
  * Core class for database connection and operations.
@@ -8,8 +10,8 @@ import java.sql.*;
 public final class Database {
 
 	/** The path to the database file. */
-	//public static final String PATH_DB = "./src/main/resources/database/Holo.db";
-	public static final String PATH_DB = "./src/main/resources/database/HoloTest.db";
+	public static final String PATH_DB = "./src/main/resources/database/Holo.db";
+	//public static final String PATH_DB = "./src/main/resources/database/HoloTest.db";
 
 	private Database() {
 	}

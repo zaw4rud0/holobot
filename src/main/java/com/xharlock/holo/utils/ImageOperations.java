@@ -301,7 +301,7 @@ public final class ImageOperations {
 				}
 				b1 = b1 / (max);
 				int sum1 = (a1 << 24) + (r1 << 16) + (g1 << 8) + b1;
-				output.setRGB(y, x, (int) (sum1));
+				output.setRGB(y, x, sum1);
 			}
 		}
 		return output;

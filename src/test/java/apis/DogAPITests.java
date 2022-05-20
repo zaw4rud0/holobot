@@ -47,17 +47,6 @@ public class DogAPITests {
 
         assertNotNull(breeds);
         assertFalse(breeds.isEmpty());
-
-        // Print out all available breeds and sub-breeds
-        for (DogAPI.Breed breed : breeds) {
-            if (breed.hasSubBreeds()) {
-                for (String subBreed : breed.subBreeds()) {
-                    System.out.println(subBreed + " " + breed.name());
-                }
-            } else {
-                System.out.println(breed.name());
-            }
-        }
     }
 
     @Test

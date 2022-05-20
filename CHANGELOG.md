@@ -1,16 +1,32 @@
 
+# Version 2.2.9
+
+## ✔️ What's new
+
+- 
+
+## ⚙️ Changes
+
+-
+
+## 🐜 Bugfixes
+
+-
+
+---
+
 # Version 2.2.8
 
 ## ✔️ What's new
 
 - New actions: `punch`
-- `xkcd` command has been improved, you can now search for xkcd comics by using their title as well
 - New `coinflip` command!
 - New `roleinfo` command! You can get information about a role by using its name, id or by mentioning it.
 
 ## ⚙️ Changes
 
 - `catch` and `spawn` commands have been disabled for the time being.
+- `xkcd` command has been improved, you can now search for xkcd comics by using their title as well
 
 ---
 

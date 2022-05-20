@@ -40,7 +40,6 @@ public class BestAnimesCmd extends AbstractCommand {
             return;
         }
 
-
         // TODO: Allow user to navigate through the list by using arrow reactions
 
 

@@ -1,20 +1,23 @@
 package com.xharlock.holo.image;
 
 import com.xharlock.holo.annotations.Command;
-import com.xharlock.holo.apis.XkcdAPI;
 import com.xharlock.holo.core.AbstractCommand;
 import com.xharlock.holo.core.CommandCategory;
 import com.xharlock.holo.database.DBOperations;
 import com.xharlock.holo.exceptions.APIException;
 import com.xharlock.holo.exceptions.InvalidRequestException;
 import com.xharlock.holo.misc.EmbedColor;
+
+import dev.zawarudo.apis.xkcd.XkcdAPI;
+
+import dev.zawarudo.apis.xkcd.XkcdComic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "xkcd",
@@ -26,20 +29,20 @@ import java.util.concurrent.TimeUnit;
 public class XkcdCmd extends AbstractCommand {
 
     /* TODO: Retrieve issues from the DB instead of storing them in a map */
-    private final Map<Integer, XkcdAPI.Comic> comics;
+    private final Map<Integer, XkcdComic> comics;
     private int newestIssue;
 
     public XkcdCmd() {
         comics = new HashMap<>();
 
         try {
-            List<XkcdAPI.Comic> list = DBOperations.getXkcdComics();
+            List<XkcdComic> list = DBOperations.getXkcdComics();
             Collections.sort(list);
 
             // Get the newest issue
             newestIssue = list.get(list.size() - 1).getIssueNr();
 
-            for (XkcdAPI.Comic comic : list) {
+            for (XkcdComic comic : list) {
                 comics.put(comic.getIssueNr(), comic);
             }
         } catch (SQLException ex) {
@@ -51,7 +54,7 @@ public class XkcdCmd extends AbstractCommand {
     public void onCommand(MessageReceivedEvent e) {
         deleteInvoke(e);
         EmbedBuilder builder = new EmbedBuilder();
-        XkcdAPI.Comic comic = null;
+        XkcdComic comic = null;
 
         // Random issue
         if (args.length == 0) {
@@ -96,7 +99,7 @@ public class XkcdCmd extends AbstractCommand {
         else {
             String title = String.join(" ", args).toLowerCase(Locale.UK);
 
-            for (XkcdAPI.Comic c : comics.values()) {
+            for (XkcdComic c : comics.values()) {
                 if (c.getTitle().toLowerCase(Locale.UK).equals(title)) {
                     comic = c;
                     break;
@@ -124,7 +127,7 @@ public class XkcdCmd extends AbstractCommand {
         sendEmbed(e, builder, 30, TimeUnit.SECONDS, true, Color.RED);
     }
 
-    private void storeIfNew(XkcdAPI.Comic comic) throws SQLException {
+    private void storeIfNew(XkcdComic comic) throws SQLException {
         int num = comic.getIssueNr();
 
         // Not new
@@ -132,11 +135,11 @@ public class XkcdCmd extends AbstractCommand {
             return;
         }
 
-        List<XkcdAPI.Comic> newComics = new ArrayList<>();
+        List<XkcdComic> newComics = new ArrayList<>();
 
         // Store all comics up to the newest issue
         for (int i = newestIssue + 1; i <= num; i++) {
-            XkcdAPI.Comic newComic;
+            XkcdComic newComic;
             try {
                 newComic = XkcdAPI.getComic(i);
             } catch (APIException | InvalidRequestException ex) {

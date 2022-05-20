@@ -1,6 +1,7 @@
 package com.xharlock.holo.misc;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 
@@ -29,7 +30,13 @@ public class MiscListener extends ListenerAdapter {
         }
 
         // React to pings
-        if (e.getMessage().isMentioned(e.getJDA().getSelfUser())) {
+        User self = e.getJDA().getSelfUser();
+        Message msg = e.getMessage().getReferencedMessage();
+        if (msg != null && msg.getAuthor().equals(self)) {
+            // Ignore self-replies
+            return;
+        }
+        if (e.getMessage().isMentioned(self)) {
             addReaction(e.getMessage(), Emote.PINGED);
         }
     }

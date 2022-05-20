@@ -22,10 +22,6 @@ public final class HttpResponse {
 		connection.setRequestMethod("GET");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String s = reader.lines().collect(Collectors.joining("\n"));
-
-		System.out.println(s);
-
-
 		return JsonParser.parseString(s).getAsJsonObject();
 	}
 

@@ -136,7 +136,12 @@ public class AkinatorCmdOld extends AbstractCommand {
 		builder.setThumbnail(AkinatorSpriteOld.START.getUrl());
 		builder.setColor(getEmbedColor());
 		builder.setDescription("**Q" + (akinator.getCurrentQuestion().getStep() + 1) + ":** " + akinator.getCurrentQuestion().getQuestion());
-		builder.addField("Answers", ":one: Yes\n" + ":two: No\n" + ":three: I don't know\n" + ":four: Probably\n" + ":five: Probably not", false);
+		builder.addField("Answers", """
+				:one: Yes
+				:two: No
+				:three: I don't know
+				:four: Probably
+				:five: Probably not""", false);
 		builder.addField("Other", Emote.UNDO.getAsText() + " Undo last answer\n" + Emote.CROSS.getAsText() + " Cancel game", false);
 		msg.editMessageEmbeds(builder.build()).queue();
 		addInGameReactions(msg);
@@ -408,22 +413,15 @@ public class AkinatorCmdOld extends AbstractCommand {
 		Random rand = new Random();
 		int index = rand.nextInt(7);
 
-		switch (index) {
-		case 0:
-			return AkinatorSpriteOld.THINKING_1.getUrl();
-		case 1:
-			return AkinatorSpriteOld.THINKING_2.getUrl();
-		case 2:
-			return AkinatorSpriteOld.THINKING_3.getUrl();
-		case 3:
-			return AkinatorSpriteOld.THINKING_4.getUrl();
-		case 4:
-			return AkinatorSpriteOld.THINKING_5.getUrl();
-		case 5:
-			return AkinatorSpriteOld.THINKING_6.getUrl();
-		default:
-			return AkinatorSpriteOld.START.getUrl();
-		}
+		return switch (index) {
+			case 0 -> AkinatorSpriteOld.THINKING_1.getUrl();
+			case 1 -> AkinatorSpriteOld.THINKING_2.getUrl();
+			case 2 -> AkinatorSpriteOld.THINKING_3.getUrl();
+			case 3 -> AkinatorSpriteOld.THINKING_4.getUrl();
+			case 4 -> AkinatorSpriteOld.THINKING_5.getUrl();
+			case 5 -> AkinatorSpriteOld.THINKING_6.getUrl();
+			default -> AkinatorSpriteOld.START.getUrl();
+		};
 	}
 }
 
