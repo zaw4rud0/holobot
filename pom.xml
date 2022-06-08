@@ -124,7 +124,6 @@
 			<artifactId>sqlite-jdbc</artifactId>
 			<version>3.36.0.3</version>
 		</dependency>
-
 		<!-- Logger Stuff -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -194,22 +193,14 @@
 	</distributionManagement>
 
 	<repositories>
-		<!-- Repository for JDA -->
 		<repository>
-			<id>dv8tion</id>
-			<name>m2-dv8tion</name>
-			<url>https://m2.dv8tion.net/releases</url>
+			<id>jitpack</id>
+			<url>https://jitpack.io</url>
 		</repository>
-
-		<!-- Used by various dependencies -->
 		<repository>
 			<id>jcenter</id>
 			<name>jcenter-bintray</name>
 			<url>https://jcenter.bintray.com</url>
-		</repository>
-		<repository>
-			<id>jitpack</id>
-			<url>https://jitpack.io</url>
 		</repository>
 	</repositories>
 </project>
