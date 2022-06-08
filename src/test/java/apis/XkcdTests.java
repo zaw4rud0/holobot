@@ -1,9 +1,9 @@
 package apis;
 
-import com.xharlock.holo.exceptions.APIException;
-import com.xharlock.holo.exceptions.InvalidRequestException;
-import dev.zawarudo.apis.xkcd.XkcdAPI;
-import dev.zawarudo.apis.xkcd.XkcdComic;
+import dev.zawarudo.holo.exceptions.APIException;
+import dev.zawarudo.holo.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
+import dev.zawarudo.holo.apis.xkcd.XkcdComic;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

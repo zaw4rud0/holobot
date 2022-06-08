@@ -8,12 +8,12 @@
 /src/main/resources/database/
 /src/main/resources/misc/
 /lib/
-/src/main/java/com/xharlock/holo/experimental/
+/src/main/java/dev/zawarudo/holo/experimental/
 /cookie.txt
 /rulesets/
 /.eclipse-pmd
 /src/main/resources/misc/delete.json
-/src/main/java/com/xharlock/holo/development/
+/src/main/java/dev/zawarudo/holo/development/
 /.idea/
 /TODO.md
 /config.json
