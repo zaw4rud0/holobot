@@ -56,6 +56,7 @@ public class Holo extends ListenerAdapter {
 		builder.setMemberCachePolicy(MemberCachePolicy.ALL);
 		builder.enableCache(CacheFlag.VOICE_STATE);
 		builder.addEventListeners(this, waiter);
+		builder.addEventListeners(new CountThreadListener());
 		builder.setActivity(Activity.watching(botConfig.getDefaultPrefix() + "help"));
 		jda = builder.build();
 	}
