@@ -4,13 +4,20 @@ import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.CommandCategory;
+import dev.zawarudo.holo.core.PermissionManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
+import java.sql.SQLException;
 import java.time.Instant;
 import java.util.Arrays;
 
+/**
+ * Command to blacklist a user from using the bot.
+ */
 @Command(name = "blacklist",
 		description = "Blacklists an user from using the bot.",
 		usage = "<user id>",
@@ -18,56 +25,87 @@ import java.util.Arrays;
 		category = CommandCategory.OWNER)
 public class BlacklistCmd extends AbstractCommand {
 
+	private final PermissionManager permissionManager;
+
+	public BlacklistCmd() {
+		permissionManager = Bootstrap.holo.getPermissionManager();
+	}
+
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		deleteInvoke(e);
+	public void onCommand(@NotNull MessageReceivedEvent event) {
+		deleteInvoke(event);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTimestamp(Instant.now());
 
 		// No argument was given
-		if (args.length != 1) {
+		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please only provide the id of the user you want to blacklist!");
-			sendToOwner(e, builder);
+			sendToOwner(event, builder);
 			return;
 		}
-		
-		long id;
-		
-		// Couldn't parse id
-		try {
-			id = Long.parseLong(args[0].replace("<@!", "").replace(">", ""));
-		} catch (NumberFormatException ex) {
-			builder.setTitle("Error");
-			builder.setDescription("Please provide the id of the user you want to blacklist");
-			sendToOwner(e, builder);
-			return;
-		}
-		
-		User toBlacklist = e.getJDA().getUserById(id);
-		
+
+		User toBlacklist = getUser(event, args[0]);
+
 		// Couldn't find user (probably because bot doesn't share a server with them)
 		if (toBlacklist == null) {
-			builder.setTitle("Error");
-			builder.setDescription("I couldn't find this user");
-			sendToOwner(e, builder);
+			sendUserNotFoundEmbed(event);
 			return;
 		}
-		
-		String reason = "None given";
-		
-		if (args.length > 1) {
-			reason = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
+
+		String reason = args.length > 1
+				? String.join(" ", Arrays.copyOfRange(args, 1, args.length))
+				: "None given";
+
+		try {
+			permissionManager.blacklist(toBlacklist, reason, event.getMessage().getTimeCreated().toLocalDateTime().toString());
+		} catch (SQLException ex) {
+			ex.printStackTrace();
+			builder.setTitle("Error");
+			builder.setDescription("An error occurred while trying to blacklist this user!");
+			sendToOwner(event, builder);
+			return;
 		}
-		
-		builder.setTitle("User Blacklisted");
-		builder.setDescription("**Name:** " + toBlacklist.getAsMention() + "\n"
-						+ "**Tag:** " + toBlacklist.getAsTag() + "\n"
-						+ "**Id:** " + toBlacklist.getIdLong() + "\n"
-						+ "**Reason:** " + reason);
-		
-		sendToOwner(e, builder);
-		Bootstrap.holo.getPermissionManager().blacklist(toBlacklist);
+
+		String description = String.format("**Name:** %s\n**Tag:** %s\n**Id:** %s\n**Reason:** %s",
+				toBlacklist.getAsMention(), toBlacklist.getAsTag(), toBlacklist.getId(), reason);
+		sendSuccessEmbed(event, description);
+	}
+
+	/**
+	 * Retrieves a {@link User} from a given String.
+	 */
+	@Nullable
+	private User getUser(MessageReceivedEvent event, String arg) {
+		long id;
+		try {
+			id = Long.parseLong(arg.replace("<@!", "").replace(">", ""));
+		} catch (NumberFormatException ex) {
+			return null;
+		}
+		return event.getJDA().getUserById(id);
+	}
+
+	/**
+	 * Sends an embed stating that the blacklist was successful.
+	 */
+	private void sendSuccessEmbed(MessageReceivedEvent event, String description) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("User successfully blacklisted");
+		builder.setDescription(description);
+		builder.setTimestamp(Instant.now());
+		sendToOwner(event, builder);
+	}
+
+	/**
+	 * Sends an embed stating that it couldn't find the user
+	 */
+	private void sendUserNotFoundEmbed(MessageReceivedEvent event) {
+		EmbedBuilder builder = new EmbedBuilder();
+		builder.setTitle("Error");
+		builder.setDescription("I couldn't find this user! Make sure to provide a valid user id or mention.");
+		builder.setTimestamp(Instant.now());
+		sendToOwner(event, builder);
 	}
 }

@@ -1,12 +1,15 @@
 package dev.zawarudo.holo.owner;
 
 import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
+@Deactivated
 @Command(name = "nickname",
         description = "Changes the nickname of the bot or of a specified user.",
         usage = "<user> <nickname>",
@@ -16,7 +19,7 @@ import java.util.Arrays;
 public class NicknameCmd extends AbstractCommand {
 
     @Override
-    public void onCommand(MessageReceivedEvent e) {
+    public void onCommand(@NotNull MessageReceivedEvent e) {
         deleteInvoke(e);
 
         // TODO: Check for other cases, such as when no argument was given

@@ -6,99 +6,123 @@ import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.core.CommandManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "help",
-		description = "Shows a list of commands or their respective usage",
-		usage = "[command]",
-		example = "ping",
-		category = CommandCategory.GENERAL)
+        description = "Shows a list of commands or their respective usage",
+        usage = "[command]",
+        example = "ping",
+        guildOnly = false,
+        category = CommandCategory.GENERAL)
 public class HelpCmd extends AbstractCommand {
 
-	private final CommandManager manager;
+    private final CommandManager manager;
 
-	public HelpCmd(CommandManager manager) {
-		this.manager = manager;
-	}
+    /**
+     * Creates a new instance of the help command.
+     *
+     * @param manager The command manager that will be used to retrieve commands
+     *                and their respective information.
+     */
+    public HelpCmd(CommandManager manager) {
+        this.manager = manager;
+    }
 
-	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		EmbedBuilder builder = new EmbedBuilder();
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent e) {
+        deleteInvoke(e);
 
-		// Given command doesn't exist
-		if (args.length >= 1 && !manager.isValidName(args[0])) {
-			builder.setTitle("Command not found");
-			builder.setDescription("Please check for typos and try again!");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true);
-			return;
-		}
+        EmbedBuilder builder = new EmbedBuilder();
 
-		deleteInvoke(e);
+        // Send the full help page
+        if (args.length == 0) {
+            sendHelpPage(e);
+            return;
+        }
 
-		/*
-		* TODO: Properly format and show all the fields of a command
-		*/
-		// Help page for given command
-		if (args.length >= 1 && manager.isValidName(args[0])) {
-			AbstractCommand cmd = manager.getCommand(args[0]);
-			builder.setTitle("Command Help");
-			builder.addField("Name", cmd.getName(), false);
-			builder.addField("Description", cmd.getDescription(), false);
-			
-			if (cmd.getUsage() != null) {
-				builder.addField("Usage", "`" + getPrefix(e) + cmd.getName() + " " + cmd.getUsage() + "`", false);
-			}
-			if (cmd.getExample() != null) {
-				builder.addField("Example", "`" + getPrefix(e) + cmd.getName() + " " + cmd.getExample() + "`", false);
-			}
-			if (cmd.getThumbnail() != null) {
-				builder.setThumbnail(cmd.getThumbnail());
-			}
-			if (cmd.getAlias().length != 0) {
-				StringBuilder aliases = new StringBuilder("`" + cmd.getAlias()[0] + "`");
-				for (int i = 1; i < cmd.getAlias().length; i++) {
-					aliases.append(", `").append(cmd.getAlias()[i]).append("`");
-				}
-				builder.addField("Alias", aliases.toString(), false);
-			}
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true, cmd.getEmbedColor());
-			return;
-		}
+        // Given command doesn't exist
+        if (!manager.isValidName(args[0])) {
+            builder.setTitle("Command not found");
+            builder.setDescription("Please check for typos and try again!");
+            sendEmbed(e, builder, true, 15, TimeUnit.SECONDS);
+            return;
+        }
 
-		// Open the full help page
-		if (args.length == 0) {
-			builder.setTitle("Help Page");
-			builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"));
-			builder.setDescription("I currently use `" + getPrefix(e) + "` as prefix for all commands\n"
-					+ "For more information on a certain command, use `" + getPrefix(e) + "help <command>`");
+        // Help page for given command
+        sendHelpPageForCommand(e, manager.getCommand(args[0]));
+    }
 
-			for (CommandCategory category : CommandCategory.values()) {
-				// Only show admin commands to guild admins (guild owner included) and bot-owner
-				if (category.equals(CommandCategory.ADMIN) && !isGuildAdmin(e) && !isBotOwner(e)) {
-					continue;
-				}
+    /**
+     * Sends the full help page of the bot.
+     */
+    private void sendHelpPage(MessageReceivedEvent event) {
+        EmbedBuilder builder = new EmbedBuilder();
 
-				// Only show bot-owner commands to bot-owner
-				if (category.equals(CommandCategory.OWNER) && !isBotOwner(e)) {
-					continue;
-				}
+        builder.setTitle("Help Page");
+        builder.setThumbnail(event.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"));
+        builder.setDescription("I currently use `" + getPrefix(event) + "` as prefix for all commands\n"
+                + "For more information on a certain command, use ```" + getPrefix(event) + "help <command>```");
 
-				List<AbstractCommand> cmds = manager.getCommands(category);
+        for (CommandCategory category : CommandCategory.values()) {
+            List<AbstractCommand> cmds = getCommandsForCategory(category, event);
 
-				// Command category is empty, nothing to display
-				if (cmds.isEmpty()) {
-					continue;
-				}
+            // Hide guild only commands from DMs
+            if (!event.isFromGuild()) {
+                cmds.removeIf(AbstractCommand::isGuildOnly);
+            }
+            if (cmds.isEmpty()) continue;
 
-				StringBuilder cmdsString = new StringBuilder("`" + cmds.get(0).getName() + "`");
-				for (int i = 1; i < cmds.size(); i++) {
-					cmdsString.append(", `").append(cmds.get(i).getName()).append("`");
-				}
-				builder.addField(category.getName(), cmdsString.toString(), false);
-			}
-			sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
-		}
-	}
+            List<String> names = cmds.stream().map(AbstractCommand::getName).toList();
+            String text = String.format("```%s```", String.join(", ", names));
+            builder.addField(category.getName(), text, false);
+        }
+        sendEmbed(event, builder, true, 2, TimeUnit.MINUTES);
+    }
+
+    /**
+     * Gets the commands of a given category. Returns an empty list if the user is
+     * missing the required permissions.
+     */
+    private List<AbstractCommand> getCommandsForCategory(CommandCategory category, MessageReceivedEvent event) {
+        if (category == CommandCategory.OWNER && !isBotOwner(event.getAuthor())) {
+            return new ArrayList<>();
+        }
+        if (category == CommandCategory.ADMIN &&
+                !(isGuildAdmin(event) || isBotOwner(event.getAuthor()))) {
+            return new ArrayList<>();
+        }
+        return manager.getCommands(category);
+    }
+
+    /**
+     * Sends the help page for a given command.
+     */
+    private void sendHelpPageForCommand(MessageReceivedEvent event, AbstractCommand cmd) {
+        EmbedBuilder builder = new EmbedBuilder();
+
+        builder.setTitle("Command Help");
+        builder.addField("Name", cmd.getName(), false);
+        builder.addField("Description", cmd.getDescription(), false);
+
+        if (cmd.hasUsage()) {
+            String s = String.format("```%s%s %s```", getPrefix(event), cmd.getName(), cmd.getUsage());
+            builder.addField("Usage", s, false);
+        }
+        if (cmd.hasExample()) {
+            String s = String.format("```%s%s %s```", getPrefix(event), cmd.getName(), cmd.getExample());
+            builder.addField("Example", s, false);
+        }
+        if (cmd.hasThumbnail()) {
+            builder.setThumbnail(cmd.getThumbnail());
+        }
+        if (cmd.hasAlias()) {
+            String aliases = String.join(", ", cmd.getAlias());
+            builder.addField("Alias", String.format("```%s```", aliases), false);
+        }
+        sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, cmd.getEmbedColor());
+    }
 }

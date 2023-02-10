@@ -4,6 +4,7 @@ import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
@@ -16,7 +17,7 @@ import java.util.Arrays;
 public class EchoCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 
 		// TODO: Check for different cases, such as no amount, no message, etc. was given.

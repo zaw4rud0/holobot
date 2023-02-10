@@ -51,5 +51,4 @@ public final class CollageMaker {
 		BufferedImage row3 = ImageOperations.join(images.get(6), images.get(7), images.get(8),	ImageOperations.Direction.HORIZONTAL);
 		return ImageOperations.join(row1, row2, row3, ImageOperations.Direction.VERTICAL);
 	}
-
 }

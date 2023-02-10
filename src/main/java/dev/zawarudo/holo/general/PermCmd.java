@@ -1,30 +1,35 @@
 package dev.zawarudo.holo.general;
 
 import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
+// TODO: Add argument to see guild-wide perms or only perms within a specific channel
+
+@Deactivated
 @Command(name = "perm",
 		description = "Shows my permissions in this channel",
 		category = CommandCategory.GENERAL)
 public class PermCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();		
-		builder.setTitle("My Perms");
-		String s = "";
-		for (Permission perm : e.getGuild().getSelfMember().getPermissions()) {
-			s += perm.getName() + "\n";
-		}
-		builder.setDescription(s);
-		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+		builder.setTitle("My Permissions");
+		String s = e.getGuild().getSelfMember().getPermissions().stream()
+				.map(Permission::getName)
+				.collect(Collectors.joining("\n"));
+		builder.setDescription("```" + s + "```");
+		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
 	}
 }

@@ -12,37 +12,37 @@ import static org.junit.jupiter.api.Assertions.*;
 public class DogAPITests {
 
     @Test
-    public void testRandomImage() throws APIException {
+    void testRandomImage() throws APIException {
         String url = DogAPI.getRandomImage();
         assertNotNull(url);
     }
 
     @Test
-    public void testRandomBreedImage() throws APIException, InvalidRequestException {
+    void testRandomBreedImage() throws APIException, InvalidRequestException {
         String url = DogAPI.getRandomBreedImage("hound");
         assertNotNull(url);
     }
 
     @Test
-    public void testRandomSubBreedImage() throws APIException, InvalidRequestException {
+    void testRandomSubBreedImage() throws APIException, InvalidRequestException {
         String url = DogAPI.getRandomSubBreedImage("hound", "afghan");
         assertNotNull(url);
     }
 
     @Test
-    public void testBreedImages() throws APIException, InvalidRequestException {
+    void testBreedImages() throws APIException, InvalidRequestException {
         List<String> images = DogAPI.getBreedImages("hound");
         assertNotNull(images);
     }
 
     @Test
-    public void testSubBreedImages() throws APIException, InvalidRequestException {
+    void testSubBreedImages() throws APIException, InvalidRequestException {
         List<String> images = DogAPI.getSubBreedImages("hound", "afghan");
         assertNotNull(images);
     }
 
     @Test
-    public void testAllBreeds() throws APIException {
+    void testAllBreeds() throws APIException {
         List<DogAPI.Breed> breeds = DogAPI.getBreedList();
 
         assertNotNull(breeds);
@@ -50,7 +50,7 @@ public class DogAPITests {
     }
 
     @Test
-    public void testHoundSubBreeds() throws InvalidRequestException, APIException {
+    void testHoundSubBreeds() throws InvalidRequestException, APIException {
         List<String> subBreeds = DogAPI.getSubBreeds("hound");
 
         assertNotNull(subBreeds);
@@ -59,7 +59,7 @@ public class DogAPITests {
     }
 
     @Test
-    public void testHasSubBreeds() throws APIException {
+    void testHasSubBreeds() throws APIException {
         List<DogAPI.Breed> breeds = DogAPI.getBreedList();
 
         for (DogAPI.Breed breed : breeds) {
@@ -75,14 +75,14 @@ public class DogAPITests {
     }
 
     @Test
-    public void testInvalidBreed() {
+    void testInvalidBreed() {
         assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreeds("nonsense"));
         assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomBreedImage("nonsense"));
         assertThrows(InvalidRequestException.class, () -> DogAPI.getBreedImages("nonsense"));
     }
 
     @Test
-    public void testInvalidSubBreed() {
+    void testInvalidSubBreed() {
         assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomSubBreedImage("hound", "nonsense"));
         assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomSubBreedImage("nonsense", "afghan"));
 

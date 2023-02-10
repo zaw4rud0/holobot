@@ -3,20 +3,24 @@ package dev.zawarudo.holo.config;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.VoiceChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 /**
- * Represents the configuration of Holo inside a single {@link Guild}
+ * Represents the configuration of Holo for a specific {@link Guild}.
  */
 public class GuildConfig {
 	
 	private Role adminRole;
 	private VoiceChannel musicChannel;
-	private Role djRole;
 	private String prefix;
 	private boolean nsfw;
 
 	private boolean autoDelete;
+
+	public GuildConfig() {
+		setDefaultPrefix();
+		nsfw = false;
+	}
 
 	public Role getAdminRole() {
 		return adminRole;
@@ -32,16 +36,6 @@ public class GuildConfig {
 	
 	public void setMusicChannel(VoiceChannel channel) {
 		this.musicChannel = channel;
-	}
-
-	@Deprecated
-	public Role getDJRole() {
-		return djRole;
-	}
-
-	@Deprecated
-	public void setDJRole(Role djRole) {
-		this.djRole = djRole;
 	}
 	
 	public String getPrefix() {

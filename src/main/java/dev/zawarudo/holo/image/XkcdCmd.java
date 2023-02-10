@@ -1,18 +1,17 @@
 package dev.zawarudo.holo.image;
 
 import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
+import dev.zawarudo.holo.apis.xkcd.XkcdComic;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.misc.EmbedColor;
-
-import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
-
-import dev.zawarudo.holo.apis.xkcd.XkcdComic;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.sql.SQLException;
@@ -50,7 +49,7 @@ public class XkcdCmd extends AbstractCommand {
     }
 
     @Override
-    public void onCommand(MessageReceivedEvent e) {
+    public void onCommand(@NotNull MessageReceivedEvent e) {
         deleteInvoke(e);
         EmbedBuilder builder = new EmbedBuilder();
         XkcdComic comic = null;
@@ -123,7 +122,7 @@ public class XkcdCmd extends AbstractCommand {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Error");
         builder.setDescription(message);
-        sendEmbed(e, builder, 30, TimeUnit.SECONDS, true, Color.RED);
+        sendEmbed(e, builder, true, 30, TimeUnit.SECONDS, Color.RED);
     }
 
     private void storeIfNew(XkcdComic comic) throws SQLException {

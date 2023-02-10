@@ -5,7 +5,8 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 /**
- * Core class for database connection and operations.
+ * Class required for database connection. To use operations on the database, see
+ * {@link DBOperations}.
  */
 public final class Database {
 
@@ -18,13 +19,16 @@ public final class Database {
 
 	/**
 	 * Creates a connection to the database.
+	 *
+	 * @return The {@link Connection} object to the database.
+	 * @throws SQLException If an error occurred while connecting.
 	 */
 	public static Connection getConnection() throws SQLException {
 		try {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
 			// This error should never occur.
-			throw new RuntimeException("Could not find SQLite JDBC driver.");
+			throw new RuntimeException("Could not find SQLite JDBC driver.", e);
 		}
 		String url = "jdbc:sqlite:" + PATH_DB;
 		return DriverManager.getConnection(url);

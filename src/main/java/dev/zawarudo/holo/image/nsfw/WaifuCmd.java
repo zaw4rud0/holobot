@@ -1,9 +1,10 @@
-package dev.zawarudo.holo.image;
+package dev.zawarudo.holo.image.nsfw;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.annotations.Deactivated;
+import dev.zawarudo.holo.image.nsfw.BlockCmd;
+import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.apis.GelbooruAPI;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
@@ -11,6 +12,7 @@ import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.misc.EmbedColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
@@ -27,14 +29,12 @@ import java.util.concurrent.TimeUnit;
 		description = "Sends an image of a specified tag from [Gelbooru](https://gelbooru.com/).",
 		usage = "<tag>",
 		embedColor = EmbedColor.GELBOORU,
-		isNSFW = true,
 		category = CommandCategory.IMAGE)
 public class WaifuCmd extends AbstractCommand {
 
 	private List<String> names;
 
 	public WaifuCmd() {
-		// Get waifus from DB
 		try {
 			names = DBOperations.getWaifuNames();
 			Collections.sort(names);
@@ -44,21 +44,20 @@ public class WaifuCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		// Owner added a new waifu to the DB
-		if (isBotOwner(e) && args.length >= 4 && args[0].equals("add")) {
+		if (isBotOwner(e.getAuthor()) && args.length >= 4 && args[0].equals("add")) {
 			String name = args[1];
 			String tag = args[2];
 			String title = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
 			
 			builder.setTitle("Waifu added to the database");
-			builder.setDescription("Name: " + name + "\n"
-					+ "Tag: " + tag + "\n"
-					+ "Title: " + title + "\n");
+			String description = "Name: %s\nTag: %s\nTitle: %s";
+			builder.setDescription(String.format(description, name, tag, title));
 			
 			try {
 				DBOperations.insertWaifu(name, tag, title);
@@ -68,7 +67,7 @@ public class WaifuCmd extends AbstractCommand {
 				builder.setDescription("Something went wrong while adding a new waifu to the database. Please try again in a few minutes.");
 			}
 			
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true, getEmbedColor());
+			sendEmbed(e, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
 			names.add(name);
 			Collections.sort(names);
 			return;
@@ -79,7 +78,7 @@ public class WaifuCmd extends AbstractCommand {
 			builder.setTitle("Image Tags");
 			builder.setDescription(getCategoriesString());
 			builder.addField("Usage", "`" + getPrefix(e) + "image <tag>`", false);
-			sendEmbed(e, builder, 1, TimeUnit.MINUTES, true, getEmbedColor());
+			sendEmbed(e, builder, true, getEmbedColor());
 			return;
 		}
 		
@@ -87,7 +86,7 @@ public class WaifuCmd extends AbstractCommand {
 		if (!names.contains(args[0].toLowerCase(Locale.UK))) {
 			builder.setTitle("Tag not found");
 			builder.setDescription("Use `" + getPrefix(e) + "image` to see all available tags");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, true, getEmbedColor());
+			sendEmbed(e, builder, true, 30, TimeUnit.SECONDS, getEmbedColor());
 			return;
 		}
 	
@@ -114,7 +113,7 @@ public class WaifuCmd extends AbstractCommand {
 			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
 		}
 		
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, getEmbedColor());
+		sendEmbed(e, builder, true, getEmbedColor());
 	}
 	
 	/**
@@ -122,7 +121,7 @@ public class WaifuCmd extends AbstractCommand {
 	 */
 	@Nullable
 	private String getImage(String tag) throws IOException {
-		JsonArray array = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.SAFE, GelbooruAPI.Sort.RANDOM, 1, tag);
+		JsonArray array = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.GENERAL, GelbooruAPI.Sort.RANDOM, 1, tag);
 		if (array == null || array.size() == 0) {
 			return null;
 		}

@@ -7,6 +7,7 @@ import dev.zawarudo.holo.misc.EmbedColor;
 import dev.zawarudo.holo.utils.HttpResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
@@ -22,26 +23,26 @@ import java.util.concurrent.TimeUnit;
 		category = CommandCategory.IMAGE)
 public class InspiroCmd extends AbstractCommand {
 
-	private static final String apiUrl = "https://inspirobot.me/api?generate=true";
+	private static final String API_URL = "https://inspirobot.me/api?generate=true";
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
-		deleteInvoke(e);
+	public void onCommand(@NotNull MessageReceivedEvent event) {
+		deleteInvoke(event);
 		EmbedBuilder builder = new EmbedBuilder();
 
 		String url;
 
 		try {
-			url = HttpResponse.readLine(apiUrl);
+			url = HttpResponse.readLine(API_URL);
 		} catch (IOException ex) {
 			builder.setTitle("API Error");
 			builder.setDescription("Something went wrong! Please try again in a few minutes.");
-			sendEmbed(e, builder, 30, TimeUnit.SECONDS, true);
+			sendEmbed(event, builder, true, 30, TimeUnit.SECONDS);
 			return;
 		}
 
 		builder.setTitle("InspiroBot Quote");
 		builder.setImage(url);
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, getEmbedColor());
+		sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, getEmbedColor());
 	}
 }

@@ -1,9 +1,9 @@
-<img align="right" src="https://github.com/xHarlock/HoloBot/blob/master/src/main/resources/logo.png" height="220" width="220" alt="Holo's profile picture">
+<img align="right" src="src/main/resources/logo.png" height="220" width="220" alt="Holo's profile picture">
 
 # HoloBot (Java Discord Bot)
 
-Holo is a Discord bot based on Holo the Wisewolf from the series [Spice & Wolf](https://en.wikipedia.org/wiki/Spice_and_Wolf). Not only can it provide music, it also lets you search for anime and manga informations and can provide numerous images of nekos and different waifus. To see all features of Holo, jump to this [section](#features).
-<br>Note that this bot is still in development and that many different features will be added in the future. If you encounter a bug, please report it by opening an issue in this repository or by using the `bug` command of Holo in your server.
+Holo is a Discord bot based on Holo the Wisewolf from the series [Spice & Wolf](https://en.wikipedia.org/wiki/Spice_and_Wolf). Not only can it provide music, it also lets you search for anime and manga information and can provide numerous images of nekos and different waifus. To see all features of Holo, jump to this [section](#features).
+<br>Note that this bot is still in development and that many features will be added in the future. If you encounter a bug, please report it by opening an issue in this repository or by using the `bug` command of Holo in your server.
 
 ## Overview
 

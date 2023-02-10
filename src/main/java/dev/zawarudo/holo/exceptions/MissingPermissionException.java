@@ -1,19 +1,23 @@
 package dev.zawarudo.holo.exceptions;
 
-import net.dv8tion.jda.api.Permission;
-
 /**
- * An exception that is thrown when the bot is missing a perm to perform an action
+ * An exception that is thrown when the bot is missing permissions to perform an action within a guild.
  */
 public class MissingPermissionException extends Exception {
 
-	private final Permission[] missingPermissions;
+    public MissingPermissionException() {
+        super();
+    }
 
-	public MissingPermissionException(Permission... missingPermissions) {
-		this.missingPermissions = missingPermissions;
-	}
+    public MissingPermissionException(String message) {
+        super(message);
+    }
 
-	public Permission[] getMissingPermissions() {
-		return missingPermissions;
-	}
+    public MissingPermissionException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    public MissingPermissionException(Throwable cause) {
+        super(cause);
+    }
 }

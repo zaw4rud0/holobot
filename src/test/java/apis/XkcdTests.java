@@ -1,9 +1,9 @@
 package apis;
 
-import dev.zawarudo.holo.exceptions.APIException;
-import dev.zawarudo.holo.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
 import dev.zawarudo.holo.apis.xkcd.XkcdComic;
+import dev.zawarudo.holo.exceptions.APIException;
+import dev.zawarudo.holo.exceptions.InvalidRequestException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;

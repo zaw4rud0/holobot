@@ -8,7 +8,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation to show that a {@link AbstractCommand} has been deactivated and shouldn't be registered.
+ * Annotation to show that an {@link AbstractCommand} has been deactivated
+ * and shouldn't be registered.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)

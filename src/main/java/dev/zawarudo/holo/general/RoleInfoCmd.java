@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -17,6 +18,8 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
+// TODO: Refactor class, split each part into separate methods
+
 @Command(name = "roleinfo",
         description = "Shows information about a role.",
         usage = "<role name, id or mention>",
@@ -24,7 +27,7 @@ import java.util.stream.Collectors;
 public class RoleInfoCmd extends AbstractCommand {
 
     @Override
-    public void onCommand(MessageReceivedEvent e) {
+    public void onCommand(@NotNull MessageReceivedEvent e) {
         deleteInvoke(e);
 
         EmbedBuilder builder = new EmbedBuilder();
@@ -33,7 +36,7 @@ public class RoleInfoCmd extends AbstractCommand {
         if (args.length == 0) {
             builder.setTitle("Error");
             builder.setDescription("You must provide a role name or id. Alternatively, you can also ping a role.");
-            sendEmbed(e, builder, 30, TimeUnit.SECONDS, true);
+            sendEmbed(e, builder, true,30, TimeUnit.SECONDS);
             return;
         }
 
@@ -53,7 +56,7 @@ public class RoleInfoCmd extends AbstractCommand {
         if (role == null) {
             builder.setTitle("Error");
             builder.setDescription("Could not find a role with that name or id.");
-            sendEmbed(e, builder, 30, TimeUnit.SECONDS, true);
+            sendEmbed(e, builder, true, 30, TimeUnit.SECONDS);
             return;
         }
 
@@ -90,6 +93,6 @@ public class RoleInfoCmd extends AbstractCommand {
         }
         builder.addField("Permissions", "```" + perms + "```", false);
 
-        sendEmbed(e, builder, 2, TimeUnit.MINUTES, true, role.getColor());
+        sendEmbed(e, builder, true, 2, TimeUnit.MINUTES, role.getColor());
     }
 }

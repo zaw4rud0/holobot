@@ -5,6 +5,7 @@ import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 @Command(name = "delete",
 		description = "Deletes a message of your choice. This works by either passing the message id or replying to a message.",
@@ -15,7 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 public class DeleteCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 		EmbedBuilder builder = new EmbedBuilder();
 

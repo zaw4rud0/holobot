@@ -1,10 +1,12 @@
 package dev.zawarudo.holo.database;
 
 import dev.zawarudo.holo.apis.xkcd.XkcdComic;
-import net.dv8tion.jda.api.entities.Emote;
+import dev.zawarudo.holo.misc.Submission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -13,6 +15,9 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Class that handles all the operations on the database. Note that the connection to the database is automatically established.
+ */
 public final class DBOperations {
 
     private DBOperations() {
@@ -34,9 +39,11 @@ public final class DBOperations {
     private static final String INSERT_XKCD_COMICS_SQL = "INSERT INTO XkcdComics (id, title, alt, img, day, month, year) VALUES (?, ?, ?, ?, ?, ?, ?);";
     private static final String SELECT_XKCD_COMICS_SQL = "SELECT * FROM XkcdComics;";
     private static final String INSERT_WAIFU_SQL = "INSERT INTO Gelbooru (id, tag, title) VALUES (?, ?, ?);";
+    private static final String INSERT_BLACKLISTED_USER_SQL = "INSERT INTO Blacklisted (user_id, reason, date) VALUES (?, ?, ?);";
+    private static final String SQL = "INSERT INTO Submissions (type, user_id, text, date, guild_id, channel_id) VALUES (?, ?, ?, ?, ?, ?);";
 
     /** Stores an emote into the database. */
-    public static void insertEmote(Emote emote) throws SQLException {
+    public static void insertEmote(CustomEmoji emote) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_EMOTE_SQL);
         ps.setLong(1, emote.getIdLong());
@@ -46,10 +53,11 @@ public final class DBOperations {
         ps.setString(5, emote.getImageUrl());
         ps.execute();
         ps.close();
+        conn.close();
     }
 
     /** Stores the emotes of the guild into the database. */
-    public static void insertEmotes(List<Emote> emotes) throws SQLException {
+    public static void insertEmotes(List<RichCustomEmoji> emotes) throws SQLException {
         // Ids of emotes that are already in the database
         List<Long> existing = getEmoteIds();
 
@@ -57,8 +65,10 @@ public final class DBOperations {
         PreparedStatement ps = conn.prepareStatement(INSERT_EMOTE_SQL);
         conn.setAutoCommit(false);
 
-        int batchSize = 100, i = 0;
-        for (Emote emote : emotes) {
+        int batchSize = 100;
+        int i = 0;
+
+        for (CustomEmoji emote : emotes) {
             // Skip emotes that are already in the database
             if (existing.contains(emote.getIdLong())) {
                 continue;
@@ -80,6 +90,7 @@ public final class DBOperations {
         conn.commit();
         ps.close();
         conn.setAutoCommit(true);
+        conn.close();
     }
 
     /** Returns a list of ids of the emotes that are stored in the database. */
@@ -94,6 +105,7 @@ public final class DBOperations {
             ids.add(rs.getLong(1));
         }
         ps.close();
+        conn.close();
         return ids;
     }
 
@@ -107,6 +119,7 @@ public final class DBOperations {
         ps.setBoolean(4, user.isBot());
         ps.execute();
         ps.close();
+        conn.close();
     }
 
     /** Returns a list of ids of the users that are stored in the database. */
@@ -160,7 +173,9 @@ public final class DBOperations {
         PreparedStatement psMember = conn.prepareStatement(INSERT_MEMBER_SQL);
         conn.setAutoCommit(false);
 
-        int batchSize = 100, i = 0;
+        int batchSize = 100;
+        int i = 0;
+
         for (Member member : members) {
             User user = member.getUser();
 
@@ -319,7 +334,6 @@ public final class DBOperations {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_XKCD_COMICS_SQL);
         conn.setAutoCommit(false);
-
         for (XkcdComic comic : comics) {
             ps.setInt(1, comic.getIssueNr());
             ps.setString(2, comic.getTitle());
@@ -374,5 +388,55 @@ public final class DBOperations {
         PreparedStatement ps = conn.prepareStatement("SELECT * FROM Gelbooru WHERE id = ?;");
         ps.setString(1, name);
         return ps.executeQuery();
+    }
+
+    /**
+     * Inserts a blacklisted user into the DB.
+     *
+     * @param userId The Discord id of the {@link User}.
+     * @param date The date when the user was blacklisted.
+     * @param reason The reason why the user was blacklisted.
+     */
+    public static void insertBlacklistedUser(long userId, String date, String reason) throws SQLException {
+        Connection conn = Database.getConnection();
+        PreparedStatement ps = conn.prepareStatement(INSERT_BLACKLISTED_USER_SQL);
+        ps.setLong(1, userId);
+        ps.setString(2, reason);
+        ps.setString(3, date);
+        ps.execute();
+        ps.close();
+    }
+
+    /**
+     * Retrieves a list of blacklisted user ids from the DB.
+     *
+     * @return A {@link List} of ids of the blacklisted {@link User}s.
+     */
+    public static List<Long> getBlacklistedUsers() throws SQLException {
+        Connection conn = Database.getConnection();
+        PreparedStatement ps = conn.prepareStatement("SELECT * FROM Blacklisted;");
+        ResultSet rs = ps.executeQuery();
+        List<Long> ids = new ArrayList<>();
+        while (rs.next()) {
+            ids.add(rs.getLong("user_id"));
+        }
+        ps.close();
+        return ids;
+    }
+
+    /**
+     * Inserts a bug report or a suggestion into the database.
+     */
+    public static void insertSubmission(Submission submission) throws SQLException {
+        Connection conn = Database.getConnection();
+        PreparedStatement ps = conn.prepareStatement(SQL);
+        ps.setString(1, "bug report");
+        ps.setString(2, submission.getAuthorId());
+        ps.setString(3, submission.getMessage());
+        ps.setString(4, submission.getDate());
+        ps.setString(5, submission.getGuildId());
+        ps.setString(6, submission.getChannelId());
+        ps.execute();
+        ps.close();
     }
 }

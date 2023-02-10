@@ -4,9 +4,11 @@ import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Command(name = "nuke",
@@ -17,9 +19,12 @@ import java.util.List;
 public class NukeCmd extends AbstractCommand {
 
     @Override
-    public void onCommand(MessageReceivedEvent e) {
-        int amount;
+    public void onCommand(@NotNull MessageReceivedEvent e) {
+        if (e.getChannel().getType() != ChannelType.TEXT) {
+            return;
+        }
 
+        int amount;
         try {
             amount = Integer.parseInt(args[0]);
             if (amount < 2) {
@@ -30,20 +35,23 @@ public class NukeCmd extends AbstractCommand {
         }
 
         int remaining = amount;
-        List<Message> messagesToNuke = new ArrayList<>();
 
         while (remaining > 0) {
             if (remaining > 100) {
-                messagesToNuke.addAll(e.getTextChannel().getHistory().retrievePast(100).complete());
-                e.getTextChannel().deleteMessages(messagesToNuke).queue();
-                messagesToNuke.clear();
+                deleteMessagesFromChannel(e.getChannel().asTextChannel(), 100);
                 remaining -= 100;
             } else {
-                messagesToNuke.addAll(e.getTextChannel().getHistory().retrievePast(remaining).complete());
-                e.getTextChannel().deleteMessages(messagesToNuke).queue();
-                messagesToNuke.clear();
+                deleteMessagesFromChannel(e.getChannel().asTextChannel(), remaining);
                 remaining = 0;
             }
         }
+    }
+
+    /**
+     * Deletes a given amount of messages from a channel.
+     */
+    private void deleteMessagesFromChannel(TextChannel channel, int amount) {
+        List<Message> messages = channel.getHistory().retrievePast(amount).complete();
+        channel.deleteMessages(messages).queue();
     }
 }

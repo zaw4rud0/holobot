@@ -24,14 +24,12 @@ public final class ImageOperations {
 		int w = img.getWidth();
         int h = img.getHeight();
         BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-		
         Graphics2D g2 = output.createGraphics();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.fill(new Ellipse2D.Double(0, 0, w, h));
         g2.setComposite(AlphaComposite.SrcAtop);
         g2.drawImage(img, 0, 0, null);
         g2.dispose();
-        
         return output;
 	}
 	
@@ -221,11 +219,11 @@ public final class ImageOperations {
 	public static BufferedImage turnBlack(BufferedImage img) {
 		int width = img.getWidth();
 		int height = img.getHeight();
+
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
 				Color pixel = new Color(img.getRGB(i, j), true);
 				if (pixel.getAlpha() == 0) {
-					// Ignore fully transparent pixels
 					continue;
 				}
 				int alpha = pixel.getAlpha();
@@ -275,7 +273,7 @@ public final class ImageOperations {
 		int max = 400, rad = 10;
 		int a1 = 0, r1 = 0, g1 = 0, b1 = 0;
 		Color[] color = new Color[max];
-		int x = 1, y = 1, x1, y1, ex = 5, d = 0;
+		int x, y, x1, y1, d;
 		for (x = rad; x < img.getHeight() - rad; x++) {
 			for (y = rad; y < img.getWidth() - rad; y++) {
 				for (x1 = x - rad; x1 < x + rad; x1++) {

@@ -9,6 +9,7 @@ import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDAInfo;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.File;
 import java.lang.management.ManagementFactory;
@@ -23,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 public class InfoBotCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {		
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 		
 		OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
@@ -37,7 +38,7 @@ public class InfoBotCmd extends AbstractCommand {
 		} else {
 			double avg = os.getSystemLoadAverage();
 			double cpuUsage = avg * 100.0 / (double) cores;
-			cpuPercentage = "" + (cpuUsage * 100 / 100.0) + "%";
+			cpuPercentage = (cpuUsage * 100 / 100.0) + "%";
 		}
 		
 		long heap = memory.getHeapMemoryUsage().getUsed();
@@ -60,6 +61,6 @@ public class InfoBotCmd extends AbstractCommand {
 		builder.addField("System Information", systemInfo, false);
 		builder.addField("Database Size", "`" + new File(Database.PATH_DB).length() / 1024 / 1024 + "MB`", false);
 		builder.addField("Source", "[GitHub](https://github.com/xHarlock/HoloBot)", false);
-		sendEmbed(e, builder, 1, TimeUnit.MINUTES, true);
+		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
 	}
 }

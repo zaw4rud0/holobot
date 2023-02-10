@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 import java.time.LocalDateTime;
@@ -27,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 public class WhoisCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
@@ -35,7 +36,7 @@ public class WhoisCmd extends AbstractCommand {
 		if (args.length > 1) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please only provide at most one argument");
-			sendEmbed(e, builder, 15, TimeUnit.SECONDS, false);
+			sendEmbed(e, builder, false, 30, TimeUnit.SECONDS);
 			return;
 		}
 
@@ -60,7 +61,7 @@ public class WhoisCmd extends AbstractCommand {
 			String type = user.isBot() ? "Bot" : "User";
 			builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
 
-			sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, null);
+			sendEmbed(e, builder, true, 5, TimeUnit.MINUTES);
 			return;
 		}
 
@@ -92,14 +93,12 @@ public class WhoisCmd extends AbstractCommand {
 					highest = role;
 				}
 
-				if (hoisted == null && role.isHoisted()) {
-					hoisted = role;
-				} else {
+				if (hoisted != null || !role.isHoisted()) {
 					if (!role.isHoisted() || role.getPosition() <= hoisted.getPosition()) {
 						continue;
 					}
-					hoisted = role;
 				}
+				hoisted = role;
 			}
 
 			builder.addField("Highest Role", highest.getAsMention(), true);
@@ -131,7 +130,7 @@ public class WhoisCmd extends AbstractCommand {
 		String type = user.isBot() ? "Bot" : "User";
 
 		builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
-		sendEmbed(e, builder, 5, TimeUnit.MINUTES, true, embedColor);
+		sendEmbed(e, builder, true, 5, TimeUnit.MINUTES, embedColor);
 	}
 
 	/**

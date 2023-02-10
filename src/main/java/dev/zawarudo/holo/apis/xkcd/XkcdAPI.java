@@ -24,9 +24,9 @@ public final class XkcdAPI {
             obj = HttpResponse.getJsonObject(url);
         } catch (IOException e) {
             if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid issue number: " + num);
+                throw new InvalidRequestException("Invalid issue number: " + num, e);
             }
-            throw new APIException("Something went wrong with the API.");
+            throw new APIException("Something went wrong with the API.", e);
         }
         return new Gson().fromJson(obj, XkcdComic.class);
     }
@@ -40,7 +40,7 @@ public final class XkcdAPI {
         try {
             obj = HttpResponse.getJsonObject(url);
         } catch (IOException e) {
-            throw new APIException("Something went wrong with the API.");
+            throw new APIException("Something went wrong with the API.", e);
         }
         return new Gson().fromJson(obj, XkcdComic.class);
     }

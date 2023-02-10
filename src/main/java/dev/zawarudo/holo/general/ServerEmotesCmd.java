@@ -4,13 +4,18 @@ import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+
+// TODO:
+//  * Rework command
+//  * Error when sending embed, embed has more than 6000 characters!
 
 @Command(name = "serveremotes",
 		description = "Shows all emotes on the server",
@@ -18,27 +23,28 @@ import java.util.concurrent.TimeUnit;
 public class ServerEmotesCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(MessageReceivedEvent e) {
+	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Emotes of " + e.getGuild().getName());
-
-		List<Emote> emotes = e.getGuild().getEmotes().stream().filter(em -> em.canInteract(e.getGuild().getSelfMember())).toList();
+		List<RichCustomEmoji> emotes = e.getGuild().getEmojis().stream().filter(em -> em.canInteract(e.getGuild().getSelfMember())).toList();
 		
 		if (emotes.isEmpty()) {
 			builder.setDescription("This server doesn't have any emotes.");
-			sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+			sendEmbed(e, builder, true, 2, TimeUnit.MINUTES);
 			return;
 		}
 
 		// Separate normal emotes from animated ones
 		List<String> normal = new ArrayList<>();
 		List<String> animated = new ArrayList<>();
-		emotes.stream().filter(Emote::isAnimated).map(Emote::getAsMention).map(String::toLowerCase).forEach(animated::add);
-		emotes.stream().filter(em -> !em.isAnimated()).map(Emote::getAsMention).map(String::toLowerCase).forEach(animated::add);
+		emotes.stream().filter(RichCustomEmoji::isAnimated).map(RichCustomEmoji::getAsMention).map(String::toLowerCase).forEach(animated::add);
+		emotes.stream().filter(em -> !em.isAnimated()).map(RichCustomEmoji::getAsMention).map(String::toLowerCase).forEach(animated::add);
 
 		int charCount = 0;
+
+		// TODO: Make this less ugly -> Methods to build each role string
 
 		if (!normal.isEmpty()) {
 			Collections.sort(normal);
@@ -47,7 +53,7 @@ public class ServerEmotesCmd extends AbstractCommand {
 			for (String s : normal) {
 				// A single embed has a char limit of 6000
 				if (charCount + s.length() > 6000) {
-					sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+					sendEmbed(e, builder, true, 2, TimeUnit.MINUTES);
 					builder.clearFields();
 					charCount = 0;
 				}
@@ -70,7 +76,7 @@ public class ServerEmotesCmd extends AbstractCommand {
 			for (String s : animated) {
 				// A single embed has a char limit of 6000
 				if (charCount + s.length() > 6000) {
-					sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+					sendEmbed(e, builder, true, 2, TimeUnit.MINUTES);
 					builder.clearFields();
 					charCount = 0;
 				}
@@ -85,6 +91,6 @@ public class ServerEmotesCmd extends AbstractCommand {
 			}
 			builder.addField("", animatedString.toString(), false);
 		}
-		sendEmbed(e, builder, 2, TimeUnit.MINUTES, true);
+		sendEmbed(e, builder, true, 2, TimeUnit.MINUTES);
 	}
 }

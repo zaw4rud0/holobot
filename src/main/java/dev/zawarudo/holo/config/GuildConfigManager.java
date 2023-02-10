@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Class that manages the configurations of the bot within a guild.
+ * Class that manages the configurations of the bot within each guild.
  */
 public class GuildConfigManager {
 
@@ -18,28 +18,24 @@ public class GuildConfigManager {
 
 	/**
 	 * Returns the bot configuration for the specified guild.
+	 *
+	 * @param guild The guild to get the configuration for.
+	 * @return The configuration for the specified guild.
 	 */
 	public GuildConfig getGuildConfig(Guild guild) {
-		if (!hasConfig(guild)) {
-			guildConfigs.put(guild.getIdLong(), createNewConfig());
-		}		
+		if (!hasGuildConfig(guild)) {
+			guildConfigs.put(guild.getIdLong(), new GuildConfig());
+		}
 		return guildConfigs.get(guild.getIdLong());
 	}
 
 	/**
-	 * Creates a new configuration with default settings.
-	 */
-	public GuildConfig createNewConfig() {
-		GuildConfig guildConfig = new GuildConfig();
-		guildConfig.setDefaultPrefix();
-		guildConfig.setAllowNSFW(false);
-		return guildConfig;
-	}
-
-	/**
 	 * Checks if there are any configurations for the specified guild.
+	 *
+	 * @param guild The guild to check for configurations.
+	 * @return True if there are configurations for the specified guild, false otherwise.
 	 */
-	public boolean hasConfig(Guild guild) {
+	public boolean hasGuildConfig(Guild guild) {
 		return guildConfigs.containsKey(guild.getIdLong());
 	}
 }
