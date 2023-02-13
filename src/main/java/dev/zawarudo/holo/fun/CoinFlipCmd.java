@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 
 @Command(name = "coinflip",
-        description = "Flips a coin. You can provide an additional argument as the number of times I should flip a coin with the limit being 1,000,000 coin flips at once.",
+        description = "Flips a coin. You can provide an additional argument as the number of times I should flip a coin with the limit being 1'000'000 coin flips at once.",
         usage = "[<times>]",
         category = CommandCategory.MISC)
 public class CoinFlipCmd extends AbstractCommand {
@@ -62,7 +62,7 @@ public class CoinFlipCmd extends AbstractCommand {
 
     private String formatMessage(int times, int heads, int tails) {
         String text = "I flipped a coin **%s** times. I got **%s** heads and **%s** tails.";
-        DecimalFormat df = new DecimalFormat("#,###,###");
+        DecimalFormat df = new DecimalFormat("#'###'###");
         return String.format(text, df.format(times), df.format(heads), df.format(tails));
     }
 
