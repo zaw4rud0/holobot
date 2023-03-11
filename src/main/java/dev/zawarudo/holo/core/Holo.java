@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.core;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.experimental.akinator.AkinatorManager;
+import dev.zawarudo.holo.games.akinator.AkinatorManager;
 import dev.zawarudo.holo.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.config.BotConfig;
 import dev.zawarudo.holo.config.GuildConfigManager;
