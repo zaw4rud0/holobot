@@ -113,9 +113,10 @@ public class XkcdCmd extends AbstractCommand {
 
         // Builds the embed and sends it
         builder.setTitle("xkcd " + comic.getIssueNr() + ": " + comic.getTitle());
-        builder.setDescription(comic.getAlt() + "\n\n[Explanation](" + comic.getExplainedUrl() + ")");
+        builder.setDescription("[Explanation](" + comic.getExplainedUrl() + ")");
         builder.setImage(comic.getImg());
-        sendEmbed(e, builder, true, getEmbedColor());
+        builder.setFooter(comic.getAlt());
+        sendEmbed(e, builder, false, getEmbedColor());
     }
 
     private void sendErrorMessage(MessageReceivedEvent e, String message) {
