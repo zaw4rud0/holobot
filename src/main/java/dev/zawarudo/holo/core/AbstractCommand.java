@@ -97,10 +97,6 @@ public abstract class AbstractCommand {
         event.getChannel().sendTyping().queue();
     }
 
-    // ####################################################################
-
-    // Start WIP Zone
-
     /**
      * Sends an embed to the channel the command was invoked in.
      */
@@ -192,26 +188,19 @@ public abstract class AbstractCommand {
         }
     }
 
-    // End WIP Zone
-
-    // ####################################################################
-
     /**
      * Checks whether a String is an integer.
      *
      * @param s The String to check.
      * @return True if the String is an integer, false otherwise.
      */
-    protected boolean isInteger(@Nullable String s) {
-        if (s == null) {
-            return false;
-        }
+    protected boolean isInteger(String s) {
         try {
             Integer.parseInt(s);
+            return true;
         } catch (NumberFormatException e) {
             return false;
         }
-        return true;
     }
 
     /**
@@ -220,16 +209,13 @@ public abstract class AbstractCommand {
      * @param s The String to check.
      * @return True if the String is a long, false otherwise.
      */
-    protected boolean isLong(@Nullable String s) {
-        if (s == null) {
-            return false;
-        }
+    protected boolean isLong(String s) {
         try {
             Long.parseLong(s);
+            return true;
         } catch (NumberFormatException ex) {
             return false;
         }
-        return true;
     }
 
     /**

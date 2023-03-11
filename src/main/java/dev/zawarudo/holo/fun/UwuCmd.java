@@ -3,88 +3,71 @@ package dev.zawarudo.holo.fun;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
-import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.concurrent.TimeUnit;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
 @Command(name = "uwu",
-		description = "Uwuifies a text of your choice. You can also reply to a message to uwuify it.",
-		usage = "<text>",
-		category = CommandCategory.MISC)
+        description = "Uwuifies a text of your choice. You can also reply to a message to uwuify it.",
+        usage = "<text>",
+        category = CommandCategory.MISC)
 public class UwuCmd extends AbstractCommand {
 
-	@Override
-	public void onCommand(@NotNull MessageReceivedEvent e) {
-		deleteInvoke(e);
+    private static final int CHAR_LIMIT = 2000;
 
-		// Check for pings
-		if (hasPings(e.getMessage())) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Error");
-			builder.setDescription("No pings!");
-			sendEmbed(e, builder, false, 30, TimeUnit.SECONDS);
-			return;
-		}
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        deleteInvoke(event);
 
-		// No emotes
-		if (!e.getMessage().getMentions().getCustomEmojis().isEmpty()) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Error");
-			builder.setDescription("No emotes!");
-			sendEmbed(e, builder, false, 30, TimeUnit.SECONDS);
-			return;
-		}
+        if (args.length == 0) {
+            sendErrorEmbed(event, "Please provide text or reply to a message!");
+            return;
+        }
 
-		// User replied to a message
-		if (e.getMessage().getReferencedMessage() != null) {
-			String uwu = uwuify(e.getMessage().getReferencedMessage().getContentRaw().split(" "));
-			if (uwu.length() > 2000) {
-				e.getChannel().sendMessage(uwu.substring(0, 2000)).queue();
-				e.getChannel().sendMessage(uwu.substring(2000)).queue();
-			} else {
-				e.getChannel().sendMessage(uwu).queue();
-			}
-		}
+        // Check for pings
+        if (hasPings(event.getMessage())) {
+            sendErrorEmbed(event, "No pings!");
+            return;
+        }
 
-		// User didn't provide text or message
-		else if (args.length == 0) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Error");
-			builder.setDescription("Please provide text or reply to a message!");
-			sendEmbed(e, builder, false, 30, TimeUnit.SECONDS);
-		}
+        // No emotes
+        if (!event.getMessage().getMentions().getCustomEmojis().isEmpty()) {
+            sendErrorEmbed(event, "I can't use custom emojis!");
+            return;
+        }
 
-		// Uwuify given text
-		else {
-			String uwu = uwuify(args);
-			if (uwu.length() > 2000) {
-				e.getChannel().sendMessage(uwu.substring(0, 2000)).queue();
-				e.getChannel().sendMessage(uwu.substring(2000)).queue();
-			} else {
-				e.getChannel().sendMessage(uwu).queue();
-			}
-		}
-	}
+        if (event.getMessage().getReferencedMessage() != null) {
+            String uwu = uwuify(event.getMessage().getReferencedMessage().getContentRaw().split(" "));
+            sendText(event, uwu);
+        } else {
+            String uwu = uwuify(args);
+            sendText(event, uwu);
+        }
+    }
 
-	private String uwuify(String... raw) {
-		StringBuilder result = new StringBuilder();
-		for (String s : raw) {
-			String word = s.replace("you", "uwu")
-					.replace("You", "Uwu")
-					.replace("r", "w")
-					.replace("R", "W")
-					.replace("l", "w")
-					.replace("L", "W")
-					.replace("at", "awt")
-					.replace("it", "iwt")
-					.replace("It", "Iwt")
-					.replace("is", "iws")
-					.replace("Is", "Iws")
-					.replace("to", "tuwu");
-			result.append(word).append(" ");
-		}
-		return result.toString();
-	}
+    private void sendText(MessageReceivedEvent event, String text) {
+        int index = 0;
+        while (index < text.length()) {
+            String chunk = text.substring(index, Math.min(index + CHAR_LIMIT, text.length()));
+            event.getChannel().sendMessage(chunk).queue();
+            index += CHAR_LIMIT;
+        }
+    }
+
+    private String uwuify(String... words) {
+        return Arrays.stream(words)
+                .map(this::replaceWord)
+                .collect(Collectors.joining(" "));
+    }
+
+    private String replaceWord(String word) {
+        return word
+                .replaceAll("(?i)you", "uwu")
+                .replaceAll("(?i)[rl]", "w")
+                .replaceAll("(?i)it", "iwt")
+                .replaceAll("(?i)(?<=[ai])t", "w$0")
+                .replaceAll("(?i)is", "iws");
+    }
 }

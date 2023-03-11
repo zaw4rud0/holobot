@@ -1,7 +1,6 @@
 package dev.zawarudo.holo.core;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.experimental.akinator.AkinatorManager;
 import dev.zawarudo.holo.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.config.BotConfig;
 import dev.zawarudo.holo.config.GuildConfigManager;
@@ -35,7 +34,7 @@ public class Holo extends ListenerAdapter {
     private CommandManager commandManager;
     private PermissionManager permissionManager;
     private PokemonSpawnManager pokemonSpawnManager;
-    private AkinatorManager akinatorManager;
+    //private AkinatorManager akinatorManager;
     private final EventWaiter waiter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Holo.class);
@@ -65,7 +64,7 @@ public class Holo extends ListenerAdapter {
     public void registerManagers() {
         guildConfigManager = new GuildConfigManager();
         pokemonSpawnManager = new PokemonSpawnManager(jda);
-        akinatorManager = new AkinatorManager(waiter);
+        //akinatorManager = new AkinatorManager(waiter);
         commandManager = new CommandManager(waiter);
         permissionManager = new PermissionManager();
     }
@@ -103,9 +102,9 @@ public class Holo extends ListenerAdapter {
         return pokemonSpawnManager;
     }
 
-    public AkinatorManager getAkinatorManager() {
-        return akinatorManager;
-    }
+    //public AkinatorManager getAkinatorManager() {
+        //return akinatorManager;
+    //}
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
