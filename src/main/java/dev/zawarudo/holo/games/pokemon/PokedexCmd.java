@@ -92,7 +92,9 @@ public class PokedexCmd extends AbstractCommand {
 		builder.addField("Gender Ratio", genderRatio, true);
 		builder.addField("Height", pokemon.getHeight() / 100.0 + " m", true);
 		builder.addField("Weight", pokemon.getWeight() / 1000.0 + " kg", true);
-		builder.addField("Pokédex Entry", entry, false);
+		if (entry != null) {
+			builder.addField("Pokédex Entry", entry, false);
+		}
 		if (evolutionChain != null) {
 			builder.addField("Evolution", evolutionChain, false);
 		}
