@@ -161,7 +161,8 @@ public class AnimeSearchCmd extends AbstractCommand {
         if (themes != null) {
             builder.addField("Themes", themes, false);
         }
-        builder.addField("Type", anime.getType(), true);
+        String type = anime.getType() == null ? "null" : anime.getType();
+        builder.addField("Type", type, true);
         if (!"Movie".equals(anime.getType())) {
             builder.addField("Episodes", episodes, true);
             builder.addField("Season", Formatter.capitalize(season), true);
