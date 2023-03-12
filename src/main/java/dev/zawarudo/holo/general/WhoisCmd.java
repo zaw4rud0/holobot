@@ -34,14 +34,17 @@ public class WhoisCmd extends AbstractCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		if (args.length > 1) {
-			builder.setTitle("Incorrect Usage");
-			builder.setDescription("Please only provide at most one argument");
-			sendEmbed(e, builder, false, 30, TimeUnit.SECONDS);
+			sendErrorEmbed(e, "Incorrect usage. Please provide at most one argument.");
 			return;
 		}
 
 		User user = getUser(e);
 		Member member = getMember(e, user);
+
+		if (user == null) {
+			sendErrorEmbed(e, "I couldn't find the given user! Please make sure you provided the correct user id or mentioned them!");
+			return;
+		}
 
 		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
 		builder.setThumbnail(user.getEffectiveAvatarUrl());
@@ -139,19 +142,23 @@ public class WhoisCmd extends AbstractCommand {
 	 */
 	private User getUser(MessageReceivedEvent e) {
 		try {
-			return e.getJDA().getUserById(Long.parseLong(args[0].replace("<", "").replace(">", "").replace("!", "").replace("@", "")));
+			long id = Long.parseLong(args[0].replace("<", "")
+					.replace(">", "")
+					.replace("!", "")
+					.replace("@", ""));
+			return e.getJDA().getUserById(id);
 		} catch (Exception ex) {
 			return e.getAuthor();
 		}
 	}
 
 	/**
-	 * Returns the user as a member of the guild. If the user isn't a member, the
+	 * Returns the user as a member of the guild.
 	 */
 	private Member getMember(MessageReceivedEvent e, User user) {
 		try {
 			return e.getGuild().retrieveMember(user).complete();
-		} catch (ErrorResponseException ex) {
+		} catch (ErrorResponseException | IllegalArgumentException ex) {
 			return null;
 		}
 	}

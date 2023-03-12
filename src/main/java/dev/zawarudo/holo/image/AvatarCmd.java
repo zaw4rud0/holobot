@@ -5,12 +5,14 @@ import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.awt.*;
+import java.awt.Color;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "avatar",
@@ -28,13 +30,22 @@ public class AvatarCmd extends AbstractCommand {
         Member member = getMember(event, user);
 
         String name = member != null ? member.getEffectiveName() : user.getName();
-        String url = user.getEffectiveAvatarUrl() + "?size=512";
+
+        String userAvatar = user.getEffectiveAvatarUrl() + "?size=1024";
+        String serverAvatar = member != null ? member.getEffectiveAvatarUrl() + "?size=1024" : null;
+
         Color embedColor = member != null ? member.getColor() : null;
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Avatar of " + name, url);
-        builder.setImage(url);
-        sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, embedColor);
+        builder.setTitle("Avatar of " + name, userAvatar);
+        builder.setImage(userAvatar);
+
+        if (serverAvatar != null && !userAvatar.equals(serverAvatar)) {
+            List<MessageEmbed> embeds = getEmbedWithMultipleImages(builder, List.of(userAvatar, serverAvatar));
+            event.getChannel().sendMessageEmbeds(embeds).queue(msg -> msg.delete().queueAfter(5, TimeUnit.MINUTES));
+        } else {
+            sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, embedColor);
+        }
     }
 
     /**
