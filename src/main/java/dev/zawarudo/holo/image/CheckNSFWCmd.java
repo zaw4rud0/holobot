@@ -26,38 +26,37 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Command(name = "check",
-        description = """
-                Checks an image for NSFW (not safe for work) elements and returns the likelihood of such elements being present. The image can be provided as a URL or as an attachment. Replying to a message with an image also works.
-                				
-                To get more information on the evaluation, use `advanced` (or `adv` for short) as an additional argument.
-                """,
+        description = "Checks an image for NSFW elements and returns the likelihood of " +
+                "such elements being present. The image can be provided as a URL or as " +
+                "an attachment. Replying to a message with an image also works. To get " +
+                "more information on the evaluation, use `advanced` (or `adv` for short) " +
+                "as an additional argument.",
         usage = "[advanced | adv] [<image url>]",
-        thumbnail = "https://cdn.discordapp.com/attachments/862371045142429756/862371109629198346/nsfw_check.png",
         category = CommandCategory.IMAGE)
 public class CheckNSFWCmd extends AbstractCommand {
 
+    /** The url of the NSFW Detector API. */
+    public static final String API_URL = "https://api.deepai.org/api/nsfw-detector";
+
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent e) {
-        deleteInvoke(e);
-        EmbedBuilder builder = new EmbedBuilder();
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        deleteInvoke(event);
 
-        Message reply = e.getMessage().getReferencedMessage();
-        String oldUrl = reply != null ? getImage(reply) : getImage(e.getMessage());
+        Message reply = event.getMessage().getReferencedMessage();
+        String imageUrl = reply != null ? getImage(reply) : getImage(event.getMessage());
 
-        if (oldUrl == null) {
-            builder.setTitle("Incorrect Usage");
-            builder.setDescription("Use `" + getPrefix(e) + "help check` to see the correct usage of this command");
-            sendEmbed(e, builder, true, 15, TimeUnit.SECONDS);
+        if (imageUrl == null) {
+            sendErrorEmbed(event, "Use `" + getPrefix(event) + "help check` to see the correct usage of this command.");
             return;
         }
 
-        sendTyping(e);
+        sendTyping(event);
         JsonObject obj;
 
         try {
-            obj = getJsonObject(oldUrl);
+            obj = getEvaluation(imageUrl);
         } catch (IOException ex) {
-            sendErrorEmbed(e, "Something went wrong while communicating with the API");
+            sendErrorEmbed(event, "Something went wrong while communicating with the API");
             return;
         }
 
@@ -65,14 +64,15 @@ public class CheckNSFWCmd extends AbstractCommand {
         if (args.length >= 1 && (args[0].equals("advanced") || args[0].equals("adv"))) {
             try {
                 double score = obj.getAsJsonObject("output").get("nsfw_score").getAsDouble();
-                String scoreString = String.format("`%.2f`", score * 100.0);
+                String scoreString = String.format("%.2f", score * 100.0);
 
+                EmbedBuilder builder = new EmbedBuilder();
                 builder.setTitle("Advanced NSFW Check");
-                builder.setDescription("Your image is " + scoreString + " likely to contain NSFW elements");
+                builder.setDescription("Your image is `" + scoreString + "` likely to contain NSFW elements");
                 builder.setImage("attachment://check.png");
 
                 // Get url as a BufferedImage to draw the boxes into it
-                BufferedImage img = ImageIO.read(new URL(oldUrl));
+                BufferedImage img = ImageIO.read(new URL(imageUrl));
 
                 int boxes = obj.getAsJsonObject("output").getAsJsonArray("detections").size();
 
@@ -88,7 +88,6 @@ public class CheckNSFWCmd extends AbstractCommand {
                     int height = boundingBox.get(3).getAsInt();
 
                     int sizeClass = Math.max(img.getWidth(), img.getHeight()) / 1000;
-
                     // For tiny images
                     if (sizeClass == 0) {
                         sizeClass = 1;
@@ -108,27 +107,27 @@ public class CheckNSFWCmd extends AbstractCommand {
                 if (reply != null) {
                     reply.replyFiles(FileUpload.fromData(input, "check.png")).setEmbeds(builder.build()).queue();
                 } else {
-                    e.getChannel().sendFiles(FileUpload.fromData(input, "check.png")).setEmbeds(builder.build()).queue();
+                    event.getChannel().sendFiles(FileUpload.fromData(input, "check.png")).setEmbeds(builder.build()).queue();
                 }
                 input.close();
             } catch (IOException ex) {
-                ex.printStackTrace();
-                sendErrorEmbed(e, "Something went wrong while processing and evaluating your image. Please try again in a few minutes!");
+                sendErrorEmbed(event, "Something went wrong while processing and evaluating your image. Please try again in a few minutes!");
             }
         }
 
         // Normal Check
         else {
             double score = obj.getAsJsonObject("output").get("nsfw_score").getAsDouble();
-            String scoreString = "`" + String.format("`%.2f", score * 100.0) + "%`";
+            String scoreString = String.format("%.2f", score * 100.0);
 
+            EmbedBuilder builder = new EmbedBuilder();
             builder.setTitle("NSFW Check");
-            builder.setDescription("Your image is " + scoreString + " likely to contain NSFW elements");
+            builder.setDescription("Your image is `" + scoreString + "` likely to contain NSFW elements");
 
             if (reply != null) {
                 reply.replyEmbeds(builder.build()).queue();
             } else {
-                sendEmbed(e, builder, true, 2, TimeUnit.MINUTES);
+                sendEmbed(event, builder, true, 2, TimeUnit.MINUTES);
             }
         }
     }
@@ -147,14 +146,10 @@ public class CheckNSFWCmd extends AbstractCommand {
     }
 
     /**
-     * The url of the NSFW Detector API.
-     */
-    public static final String API_URL = "https://api.deepai.org/api/nsfw-detector";
-
-    /**
      * Makes an API request to evaluate the image.
      */
-    public static JsonObject getJsonObject(String imageUrl) throws IOException {
+    @NotNull
+    public static JsonObject getEvaluation(String imageUrl) throws IOException {
         String token = Bootstrap.holo.getConfig().getKeyDeepAI();
         Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + API_URL);
         String result = new BufferedReader(new InputStreamReader(pr.getInputStream())).lines().collect(Collectors.joining("\n"));
