@@ -8,6 +8,7 @@ import dev.zawarudo.holo.experimental.PixelateCmd;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
 import dev.zawarudo.holo.fun.UwuCmd;
+import dev.zawarudo.holo.games.akinator.AkinatorCmd;
 import dev.zawarudo.holo.games.pokemon.CatchCmd;
 import dev.zawarudo.holo.games.pokemon.PokedexCmd;
 import dev.zawarudo.holo.games.pokemon.PokemonTeamCmd;

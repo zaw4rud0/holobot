@@ -118,7 +118,7 @@ public class DogCmd extends AbstractCommand {
     private void sendUnknownBreedEmbed(MessageReceivedEvent event) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Unknown breed");
-        builder.setDescription("The breed you specified is unknown. Use " + getPrefix(event) + "`dog breeds` to see a list of available breeds.");
+        builder.setDescription("The breed you specified is unknown. Use `" + getPrefix(event) + "dog breeds` to see a list of available breeds.");
         sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
     }
 

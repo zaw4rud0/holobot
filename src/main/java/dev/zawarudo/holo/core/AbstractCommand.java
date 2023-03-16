@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static net.dv8tion.jda.api.entities.Message.Attachment;
+
 /**
  * Abstract class representing a bot command.
  */
@@ -254,24 +256,30 @@ public abstract class AbstractCommand {
     @Nullable
     protected String getImage(@NotNull Message msg) {
         // Image as attachment
-        List<Message.Attachment> attachments = msg.getAttachments();
-        String url = !attachments.isEmpty() ? attachments.get(0).getUrl() : null;
-        if (url != null) {
-            return url;
+        List<Attachment> attachments = msg.getAttachments();
+        if (!attachments.isEmpty()) {
+            for (Attachment attachment : attachments) {
+                if (attachment.isImage()) {
+                    return attachment.getUrl();
+                }
+            }
         }
-
         // Image in an embed
-        MessageEmbed.ImageInfo image = msg.getEmbeds().isEmpty() ? null : msg.getEmbeds().get(0).getImage();
-        if (image != null) {
-            return image.getUrl();
+        List<MessageEmbed> embeds = msg.getEmbeds();
+        if (!embeds.isEmpty()) {
+            for (MessageEmbed embed : embeds) {
+                MessageEmbed.ImageInfo image = embed.getImage();
+                if (image != null) {
+                    return image.getUrl();
+                }
+            }
         }
-
         // Image url as message text
-        url = msg.getContentRaw().split(" ")[1].replace("<", "").replace(">", "");
-        if (isValidUrl(url)) {
-            return url;
+        String[] args = msg.getContentRaw().split(" ");
+        String content = args[args.length - 1];
+        if (isValidUrl(content)) {
+            return content;
         }
-
         // No image found
         return null;
     }

@@ -120,11 +120,11 @@ public class PokedexCmd extends AbstractCommand {
 
 	private String getAbilitiesString(Pokemon pokemon) {
 		return pokemon.getAbilities().stream().map(ability -> {
+			String abilityString = ability.getName();
 			if (ability.isHidden()) {
-				return ability.getName() + " ★";
-			} else {
-				return ability.getName();
+				abilityString += " ★";
 			}
+			return abilityString;
 		}).map(Formatter::format).collect(Collectors.joining("\n"));
 	}
 }
