@@ -11,22 +11,24 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class AkinatorInstance {
 
-    private final Akiwrapper instance;
+    private final Akiwrapper akiwrapper;
     private final EventWaiter waiter;
     private final MessageReceivedEvent event;
 
     private boolean isFinished = false;
+    private final List<String> wrongGuesses = new ArrayList<>();
 
     public AkinatorInstance(MessageReceivedEvent event, EventWaiter waiter) throws APIException {
         this.event = event;
         this.waiter = waiter;
 
         try {
-            instance = new AkiwrapperBuilder().build();
+            akiwrapper = new AkiwrapperBuilder().build();
         } catch (ServerNotFoundException e) {
             throw new APIException(e.getMessage(), e);
         }
@@ -40,13 +42,15 @@ public class AkinatorInstance {
             setTitle("Akinator");
             setThumbnail(AkinatorSprite.ICON);
             setColor(EmbedColor.AKINATOR.getColor());
+
+            String description = String.format("To start the game, please think about a real or fictional " +
+                    "character. I will try to guess who it is by asking some questions.\nIf you are ready, " +
+                    "please react with %s, or if you want to cancel the game, react with %s.",
+                    Emote.TICK.getAsText(), Emote.CROSS.getAsText());
+            setDescription(description);
         }};
 
-        event.getChannel().sendMessage("New Akinator game").queue();
-
-        while (!isFinished) {
-
-        }
+        Message msg = event.getChannel().sendMessageEmbeds(embedBuilder.build()).complete();
     }
 
     /**

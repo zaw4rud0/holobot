@@ -95,7 +95,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new XkcdCmd());
 
         // Game Cmds
-		addCommand(new AkinatorCmd());
+//		addCommand(new AkinatorCmd());
 //		addCommand(new AkinatorCmdOld(waiter));
 		addCommand(new CatchCmd());
 		addCommand(new PokedexCmd());
