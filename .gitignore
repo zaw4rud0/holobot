@@ -35,7 +35,7 @@ hs_err_pid*
 # Resources files
 /src/main/resources/database/
 /src/main/resources/image/
-/src/main/resources/misc/
+/src/main/resources/experimental/
 /src/main/resources/pokemon/
 /src/main/resources/logback.xml
 

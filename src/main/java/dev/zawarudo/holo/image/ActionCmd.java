@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
  * reaction or action gif.
  */
 @Command(name = "action",
-        description = "Sends an action GIF",
+        description = "Sends an action GIF.",
         usage = "[<action> | list]",
         example = "blush",
         embedColor = EmbedColor.LIGHT_GRAY,
@@ -44,37 +44,35 @@ public class ActionCmd extends AbstractCommand {
     }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent e) {
+    public void onCommand(@NotNull MessageReceivedEvent event) {
         EmbedBuilder builder = new EmbedBuilder();
 
         // Show a list of available actions
         if (args.length == 0 || args[0].equals("list")) {
-            deleteInvoke(e);
+            deleteInvoke(event);
             builder.setTitle("List of Actions");
             builder.setDescription(getActionsAsString());
-            sendEmbed(e, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
+            sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
         }
 
         // Call specific action
         else if (isAction(args[0])) {
             Action action = actions.get(args[0]);
             args = Arrays.copyOfRange(args, 1, args.length);
-            displayAction(e, action);
+            displayAction(event, action);
         }
 
         // Unknown action
         else {
-            builder.setTitle("Error");
-            builder.setDescription("Couldn't find this action. Use `" + getPrefix(e) + "action list` to see all available actions.");
-            sendEmbed(e, builder, true, 1, TimeUnit.MINUTES, EmbedColor.ERROR.getColor());
+            sendErrorEmbed(event, "Couldn't find this action. Use `" + getPrefix(event) + "action list` to see all available actions.");
         }
     }
 
     /**
      * Displays the action gif or image in an embed and sends it.
      */
-    public void displayAction(@NotNull MessageReceivedEvent e, @NotNull Action action) {
-        deleteInvoke(e);
+    public void displayAction(@NotNull MessageReceivedEvent event, @NotNull Action action) {
+        deleteInvoke(event);
         EmbedBuilder builder = new EmbedBuilder();
 
         String url;
@@ -84,9 +82,7 @@ public class ActionCmd extends AbstractCommand {
                 JsonObject obj = HttpResponse.getJsonObject(action.getRandomUrl());
                 url = obj.getAsJsonArray("results").get(0).getAsJsonObject().get("url").getAsString();
             } catch (IOException ex) {
-                builder.setTitle("Error");
-                builder.setDescription("Something went wrong while fetching an image");
-                sendEmbed(e, builder, true, 15, TimeUnit.SECONDS, EmbedColor.ERROR.getColor());
+                sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again later.");
                 return;
             }
         } else {
@@ -96,22 +92,22 @@ public class ActionCmd extends AbstractCommand {
         String mention = "nothing";
 
         if (args.length != 0) {
-            if (!e.getMessage().getMentions().getMembers().isEmpty()) {
-                mention = e.getMessage().getMentions().getMembers().get(0).getEffectiveName();
+            if (!event.getMessage().getMentions().getMembers().isEmpty()) {
+                mention = event.getMessage().getMentions().getMembers().get(0).getEffectiveName();
             } else {
                 mention = String.join(" ", args);
             }
         }
 
         // In case the member is a webhook
-        if (e.getMember() == null) {
+        if (event.getMember() == null) {
             return;
         }
 
-        String title = action.getSentence().replace("{s}", e.getMember().getEffectiveName()).replace("{u}", mention);
+        String title = action.getSentence().replace("{s}", event.getMember().getEffectiveName()).replace("{u}", mention);
         builder.setTitle(title);
         builder.setImage(url);
-        sendEmbed(e, builder, false, getEmbedColor());
+        sendEmbed(event, builder, false, getEmbedColor());
     }
 
     /**
@@ -160,30 +156,22 @@ public class ActionCmd extends AbstractCommand {
         @SerializedName("urls")
         private List<String> urls;
 
-        /**
-         * Gets the name of the action.
-         */
+        /** Gets the name of the action. */
         public String getName() {
             return name;
         }
 
-        /**
-         * Gets the sentence associated with the action.
-         */
+        /** Gets the sentence associated with the action. */
         public String getSentence() {
             return sentence;
         }
 
-        /**
-         * Checks whether the images or gifs are fetched from an API.
-         */
+        /** Checks whether the images or gifs are fetched from an API. */
         public boolean isApi() {
             return api;
         }
 
-        /**
-         * Gets a random URL to a gif or image of this action.
-         */
+        /** Gets a random URL to a gif or image of this action. */
         public String getRandomUrl() {
             return urls.get(new Random().nextInt(urls.size()));
         }
