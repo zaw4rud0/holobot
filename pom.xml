@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>dev.zawarudo</groupId>
 	<artifactId>holobot</artifactId>
-	<version>3.0.0</version>
+	<version>3.0.1</version>
 	<name>HoloBot</name>
 	<description>Java Discord Bot</description>
 	<packaging>jar</packaging>
@@ -54,14 +54,14 @@
 	</build>
 
 	<dependencies>
-		<!-- Lightweight package for using Jikan API by myself -->
+		<!-- Lightweight package for using Jikan API written by myself -->
 		<dependency>
 			<groupId>dev.zawarudo</groupId>
 			<artifactId>nanojikan</artifactId>
 			<version>1.0.1</version>
 		</dependency>
 
-		<!-- Lightweight package for using the PokeAPI by myself -->
+		<!-- Lightweight package for using the PokeAPI written by myself -->
 		<dependency>
 			<groupId>dev.zawarudo</groupId>
 			<artifactId>pokeapi4java</artifactId>

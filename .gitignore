@@ -37,7 +37,6 @@ hs_err_pid*
 /src/main/resources/image/
 /src/main/resources/experimental/
 /src/main/resources/pokemon/
-/src/main/resources/logback.xml
 
 /src/main/java/dev/zawarudo/holo/experimental/
 /src/main/java/dev/zawarudo/holo/development/
