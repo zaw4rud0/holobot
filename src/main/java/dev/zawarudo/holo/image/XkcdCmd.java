@@ -58,7 +58,7 @@ public class XkcdCmd extends AbstractCommand {
         if (args.length == 0) {
             try {
                 comic = XkcdAPI.getComic(new Random().nextInt(newestIssue) + 1);
-                storeIfNew(comic);
+                storeComicIfNew(comic);
             } catch (APIException | InvalidRequestException | SQLException ex) {
                 sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
                 return;
@@ -69,7 +69,7 @@ public class XkcdCmd extends AbstractCommand {
         else if (args[0].equals("new")) {
             try {
                 comic = XkcdAPI.getLatest();
-                storeIfNew(comic);
+                storeComicIfNew(comic);
             } catch (APIException | SQLException ex) {
                 sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
                 return;
@@ -96,14 +96,12 @@ public class XkcdCmd extends AbstractCommand {
         // Specific issue by title
         else {
             String title = String.join(" ", args).toLowerCase(Locale.UK);
-
             for (XkcdComic c : comics.values()) {
                 if (c.getTitle().toLowerCase(Locale.UK).equals(title)) {
                     comic = c;
                     break;
                 }
             }
-
             // Couldn't find the comic
             if (comic == null) {
                 sendErrorMessage(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
@@ -126,7 +124,7 @@ public class XkcdCmd extends AbstractCommand {
         sendEmbed(e, builder, true, 30, TimeUnit.SECONDS, Color.RED);
     }
 
-    private void storeIfNew(XkcdComic comic) throws SQLException {
+    private void storeComicIfNew(XkcdComic comic) throws SQLException {
         int num = comic.getIssueNr();
 
         // Not new
