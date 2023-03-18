@@ -1,0 +1,657 @@
+{
+  "breeds": [
+    "affenpinscher",
+    "african",
+    "airedale",
+    "akita",
+    "appenzeller",
+    "australian",
+    "basenji",
+    "beagle",
+    "bluetick",
+    "borzoi",
+    "bouvier",
+    "boxer",
+    "brabancon",
+    "briard",
+    "buhund",
+    "bulldog",
+    "bullterrier",
+    "cattledog",
+    "chihuahua",
+    "chow",
+    "clumber",
+    "cockapoo",
+    "collie",
+    "coonhound",
+    "corgi",
+    "cotondetulear",
+    "dachshund",
+    "dalmatian",
+    "dane",
+    "deerhound",
+    "dhole",
+    "dingo",
+    "doberman",
+    "elkhound",
+    "entlebucher",
+    "eskimo",
+    "finnish",
+    "frise",
+    "germanshepherd",
+    "greyhound",
+    "groenendael",
+    "havanese",
+    "hound",
+    "husky",
+    "keeshond",
+    "kelpie",
+    "komondor",
+    "kuvasz",
+    "labradoodle",
+    "labrador",
+    "leonberg",
+    "lhasa",
+    "malamute",
+    "malinois",
+    "maltese",
+    "mastiff",
+    "mexicanhairless",
+    "mix",
+    "mountain",
+    "newfoundland",
+    "otterhound",
+    "ovcharka",
+    "papillon",
+    "pekinese",
+    "pembroke",
+    "pinscher",
+    "pitbull",
+    "pointer",
+    "pomeranian",
+    "poodle",
+    "pug",
+    "puggle",
+    "pyrenees",
+    "redbone",
+    "retriever",
+    "ridgeback",
+    "rottweiler",
+    "saluki",
+    "samoyed",
+    "schipperke",
+    "schnauzer",
+    "setter",
+    "sheepdog",
+    "shiba",
+    "shihtzu",
+    "spaniel",
+    "springer",
+    "stbernard",
+    "terrier",
+    "tervuren",
+    "vizsla",
+    "waterdog",
+    "weimaraner",
+    "whippet",
+    "wolfhound"
+  ],
+  "breeds-formatted": [
+    {
+      "name": "akita",
+      "formattedName": "Akita"
+    },
+    {
+      "name": "beagle",
+      "formattedName": "Beagle"
+    },
+    {
+      "name": "corgi-cardigan",
+      "formattedName": "Cardigan Welsh Corgi"
+    },
+    {
+      "name": "pembroke",
+      "formattedName": "Pembroke Welsh Corgi"
+    },
+    {
+      "name": "eskimo",
+      "formattedName": "Eskimo"
+    },
+    {
+      "name": "dane-great",
+      "formattedName": "Great Dane"
+    },
+    {
+      "name": "bulldog-boston",
+      "formattedName": "Boston Terrier"
+    },
+    {
+      "name": "bulldog-english",
+      "formattedName": "English Bulldog"
+    },
+    {
+      "name": "bulldog-french",
+      "formattedName": "French Bulldog"
+    },
+    {
+      "name": "pointer",
+      "formattedName": "Pointer"
+    },
+    {
+      "name": "pointer-english",
+      "formattedName": "English Pointer"
+    },
+    {
+      "name": "pointer-german",
+      "formattedName": "Pointing dog"
+    },
+    {
+      "name": "pointer-germanlonghair",
+      "formattedName": "German Longhaired Pointer"
+    },
+    {
+      "name": "setter",
+      "formattedName": "Setter"
+    },
+    {
+      "name": "setter-english",
+      "formattedName": "English Setter"
+    },
+    {
+      "name": "setter-irish",
+      "formattedName": "Irish Setter"
+    },
+    {
+      "name": "mastiff",
+      "formattedName": "Mastiff"
+    },
+    {
+      "name": "mastiff-bull",
+      "formattedName": "Bullmastiff"
+    },
+    {
+      "name": "mastiff-english",
+      "formattedName": "English Mastiff"
+    },
+    {
+      "name": "mastiff-tibetan",
+      "formattedName": "Tibetan Mastiff"
+    },
+    {
+      "name": "poodle",
+      "formattedName": "Poodle"
+    },
+    {
+      "name": "poodle-miniature",
+      "formattedName": "Miniature Poodle"
+    },
+    {
+      "name": "poodle-standard",
+      "formattedName": "Standard Poodle"
+    },
+    {
+      "name": "poodle-toy",
+      "formattedName": "Toy Poodle"
+    },
+    {
+      "name": "retriever",
+      "formattedName": "Retriever"
+    },
+    {
+      "name": "retriever-chesapeake",
+      "formattedName": "Chesapeake Bay Retriever"
+    },
+    {
+      "name": "retriever-flatcoated",
+      "formattedName": "Flat-coated Retriever"
+    },
+    {
+      "name": "retriever-golden",
+      "formattedName": "Golden Retriever"
+    },
+    {
+      "name": "retriever-curly",
+      "formattedName": "Curly-coated Retriever"
+    },
+    {
+      "name": "retriever-labrador",
+      "formattedName": "Labrador Retriever"
+    },
+    {
+      "name": "komondor",
+      "formattedName": "Komondor"
+    },
+    {
+      "name": "sheepdog-english",
+      "formattedName": "English Sheepdog"
+    },
+    {
+      "name": "sheepdog-shetland",
+      "formattedName": "Shetland Sheepdog"
+    },
+    {
+      "name": "australian",
+      "formattedName": "Australian Shepherd Dog"
+    },
+    {
+      "name": "australian-shepherd",
+      "formattedName": "Australian Shepherd Dog"
+    },
+    {
+      "name": "malinois",
+      "formattedName": "Malinois"
+    },
+    {
+      "name": "tervuren",
+      "formattedName": "Tervuren"
+    },
+    {
+      "name": "groenendael",
+      "formattedName": "Groenendael"
+    },
+    {
+      "name": "laekenois",
+      "formattedName": "Laekenois"
+    },
+    {
+      "name": "ovcharka-caucasian",
+      "formattedName": "Caucasian Shepherd Dog"
+    },
+    {
+      "name": "germanshepherd",
+      "formattedName": "German Shepherd Dog"
+    },
+    {
+      "name": "spaniel-blenheim",
+      "formattedName": "King Charles Spaniel"
+    },
+    {
+      "name": "spaniel-brittany",
+      "formattedName": "Brittany Spaniel"
+    },
+    {
+      "name": "spaniel-cocker",
+      "formattedName": "Cocker Spaniel"
+    },
+    {
+      "name": "spaniel-irish",
+      "formattedName": "Irish Water Spaniel"
+    },
+    {
+      "name": "spaniel-japanese",
+      "formattedName": "Japanese Spaniel"
+    },
+    {
+      "name": "spaniel-sussex",
+      "formattedName": "Sussex Spaniel"
+    },
+    {
+      "name": "spaniel-welsh",
+      "formattedName": "Welsh Springer Spaniel"
+    },
+    {
+      "name": "airedale",
+      "formattedName": "Airedale Terrier"
+    },
+    {
+      "name": "terrier",
+      "formattedName": "Terrier"
+    },
+    {
+      "name": "terrier-american",
+      "formattedName": "American Staffordshire Terrier"
+    },
+    {
+      "name": "terrier-australian",
+      "formattedName": "Australian Terrier"
+    },
+    {
+      "name": "terrier-bedlington",
+      "formattedName": "Bedlington Terrier"
+    },
+    {
+      "name": "terrier-border",
+      "formattedName": "Border Terrier"
+    },
+    {
+      "name": "terrier-cairn",
+      "formattedName": "Cairn Terrier"
+    },
+    {
+      "name": "terrier-dandie",
+      "formattedName": "Dandie Dinmont Terrier"
+    },
+    {
+      "name": "terrier-fox",
+      "formattedName": "Fox Terrier"
+    },
+    {
+      "name": "terrier-irish",
+      "formattedName": "Irish Terrier"
+    },
+    {
+      "name": "terrier-kerryblue",
+      "formattedName": "Kerry Blue Terrier"
+    },
+    {
+      "name": "terrier-lakeland",
+      "formattedName": "Lakeland Terrier"
+    },
+    {
+      "name": "terrier-norfolk",
+      "formattedName": "Norfolk Terrier"
+    },
+    {
+      "name": "terrier-norwich",
+      "formattedName": "Norwich Terrier"
+    },
+    {
+      "name": "terrier-patterdale",
+      "formattedName": "Patterdale Terrier"
+    },
+    {
+      "name": "terrier-russell",
+      "formattedName": "Jack Russell Terrier"
+    },
+    {
+      "name": "terrier-scottish",
+      "formattedName": "Scottish Terrier"
+    },
+    {
+      "name": "terrier-silky",
+      "formattedName": "Silky Terrier"
+    },
+    {
+      "name": "terrier-tibetan",
+      "formattedName": "Tibetan Terrier"
+    },
+    {
+      "name": "terrier-toy",
+      "formattedName": "Toy Terrier"
+    },
+    {
+      "name": "terrier-welsh",
+      "formattedName": "Welsh Terrier"
+    },
+    {
+      "name": "terrier-westhighland",
+      "formattedName": "West Highland White Terrier"
+    },
+    {
+      "name": "terrier-wheaten",
+      "formattedName": "Wheaten Terrier"
+    },
+    {
+      "name": "mexicanhairless",
+      "formattedName": "Mexican Hairless Dog"
+    },
+    {
+      "name": "african",
+      "formattedName": "African"
+    },
+    {
+      "name": "bouvier",
+      "formattedName": "Bouvier des Flandres"
+    },
+    {
+      "name": "papillon",
+      "formattedName": "Papillon"
+    },
+    {
+      "name": "mountain-bernese",
+      "formattedName": "Bernese Mountain Dog"
+    },
+    {
+      "name": "entlebucher",
+      "formattedName": "Entlebucher Mountain Dog"
+    },
+    {
+      "name": "mountain-swiss",
+      "formattedName": "Swiss Mountain Dog"
+    },
+    {
+      "name": "pyrenees",
+      "formattedName": "Pyrenean Mountain Dog"
+    },
+    {
+      "name": "stbernard",
+      "formattedName": "St. Bernard"
+    },
+    {
+      "name": "bullterrier-staffordshire",
+      "formattedName": "Staffordshire Bull Terrier"
+    },
+    {
+      "name": "schnauzer-giant",
+      "formattedName": "Giant Schnauzer"
+    },
+    {
+      "name": "schnauzer-miniature",
+      "formattedName": "Miniature Schnauzer"
+    },
+    {
+      "name": "kuvasz",
+      "formattedName": "Kuvasz"
+    },
+    {
+      "name": "samoyed",
+      "formattedName": "Samoyed"
+    },
+    {
+      "name": "springer-english",
+      "formattedName": "English Springer Spaniel"
+    },
+    {
+      "name": "hound-basset",
+      "formattedName": "Basset Hound"
+    },
+    {
+      "name": "hound-blood",
+      "formattedName": "Blood Hound"
+    },
+    {
+      "name": "hound-ibizan",
+      "formattedName": "Ibizan Hound"
+    },
+    {
+      "name": "hound-plott",
+      "formattedName": "Plott Hound"
+    },
+    {
+      "name": "hound-afghan",
+      "formattedName": "Afghan Hound"
+    },
+    {
+      "name": "hound-english",
+      "formattedName": "English Hound"
+    },
+    {
+      "name": "hound-walker",
+      "formattedName": "Walker Hound"
+    },
+    {
+      "name": "otterhound",
+      "formattedName": "Otterhound"
+    },
+    {
+      "name": "wolfhound-irish",
+      "formattedName": "Irish Wolfhound"
+    },
+    {
+      "name": "greyhound-italian",
+      "formattedName": "Italian Greyhound"
+    },
+    {
+      "name": "coonhound",
+      "formattedName": "Coonhound"
+    },
+    {
+      "name": "redbone",
+      "formattedName": "Redbone Coonhound"
+    },
+    {
+      "name": "deerhound-scottish",
+      "formattedName": "Scottish Deerhound"
+    },
+    {
+      "name": "buhund-norwegian",
+      "formattedName": "Norwegian Buhund"
+    },
+    {
+      "name": "finnish-lapphund",
+      "formattedName": "Finnish Lapphund"
+    },
+    {
+      "name": "saluki",
+      "formattedName": "Saluki"
+    },
+    {
+      "name": "elkhound-norwegian",
+      "formattedName": "Norwegian Elkhound"
+    },
+    {
+      "name": "cotondetulear",
+      "formattedName": "Coton de Tulear"
+    },
+    {
+      "name": "newfoundland",
+      "formattedName": "Newfoundland"
+    },
+    {
+      "name": "ridgeback-rhodesian",
+      "formattedName": "Rhodesian Ridgeback"
+    },
+    {
+      "name": "chihuahua",
+      "formattedName": "Chihuahua"
+    },
+    {
+      "name": "husky",
+      "formattedName": "Husky"
+    },
+    {
+      "name": "collie-border",
+      "formattedName": "Border Collie"
+    },
+    {
+      "name": "malamute",
+      "formattedName": "Alaskan Malamute"
+    },
+    {
+      "name": "briard",
+      "formattedName": "Briard"
+    },
+    {
+      "name": "waterdog-spanish",
+      "formattedName": "Spanish Water Dog"
+    },
+    {
+      "name": "appenzeller",
+      "formattedName": "Appenzeller Sennenhund"
+    },
+    {
+      "name": "vizsla",
+      "formattedName": "Vizsla"
+    },
+    {
+      "name": "cattledog-australian",
+      "formattedName": "Australian Cattle Dog"
+    },
+    {
+      "name": "maltese",
+      "formattedName": "Maltese"
+    },
+    {
+      "name": "havanese",
+      "formattedName": "Havanese"
+    },
+    {
+      "name": "frise-bichon",
+      "formattedName": "Bichon Frise"
+    },
+    {
+      "name": "brabancon",
+      "formattedName": "Griffon Bruxellois"
+    },
+    {
+      "name": "affenpinscher",
+      "formattedName": "Affenpinscher"
+    },
+    {
+      "name": "pinscher-miniature",
+      "formattedName": "Miniature Pinscher"
+    },
+    {
+      "name": "whippet",
+      "formattedName": "Whippet"
+    },
+    {
+      "name": "bluetick",
+      "formattedName": "Bluetick Coonhound"
+    },
+    {
+      "name": "basenj",
+      "formattedName": "Basenji"
+    },
+    {
+      "name": "labrador",
+      "formattedName": "Labrador Retriever"
+    },
+    {
+      "name": "dalmatian",
+      "formattedName": "Dalmatian"
+    },
+    {
+      "name": "labradoodle",
+      "formattedName": "Labradoodle"
+    },
+    {
+      "name": "schipperke",
+      "formattedName": "Schipperke"
+    },
+    {
+      "name": "doberman",
+      "formattedName": "Dobermann"
+    },
+    {
+      "name": "shiba",
+      "formattedName": "Shiba Inu"
+    },
+    {
+      "name": "rottweiler",
+      "formattedName": "Rottweiler"
+    },
+    {
+      "name": "pug",
+      "formattedName": "Pug"
+    },
+    {
+      "name": "boxer",
+      "formattedName": "Boxer"
+    },
+    {
+      "name": "pomeranian",
+      "formattedName": "Pomeranian"
+    },
+    {
+      "name": "pekinese",
+      "formattedName": "Pekingese"
+    },
+    {
+      "name": "chow",
+      "formattedName": "Chow Chow"
+    },
+    {
+      "name": "kelpie",
+      "formattedName": "Kelpie"
+    },
+    {
+      "name": "weimaraner",
+      "formattedName": "Weimaraner"
+    },
+    {
+      "name": "shihtzu",
+      "formattedName": "Shih Tzu"
+    }
+  ]
+}
