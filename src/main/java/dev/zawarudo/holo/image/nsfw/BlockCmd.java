@@ -16,8 +16,9 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "block",
-		description = "Requests to block an image. Simply reply to a message containing the image you want to block. Note that this command is intended for NSFW (not safe for work) images and that you will be blacklisted if you abuse it.",
-		alias = {"bonk"},
+		description = "Requests to block an image. Simply reply to a message containing " +
+				"the image you want to block. Note that this command is intended for NSFW " +
+				"(not safe for work) images and that you will be blacklisted if you abuse it.",
 		category = CommandCategory.IMAGE)
 public class BlockCmd extends AbstractCommand {
 
