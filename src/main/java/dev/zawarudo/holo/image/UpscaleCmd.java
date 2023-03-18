@@ -19,64 +19,57 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Command(name = "upscale",
-		description = "This command lets you Upscale a given image with Waifu2x. Please provide an image as an attachment " +
-					  "or a link to process it. Alternatively, you can reply to a message with an image.",
-		embedColor = EmbedColor.DEFAULT,
-		category = CommandCategory.IMAGE)
+        description = "This command lets you Upscale a given image with Waifu2x. Please provide an image as an attachment " +
+                "or a link to process it. Alternatively, you can reply to a message with an image.",
+        category = CommandCategory.IMAGE)
 public class UpscaleCmd extends AbstractCommand {
 
-	@Override
-	public void onCommand(@NotNull MessageReceivedEvent event) {
-		deleteInvoke(event);
-		EmbedBuilder eb = new EmbedBuilder();
+    /** The URL of the Waifu2x API. */
+    public static final String API_URL = "https://api.deepai.org/api/waifu2x";
 
-		Message referenced = event.getMessage().getReferencedMessage();
-		String url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        deleteInvoke(event);
+        EmbedBuilder eb = new EmbedBuilder();
 
-		// User didn't provide an image
-		if (url == null) {
-			eb.setTitle("Error");
-			eb.setDescription("You need to provide an image to upscale!");
-			sendEmbed(event, eb, true, 30, TimeUnit.SECONDS, getEmbedColor());
-			return;
-		}
+        Message referenced = event.getMessage().getReferencedMessage();
+        String url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
 
-		sendTyping(event);
+        // User didn't provide an image
+        if (url == null) {
+            sendErrorEmbed(event, "You need to provide an image to upscale!");
+            return;
+        }
 
-		try {
-			url = process(url);
-		} catch (IOException ex) {
-			eb.setTitle("Error");
-			eb.setDescription("Something went wrong while processing your image! Please try again later.");
-			sendEmbed(event, eb, true, 30, TimeUnit.SECONDS, getEmbedColor());
-			return;
-		}
+        sendTyping(event);
 
-		eb.setTitle("Upscaled Image");
-		eb.setImage(url);
-		sendEmbed(event, eb, true, 5, TimeUnit.MINUTES, getEmbedColor());
-	}
+        try {
+            url = process(url);
+        } catch (IOException ex) {
+            sendErrorEmbed(event, "Something went wrong while processing your image! Please make sure it's an image and try again.");
+            return;
+        }
 
-	/**
-	 * The URL of the Waifu2x API.
-	 */
-	public static final String API_URL = "https://api.deepai.org/api/waifu2x";
+        eb.setTitle("Upscaled Image");
+        eb.setImage(url);
+        sendEmbed(event, eb, true, 5, TimeUnit.MINUTES, getEmbedColor());
+    }
 
-	/**
-	 * Sends a given image URL to the Waifu2x API where it is upscaled. The processed image is then returned.
-	 *
-	 * @param url The URL of the image to upscale.
-	 * @return The URL of the upscaled image.
-	 */
-	public static String process(String url) throws IOException {
-		String token = Bootstrap.holo.getConfig().getKeyDeepAI();
-		Process pr = Runtime.getRuntime().exec("curl -F image=" + url + " -H api-key:" + token + " " + API_URL);
-		BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
-		String result = reader.lines().collect(Collectors.joining("\n"));
-		JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
-		if (obj == null || obj.get("err") != null) {
-			throw new IOException("No result!");
-		}
-		return obj.get("output_url").getAsString();
-	}
+    /**
+     * Sends a given image URL to the Waifu2x API where it is upscaled. The processed image is then returned.
+     *
+     * @param url The URL of the image to upscale.
+     * @return The URL of the upscaled image.
+     */
+    public static String process(String url) throws IOException {
+        String token = Bootstrap.holo.getConfig().getKeyDeepAI();
+        Process pr = Runtime.getRuntime().exec("curl -F image=" + url + " -H api-key:" + token + " " + API_URL);
+        BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        String result = reader.lines().collect(Collectors.joining("\n"));
+        JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
+        if (obj == null || obj.get("err") != null) {
+            throw new IOException("No result!");
+        }
+        return obj.get("output_url").getAsString();
+    }
 }

@@ -8,7 +8,6 @@ import dev.zawarudo.holo.experimental.PixelateCmd;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
 import dev.zawarudo.holo.fun.UwuCmd;
-import dev.zawarudo.holo.games.akinator.AkinatorCmd;
 import dev.zawarudo.holo.games.pokemon.CatchCmd;
 import dev.zawarudo.holo.games.pokemon.PokedexCmd;
 import dev.zawarudo.holo.games.pokemon.PokemonTeamCmd;
@@ -21,9 +20,6 @@ import dev.zawarudo.holo.image.nsfw.NekoCmd;
 import dev.zawarudo.holo.image.nsfw.WaifuCmd;
 import dev.zawarudo.holo.music.cmds.*;
 import dev.zawarudo.holo.owner.*;
-import dev.zawarudo.holo.music.cmds.QueueCmd;
-import dev.zawarudo.holo.music.cmds.ClearCmd;
-import dev.zawarudo.holo.music.cmds.SkipCmd;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,18 +57,18 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new MangaSearchCmd(waiter));
 
         // Music Cmds
-		addCommand(new ClearCmd(waiter));
-		addCommand(new CloneCmd());
-		addCommand(new JoinCmd());
-		addCommand(new LeaveCmd());
+        addCommand(new ClearCmd(waiter));
+        addCommand(new CloneCmd());
+        addCommand(new JoinCmd());
+        addCommand(new LeaveCmd());
 //		addCommand(new LoopCmd());
-		addCommand(new LyricsCmd());
-		addCommand(new NowPlayingCmd());
-		addCommand(new PlayCmd());
-		addCommand(new QueueCmd());
-		addCommand(new ShuffleCmd());
-		addCommand(new SkipCmd(waiter));
-		addCommand(new StopCmd());
+        addCommand(new LyricsCmd());
+        addCommand(new NowPlayingCmd());
+        addCommand(new PlayCmd());
+        addCommand(new QueueCmd());
+        addCommand(new ShuffleCmd());
+        addCommand(new SkipCmd(waiter));
+        addCommand(new StopCmd());
 
         // Image Cmds
         addCommand(new ActionCmd());
@@ -80,7 +76,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new AvatarCmd());
         addCommand(new BannerCmd());
         addCommand(new BlockCmd());
-		addCommand(new CheckNSFWCmd());
+        addCommand(new CheckNSFWCmd());
 //		addCommand(new CollageCmd());
 //		addCommand(new DanbooruCmd());
         addCommand(new DogCmd());
@@ -89,17 +85,17 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new HoloCmd());
         addCommand(new InspiroCmd());
         addCommand(new NekoCmd());
-		addCommand(new PixelateCmd());
-//		addCommand(new UpscaleCmd());
+        addCommand(new PixelateCmd());
+        addCommand(new UpscaleCmd());
         addCommand(new WaifuCmd());
         addCommand(new XkcdCmd());
 
         // Game Cmds
 //		addCommand(new AkinatorCmd());
 //		addCommand(new AkinatorCmdOld(waiter));
-		addCommand(new CatchCmd());
-		addCommand(new PokedexCmd());
-		addCommand(new PokemonTeamCmd());
+        addCommand(new CatchCmd());
+        addCommand(new PokedexCmd());
+        addCommand(new PokemonTeamCmd());
 
         // Misc Cmds
         addCommand(new Magic8BallCmd());
@@ -115,7 +111,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new NukeCmd());
         addCommand(new RestartCmd());
         addCommand(new ShutdownCmd());
-		addCommand(new SpawnCmd());
+        addCommand(new SpawnCmd());
         addCommand(new StatusCmd());
 
         // Experimental Cmds
