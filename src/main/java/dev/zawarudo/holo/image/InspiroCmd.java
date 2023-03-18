@@ -13,10 +13,10 @@ import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Command to fetch a quote from inspirobot.me and display it in an embed
+ * Command to fetch a quote from inspirobot.me and display it in an embed.
  */
 @Command(name = "inspiro",
-		description = "Fetch a quote from [Inspirobot](https://inspirobot.me).",
+		description = "Fetch a random quote from [Inspirobot](https://inspirobot.me).",
 		thumbnail = "https://inspirobot.me/website/images/inspirobot-dark-green.png",
 		embedColor = EmbedColor.INSPIRO,
 		guildOnly = false,
@@ -31,16 +31,12 @@ public class InspiroCmd extends AbstractCommand {
 		EmbedBuilder builder = new EmbedBuilder();
 
 		String url;
-
 		try {
 			url = HttpResponse.readLine(API_URL);
 		} catch (IOException ex) {
-			builder.setTitle("API Error");
-			builder.setDescription("Something went wrong! Please try again in a few minutes.");
-			sendEmbed(event, builder, true, 30, TimeUnit.SECONDS);
+			sendErrorEmbed(event, "Something went wrong while communicating with the API! Please try again in a few minutes.");
 			return;
 		}
-
 		builder.setTitle("InspiroBot Quote");
 		builder.setImage(url);
 		sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, getEmbedColor());
