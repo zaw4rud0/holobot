@@ -7,16 +7,17 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.middleman.AudioChannel;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
-@SuppressWarnings("BooleanMethodIsAlwaysInverted")
 public abstract class AbstractMusicCommand extends AbstractCommand {
 
     /**
      * Returns the voice state of a member within a guild.
      */
+    @NotNull
     protected GuildVoiceState getMemberVoiceState(Member member) {
         return Objects.requireNonNull(member.getVoiceState());
     }
