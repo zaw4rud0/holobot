@@ -18,8 +18,9 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Command(name = "upscale",
-        description = "This command lets you Upscale a given image with Waifu2x. Please provide an image as an attachment " +
-                "or a link to process it. Alternatively, you can reply to a message with an image.",
+        description = "This command lets you Upscale a given image with Waifu2x. Please provide an image " +
+                "as an attachment or as a link to process it. Alternatively, you can reply to a message " +
+                "with an image.",
         category = CommandCategory.IMAGE)
 public class UpscaleCmd extends AbstractCommand {
 

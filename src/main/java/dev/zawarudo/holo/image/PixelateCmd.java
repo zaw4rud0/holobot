@@ -1,0 +1,71 @@
+package dev.zawarudo.holo.image;
+
+import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.core.AbstractCommand;
+import dev.zawarudo.holo.core.CommandCategory;
+import dev.zawarudo.holo.utils.ImageOperations;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
+import org.jetbrains.annotations.NotNull;
+
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+
+@Command(name = "pixelate",
+        description = "Pixelates a given image",
+        usage = "[<intensity>]",
+        alias = {"pixel"},
+        category = CommandCategory.IMAGE)
+public class PixelateCmd extends AbstractCommand {
+
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        Message referenced = event.getMessage().getReferencedMessage();
+        String url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
+
+        // User didn't provide an image
+        if (url == null) {
+            sendErrorEmbed(event, "You need to provide an image to pixelate!");
+            return;
+        }
+
+        int intensity = 1;
+
+        if (args.length > 0 && isInteger(args[0])) {
+            intensity = Integer.parseInt(args[0]);
+            if (intensity < 1 || intensity > 250) {
+                sendErrorEmbed(event, "Intensity should be an integer between 1 and 250!");
+                return;
+            }
+        }
+
+        try {
+            BufferedImage img = ImageIO.read(new URL(url));
+            if (img == null) {
+                sendErrorEmbed(event, "I couldn't read the image. Please check your image format or try a different image.");
+                return;
+            }
+            BufferedImage result = pixelate(img, intensity);
+            InputStream input = ImageOperations.toInputStream(result);
+            event.getMessage().replyFiles(FileUpload.fromData(input, "result.png")).queue();
+        } catch (IOException ex) {
+            ex.printStackTrace();
+            sendErrorEmbed(event, "Something went wrong while pixelating your image. Please try again later.");
+        }
+    }
+
+    private BufferedImage pixelate(@NotNull BufferedImage img, int intensity) {
+        int width = img.getWidth();
+        int height = img.getHeight();
+
+        int newWidth = (int) Math.ceil(width / (intensity * 4.0));
+        int newHeight = (int) Math.ceil(height / (intensity * 4.0));
+
+        BufferedImage result = ImageOperations.resize(img, newWidth, newHeight);
+        return ImageOperations.resize(result, width, height);
+    }
+}

@@ -4,7 +4,7 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.anime.AnimeSearchCmd;
 import dev.zawarudo.holo.anime.MangaSearchCmd;
 import dev.zawarudo.holo.annotations.Deactivated;
-import dev.zawarudo.holo.experimental.PixelateCmd;
+import dev.zawarudo.holo.image.PixelateCmd;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
 import dev.zawarudo.holo.fun.UwuCmd;
