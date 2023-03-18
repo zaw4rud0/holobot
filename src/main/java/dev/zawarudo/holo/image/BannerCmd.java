@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "banner",
-		description = "Retrieves the current banner of this guild. A guild needs to be boosted to level 2 in order to have a banner.",
+		description = "Retrieves the current banner of this guild. Note that a guild " +
+				"needs to be boosted to level 2 in order to have a banner.",
 		category = CommandCategory.IMAGE)
 public class BannerCmd extends AbstractCommand {
 
@@ -18,15 +19,16 @@ public class BannerCmd extends AbstractCommand {
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
 
-		EmbedBuilder builder = new EmbedBuilder();		
-		
-		if (event.getGuild().getBannerUrl() == null) {
+		EmbedBuilder builder = new EmbedBuilder();
+		String bannerUrl = event.getGuild().getBannerUrl();
+
+		if (bannerUrl == null) {
 			builder.setTitle("No Banner Found!");
 			builder.setDescription("This guild doesn't seem to have a banner.");
 			sendEmbed(event, builder, true, 15, TimeUnit.SECONDS);
 		} else {
-			builder.setTitle("Banner of " + event.getGuild().getName(), event.getGuild().getBannerUrl() + "?size=4096");
-			builder.setImage(event.getGuild().getBannerUrl() + "?size=4096");
+			builder.setTitle("Banner of " + event.getGuild().getName(), bannerUrl + "?size=4096");
+			builder.setImage(bannerUrl + "?size=4096");
 			sendEmbed(event, builder, true, 1, TimeUnit.MINUTES);
 		}
 	}
