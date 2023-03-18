@@ -8,7 +8,6 @@ import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.exceptions.InvalidRequestException;
-import dev.zawarudo.holo.misc.EmbedColor;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.Reader;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -44,7 +43,7 @@ public class DogCmd extends AbstractCommand {
                 formattedNames.put(name, formatted);
             });
         } catch (IOException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Something went wrong while reading the dog breeds file!", e);
         }
     }
 
@@ -59,7 +58,7 @@ public class DogCmd extends AbstractCommand {
         } else if (Arrays.stream(breeds).anyMatch(b -> b.equalsIgnoreCase(args[0]))) {
             sendDogImageEmbed(event, args[0]);
         } else {
-            sendUnknownBreedEmbed(event);
+            sendErrorEmbed(event, "The breed you specified is unknown. Use `" + getPrefix(event) + "dog breeds` to see a list of available breeds.");
         }
     }
 
@@ -72,7 +71,7 @@ public class DogCmd extends AbstractCommand {
             url = DogAPI.getRandomImage();
         } catch (APIException e) {
             e.printStackTrace();
-            sendAPIErrorEmbed(event);
+            sendErrorEmbed(event, "An error occurred while fetching the image from the API. Try again later!");
             return;
         }
         String breed = url.split("/")[4];
@@ -99,37 +98,19 @@ public class DogCmd extends AbstractCommand {
      * Sends an embed with a dog image of the specified breed.
      */
     private void sendDogImageEmbed(MessageReceivedEvent event, String breed) {
-        String url = null;
+        String url;
         try {
             url = DogAPI.getRandomBreedImage(breed);
         } catch (APIException | InvalidRequestException e) {
-            sendAPIErrorEmbed(event);
+            e.printStackTrace();
+            sendErrorEmbed(event, "An error occurred while fetching the image from the API. Try again later!");
+            return;
         }
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Here is your " + getFormattedName(breed) + "!");
         builder.setImage(url);
         sendEmbed(event, builder, true, 2, TimeUnit.MINUTES, getEmbedColor());
-    }
-
-    /**
-     * Sends an embed stating that the given breed is unknown.
-     */
-    private void sendUnknownBreedEmbed(MessageReceivedEvent event) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Unknown breed");
-        builder.setDescription("The breed you specified is unknown. Use `" + getPrefix(event) + "dog breeds` to see a list of available breeds.");
-        sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
-    }
-
-    /**
-     * Sends an embed stating that there was an error with the API.
-     */
-    private void sendAPIErrorEmbed(MessageReceivedEvent event) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("API Error");
-        builder.setDescription("An error occurred while fetching the image. Try again later!");
-        sendEmbed(event, builder, true, 30, TimeUnit.SECONDS, EmbedColor.ERROR.getColor());
     }
 
     /**
