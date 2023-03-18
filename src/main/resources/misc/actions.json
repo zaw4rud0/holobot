@@ -258,6 +258,31 @@
     ]
   },
   {
+    "name": "study",
+    "sentence": "{s} is studying",
+    "directed": false,
+    "api": false,
+    "urls": [
+      "https://media.tenor.com/0IudfCinoWgAAAAC/study-anime.gif",
+      "https://media.tenor.com/_h_1fcwEkHYAAAAC/studying-windy.gif",
+      "https://media.tenor.com/zk6OuE-RGngAAAAC/midoriya-izuku-anime-stud.gif",
+      "https://media.tenor.com/HwMm88Olb14AAAAC/k-on-yui.gif",
+      "https://media.tenor.com/D48L_xXEcDoAAAAd/stress-study.gif",
+      "https://media.tenor.com/Ucz3oKrJNdsAAAAC/spy-x-family-study.gif",
+      "https://media.tenor.com/ycBSGu7GEQAAAAAC/crying-kill-la-kill.gif",
+      "https://media.tenor.com/UH2l27eLWBUAAAAC/papi-monster-musume.gif",
+      "https://media.tenor.com/LdflfYxrPLkAAAAC/anime-study.gif",
+      "https://media.tenor.com/UHYgSGkjpusAAAAC/anime-read-book.gif",
+      "https://media.tenor.com/hWWn-MsXY0kAAAAC/anime-bookworm.gif",
+      "https://media.tenor.com/eVegEHxt9goAAAAC/study-work.gif",
+      "https://media.tenor.com/2vHjW5QbFckAAAAC/yorimoi-sora-yori.gif",
+      "https://media.tenor.com/Txr7RYfzW-EAAAAC/anime-boy.gif",
+      "https://media.tenor.com/E_e1-lp25LMAAAAC/anime-notes.gif",
+      "https://media.tenor.com/eIDOCgLRMNQAAAAd/hachioji-naoto-naoto-waiting-for-a-chat.gif",
+      "https://media.tenor.com/t7pxbAbPSWsAAAAC/anime.gif"
+    ]
+  },
+  {
     "name": "think",
     "sentence": "{s} thinks",
     "directed": false,
