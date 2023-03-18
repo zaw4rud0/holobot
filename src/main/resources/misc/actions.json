@@ -1,0 +1,314 @@
+[
+  {
+    "name": "baka",
+    "sentence": "{s} calls {u} a baka",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/baka"
+    ]
+  },
+  {
+    "name": "bite",
+    "sentence": "{s} bites {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/bite"
+    ]
+  },
+  {
+    "name": "blush",
+    "sentence": "{s} blushes",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/blush"
+    ]
+  },
+  {
+    "name": "bonk",
+    "sentence": "{s} bonks {u}",
+    "directed": true,
+    "api": false,
+    "urls": [
+      "https://media.tenor.com/mXwNLMSQRN8AAAAC/yuru-yuri-chinatsu-yoshikawa.gif",
+      "https://media.tenor.com/D6Ln3UPAdKcAAAAd/bonk-anime.gif",
+      "https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif",
+      "https://media.tenor.com/JS0ZB_b3kjoAAAAC/sugiura-ayano-funami-yui.gif",
+      "https://media.tenor.com/DiGHoKx3x8kAAAAC/atonnic-bonk.gif",
+      "https://media.tenor.com/lqVMTRILn8QAAAAd/anime-bonk-anime.gif",
+      "https://media.tenor.com/E6njrpISBV4AAAAC/bonk-hit.gif"
+    ]
+  },
+  {
+    "name": "bored",
+    "sentence": "{s} is bored",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/bored"
+    ]
+  },
+  {
+    "name": "cry",
+    "sentence": "{s} cries",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/cry"
+    ]
+  },
+  {
+    "name": "cuddle",
+    "sentence": "{s} cuddles {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/cuddle"
+    ]
+  },
+  {
+    "name": "dance",
+    "sentence": "{s} dances",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/dance"
+    ]
+  },
+  {
+    "name": "facepalm",
+    "sentence": "{s} face-palms",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/facepalm"
+    ]
+  },
+  {
+    "name": "feed",
+    "sentence": "{s} feeds {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/feed"
+    ]
+  },
+  {
+    "name": "handhold",
+    "sentence": "{s} holds the hand of {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/handhold"
+    ]
+  },
+  {
+    "name": "happy",
+    "sentence": "{s} is happy",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/happy"
+    ]
+  },
+  {
+    "name": "highfive",
+    "sentence": "{s} highfives {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/highfive"
+    ]
+  },
+  {
+    "name": "hug",
+    "sentence": "{s} hugs {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/hug"
+    ]
+  },
+  {
+    "name": "kick",
+    "sentence": "{s} kicks {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/kick"
+    ]
+  },
+  {
+    "name": "kiss",
+    "sentence": "{s} kisses {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/kiss"
+    ]
+  },
+  {
+    "name": "laugh",
+    "sentence": "{s} laughs",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/laugh"
+    ]
+  },
+  {
+    "name": "pat",
+    "sentence": "{s} pats {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/pat"
+    ]
+  },
+  {
+    "name": "poke",
+    "sentence": "{s} pokes {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/poke"
+    ]
+  },
+  {
+    "name": "pout",
+    "sentence": "{s} pouts",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/pout"
+    ]
+  },
+  {
+    "name": "punch",
+    "sentence": "{s} punches {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/punch"
+    ]
+  },
+  {
+    "name": "shoot",
+    "sentence": "{s} shoots {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/shoot"
+    ]
+  },
+  {
+    "name": "shrug",
+    "sentence": "{s} shrugs",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/shrug"
+    ]
+  },
+  {
+    "name": "slap",
+    "sentence": "{s} slaps {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/slap"
+    ]
+  },
+  {
+    "name": "sleep",
+    "sentence": "{s} sleeps",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/sleep"
+    ]
+  },
+  {
+    "name": "smile",
+    "sentence": "{s} smiles",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/smile"
+    ]
+  },
+  {
+    "name": "smug",
+    "sentence": "{s} is smug",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/smug"
+    ]
+  },
+  {
+    "name": "stare",
+    "sentence": "{s} stares at {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/stare"
+    ]
+  },
+  {
+    "name": "think",
+    "sentence": "{s} thinks",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/think"
+    ]
+  },
+  {
+    "name": "thumbsup",
+    "sentence": "{s} gives a thumbs-up",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/thumbsup"
+    ]
+  },
+  {
+    "name": "tickle",
+    "sentence": "{s} tickles {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/tickle"
+    ]
+  },
+  {
+    "name": "wave",
+    "sentence": "{s} waves",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/wave"
+    ]
+  },
+  {
+    "name": "wink",
+    "sentence": "{s} winks",
+    "directed": false,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/wink"
+    ]
+  },
+  {
+    "name": "yeet",
+    "sentence": "{s} yeets {u}",
+    "directed": true,
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/yeet"
+    ]
+  }
+]
