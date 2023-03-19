@@ -14,7 +14,7 @@ import java.util.Map;
  */
 public class PlayerManager {
 
-	private static PlayerManager INSTANCE;
+	private static PlayerManager instance;
 	private final Map<Long, GuildMusicManager> musicManagers;
 	private final AudioPlayerManager audioPlayerManager;
 
@@ -41,9 +41,9 @@ public class PlayerManager {
 	 * Returns the instance of this class.
 	 */
 	public static PlayerManager getInstance() {
-		if (PlayerManager.INSTANCE == null) {
-			PlayerManager.INSTANCE = new PlayerManager();
+		if (PlayerManager.instance == null) {
+			PlayerManager.instance = new PlayerManager();
 		}
-		return PlayerManager.INSTANCE;
+		return PlayerManager.instance;
 	}
 }

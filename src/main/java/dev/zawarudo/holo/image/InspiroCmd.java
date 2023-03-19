@@ -28,7 +28,6 @@ public class InspiroCmd extends AbstractCommand {
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
-		EmbedBuilder builder = new EmbedBuilder();
 
 		String url;
 		try {
@@ -37,6 +36,8 @@ public class InspiroCmd extends AbstractCommand {
 			sendErrorEmbed(event, "Something went wrong while communicating with the API! Please try again in a few minutes.");
 			return;
 		}
+
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("InspiroBot Quote");
 		builder.setImage(url);
 		sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, getEmbedColor());

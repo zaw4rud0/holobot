@@ -31,7 +31,7 @@ public abstract class AbstractCommand {
 
     protected String[] args;
 
-    protected final Logger LOGGER = LoggerFactory.getLogger(this.getClass());
+    protected final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     /**
      * Abstract method that defines the function of the command.
@@ -111,7 +111,7 @@ public abstract class AbstractCommand {
      */
     protected void sendEmbed(MessageReceivedEvent event, EmbedBuilder embedBuilder, boolean footer, Color embedColor) {
         if (footer) {
-            embedBuilder = addFooter(event, embedBuilder);
+            addFooter(event, embedBuilder);
         }
         embedBuilder.setColor(embedColor);
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
@@ -129,7 +129,7 @@ public abstract class AbstractCommand {
      */
     protected void sendEmbed(MessageReceivedEvent event, EmbedBuilder embedBuilder, boolean footer, long delay, TimeUnit unit, Color embedColor) {
         if (footer) {
-            embedBuilder = addFooter(event, embedBuilder);
+            addFooter(event, embedBuilder);
         }
         embedBuilder.setColor(embedColor);
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue(msg -> msg.delete().queueAfter(delay, unit));
@@ -145,11 +145,14 @@ public abstract class AbstractCommand {
         sendEmbed(event, builder, false, 30, TimeUnit.SECONDS, Color.RED);
     }
 
+    /**
+     * Sends an embed to the owner of the bot.
+     */
     public void sendToOwner(EmbedBuilder builder) {
         User owner = Bootstrap.holo.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId());
         if (owner == null) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Owner is null which wasn't supposed to happen! Please check your config!");
+            if (logger.isErrorEnabled()) {
+                logger.error("Owner is null which wasn't supposed to happen! Please check your config!");
             }
             return;
         }
@@ -157,37 +160,14 @@ public abstract class AbstractCommand {
     }
 
     /**
-     * Sends an embed to the owner of the bot.
-     */
-    protected void sendToOwner(MessageReceivedEvent e, EmbedBuilder builder) {
-        User owner = e.getJDA().getUserById(Bootstrap.holo.getConfig().getOwnerId());
-        if (owner == null) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Owner is null which wasn't supposed to happen! Please check your config!");
-            }
-            return;
-        }
-        owner.openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue());
-    }
-
-    /**
      * Adds a footer to the embed if and only if the event is from a guild.
      */
-    private EmbedBuilder addFooter(@NotNull MessageReceivedEvent event, @NotNull EmbedBuilder builder) {
+    private void addFooter(@NotNull MessageReceivedEvent event, @NotNull EmbedBuilder builder) {
         if (event.getMember() == null) {
-            return builder;
+            return;
         }
         String footerText = String.format("Invoked by %s", event.getMember().getEffectiveName());
-        return builder.setFooter(footerText, event.getAuthor().getAvatarUrl());
-    }
-
-    /**
-     * Logs an error to the console.
-     */
-    protected void logError(String message) {
-        if (LOGGER.isErrorEnabled()) {
-            LOGGER.error(message);
-        }
+        builder.setFooter(footerText, event.getAuthor().getAvatarUrl());
     }
 
     /**

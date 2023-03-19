@@ -58,13 +58,17 @@ public class MangaSearchCmd extends AbstractCommand {
         List<Manga> result;
         try {
             result = JikanAPI.searchManga(search);
-        } catch (InvalidRequestException e) {
+        } catch (InvalidRequestException ex) {
             sendErrorEmbed(event, "Something went wrong while searching for the manga! Please try again later.");
-            logError("Invalid request: " + e.getMessage() + "! This wasn't supposed to happen!");
+            if (logger.isErrorEnabled()) {
+                logger.error("Invalid request! This wasn't supposed to happen!", ex);
+            }
             return;
-        } catch (APIException e) {
+        } catch (APIException ex) {
             sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
-            logError("An API error occurred while trying to search for the manga: " + e.getMessage() + " | Manga: " + search);
+            if (logger.isErrorEnabled()) {
+                logger.error("An API error occurred while trying to search for the manga: " + ex.getMessage() + " | Manga: " + search, ex);
+            }
             return;
         }
 
@@ -136,11 +140,13 @@ public class MangaSearchCmd extends AbstractCommand {
         if (manga.getThemes() != null && manga.getThemes().size() != 0) {
             themes = manga.getThemes().toString().replace("[", "").replace("]", "");
         }
+
         int ch = manga.getChapters();
         int vol = manga.getVolumes();
         String chapters = ch != 0 ? vol != 0 ? "Vol: " + vol + "\nCh: " + ch : ch + "Ch." : "TBA";
-        String malScore = manga.getScore() != 0.0 ? String.valueOf(manga.getScore()) : "N/A";
-        String malRank = manga.getRank() != 0 ? String.valueOf(manga.getRank()) : "N/A";
+
+        String malScore = manga.getScore() == 0.0 ? "N/A" : String.valueOf(manga.getScore());
+        String malRank = manga.getRank() == 0 ? "N/A" : String.valueOf(manga.getRank());
 
         // Set embed
         builder.setTitle(manga.getTitle());

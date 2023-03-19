@@ -14,7 +14,7 @@ import java.text.DecimalFormat;
         category = CommandCategory.MISC)
 public class CoinFlipCmd extends AbstractCommand {
 
-    private static final int MAX_COIN_FLIPS = 1000000;
+    private static final int MAX_COIN_FLIPS = 1_000_000;
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {

@@ -21,7 +21,6 @@ public class ShuffleCmd extends AbstractMusicCommand {
 		deleteInvoke(e);
 
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
-		EmbedBuilder builder = new EmbedBuilder();
 
 		if (musicManager.scheduler.queue.isEmpty()) {
 			sendErrorEmbed(e, "I can't shuffle an empty queue!");
@@ -32,6 +31,7 @@ public class ShuffleCmd extends AbstractMusicCommand {
 
 		String userName = e.getMember() != null ? e.getMember().getEffectiveName() : e.getAuthor().getName();
 
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Shuffled Queue");
 		builder.setDescription(userName + " shuffled the queue!");
 		sendEmbed(e, builder, false, 1, TimeUnit.MINUTES);

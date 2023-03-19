@@ -104,7 +104,9 @@ public class PlayCmd extends AbstractMusicCommand {
                 builder.setDescription("Something went wrong while loading the track! My owner has already been notified. Please try again later.");
                 sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
 
-                logError("Load failed for track: " + link + " with exception: " + exception.getMessage());
+                if (logger.isErrorEnabled()) {
+                    logger.error("Load failed for track: " + link, exception);
+                }
             }
         };
     }

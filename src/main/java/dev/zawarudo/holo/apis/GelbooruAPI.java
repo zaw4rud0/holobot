@@ -9,30 +9,24 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * TODO: Use Gelbooru Post to store information about a post instead of Json objects. This way
+ * TODO:
+ *  * Use Gelbooru Post to store information about a post instead of Json objects. This way
  *  an additional layer is created which increases maintainability.
+ *  * Remove this class and use my wrapper library for the various Booru sites.
  */
+@Deprecated(forRemoval = true)
 public final class GelbooruAPI {
 
 	private static final String BASE_URL = "https://gelbooru.com/index.php?page=dapi&s=post&q=index&json=1&";
 	
 	private GelbooruAPI() {
 	}
-	
-	/** List of Gelbooru tags that are banned */ 
-	private static final List<String> BANNED = new ArrayList<>();
-
-	public static void main(String[] args) throws IOException {
-		System.out.println(getJsonObject(Rating.GENERAL, Sort.RANDOM, 1, "blahaj"));
-	}
 
 	public static JsonObject getJsonObject(Rating rating, Sort sort, int limit,	String tags) throws IOException {		
-		String urlQueryString = BASE_URL + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags + "%20-" + String.join("%20-", BANNED);
+		String urlQueryString = BASE_URL + "limit=" + limit + "&tags=" + rating.getName() + sort.getName() + tags;
 		HttpURLConnection connection = (HttpURLConnection) new URL(urlQueryString).openConnection();
 		connection.setRequestMethod("GET");
 		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/89.0.4389.90 Safari/537.36");

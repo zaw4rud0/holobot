@@ -59,13 +59,17 @@ public class AnimeSearchCmd extends AbstractCommand {
         List<Anime> result;
         try {
             result = JikanAPI.searchAnime(search);
-        } catch (InvalidRequestException e) {
+        } catch (InvalidRequestException ex) {
             sendErrorEmbed(event, "Something went wrong while searching for the anime! Please try again later.");
-            logError("Invalid request: " + e.getMessage() + "! This wasn't supposed to happen!");
+            if (logger.isErrorEnabled()) {
+                logger.error("Invalid request! This wasn't supposed to happen!", ex);
+            }
             return;
-        } catch (APIException e) {
+        } catch (APIException ex) {
             sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
-            logError("An API error occurred while trying to search for the anime: " + e.getMessage() + " | Anime: " + search);
+            if (logger.isErrorEnabled()) {
+                logger.error("An API error occurred while trying to search for the anime: " + ex.getMessage() + " | Anime: " + search, ex);
+            }
             return;
         }
 
@@ -138,10 +142,10 @@ public class AnimeSearchCmd extends AbstractCommand {
         if (anime.getThemes() != null && anime.getThemes().size() != 0) {
             themes = anime.getThemes().toString().replace("[", "").replace("]", "");
         }
-        String episodes = anime.getEpisodes() != 0 ? String.valueOf(anime.getEpisodes()) : "TBA";
-        String season = anime.getSeason() != null ? anime.getSeason() : "TBA";
-        String malScore = anime.getScore() != 0.0 ? String.valueOf(anime.getScore()) : "N/A";
-        String malRank = anime.getRank() != 0 ? String.valueOf(anime.getRank()) : "N/A";
+        String episodes = anime.getEpisodes() == 0 ? "TBA" : String.valueOf(anime.getEpisodes());
+        String season = anime.getSeason() == null ? "TBA" : anime.getSeason();
+        String malScore = anime.getScore() == 0.0 ? "N/A" : String.valueOf(anime.getScore());
+        String malRank = anime.getRank() == 0 ? "N/A" : String.valueOf(anime.getRank());
 
         // Set embed
         builder.setTitle(anime.getTitle());
@@ -163,12 +167,12 @@ public class AnimeSearchCmd extends AbstractCommand {
         }
         String type = anime.getType() == null ? "null" : anime.getType();
         builder.addField("Type", type, true);
-        if (!"Movie".equals(anime.getType())) {
-            builder.addField("Episodes", episodes, true);
-            builder.addField("Season", Formatter.capitalize(season), true);
-        } else {
+        if ("Movie".equals(anime.getType())) {
             builder.addField("Season", Formatter.capitalize(season), true);
             builder.addBlankField(true);
+        } else {
+            builder.addField("Episodes", episodes, true);
+            builder.addField("Season", Formatter.capitalize(season), true);
         }
         builder.addField("MAL Score", malScore, true);
         builder.addField("MAL Rank", malRank, true);

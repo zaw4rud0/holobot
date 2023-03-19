@@ -34,7 +34,6 @@ public class SkipCmd extends AbstractMusicCommand {
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
 
-		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 
 		// Checks if there are tracks to skip
@@ -85,6 +84,7 @@ public class SkipCmd extends AbstractMusicCommand {
 
 		String username = event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getName();
 
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(username + " requested a skip");
 		builder.setDescription("Upvote to skip current track\n`" + requiredVotes + "` upvotes are required");
 

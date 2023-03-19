@@ -20,7 +20,9 @@ public class RestartCmd extends AbstractCommand {
 
         // Leaves all voice channels
         e.getJDA().getGuilds().stream().filter(g -> {
-            if (g.getSelfMember().getVoiceState() == null) return false;
+            if (g.getSelfMember().getVoiceState() == null) {
+                return false;
+            }
             return g.getSelfMember().getVoiceState().inAudioChannel();
         }).forEach(g -> g.getAudioManager().closeAudioConnection());
 

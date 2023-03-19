@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -25,6 +27,8 @@ import java.util.Map;
  * Class that manages where and when a {@link Pokemon} spawns.
  */
 public class PokemonSpawnManager {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(PokemonSpawnManager.class);
 
     private final List<Long> channels;
 
@@ -62,8 +66,10 @@ public class PokemonSpawnManager {
                 pokemon = PokeAPI.getRandomPokemon();
                 BufferedImage image = PokemonUtils.drawHiddenPokemon(pokemon);
                 upload = FileUpload.fromData(ImageOperations.toInputStream(image), "pokemon.png");
-            } catch (IOException | InvalidPokedexIdException e) {
-                e.printStackTrace();
+            } catch (IOException | InvalidPokedexIdException ex) {
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", id, ex);
+                }
                 continue;
             }
 
@@ -81,8 +87,10 @@ public class PokemonSpawnManager {
         Pokemon pokemon;
         try {
             pokemon = PokeAPI.getRandomPokemon();
-        } catch (IOException | InvalidPokedexIdException e) {
-            e.printStackTrace();
+        } catch (IOException | InvalidPokedexIdException ex) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", channelId, ex);
+            }
             return;
         }
         spawnNewPokemon(channelId, pokemon);
@@ -98,8 +106,10 @@ public class PokemonSpawnManager {
         try {
             BufferedImage image = PokemonUtils.drawHiddenPokemon(pokemon);
             upload = FileUpload.fromData(ImageOperations.toInputStream(image), "pokemon.png");
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException ex) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", channelId, ex);
+            }
             return;
         }
         builder.setImage("attachment://pokemon.png");

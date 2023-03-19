@@ -22,13 +22,15 @@ public class ShutdownCmd extends AbstractCommand {
         // Leaves all voice channels
         e.getJDA().getGuilds().stream().filter(g -> {
             GuildVoiceState self = g.getSelfMember().getVoiceState();
-            if (self == null) return false;
+            if (self == null) {
+                return false;
+            }
             return self.inAudioChannel();
         }).forEach(g -> g.getAudioManager().closeAudioConnection());
 
         // Deletes messages
         Bootstrap.holo.getPokemonSpawnManager().getMessages().values().forEach(m -> m.delete().queue());
 
-        e.getJDA().shutdown();
+        Bootstrap.shutdown();
     }
 }

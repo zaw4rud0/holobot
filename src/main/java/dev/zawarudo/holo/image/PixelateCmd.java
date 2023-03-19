@@ -53,8 +53,10 @@ public class PixelateCmd extends AbstractCommand {
             InputStream input = ImageOperations.toInputStream(result);
             event.getMessage().replyFiles(FileUpload.fromData(input, "result.png")).queue();
         } catch (IOException ex) {
-            ex.printStackTrace();
             sendErrorEmbed(event, "Something went wrong while pixelating your image. Please try again later.");
+            if (logger.isErrorEnabled()) {
+                logger.error("Something went wrong during the pixelation of an image.", ex);
+            }
         }
     }
 

@@ -31,7 +31,8 @@ public final class DogAPI {
      * @return An image URL of a dog as a String.
      * @throws APIException If the API returns an error.
      */
-    public static @NotNull String getRandomImage() throws APIException {
+    @NotNull
+    public static String getRandomImage() throws APIException {
         JsonObject obj;
         try {
             obj = HttpResponse.getJsonObject(ENDPOINT.RANDOM.getUrl());
@@ -49,7 +50,8 @@ public final class DogAPI {
      * @throws APIException            If the API returns an error.
      * @throws InvalidRequestException If the given breed is invalid.
      */
-    public static @NotNull String getRandomBreedImage(@NotNull String breed) throws APIException, InvalidRequestException {
+    @NotNull
+    public static String getRandomBreedImage(@NotNull String breed) throws APIException, InvalidRequestException {
         JsonObject obj;
         try {
             obj = HttpResponse.getJsonObject(String.format(ENDPOINT.RANDOM_BREED.getUrl(), breed));
@@ -70,7 +72,8 @@ public final class DogAPI {
      * @throws APIException            If the API returns an error.
      * @throws InvalidRequestException If the given breed is invalid.
      */
-    public static @NotNull List<String> getBreedImages(@NotNull String breed) throws APIException, InvalidRequestException {
+    @NotNull
+    public static List<String> getBreedImages(@NotNull String breed) throws APIException, InvalidRequestException {
         JsonObject jsonObj;
         try {
             jsonObj = HttpResponse.getJsonObject(String.format(ENDPOINT.BY_BREED.getUrl(), breed));
@@ -94,7 +97,8 @@ public final class DogAPI {
      * @throws APIException            If the API returns an error.
      * @throws InvalidRequestException If the given breed or sub-breed is invalid.
      */
-    public static @NotNull String getRandomSubBreedImage(@NotNull String breed, @NotNull String subBreed) throws APIException, InvalidRequestException {
+    @NotNull
+    public static String getRandomSubBreedImage(@NotNull String breed, @NotNull String subBreed) throws APIException, InvalidRequestException {
         JsonObject obj;
         try {
             obj = HttpResponse.getJsonObject(String.format(ENDPOINT.RANDOM_SUB_BREED.getUrl(), breed, subBreed));
@@ -116,7 +120,8 @@ public final class DogAPI {
      * @throws APIException            If the API returns an error.
      * @throws InvalidRequestException If the given breed or sub-breed is invalid.
      */
-    public static @NotNull List<String> getSubBreedImages(@NotNull String breed, @NotNull String subBreed) throws APIException, InvalidRequestException {
+    @NotNull
+    public static List<String> getSubBreedImages(@NotNull String breed, @NotNull String subBreed) throws APIException, InvalidRequestException {
         JsonObject jsonObj;
         try {
             jsonObj = HttpResponse.getJsonObject(String.format(ENDPOINT.BY_SUB_BREED.getUrl(), breed, subBreed));
@@ -137,7 +142,8 @@ public final class DogAPI {
      * @return A list of breeds.
      * @throws APIException If the API returns an error.
      */
-    public static @NotNull List<Breed> getBreedList() throws APIException {
+    @NotNull
+    public static List<Breed> getBreedList() throws APIException {
         JsonObject jsonObj;
         try {
             jsonObj = HttpResponse.getJsonObject(ENDPOINT.ALL_BREEDS.getUrl());
@@ -162,7 +168,8 @@ public final class DogAPI {
      * @throws APIException            If the API returns an error.
      * @throws InvalidRequestException If the given breed is invalid.
      */
-    public static @NotNull List<String> getSubBreeds(@NotNull String breed) throws InvalidRequestException, APIException {
+    @NotNull
+    public static List<String> getSubBreeds(@NotNull String breed) throws InvalidRequestException, APIException {
         String url = String.format(ENDPOINT.ALL_SUB_BREEDS.getUrl(), breed);
 
         JsonObject jsonObj;
@@ -191,7 +198,7 @@ public final class DogAPI {
      * @param name      The name of the breed.
      * @param subBreeds The sub-breeds of the given breed.
      */
-    public @NotNull record Breed(@NotNull String name, String[] subBreeds) {
+    public record Breed(@NotNull String name, String[] subBreeds) {
         /**
          * Checks if this breed has sub-breeds.
          *

@@ -33,7 +33,6 @@ public class ClearCmd extends AbstractMusicCommand {
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
 
-		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 
 		// Checks if queue is empty
@@ -84,6 +83,7 @@ public class ClearCmd extends AbstractMusicCommand {
 
 		String username = event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getName();
 
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(username + " requested to clear the queue");
 		builder.setDescription("Upvote to clear the queue\n`" + requiredVotes + "` upvotes are required");
 

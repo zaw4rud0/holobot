@@ -18,6 +18,7 @@ import java.util.Locale;
         thumbnail = AkinatorSprite.ICON,
         category = CommandCategory.GAMES,
         ownerOnly = true)
+@SuppressWarnings({"PMD", "unused"})
 public class AkinatorCmd extends AbstractCommand {
 
     private final AkinatorManager manager;
@@ -40,7 +41,7 @@ public class AkinatorCmd extends AbstractCommand {
         }
     }
 
-    private Server.GuessType getGuessType(@NotNull String s) throws IllegalArgumentException {
+    private Server.GuessType getGuessType(@NotNull String s) {
         return switch(s.toLowerCase(Locale.UK)) {
             case ("animal") -> Server.GuessType.ANIMAL;
             case ("movie") -> Server.GuessType.MOVIE_TV_SHOW;

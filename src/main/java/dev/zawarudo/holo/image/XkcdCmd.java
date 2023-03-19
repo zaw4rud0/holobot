@@ -13,11 +13,14 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Random;
 
 @Command(name = "xkcd",
         description = "Use this command to access the comics of xkcd.",
@@ -44,14 +47,15 @@ public class XkcdCmd extends AbstractCommand {
                 comics.put(comic.getIssueNr(), comic);
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (logger.isErrorEnabled()) {
+                logger.error("Something went wrong while fetching the XKCD comics from the DB.", ex);
+            }
         }
     }
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent e) {
         deleteInvoke(e);
-        EmbedBuilder builder = new EmbedBuilder();
         XkcdComic comic = null;
 
         // Random issue
@@ -60,7 +64,7 @@ public class XkcdCmd extends AbstractCommand {
                 comic = XkcdAPI.getComic(new Random().nextInt(newestIssue) + 1);
                 storeComicIfNew(comic);
             } catch (APIException | InvalidRequestException | SQLException ex) {
-                sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
+                sendErrorEmbed(e, "Something went wrong while retrieving the comic. Please try again later.");
                 return;
             }
         }
@@ -71,7 +75,7 @@ public class XkcdCmd extends AbstractCommand {
                 comic = XkcdAPI.getLatest();
                 storeComicIfNew(comic);
             } catch (APIException | SQLException ex) {
-                sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
+                sendErrorEmbed(e, "Something went wrong while retrieving the comic. Please try again later.");
                 return;
             }
         }
@@ -81,14 +85,14 @@ public class XkcdCmd extends AbstractCommand {
             int num = Integer.parseInt(args[0]);
 
             if (num > newestIssue || num < 1) {
-                sendErrorMessage(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
+                sendErrorEmbed(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
                 return;
             }
 
             try {
                 comic = XkcdAPI.getComic(num);
             } catch (APIException | InvalidRequestException ex) {
-                sendErrorMessage(e, "Something went wrong while retrieving the comic. Please try again later.");
+                sendErrorEmbed(e, "Something went wrong while retrieving the comic. Please try again later.");
                 return;
             }
         }
@@ -104,24 +108,18 @@ public class XkcdCmd extends AbstractCommand {
             }
             // Couldn't find the comic
             if (comic == null) {
-                sendErrorMessage(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
+                sendErrorEmbed(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
                 return;
             }
         }
 
         // Builds the embed and sends it
+        EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("xkcd " + comic.getIssueNr() + ": " + comic.getTitle());
         builder.setDescription("[Explanation](" + comic.getExplainedUrl() + ")");
         builder.setImage(comic.getImg());
         builder.setFooter(comic.getAlt());
         sendEmbed(e, builder, false, getEmbedColor());
-    }
-
-    private void sendErrorMessage(MessageReceivedEvent e, String message) {
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Error");
-        builder.setDescription(message);
-        sendEmbed(e, builder, true, 30, TimeUnit.SECONDS, Color.RED);
     }
 
     private void storeComicIfNew(XkcdComic comic) throws SQLException {
@@ -140,7 +138,9 @@ public class XkcdCmd extends AbstractCommand {
             try {
                 newComic = XkcdAPI.getComic(i);
             } catch (APIException | InvalidRequestException ex) {
-                ex.printStackTrace();
+                if (logger.isErrorEnabled()) {
+                    logger.error("Something went wrong while storing the XKCD comics in the DB.", ex);
+                }
                 return;
             }
             comics.put(newComic.getIssueNr(), newComic);

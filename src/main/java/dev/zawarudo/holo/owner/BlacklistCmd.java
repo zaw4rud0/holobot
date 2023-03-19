@@ -42,7 +42,7 @@ public class BlacklistCmd extends AbstractCommand {
 		if (args.length == 0) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please only provide the id of the user you want to blacklist!");
-			sendToOwner(event, builder);
+			sendToOwner(builder);
 			return;
 		}
 
@@ -50,7 +50,7 @@ public class BlacklistCmd extends AbstractCommand {
 
 		// Couldn't find user (probably because bot doesn't share a server with them)
 		if (toBlacklist == null) {
-			sendUserNotFoundEmbed(event);
+			sendUserNotFoundEmbed();
 			return;
 		}
 
@@ -61,16 +61,20 @@ public class BlacklistCmd extends AbstractCommand {
 		try {
 			permissionManager.blacklist(toBlacklist, reason, event.getMessage().getTimeCreated().toLocalDateTime().toString());
 		} catch (SQLException ex) {
-			ex.printStackTrace();
 			builder.setTitle("Error");
 			builder.setDescription("An error occurred while trying to blacklist this user!");
-			sendToOwner(event, builder);
+			sendToOwner(builder);
+
+			if (logger.isErrorEnabled()) {
+				logger.error("An error occurred while trying to blacklist the user with id={}.", toBlacklist.getIdLong(), ex);
+			}
+
 			return;
 		}
 
 		String description = String.format("**Name:** %s\n**Tag:** %s\n**Id:** %s\n**Reason:** %s",
 				toBlacklist.getAsMention(), toBlacklist.getAsTag(), toBlacklist.getId(), reason);
-		sendSuccessEmbed(event, description);
+		sendSuccessEmbed(description);
 	}
 
 	/**
@@ -90,22 +94,22 @@ public class BlacklistCmd extends AbstractCommand {
 	/**
 	 * Sends an embed stating that the blacklist was successful.
 	 */
-	private void sendSuccessEmbed(MessageReceivedEvent event, String description) {
+	private void sendSuccessEmbed(String description) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("User successfully blacklisted");
 		builder.setDescription(description);
 		builder.setTimestamp(Instant.now());
-		sendToOwner(event, builder);
+		sendToOwner(builder);
 	}
 
 	/**
 	 * Sends an embed stating that it couldn't find the user
 	 */
-	private void sendUserNotFoundEmbed(MessageReceivedEvent event) {
+	private void sendUserNotFoundEmbed() {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Error");
 		builder.setDescription("I couldn't find this user! Make sure to provide a valid user id or mention.");
 		builder.setTimestamp(Instant.now());
-		sendToOwner(event, builder);
+		sendToOwner(builder);
 	}
 }

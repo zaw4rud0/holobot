@@ -28,7 +28,7 @@ public final class Database {
 			Class.forName("org.sqlite.JDBC");
 		} catch (ClassNotFoundException e) {
 			// This error should never occur.
-			throw new RuntimeException("Could not find SQLite JDBC driver.", e);
+			throw new NoClassDefFoundError("Could not find SQLite JDBC driver. " + e.getMessage());
 		}
 		String url = "jdbc:sqlite:" + PATH_DB;
 		return DriverManager.getConnection(url);

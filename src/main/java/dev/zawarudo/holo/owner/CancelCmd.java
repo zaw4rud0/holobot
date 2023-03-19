@@ -19,13 +19,13 @@ import java.time.Instant;
 public class CancelCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(@NotNull MessageReceivedEvent e) {
-		deleteInvoke(e);
-		e.getJDA().cancelRequests();
+	public void onCommand(@NotNull MessageReceivedEvent event) {
+		deleteInvoke(event);
+		event.getJDA().cancelRequests();
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Success");
 		builder.setDescription("Cancelled all requests");
 		builder.setTimestamp(Instant.now());
-		sendToOwner(e, builder);
+		sendToOwner(builder);
 	}
 }

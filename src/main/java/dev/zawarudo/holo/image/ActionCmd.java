@@ -73,7 +73,6 @@ public class ActionCmd extends AbstractCommand {
      */
     public void displayAction(@NotNull MessageReceivedEvent event, @NotNull Action action) {
         deleteInvoke(event);
-        EmbedBuilder builder = new EmbedBuilder();
 
         String url;
 
@@ -92,10 +91,10 @@ public class ActionCmd extends AbstractCommand {
         String mention = "nothing";
 
         if (args.length != 0) {
-            if (!event.getMessage().getMentions().getMembers().isEmpty()) {
-                mention = event.getMessage().getMentions().getMembers().get(0).getEffectiveName();
-            } else {
+            if (event.getMessage().getMentions().getMembers().isEmpty()) {
                 mention = String.join(" ", args);
+            } else {
+                mention = event.getMessage().getMentions().getMembers().get(0).getEffectiveName();
             }
         }
 
@@ -104,6 +103,7 @@ public class ActionCmd extends AbstractCommand {
             return;
         }
 
+        EmbedBuilder builder = new EmbedBuilder();
         String title = action.getSentence().replace("{s}", event.getMember().getEffectiveName()).replace("{u}", mention);
         builder.setTitle(title);
         builder.setImage(url);

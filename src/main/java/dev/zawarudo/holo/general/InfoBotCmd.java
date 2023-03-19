@@ -43,7 +43,7 @@ public class InfoBotCmd extends AbstractCommand {
 		
 		long heap = memory.getHeapMemoryUsage().getUsed();
 		long max = memory.getHeapMemoryUsage().getMax();
-		double heapPercentage = (double)((heap * 10000) / max) / 100.0;
+		double heapPercentage = (double)((heap * 10_000) / max) / 100.0;
 		
 		String systemInfo = "**CPU:** `" + cpuPercentage + " on " + cores + " core(s)`\n"
 						+ "**Memory:** `" + heap / 1024 / 1024 + "MB / " + max / 1024 / 1024 + "MB (" + heapPercentage + "%)`\n"

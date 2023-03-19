@@ -42,8 +42,8 @@ public class DogCmd extends AbstractCommand {
                 String formatted = breed.getAsJsonObject().get("formattedName").getAsString();
                 formattedNames.put(name, formatted);
             });
-        } catch (IOException e) {
-            throw new RuntimeException("Something went wrong while reading the dog breeds file!", e);
+        } catch (IOException ex) {
+            throw new RuntimeException("Something went wrong while reading the dog breeds file!", ex);
         }
     }
 
@@ -69,9 +69,11 @@ public class DogCmd extends AbstractCommand {
         String url;
         try {
             url = DogAPI.getRandomImage();
-        } catch (APIException e) {
-            e.printStackTrace();
+        } catch (APIException ex) {
             sendErrorEmbed(event, "An error occurred while fetching the image from the API. Try again later!");
+            if (logger.isErrorEnabled()) {
+                logger.error("An error occurred while fetching the image from the API.", ex);
+            }
             return;
         }
         String breed = url.split("/")[4];
@@ -101,9 +103,11 @@ public class DogCmd extends AbstractCommand {
         String url;
         try {
             url = DogAPI.getRandomBreedImage(breed);
-        } catch (APIException | InvalidRequestException e) {
-            e.printStackTrace();
+        } catch (APIException | InvalidRequestException ex) {
             sendErrorEmbed(event, "An error occurred while fetching the image from the API. Try again later!");
+            if (logger.isErrorEnabled()) {
+                logger.error("An error occurred while fetching the image from the API.", ex);
+            }
             return;
         }
 

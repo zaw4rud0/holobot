@@ -3,6 +3,7 @@ package dev.zawarudo.holo.image.nsfw;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
+import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.utils.HttpResponse;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -11,7 +12,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.util.Random;
-import java.util.concurrent.TimeUnit;
 
 @Deactivated
 @Command(name = "neko",
@@ -26,6 +26,8 @@ public class NekoCmd extends AbstractCommand {
 
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent event) {
+		BlockCmd blockCmd = (BlockCmd) Bootstrap.holo.getCommandManager().getCommand("block");
+
 		deleteInvoke(event);
 
 		EmbedBuilder builder = new EmbedBuilder();
@@ -34,11 +36,9 @@ public class NekoCmd extends AbstractCommand {
 		try {
 			do {
 				url = HttpResponse.getJsonObject(urls[new Random().nextInt(urls.length)]).getAsJsonArray("results").get(0).getAsJsonObject().get("url").getAsString();
-			} while (BlockCmd.blocked.contains(url));
+			} while (blockCmd.isBlocked(url) || blockCmd.isBlockRequested(url));
 		} catch (IOException ex) {
-			builder.setTitle("Error");
-			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
-			sendEmbed(event, builder, true, 15, TimeUnit.SECONDS);
+			sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again in a few minutes!");
 			return;
 		}
 

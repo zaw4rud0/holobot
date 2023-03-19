@@ -18,8 +18,7 @@ public class GuildConfig {
 	private boolean autoDelete;
 
 	public GuildConfig() {
-		setDefaultPrefix();
-		nsfw = false;
+		prefix = Bootstrap.holo.getConfig().getDefaultPrefix();
 	}
 
 	public Role getAdminRole() {
@@ -51,7 +50,7 @@ public class GuildConfig {
 	}
 	
 	public void setDefaultPrefix() {
-		this.prefix = Bootstrap.holo.getConfig().getDefaultPrefix();
+		prefix = Bootstrap.holo.getConfig().getDefaultPrefix();
 	}
 
 	/**

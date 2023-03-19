@@ -15,7 +15,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * Class containing miscellaneous utility methods.
  */
-public class HoloUtils {
+public final class HoloUtils {
+
+    private HoloUtils() {
+    }
 
     /**
      * Returns a list of {@link Emote}s representing the numbers one to ten.

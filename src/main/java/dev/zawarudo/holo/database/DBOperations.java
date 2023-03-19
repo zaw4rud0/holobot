@@ -42,7 +42,9 @@ public final class DBOperations {
     private static final String INSERT_BLACKLISTED_USER_SQL = "INSERT INTO Blacklisted (user_id, reason, date) VALUES (?, ?, ?);";
     private static final String SQL = "INSERT INTO Submissions (type, user_id, text, date, guild_id, channel_id) VALUES (?, ?, ?, ?, ?, ?);";
 
-    /** Stores an emote into the database. */
+    /**
+     * Stores an emote into the database.
+     */
     public static void insertEmote(CustomEmoji emote) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_EMOTE_SQL);
@@ -56,7 +58,9 @@ public final class DBOperations {
         conn.close();
     }
 
-    /** Stores the emotes of the guild into the database. */
+    /**
+     * Stores the emotes of the guild into the database.
+     */
     public static void insertEmotes(List<RichCustomEmoji> emotes) throws SQLException {
         // Ids of emotes that are already in the database
         List<Long> existing = getEmoteIds();
@@ -93,7 +97,9 @@ public final class DBOperations {
         conn.close();
     }
 
-    /** Returns a list of ids of the emotes that are stored in the database. */
+    /**
+     * Returns a list of ids of the emotes that are stored in the database.
+     */
     public static List<Long> getEmoteIds() throws SQLException {
         String sql = "SELECT emote_id FROM Emotes;";
         Connection conn = Database.getConnection();
@@ -109,7 +115,9 @@ public final class DBOperations {
         return ids;
     }
 
-    /** Inserts a user into the database. Note that this method doesn't check if a user is already in the DB. */
+    /**
+     * Inserts a user into the database. Note that this method doesn't check if a user is already in the DB.
+     */
     public static void insertUser(User user) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_USER_SQL);
@@ -122,7 +130,9 @@ public final class DBOperations {
         conn.close();
     }
 
-    /** Returns a list of ids of the users that are stored in the database. */
+    /**
+     * Returns a list of ids of the users that are stored in the database.
+     */
     public static List<Long> getUserIds() throws SQLException {
         String sql = "SELECT user_id FROM DiscordUsers;";
         Connection conn = Database.getConnection();
@@ -137,7 +147,9 @@ public final class DBOperations {
         return ids;
     }
 
-    /** Updates a user in the database. */
+    /**
+     * Updates a user in the database.
+     */
     public static void updateUser(User user) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(UPDATE_USER_SQL);
@@ -149,7 +161,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Stores a guild member. */
+    /**
+     * Stores a guild member.
+     */
     public static void insertMember(Member member) throws SQLException {
         // Store user in the DB
         if (!hasUser(member.getIdLong())) {
@@ -163,7 +177,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Stores the members of a guild into the database. */
+    /**
+     * Stores the members of a guild into the database.
+     */
     public static void insertMembers(List<Member> members) throws SQLException {
         // Ids of users that are already in the database
         List<Long> existing = getUserIds();
@@ -216,8 +232,10 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Removes a member from the DB. In other words, it removes the relation between a user and a guild,
-     *  but not the user and guild entries themselves. */
+    /**
+     * Removes a member from the DB. In other words, it removes the relation between a user and a guild,
+     * but not the user and guild entries themselves.
+     */
     public static void deleteMember(Member member) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(DELETE_MEMBER_SQL);
@@ -227,7 +245,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Inserts a guild into the DB. */
+    /**
+     * Inserts a guild into the DB.
+     */
     public static void insertGuild(Guild guild) throws SQLException {
         if (hasGuild(guild.getIdLong())) {
             return;
@@ -241,7 +261,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Updates a guild in the DB. */
+    /**
+     * Updates a guild in the DB.
+     */
     public static void updateGuild(Guild guild) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(UPDATE_GUILD_SQL);
@@ -252,7 +274,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Stores the nickname of a member. */
+    /**
+     * Stores the nickname of a member.
+     */
     public static void insertNickname(Member member) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_NICKNAME_SQL);
@@ -263,29 +287,41 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Checks if a given user is already in the database. */
+    /**
+     * Checks if a given user is already in the database.
+     *
+     * @param userId The id of the Discord user.
+     * @return True if the user is already stored in the DB, false otherwise.
+     */
     public static boolean hasUser(long userId) throws SQLException {
-        Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(SELECT_USER_SQL);
-        ps.setLong(1, userId);
-        ResultSet rs = ps.executeQuery();
-        boolean result = rs.next();
-        ps.close();
-        return result;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_USER_SQL)) {
+            ps.setLong(1, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
-    /** Checks if a given guild is already in the database. */
+    /**
+     * Checks if a given guild is already in the database.
+     *
+     * @param guildId The id of the Discord guild.
+     * @return True if the guild is already stored in the DB, false otherwise.
+     */
     public static boolean hasGuild(long guildId) throws SQLException {
-        Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(SELECT_GUILD_SQL);
-        ps.setLong(1, guildId);
-        ResultSet rs = ps.executeQuery();
-        boolean result = rs.next();
-        ps.close();
-        return result;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(SELECT_GUILD_SQL)) {
+            ps.setLong(1, guildId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
     }
 
-    /** Returns a list of blocked images from the DB. */
+    /**
+     * Returns a list of blocked images from the DB.
+     */
     public static List<String> getBlockedImages() throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(SELECT_BLOCKED_IMAGE_SQL);
@@ -298,7 +334,9 @@ public final class DBOperations {
         return result;
     }
 
-    /** Inserts a new blocked image into the DB. */
+    /**
+     * Inserts a new blocked image into the DB.
+     */
     public static void insertBlockedImage(String image, long userId, String date, String reason) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_BLOCKED_IMAGE_SQL);
@@ -310,7 +348,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Returns a list of xkcd comics from the DB. */
+    /**
+     * Returns a list of xkcd comics from the DB.
+     */
     public static List<XkcdComic> getXkcdComics() throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(SELECT_XKCD_COMICS_SQL);
@@ -329,7 +369,9 @@ public final class DBOperations {
         return result;
     }
 
-    /** Inserts a list of xkcd comics into the DB. */
+    /**
+     * Inserts a list of xkcd comics into the DB.
+     */
     public static void insertXkcdComics(List<XkcdComic> comics) throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(INSERT_XKCD_COMICS_SQL);
@@ -353,8 +395,8 @@ public final class DBOperations {
     /**
      * Inserts a waifu into the DB.
      *
-     * @param name Name of the waifu.
-     * @param tag Gelbooru tag of the waifu.
+     * @param name  Name of the waifu.
+     * @param tag   Gelbooru tag of the waifu.
      * @param title Title of the embed.
      */
     public static void insertWaifu(String name, String tag, String title) throws SQLException {
@@ -367,7 +409,9 @@ public final class DBOperations {
         ps.close();
     }
 
-    /** Returns a list of waifu names from the DB. */
+    /**
+     * Returns a list of waifu names from the DB.
+     */
     public static List<String> getWaifuNames() throws SQLException {
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement("SELECT id FROM Gelbooru;");
@@ -394,7 +438,7 @@ public final class DBOperations {
      * Inserts a blacklisted user into the DB.
      *
      * @param userId The Discord id of the {@link User}.
-     * @param date The date when the user was blacklisted.
+     * @param date   The date when the user was blacklisted.
      * @param reason The reason why the user was blacklisted.
      */
     public static void insertBlacklistedUser(long userId, String date, String reason) throws SQLException {

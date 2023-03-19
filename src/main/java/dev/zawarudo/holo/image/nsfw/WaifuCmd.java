@@ -3,7 +3,7 @@ package dev.zawarudo.holo.image.nsfw;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import dev.zawarudo.holo.annotations.Deactivated;
-import dev.zawarudo.holo.image.nsfw.BlockCmd;
+import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.apis.GelbooruAPI;
 import dev.zawarudo.holo.core.AbstractCommand;
@@ -38,19 +38,23 @@ public class WaifuCmd extends AbstractCommand {
 		try {
 			names = DBOperations.getWaifuNames();
 			Collections.sort(names);
-		} catch (SQLException e) {
-			e.printStackTrace();
+		} catch (SQLException ex) {
+			if (logger.isErrorEnabled()) {
+				logger.error("Something went wrong while fetching the waifus from the DB.", ex);
+			}
 		}
 	}
 
 	@Override
-	public void onCommand(@NotNull MessageReceivedEvent e) {
-		deleteInvoke(e);
+	public void onCommand(@NotNull MessageReceivedEvent event) {
+		BlockCmd blockCmd = (BlockCmd) Bootstrap.holo.getCommandManager().getCommand("block");
+
+		deleteInvoke(event);
 		
 		EmbedBuilder builder = new EmbedBuilder();
 		
 		// Owner added a new waifu to the DB
-		if (isBotOwner(e.getAuthor()) && args.length >= 4 && args[0].equals("add")) {
+		if (isBotOwner(event.getAuthor()) && args.length >= 4 && args[0].equals("add")) {
 			String name = args[1];
 			String tag = args[2];
 			String title = String.join(" ", Arrays.copyOfRange(args, 3, args.length));
@@ -62,12 +66,14 @@ public class WaifuCmd extends AbstractCommand {
 			try {
 				DBOperations.insertWaifu(name, tag, title);
 			} catch (SQLException ex) {
-				ex.printStackTrace();
-				builder.setTitle("Error");
-				builder.setDescription("Something went wrong while adding a new waifu to the database. Please try again in a few minutes.");
+				sendErrorEmbed(event, "Something went wrong while adding a new waifu to the database. Please try again in a few minutes.");
+				if (logger.isErrorEnabled()) {
+					logger.error("Something went wrong while adding a new waifu to the database.", ex);
+				}
+				return;
 			}
 			
-			sendEmbed(e, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
+			sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
 			names.add(name);
 			Collections.sort(names);
 			return;
@@ -77,23 +83,22 @@ public class WaifuCmd extends AbstractCommand {
 		if (args.length == 0 || args[0].toLowerCase(Locale.UK).equals("list")) {
 			builder.setTitle("Image Tags");
 			builder.setDescription(getCategoriesString());
-			builder.addField("Usage", "`" + getPrefix(e) + "image <tag>`", false);
-			sendEmbed(e, builder, true, getEmbedColor());
+			builder.addField("Usage", "`" + getPrefix(event) + "image <tag>`", false);
+			sendEmbed(event, builder, true, getEmbedColor());
 			return;
 		}
 		
 		// Tag not found
 		if (!names.contains(args[0].toLowerCase(Locale.UK))) {
 			builder.setTitle("Tag not found");
-			builder.setDescription("Use `" + getPrefix(e) + "image` to see all available tags");
-			sendEmbed(e, builder, true, 30, TimeUnit.SECONDS, getEmbedColor());
+			builder.setDescription("Use `" + getPrefix(event) + "image` to see all available tags");
+			sendEmbed(event, builder, true, 30, TimeUnit.SECONDS, getEmbedColor());
 			return;
 		}
 	
 		String name = args[0].toLowerCase(Locale.UK);
 		
-		try {
-			ResultSet rs = DBOperations.getWaifu(name);
+		try (ResultSet rs = DBOperations.getWaifu(name)) {
 			rs.next();
 			String tag = rs.getString("Tag");
 			String url;
@@ -101,19 +106,19 @@ public class WaifuCmd extends AbstractCommand {
 			// Keeps fetching a new url until the url isn't on the blocklist
 			do {
 				url = getImage(tag);
-			} while (BlockCmd.blocked.contains(url) || BlockCmd.blockRequests.contains(url));
+			} while (blockCmd.isBlocked(url) || blockCmd.isBlockRequested(url));
 			
 			builder.setTitle(rs.getString("Title"));
 			builder.setImage(url);
-
-			rs.close();
 		} catch (SQLException | IOException ex) {
-			ex.printStackTrace();
-			builder.setTitle("Error");
-			builder.setDescription("Something went wrong while fetching an image. Please try again in a few minutes!");
+			sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again in a few minutes!");
+			if (logger.isErrorEnabled()) {
+				logger.error("Something went wrong while fetching a waifu image.", ex);
+			}
+			return;
 		}
 		
-		sendEmbed(e, builder, true, getEmbedColor());
+		sendEmbed(event, builder, true, getEmbedColor());
 	}
 	
 	/**

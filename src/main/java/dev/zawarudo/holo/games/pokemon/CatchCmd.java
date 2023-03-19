@@ -53,17 +53,18 @@ public class CatchCmd extends AbstractCommand {
 		try {
 			species = pokemon.getPokemonSpecies();
 		} catch (IOException ex) {
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Error");
-			builder.setDescription("API error. Please try again later");
-			sendEmbed(event, builder, true, 15, TimeUnit.SECONDS);
+			sendErrorEmbed(event, "API error. Please try again later");
+			if (logger.isErrorEnabled()) {
+				logger.error("There has been an API error.", ex);
+			}
 			return;
 		} catch (PokemonNotFoundException ex) {
-			ex.printStackTrace();
-			EmbedBuilder builder = new EmbedBuilder();
-			builder.setTitle("Internal Error");
-			builder.setDescription("Uh-oh! This wasn't supposed to happen. Please submit a bug report with the name of this Pokémon and the id of the channel where this happened.");
-			sendEmbed(event, builder, true, 15, TimeUnit.SECONDS);
+			sendErrorEmbed(event, "There has been an internal error that wasn't supposed to " +
+					"happen. Please submit a bug report with the name of this Pokémon and the id of " +
+					"the channel where this happened.");
+			if (logger.isErrorEnabled()) {
+				logger.error("There has been an internal error. Check for possible bug report.", ex);
+			}
 			return;
 		}
 		

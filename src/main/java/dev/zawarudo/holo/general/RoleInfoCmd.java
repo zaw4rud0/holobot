@@ -31,7 +31,6 @@ public class RoleInfoCmd extends AbstractCommand {
         deleteInvoke(e);
 
         EmbedBuilder builder = new EmbedBuilder();
-        Role role = null;
 
         if (args.length == 0) {
             builder.setTitle("Error");
@@ -39,6 +38,8 @@ public class RoleInfoCmd extends AbstractCommand {
             sendEmbed(e, builder, true,30, TimeUnit.SECONDS);
             return;
         }
+
+        Role role = null;
 
         if (!e.getMessage().getMentions().getRoles().isEmpty()) {
             role = e.getMessage().getMentions().getRoles().get(0);

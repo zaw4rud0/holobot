@@ -16,21 +16,22 @@ import org.jetbrains.annotations.NotNull;
 public class DeleteCmd extends AbstractCommand {
 
 	@Override
-	public void onCommand(@NotNull MessageReceivedEvent e) {
-		deleteInvoke(e);
-		EmbedBuilder builder = new EmbedBuilder();
+	public void onCommand(@NotNull MessageReceivedEvent event) {
+		deleteInvoke(event);
 
 		// Delete message user is replying to
-		if (e.getMessage().getReferencedMessage() != null) {
-			e.getMessage().getReferencedMessage().delete().queue();
+		if (event.getMessage().getReferencedMessage() != null) {
+			event.getMessage().getReferencedMessage().delete().queue();
 			return;
 		}
-		
+
+		EmbedBuilder builder = new EmbedBuilder();
+
 		// No argument was given
 		if (args.length != 1) {
 			builder.setTitle("Incorrect Usage");
 			builder.setDescription("Please only provide the id of the message you want to delete!");
-			sendToOwner(e, builder);
+			sendToOwner(builder);
 			return;
 		}
 
@@ -41,10 +42,10 @@ public class DeleteCmd extends AbstractCommand {
 		} catch (NumberFormatException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Please provide the id of the message you want to delete!");
-			sendToOwner(e, builder);
+			sendToOwner(builder);
 			return;
 		}
 
-		e.getChannel().retrieveMessageById(id).complete().delete().queue(v -> {}, err -> {});
+		event.getChannel().retrieveMessageById(id).complete().delete().queue(v -> {}, err -> {});
 	}
 }

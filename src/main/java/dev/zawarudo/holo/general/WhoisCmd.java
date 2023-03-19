@@ -31,23 +31,23 @@ public class WhoisCmd extends AbstractCommand {
 	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 
-		EmbedBuilder builder = new EmbedBuilder();
-
 		if (args.length > 1) {
 			sendErrorEmbed(e, "Incorrect usage. Please provide at most one argument.");
 			return;
 		}
 
 		User user = getUser(e);
-		Member member = getMember(e, user);
 
 		if (user == null) {
 			sendErrorEmbed(e, "I couldn't find the given user! Please make sure you provided the correct user id or mentioned them!");
 			return;
 		}
 
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
 		builder.setThumbnail(user.getEffectiveAvatarUrl());
+
+		Member member = getMember(e, user);
 
 		// User isn't in guild
 		if (member == null) {
@@ -76,7 +76,7 @@ public class WhoisCmd extends AbstractCommand {
 		builder.addField("Join Date", "`" + s + "`", false);
 
 		Color embedColor = member.getColor();
-		
+
 		List<Role> roles = member.getRoles();
 
 		// Member has no roles in this guild
@@ -127,7 +127,7 @@ public class WhoisCmd extends AbstractCommand {
 			}
 			builder.addField("Roles", rolesString.toString(), false);
 		}
-		
+
 		localDateTime = LocalDateTime.ofInstant(user.getTimeCreated().toInstant(), ZoneId.of("Europe/Zurich"));
 		s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
 		String type = user.isBot() ? "Bot" : "User";
@@ -147,7 +147,7 @@ public class WhoisCmd extends AbstractCommand {
 					.replace("!", "")
 					.replace("@", ""));
 			return e.getJDA().getUserById(id);
-		} catch (Exception ex) {
+		} catch (NumberFormatException ex) {
 			return e.getAuthor();
 		}
 	}

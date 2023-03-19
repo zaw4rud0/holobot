@@ -30,7 +30,6 @@ public class UpscaleCmd extends AbstractCommand {
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
-        EmbedBuilder eb = new EmbedBuilder();
 
         Message referenced = event.getMessage().getReferencedMessage();
         String url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
@@ -50,9 +49,10 @@ public class UpscaleCmd extends AbstractCommand {
             return;
         }
 
-        eb.setTitle("Upscaled Image");
-        eb.setImage(url);
-        sendEmbed(event, eb, true, 5, TimeUnit.MINUTES, getEmbedColor());
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setTitle("Upscaled Image");
+        embedBuilder.setImage(url);
+        sendEmbed(event, embedBuilder, true, 5, TimeUnit.MINUTES, getEmbedColor());
     }
 
     /**

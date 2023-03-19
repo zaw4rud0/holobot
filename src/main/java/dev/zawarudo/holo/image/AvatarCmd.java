@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -59,7 +60,7 @@ public class AvatarCmd extends AbstractCommand {
                     .replace(">", "")
                     .replace("!", "")
                     .replace("@", "")));
-        } catch (Exception ex) {
+        } catch (NumberFormatException ex) {
             return e.getAuthor();
         }
     }
@@ -68,10 +69,10 @@ public class AvatarCmd extends AbstractCommand {
      * Returns the user as a member of the guild. If the user isn't a member, it returns null
      */
     @Nullable
-    private Member getMember(MessageReceivedEvent e, User user) {
+    private Member getMember(MessageReceivedEvent event, User user) {
         try {
-            return e.getGuild().retrieveMember(user).complete();
-        } catch (Exception ex) {
+            return event.getGuild().retrieveMember(user).complete();
+        } catch (ErrorResponseException ex) {
             return null;
         }
     }

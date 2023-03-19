@@ -21,7 +21,6 @@ public class CloneCmd extends AbstractMusicCommand {
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
 
-		EmbedBuilder builder = new EmbedBuilder();
 		GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
 
 		AudioTrack current = musicManager.audioPlayer.getPlayingTrack();
@@ -45,6 +44,7 @@ public class CloneCmd extends AbstractMusicCommand {
 		String thumbnail = "https://img.youtube.com/vi/" + uri + "/hqdefault.jpg";
 
 		// Display information of the cloned track
+		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("Cloned track");
 		builder.setThumbnail(thumbnail);
 		builder.addField("Title", current.getInfo().title, false);

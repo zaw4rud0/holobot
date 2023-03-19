@@ -216,7 +216,11 @@ public final class ImageOperations {
         Graphics2D graphics = result.createGraphics();
         graphics.setPaint(color);
         graphics.fillRect(0, 0, length, length);
-        int x = 0, y = 0, width = image.getWidth(), height = image.getHeight();
+
+        int x = 0;
+        int y = 0;
+        int width = image.getWidth();
+        int height = image.getHeight();
 
         if (cut) {
             if (width > height) {
@@ -302,13 +306,22 @@ public final class ImageOperations {
         return img;
     }
 
+    @Deprecated
     public static BufferedImage blur(BufferedImage img) {
         BufferedImage output = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
         int i = 0;
-        int max = 400, rad = 10;
-        int a1 = 0, r1 = 0, g1 = 0, b1 = 0;
+        int max = 400;
+        int rad = 10;
+        int a1 = 0;
+        int r1 = 0;
+        int g1 = 0;
+        int b1 = 0;
         Color[] color = new Color[max];
-        int x, y, x1, y1, d;
+        int x;
+        int y;
+        int x1;
+        int y1;
+        int d;
         for (x = rad; x < img.getHeight() - rad; x++) {
             for (y = rad; y < img.getWidth() - rad; y++) {
                 for (x1 = x - rad; x1 < x + rad; x1++) {

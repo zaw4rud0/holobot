@@ -15,7 +15,10 @@ import java.util.Locale;
 /**
  * Utility class for Pokémon-related functionality.
  */
-public class PokemonUtils {
+public final class PokemonUtils {
+
+    private PokemonUtils() {
+    }
 
     /**
      * Returns the {@link PokemonType} from the given name.
@@ -48,26 +51,28 @@ public class PokemonUtils {
     }
 
     public static BufferedImage drawHiddenPokemon(Pokemon pokemon) throws IOException {
-        String sprite = pokemon.getSprites().getOther().getArtwork().getFrontDefault();
-        BufferedImage blackPokemon = ImageOperations.turnBlack(ImageIO.read(new URL(sprite)));
-        BufferedImage bg = ImageIO.read(new File("src/main/resources/pokemon/background/battle-background.png"));
+        BufferedImage blackPokemon = getBlackPokemon(pokemon);
+        BufferedImage bg = getBackgroundImage();
         return createPokemonScene(blackPokemon, bg);
     }
 
-    /**
-     * Creates a Pokémon scene with the Pokémon silhouette and the background.
-     *
-     * @param pokemon = A BufferedImage of the Pokémon sprite.
-     * @param background = A BufferedImage of the background.
-     * @return A BufferedImage of the Pokémon scene.
-     */
-    public static BufferedImage createPokemonScene(BufferedImage pokemon, BufferedImage background) {
-        Graphics2D g2 = background.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        BufferedImage silhouette = ImageOperations.turnBlack(pokemon);
-        g2.drawImage(silhouette, 200, 50, 400, 400, null);
-        g2.dispose();
+    private static BufferedImage getBlackPokemon(Pokemon pokemon) throws IOException {
+        String spriteUrl = pokemon.getSprites().getOther().getArtwork().getFrontDefault();
+        BufferedImage spriteImage = ImageIO.read(new URL(spriteUrl));
+        return ImageOperations.turnBlack(spriteImage);
+    }
+
+    private static BufferedImage getBackgroundImage() throws IOException {
+        File bgFile = new File("src/main/resources/pokemon/background/battle-background.png");
+        return ImageIO.read(bgFile);
+    }
+
+    private static BufferedImage createPokemonScene(BufferedImage silhouette, BufferedImage background) {
+        Graphics2D graphics = background.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        graphics.drawImage(silhouette, 200, 50, 400, 400, null);
+        graphics.dispose();
         return background;
     }
 }

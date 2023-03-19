@@ -13,12 +13,14 @@ import java.util.stream.Collectors;
 
 public final class HttpResponse {
 
+	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+
 	private HttpResponse() {
 	}
 
 	public static JsonObject getJsonObject(String url) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+		connection.setRequestProperty("User-Agent", USER_AGENT);
 		connection.setRequestMethod("GET");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String s = reader.lines().collect(Collectors.joining("\n"));
@@ -27,7 +29,8 @@ public final class HttpResponse {
 
 	public static JsonArray getJsonArray(String url) throws IOException {
 		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36");
+		connection.setRequestProperty("User-Agent", USER_AGENT);
+		connection.setRequestMethod("GET");
 		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
 		String s = reader.lines().collect(Collectors.joining("\n"));
 		return (JsonArray) JsonParser.parseString(s);

@@ -64,11 +64,11 @@ public class PokedexCmd extends AbstractCommand {
 		String name = species.getName("en");
 		String gen = species.getGeneration().getName().toUpperCase(Locale.UK).replace("GENERATION-", "Gen ");
 		String type;
-		if (pokemon.getTypes().size() != 2) {
-			type = PokemonUtils.getType(pokemon.getTypes().get(0)).getEmote().getAsEmoji().getFormatted() + " " + pokemon.getTypes().get(0);
-		} else {
+		if (pokemon.getTypes().size() == 2) {
 			type = PokemonUtils.getType(pokemon.getTypes().get(0)).getEmote().getAsEmoji().getFormatted() + " " + pokemon.getTypes().get(0)
 					+ "\n" + PokemonUtils.getType(pokemon.getTypes().get(1)).getEmote().getAsEmoji().getFormatted() + " "	+ pokemon.getTypes().get(1);
+		} else {
+			type = PokemonUtils.getType(pokemon.getTypes().get(0)).getEmote().getAsEmoji().getFormatted() + " " + pokemon.getTypes().get(0);
 		}
 		String genderRatio = species.getGenderRate() == -1.0 ? "Genderless" : 100 - species.getGenderRate() / 8.0 * 100 + "% \\\u2642 | " + species.getGenderRate() / 8.0 * 100 + "% \\\u2640";
 		String entry = species.getPokedexEntry("en");

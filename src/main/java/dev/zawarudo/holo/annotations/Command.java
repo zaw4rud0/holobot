@@ -32,21 +32,21 @@ public @interface Command {
     /** The thumbnail of the command. */
     String thumbnail() default "";
 
-    /** The color the embeds should have. */
+    /** The color of the embeds. */
     EmbedColor embedColor() default EmbedColor.DEFAULT;
 
     /** The category of the command. */
     CommandCategory category() default CommandCategory.BLANK;
 
-    /** Whether this command can only be used in a guild. By default, this is true. */
+    /** Whether the command can only be used in a guild. True by default. */
     boolean guildOnly() default true;
 
-    /** Whether this command can only be used by the guild administrator. By default, this is false. */
+    /** Whether the command can only be used by the guild admin. False by default. */
     boolean adminOnly() default false;
 
-    /** Whether this command can only be used by the bot owner. By default, this is false. */
+    /** Whether the command can only be used by the bot owner. False by default. */
     boolean ownerOnly() default false;
 
-    /** Whether this command is NSFW (not safe for work). By default, this is false. */
+    /** Whether the command is NSFW (not safe for work). False by default. */
     boolean isNSFW() default false;
 }

@@ -36,13 +36,13 @@ public class HelpCmd extends AbstractCommand {
     public void onCommand(@NotNull MessageReceivedEvent e) {
         deleteInvoke(e);
 
-        EmbedBuilder builder = new EmbedBuilder();
-
         // Send the full help page
         if (args.length == 0) {
             sendHelpPage(e);
             return;
         }
+
+        EmbedBuilder builder = new EmbedBuilder();
 
         // Given command doesn't exist
         if (!manager.isValidName(args[0])) {
@@ -74,7 +74,9 @@ public class HelpCmd extends AbstractCommand {
             if (!event.isFromGuild()) {
                 cmds.removeIf(AbstractCommand::isGuildOnly);
             }
-            if (cmds.isEmpty()) continue;
+            if (cmds.isEmpty()) {
+                continue;
+            }
 
             List<String> names = cmds.stream().map(AbstractCommand::getName).toList();
             String text = String.format("```%s```", String.join(", ", names));

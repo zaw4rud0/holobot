@@ -24,7 +24,6 @@ public class JoinCmd extends AbstractMusicCommand {
         deleteInvoke(event);
 
         AudioManager audioManager = event.getGuild().getAudioManager();
-        EmbedBuilder builder = new EmbedBuilder();
 
         if (audioManager.getConnectedChannel() != null) {
             String msg = "I'm already connected to a voice channel!\nJoin me in " + audioManager.getConnectedChannel().getAsMention() + "!";
@@ -43,6 +42,7 @@ public class JoinCmd extends AbstractMusicCommand {
 
         audioManager.openAudioConnection(memberChannel);
 
+        EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Connected " + Emote.NOTE.getAsText());
         builder.setDescription("Join me in " + memberChannel.getAsMention());
 

@@ -1,6 +1,8 @@
 package dev.zawarudo.holo.misc;
 
 import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.music.GuildMusicManager;
+import dev.zawarudo.holo.music.PlayerManager;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
@@ -14,6 +16,8 @@ import net.dv8tion.jda.api.events.user.update.UserUpdateDiscriminatorEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nonnull;
 import java.sql.SQLException;
@@ -23,20 +27,24 @@ import java.sql.SQLException;
  */
 public class GuildListener extends ListenerAdapter {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(GuildListener.class);
+
     /**
      * Event that is fired when this bot instance joins a guild.
      */
     @Override
-    public void onGuildJoin(@NotNull GuildJoinEvent e) {
+    public void onGuildJoin(@NotNull GuildJoinEvent event) {
         try {
             // Store members
-            DBOperations.insertMembers(e.getGuild().getMembers());
+            DBOperations.insertMembers(event.getGuild().getMembers());
             // Store guild information
-            DBOperations.insertGuild(e.getGuild());
+            DBOperations.insertGuild(event.getGuild());
             // Store emotes of the guild
-            DBOperations.insertEmotes(e.getGuild().getEmojis());
+            DBOperations.insertEmotes(event.getGuild().getEmojis());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing the server in the DB.", ex);
+            }
         }
     }
 
@@ -44,11 +52,13 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a new user joins a guild.
      */
     @Override
-    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent e) {
+    public void onGuildMemberJoin(@NotNull GuildMemberJoinEvent event) {
         try {
-            DBOperations.insertMember(e.getMember());
+            DBOperations.insertMember(event.getMember());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing a new member in the DB.", ex);
+            }
         }
     }
 
@@ -56,13 +66,15 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a member leaves, is banned or is kicked from a guild.
      */
     @Override
-    public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent e) {
+    public void onGuildMemberRemove(@NotNull GuildMemberRemoveEvent event) {
         try {
-            if (e.getMember() != null) {
-                DBOperations.deleteMember(e.getMember());
+            if (event.getMember() != null) {
+                DBOperations.deleteMember(event.getMember());
             }
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while removing the guild member from the DB.", ex);
+            }
         }
     }
 
@@ -70,11 +82,13 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a member changes their nickname.
      */
     @Override
-    public void onGuildMemberUpdateNickname(@NotNull GuildMemberUpdateNicknameEvent e) {
+    public void onGuildMemberUpdateNickname(@NotNull GuildMemberUpdateNicknameEvent event) {
         try {
-            DBOperations.insertNickname(e.getMember());
+            DBOperations.insertNickname(event.getMember());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing the new nickname of a member in the DB.", ex);
+            }
         }
     }
 
@@ -82,11 +96,13 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a new emote is added to the guild.
      */
     @Override
-    public void onEmojiAdded(@NotNull EmojiAddedEvent e) {
+    public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         try {
-            DBOperations.insertEmote(e.getEmoji());
+            DBOperations.insertEmote(event.getEmoji());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing the new emoji in the DB.", ex);
+            }
         }
     }
 
@@ -94,11 +110,13 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when the owner of a guild changes.
      */
     @Override
-    public void onGuildUpdateOwner(@NotNull GuildUpdateOwnerEvent e) {
+    public void onGuildUpdateOwner(@NotNull GuildUpdateOwnerEvent event) {
         try {
-            DBOperations.updateGuild(e.getGuild());
+            DBOperations.updateGuild(event.getGuild());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing the new guild owner in the DB.", ex);
+            }
         }
     }
 
@@ -106,11 +124,13 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a guild chances its name.
      */
     @Override
-    public void onGuildUpdateName(@Nonnull GuildUpdateNameEvent e) {
+    public void onGuildUpdateName(@Nonnull GuildUpdateNameEvent event) {
         try {
-            DBOperations.updateGuild(e.getGuild());
+            DBOperations.updateGuild(event.getGuild());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing the new guild name in the DB.", ex);
+            }
         }
     }
 
@@ -118,36 +138,37 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a member leaves a voice channel.
      */
     @Override
-    public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent e) {
+    public void onGuildVoiceUpdate(@NotNull GuildVoiceUpdateEvent event) {
         // Holo's voice state has been disabled
-        if (e.getGuild().getSelfMember().getVoiceState() == null) {
+        if (event.getGuild().getSelfMember().getVoiceState() == null) {
             return;
         }
 
         // Holo is not in any voice channel, thus this event is irrelevant
-        if (!e.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
+        if (!event.getGuild().getSelfMember().getVoiceState().inAudioChannel()) {
             return;
         }
 
-        AudioChannelUnion botVoice = e.getGuild().getSelfMember().getVoiceState().getChannel();
+        AudioChannelUnion botVoice = event.getGuild().getSelfMember().getVoiceState().getChannel();
 
-        /* TODO
-        if (e.getChannelLeft().equals(botVoice) && botVoice.getMembers().size() <= 1) {
-            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(e.getGuild());
+        if (event.getChannelLeft().equals(botVoice) && botVoice.getMembers().size() <= 1) {
+            GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
             musicManager.clear();
-            e.getGuild().getAudioManager().closeAudioConnection();
-        }*/
+            event.getGuild().getAudioManager().closeAudioConnection();
+        }
     }
 
     /**
      * Event that is fired when a user changes their username.
      */
     @Override
-    public void onUserUpdateName(@Nonnull UserUpdateNameEvent e) {
+    public void onUserUpdateName(@Nonnull UserUpdateNameEvent event) {
         try {
-            DBOperations.updateUser(e.getUser());
+            DBOperations.updateUser(event.getUser());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while the new username in the DB.", ex);
+            }
         }
     }
 
@@ -155,11 +176,13 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a user changes their discriminator.
      */
     @Override
-    public void onUserUpdateDiscriminator(@Nonnull UserUpdateDiscriminatorEvent e) {
+    public void onUserUpdateDiscriminator(@Nonnull UserUpdateDiscriminatorEvent event) {
         try {
-            DBOperations.updateUser(e.getUser());
+            DBOperations.updateUser(event.getUser());
         } catch (SQLException ex) {
-            ex.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while storing the new discriminator of an user in the DB.", ex);
+            }
         }
     }
 }

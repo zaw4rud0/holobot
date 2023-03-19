@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -17,6 +19,8 @@ import java.util.List;
  */
 public class PermissionManager {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(PermissionManager.class);
+
     private List<Long> blacklisted;
 
     public PermissionManager() {
@@ -24,8 +28,10 @@ public class PermissionManager {
 
         try {
             blacklisted = DBOperations.getBlacklistedUsers();
-        } catch (SQLException e) {
-            e.printStackTrace();
+        } catch (SQLException ex) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while fetching the blocked users", ex);
+            }
         }
     }
 
@@ -37,17 +43,19 @@ public class PermissionManager {
      * @return True if the user is allowed to use the command, false otherwise.
      */
     public boolean hasChannelPermission(@NotNull MessageReceivedEvent event, @NotNull AbstractCommand cmd) {
+        boolean hasPermission = true;
+
         // Guild commands can't be used in DMs
         if (event.isFromType(ChannelType.PRIVATE) && cmd.isGuildOnly()) {
-            return false;
+            hasPermission = false;
         }
 
         // NSFW commands can't be used in non-NSFW channels
         if (cmd.isNSFW() && !isNsfwAllowed(event.getChannel())) {
-            return false;
+            hasPermission = false;
         }
 
-        return true;
+        return hasPermission;
     }
 
     /**

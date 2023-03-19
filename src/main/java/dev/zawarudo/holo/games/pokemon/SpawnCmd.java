@@ -56,12 +56,12 @@ public class SpawnCmd extends AbstractCommand {
 		} catch (IOException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("API error. Please try again later.");
-			sendToOwner(e, builder);
+			sendToOwner(builder);
 			return;
 		} catch (InvalidPokedexIdException | PokemonNotFoundException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Pokémon not found. Please check for typos.");
-			sendToOwner(e, builder);
+			sendToOwner(builder);
 			return;
 		}
 		manager.spawnNewPokemon(e.getChannel().getIdLong(), pokemon);
