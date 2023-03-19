@@ -4,6 +4,7 @@ import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -30,20 +31,28 @@ public class ServerRolesCmd extends AbstractCommand {
 			sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
 			return;
 		}
-		
-		StringBuilder s = new StringBuilder();
+
+		StringBuilder fieldContent = new StringBuilder();
 		int counter = 0;
-		
-		for (Role r : roles) {
-			String role = r.getAsMention() + "\n(" + r.getId() + ")";
-			if (s.length() + role.length() > 1024) {
-				builder.addField(String.valueOf(counter++), s.toString(), true);
-				s = new StringBuilder(role + "\n");
+
+		for (Role role : roles) {
+			String roleName = role.getAsMention();
+			String roleId = role.getId();
+			String roleText = String.format("%s%n(%s)%n", roleName, roleId);
+
+			if (fieldContent.length() + roleText.length() > MessageEmbed.VALUE_MAX_LENGTH) {
+				builder.addField(Integer.toString(counter), fieldContent.toString(), true);
+				fieldContent = new StringBuilder(roleText);
+				counter++;
 			} else {
-				s.append(role).append("\n");
+				fieldContent.append(roleText);
 			}
 		}
-		builder.addField(String.valueOf(counter + 1), s.toString(), true);
+
+		if (fieldContent.length() > 0) {
+			builder.addField(Integer.toString(counter), fieldContent.toString(), true);
+		}
+
 		sendEmbed(e, builder, true, 2, TimeUnit.MINUTES);
 	}
 }
