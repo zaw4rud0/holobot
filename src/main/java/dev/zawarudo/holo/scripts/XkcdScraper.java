@@ -6,6 +6,8 @@ import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.database.Database;
 import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.exceptions.InvalidRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -17,21 +19,14 @@ import java.util.List;
 /**
  * Scrapes the xkcd API and stores new comics in the database.
  */
-public final class XkcdScraper implements Runnable {
+public final class XkcdScraper {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(XkcdScraper.class);
 
     private XkcdScraper() {
     }
 
-    @Override
-    public void run() {
-        try {
-            scrape();
-        } catch (APIException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static void scrape() throws APIException {
+    public void scrape() throws APIException {
         int newest = XkcdAPI.getLatest().getIssueNr();
         int last = 0;
         try {
@@ -43,17 +38,22 @@ public final class XkcdScraper implements Runnable {
             }
             ps.close();
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong while reading the XKCD comics from the DB.");
+            }
             return;
         }
-
-        List<XkcdComic> comics = new ArrayList<>();
 
         if (last >= newest) {
             return;
         }
 
-        System.out.println("New issues found!");
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("New xkcd issues found!");
+        }
+
+        List<XkcdComic> comics = new ArrayList<>();
+
         for (int i = last + 1; i <= newest; i++) {
 
             // Issue doesn't exist
@@ -65,24 +65,29 @@ public final class XkcdScraper implements Runnable {
             try {
                 comic = XkcdAPI.getComic(i);
             } catch (InvalidRequestException e) {
-                System.out.println("XkcdScraper: Something went wrong! (InvalidRequestException)");
+                if (LOGGER.isErrorEnabled()) {
+                    LOGGER.error("Something went wrong!", e);
+                }
                 return;
             }
             comics.add(comic);
-            System.out.println("Added xkcd " + comic.getIssueNr() + ": " + comic.getTitle());
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("Added xkcd {}: {}", comic.getIssueNr(), comic.getTitle());
+            }
         }
 
         // Store to database
         try {
             DBOperations.insertXkcdComics(comics);
         } catch (SQLException e) {
-            e.printStackTrace();
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("Something went wrong!", e);
+            }
             return;
         }
-        System.out.println("Stored to the database!");
-    }
 
-    public static void main(String[] args) {
-        new XkcdScraper().run();
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("Stored to the database!");
+        }
     }
 }

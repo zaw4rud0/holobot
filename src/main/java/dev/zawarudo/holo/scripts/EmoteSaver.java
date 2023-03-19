@@ -54,7 +54,7 @@ public final class EmoteSaver {
             return;
         }
 
-        int batchSize = 1000000;
+        int batchSize = 1_000_000;
         String sql = "INSERT INTO Emotes (emote_id, emote_name, is_animated, created_at, image_url) VALUES (?, ?, ?, ?, ?)";
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement(sql);
