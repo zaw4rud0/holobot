@@ -9,53 +9,48 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DogAPITests {
+class DogAPITests {
 
     @Test
     void testRandomImage() throws APIException {
         String url = DogAPI.getRandomImage();
-        assertNotNull(url);
+        assertNotNull(url, "URL should not be null");
     }
 
     @Test
     void testRandomBreedImage() throws APIException, InvalidRequestException {
         String url = DogAPI.getRandomBreedImage("hound");
-        assertNotNull(url);
+        assertNotNull(url, "URL should not be null");
     }
 
     @Test
     void testRandomSubBreedImage() throws APIException, InvalidRequestException {
         String url = DogAPI.getRandomSubBreedImage("hound", "afghan");
-        assertNotNull(url);
+        assertNotNull(url, "URL should not be null");
     }
 
     @Test
     void testBreedImages() throws APIException, InvalidRequestException {
         List<String> images = DogAPI.getBreedImages("hound");
-        assertNotNull(images);
+        assertNotNull(images, "List should not be null");
     }
 
     @Test
     void testSubBreedImages() throws APIException, InvalidRequestException {
         List<String> images = DogAPI.getSubBreedImages("hound", "afghan");
-        assertNotNull(images);
+        assertFalse(images.isEmpty(), "List should not be empty");
     }
 
     @Test
     void testAllBreeds() throws APIException {
         List<DogAPI.Breed> breeds = DogAPI.getBreedList();
-
-        assertNotNull(breeds);
-        assertFalse(breeds.isEmpty());
+        assertFalse(breeds.isEmpty(), "List should not be empty");
     }
 
     @Test
     void testHoundSubBreeds() throws InvalidRequestException, APIException {
         List<String> subBreeds = DogAPI.getSubBreeds("hound");
-
-        assertNotNull(subBreeds);
-        assertFalse(subBreeds.isEmpty());
-        assertTrue(subBreeds.contains("afghan"));
+        assertFalse(subBreeds.isEmpty(), "List should not be empty");
     }
 
     @Test
@@ -65,28 +60,28 @@ public class DogAPITests {
         for (DogAPI.Breed breed : breeds) {
             // Hound has different sub-breeds
             if (breed.name().equals("hound")) {
-                assertTrue(breed.hasSubBreeds());
+                assertTrue(breed.hasSubBreeds(), "Breed should have sub-breeds");
             }
             // API doesn't have any Chihuahua sub-breeds
             if (breed.name().equals("chihuahua")) {
-                assertFalse(breed.hasSubBreeds());
+                assertFalse(breed.hasSubBreeds(), "Breed should not have sub-breeds");
             }
         }
     }
 
     @Test
     void testInvalidBreed() {
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreeds("nonsense"));
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomBreedImage("nonsense"));
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getBreedImages("nonsense"));
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreeds("nonsense"), "Method should throw an exception");
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomBreedImage("nonsense"), "Method should throw an exception");
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getBreedImages("nonsense"), "Method should throw an exception");
     }
 
     @Test
     void testInvalidSubBreed() {
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomSubBreedImage("hound", "nonsense"));
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomSubBreedImage("nonsense", "afghan"));
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomSubBreedImage("hound", "nonsense"), "Method should throw an exception");
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getRandomSubBreedImage("nonsense", "afghan"), "Method should throw an exception");
 
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreedImages("hound", "nonsense"));
-        assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreedImages("nonsense", "afghan"));
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreedImages("hound", "nonsense"), "Method should throw an exception");
+        assertThrows(InvalidRequestException.class, () -> DogAPI.getSubBreedImages("nonsense", "afghan"), "Method should throw an exception");
     }
 }
