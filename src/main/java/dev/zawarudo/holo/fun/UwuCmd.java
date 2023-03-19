@@ -3,19 +3,17 @@ package dev.zawarudo.holo.fun;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Arrays;
-import java.util.stream.Collectors;
+import java.util.Random;
 
 @Command(name = "uwu",
         description = "Uwuifies a text of your choice. You can also reply to a message to uwuify it.",
         usage = "<text>",
         category = CommandCategory.MISC)
 public class UwuCmd extends AbstractCommand {
-
-    private static final int CHAR_LIMIT = 2000;
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
@@ -39,10 +37,10 @@ public class UwuCmd extends AbstractCommand {
         }
 
         if (event.getMessage().getReferencedMessage() != null) {
-            String uwu = uwuify(event.getMessage().getReferencedMessage().getContentRaw().split(" "));
+            String uwu = uwuify(event.getMessage().getReferencedMessage().getContentRaw());
             sendText(event, uwu);
         } else {
-            String uwu = uwuify(args);
+            String uwu = uwuify(String.join(" ", args));
             sendText(event, uwu);
         }
     }
@@ -50,24 +48,28 @@ public class UwuCmd extends AbstractCommand {
     private void sendText(MessageReceivedEvent event, String text) {
         int index = 0;
         while (index < text.length()) {
-            String chunk = text.substring(index, Math.min(index + CHAR_LIMIT, text.length()));
+            String chunk = text.substring(index, Math.min(index + Message.MAX_CONTENT_LENGTH, text.length()));
             event.getChannel().sendMessage(chunk).queue();
-            index += CHAR_LIMIT;
+            index += Message.MAX_CONTENT_LENGTH;
         }
     }
 
-    private String uwuify(String... words) {
-        return Arrays.stream(words)
-                .map(this::replaceWord)
-                .collect(Collectors.joining(" "));
-    }
-
-    private String replaceWord(String word) {
-        return word
-                .replaceAll("(?i)you", "uwu")
-                .replaceAll("(?i)[rl]", "w")
-                .replaceAll("(?i)it", "iwt")
-                .replaceAll("(?i)(?<=[ai])t", "w$0")
-                .replaceAll("(?i)is", "iws");
+    private static String uwuify(String stringToUwuify) {
+        Random rand = new Random();
+        String result = stringToUwuify
+                .toLowerCase()
+                .replaceAll("[rl]", "w")
+                .replaceAll("n([aeiou])", "ny$1")
+                .replaceAll("ove", "uve")
+                .replaceAll("uck", "uwq")
+                .replaceFirst("i", "i-i")
+                .replaceFirst("(?s)(.*)" + "i-i-i", "$1" + "i-i");
+        if (rand.nextInt(10) <= 2) {
+            result += " >-<";
+        }
+        if (rand.nextInt(10) <= 1) {
+            result += " UwU";
+        }
+        return result;
     }
 }
