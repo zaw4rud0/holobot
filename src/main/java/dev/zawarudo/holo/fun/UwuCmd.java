@@ -19,19 +19,22 @@ public class UwuCmd extends AbstractCommand {
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
 
-        if (args.length == 0) {
+        if (args.length == 0 && event.getMessage().getReferencedMessage() == null) {
             sendErrorEmbed(event, "Please provide text or reply to a message!");
             return;
         }
 
+        Message reply = event.getMessage().getReferencedMessage();
+        Message msg = reply != null ? reply : event.getMessage();
+
         // Check for pings
-        if (hasPings(event.getMessage())) {
+        if (hasPings(msg)) {
             sendErrorEmbed(event, "No pings!");
             return;
         }
 
         // No emotes
-        if (!event.getMessage().getMentions().getCustomEmojis().isEmpty()) {
+        if (!msg.getMentions().getCustomEmojis().isEmpty()) {
             sendErrorEmbed(event, "I can't use custom emojis!");
             return;
         }
