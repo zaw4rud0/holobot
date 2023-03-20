@@ -9,10 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-/**
- * TODO: Refactor this class
- */
 public final class ImageOperations {
+
+    private static final double RED_TO_GRAY_WEIGHT = 0.2126;
+    private static final double GREEN_TO_GRAY_WEIGHT = 0.7152;
+    private static final double BLUE_TO_GRAY_WEIGHT = 0.0722;
 
     private ImageOperations() {
     }
@@ -21,15 +22,15 @@ public final class ImageOperations {
      * Crops an image to a circle
      */
     public static BufferedImage cropToCircle(BufferedImage img) {
-        int w = img.getWidth();
-        int h = img.getHeight();
-        BufferedImage output = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = output.createGraphics();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.fill(new Ellipse2D.Double(0, 0, w, h));
-        g2.setComposite(AlphaComposite.SrcAtop);
-        g2.drawImage(img, 0, 0, null);
-        g2.dispose();
+        int width = img.getWidth();
+        int height = img.getHeight();
+        BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = output.createGraphics();
+        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        graphics.fill(new Ellipse2D.Double(0, 0, width, height));
+        graphics.setComposite(AlphaComposite.SrcAtop);
+        graphics.drawImage(img, 0, 0, null);
+        graphics.dispose();
         return output;
     }
 
@@ -50,26 +51,26 @@ public final class ImageOperations {
             int width = img1.getWidth() + img2.getWidth();
             int height = Math.min(img1.getHeight(), img2.getHeight());
             result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = result.createGraphics();
-            Color oldColor = g2.getColor();
-            g2.setPaint(Color.WHITE);
-            g2.fillRect(0, 0, width, height);
-            g2.setColor(oldColor);
-            g2.drawImage(img1, null, 0, 0);
-            g2.drawImage(img2, null, img1.getWidth(), 0);
-            g2.dispose();
+            Graphics2D graphics = result.createGraphics();
+            Color oldColor = graphics.getColor();
+            graphics.setPaint(Color.WHITE);
+            graphics.fillRect(0, 0, width, height);
+            graphics.setColor(oldColor);
+            graphics.drawImage(img1, null, 0, 0);
+            graphics.drawImage(img2, null, img1.getWidth(), 0);
+            graphics.dispose();
         } else if (direction == Direction.VERTICAL) {
             int height = img1.getHeight() + img2.getHeight();
             int width = Math.min(img1.getWidth(), img2.getWidth());
             result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = result.createGraphics();
-            Color oldColor = g2.getColor();
-            g2.setPaint(Color.WHITE);
-            g2.fillRect(0, 0, width, height);
-            g2.setColor(oldColor);
-            g2.drawImage(img1, null, 0, 0);
-            g2.drawImage(img2, null, 0, img1.getHeight());
-            g2.dispose();
+            Graphics2D graphics = result.createGraphics();
+            Color oldColor = graphics.getColor();
+            graphics.setPaint(Color.WHITE);
+            graphics.fillRect(0, 0, width, height);
+            graphics.setColor(oldColor);
+            graphics.drawImage(img1, null, 0, 0);
+            graphics.drawImage(img2, null, 0, img1.getHeight());
+            graphics.dispose();
         } else {
             throw new IllegalArgumentException("Direction can only be either horizontal or vertical!");
         }
@@ -93,33 +94,33 @@ public final class ImageOperations {
             int height = Math.min(Math.min(img1.getHeight(), img2.getHeight()), img3.getHeight());
 
             result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = result.createGraphics();
-            Color oldColor = g2.getColor();
+            Graphics2D graphics = result.createGraphics();
+            Color oldColor = graphics.getColor();
 
-            g2.setPaint(Color.WHITE);
-            g2.fillRect(0, 0, width, height);
+            graphics.setPaint(Color.WHITE);
+            graphics.fillRect(0, 0, width, height);
 
-            g2.setColor(oldColor);
-            g2.drawImage(img1, null, 0, 0);
-            g2.drawImage(img2, null, img1.getWidth(), 0);
-            g2.drawImage(img3, null, img1.getWidth() + img2.getWidth(), 0);
-            g2.dispose();
+            graphics.setColor(oldColor);
+            graphics.drawImage(img1, null, 0, 0);
+            graphics.drawImage(img2, null, img1.getWidth(), 0);
+            graphics.drawImage(img3, null, img1.getWidth() + img2.getWidth(), 0);
+            graphics.dispose();
         } else if (direction == Direction.VERTICAL) {
             int height = img1.getHeight() + img2.getHeight() + img3.getHeight();
             int width = Math.min(Math.min(img1.getWidth(), img2.getWidth()), img3.getWidth());
 
             result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = result.createGraphics();
-            Color oldColor = g2.getColor();
+            Graphics2D graphics = result.createGraphics();
+            Color oldColor = graphics.getColor();
 
-            g2.setPaint(Color.WHITE);
-            g2.fillRect(0, 0, width, height);
+            graphics.setPaint(Color.WHITE);
+            graphics.fillRect(0, 0, width, height);
 
-            g2.setColor(oldColor);
-            g2.drawImage(img1, null, 0, 0);
-            g2.drawImage(img2, null, 0, img1.getHeight());
-            g2.drawImage(img3, null, 0, img1.getHeight() + img2.getHeight());
-            g2.dispose();
+            graphics.setColor(oldColor);
+            graphics.drawImage(img1, null, 0, 0);
+            graphics.drawImage(img2, null, 0, img1.getHeight());
+            graphics.drawImage(img3, null, 0, img1.getHeight() + img2.getHeight());
+            graphics.dispose();
         } else {
             throw new IllegalArgumentException("Direction can only be either horizontal or vertical!");
         }
@@ -157,24 +158,24 @@ public final class ImageOperations {
     public static BufferedImage squarefyCut(BufferedImage image, int length, Color color) {
         BufferedImage temp;
         BufferedImage res = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = res.createGraphics();
-        Color oldColor = g2.getColor();
-        g2.setPaint(color);
-        g2.fillRect(0, 0, length, length);
-        g2.setColor(oldColor);
+        Graphics2D graphics = res.createGraphics();
+        Color oldColor = graphics.getColor();
+        graphics.setPaint(color);
+        graphics.fillRect(0, 0, length, length);
+        graphics.setColor(oldColor);
         if (image.getWidth() < image.getHeight()) {
             int height = length * image.getHeight() / image.getWidth();
             temp = resize(image, length, height);
-            g2.drawImage(temp, null, 0, length / 2 - height / 2);
+            graphics.drawImage(temp, null, 0, length / 2 - height / 2);
         } else if (image.getWidth() > image.getHeight()) {
             int width = length * image.getWidth() / image.getHeight();
             temp = resize(image, width, length);
-            g2.drawImage(temp, null, length / 2 - width / 2, 0);
+            graphics.drawImage(temp, null, length / 2 - width / 2, 0);
         } else {
             temp = resize(image, length, length);
-            g2.drawImage(temp, null, 0, 0);
+            graphics.drawImage(temp, null, 0, 0);
         }
-        g2.dispose();
+        graphics.dispose();
         return res;
     }
 
@@ -190,24 +191,24 @@ public final class ImageOperations {
     public static BufferedImage squarefyResize(BufferedImage image, int length, Color color) {
         BufferedImage temp;
         BufferedImage res = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = res.createGraphics();
-        Color oldColor = g2.getColor();
-        g2.setPaint(color);
-        g2.fillRect(0, 0, length, length);
-        g2.setColor(oldColor);
+        Graphics2D graphics = res.createGraphics();
+        Color oldColor = graphics.getColor();
+        graphics.setPaint(color);
+        graphics.fillRect(0, 0, length, length);
+        graphics.setColor(oldColor);
         if (image.getWidth() > image.getHeight()) {
             int height = length * image.getHeight() / image.getWidth();
             temp = resize(image, length, height);
-            g2.drawImage(temp, null, 0, length / 2 - height / 2);
+            graphics.drawImage(temp, null, 0, length / 2 - height / 2);
         } else if (image.getWidth() < image.getHeight()) {
             int width = length * image.getWidth() / image.getHeight();
             temp = resize(image, width, length);
-            g2.drawImage(temp, null, length / 2 - width / 2, 0);
+            graphics.drawImage(temp, null, length / 2 - width / 2, 0);
         } else {
             temp = resize(image, length, length);
-            g2.drawImage(temp, null, 0, 0);
+            graphics.drawImage(temp, null, 0, 0);
         }
-        g2.dispose();
+        graphics.dispose();
         return res;
     }
 
@@ -253,20 +254,22 @@ public final class ImageOperations {
     }
 
     /**
-     * Turns a BufferedImage completely black while ignoring fully transparent pixels.
+     * Turns an image completely black while ignoring fully transparent pixels.
+     *
+     * @param img The {@link BufferedImage} to turn black.
+     * @return The image but in black.
      */
     public static BufferedImage turnBlack(BufferedImage img) {
-        int width = img.getWidth();
-        int height = img.getHeight();
+        int blackRGB = Color.BLACK.getRGB() & 0x00FFFFFF;
 
-        for (int i = 0; i < width; i++) {
-            for (int j = 0; j < height; j++) {
-                Color pixel = new Color(img.getRGB(i, j), true);
-                if (pixel.getAlpha() == 0) {
+        for (int i = 0; i < img.getWidth(); i++) {
+            for (int j = 0; j < img.getHeight(); j++) {
+                int rgb = img.getRGB(i, j);
+                int alpha = (rgb >> 24) & 0xFF;
+                if (alpha == 0) {
                     continue;
                 }
-                int alpha = pixel.getAlpha();
-                img.setRGB(i, j, alpha << 24 + Color.BLACK.getRGB());
+                img.setRGB(i, j, (alpha << 24) | blackRGB);
             }
         }
         return img;
@@ -279,78 +282,39 @@ public final class ImageOperations {
      * @return An {@link InputStream}
      */
     public static InputStream toInputStream(BufferedImage img) throws IOException {
-        ByteArrayOutputStream os = new ByteArrayOutputStream();
-        ImageIO.write(img, "png", os);
-        return new ByteArrayInputStream(os.toByteArray());
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ImageIO.write(img, "png", outputStream);
+        return new ByteArrayInputStream(outputStream.toByteArray());
     }
 
-    public static int[][] getRGBGrid(BufferedImage img) {
-        int[][] rgb = new int[img.getWidth()][img.getHeight()];
-        for (int i = 0; i < img.getHeight(); ++i) {
-            for (int j = 0; j < img.getWidth(); ++j) {
-                rgb[j][i] = img.getRGB(j, i);
+    /**
+     * Turns a given image to grayscale.
+     *
+     * @param image The {@link BufferedImage} to grayscale.
+     * @return The grayscaled image.
+     */
+    public static BufferedImage convertToGrayScale(BufferedImage image) {
+        int width = image.getWidth();
+        int height = image.getHeight();
+
+        BufferedImage grayscaleImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
+
+        for (int row = 0; row < height; row++) {
+            for (int col = 0; col < width; col++) {
+                int pixel = image.getRGB(col, row);
+                int red = (pixel >> 16) & 0xff;
+                int green = (pixel >> 8) & 0xff;
+                int blue = pixel & 0xff;
+                int grayscaleValue = calculateGrayscaleValue(red, green, blue);
+                Color grayscaleColor = new Color(grayscaleValue, grayscaleValue, grayscaleValue);
+                grayscaleImage.setRGB(col, row, grayscaleColor.getRGB());
             }
         }
-        return rgb;
+        return grayscaleImage;
     }
 
-    public static BufferedImage convertToGrayScale(BufferedImage img) {
-        for (int i = 0; i < img.getHeight(); ++i) {
-            for (int j = 0; j < img.getWidth(); ++j) {
-                Color color = new Color(img.getRGB(i, j));
-                int rgb = (int) (color.getRed() * 0.299);
-                rgb += (int) (color.getGreen() * 0.587 + color.getBlue() * 0.114);
-                img.setRGB(i, j, new Color(rgb, rgb, rgb).getRGB());
-            }
-        }
-        return img;
-    }
-
-    @Deprecated
-    public static BufferedImage blur(BufferedImage img) {
-        BufferedImage output = new BufferedImage(img.getWidth(), img.getHeight(), BufferedImage.TYPE_INT_RGB);
-        int i = 0;
-        int max = 400;
-        int rad = 10;
-        int a1 = 0;
-        int r1 = 0;
-        int g1 = 0;
-        int b1 = 0;
-        Color[] color = new Color[max];
-        int x;
-        int y;
-        int x1;
-        int y1;
-        int d;
-        for (x = rad; x < img.getHeight() - rad; x++) {
-            for (y = rad; y < img.getWidth() - rad; y++) {
-                for (x1 = x - rad; x1 < x + rad; x1++) {
-                    for (y1 = y - rad; y1 < y + rad; y1++) {
-                        color[i++] = new Color(img.getRGB(y1, x1));
-                    }
-                }
-                i = 0;
-                for (d = 0; d < max; d++) {
-                    a1 = a1 + color[d].getAlpha();
-                }
-                a1 = a1 / (max);
-                for (d = 0; d < max; d++) {
-                    r1 = r1 + color[d].getRed();
-                }
-                r1 = r1 / (max);
-                for (d = 0; d < max; d++) {
-                    g1 = g1 + color[d].getGreen();
-                }
-                g1 = g1 / (max);
-                for (d = 0; d < max; d++) {
-                    b1 = b1 + color[d].getBlue();
-                }
-                b1 = b1 / (max);
-                int sum1 = (a1 << 24) + (r1 << 16) + (g1 << 8) + b1;
-                output.setRGB(y, x, sum1);
-            }
-        }
-        return output;
+    private static int calculateGrayscaleValue(int red, int green, int blue) {
+        return (int) (RED_TO_GRAY_WEIGHT * red + GREEN_TO_GRAY_WEIGHT * green + BLUE_TO_GRAY_WEIGHT * blue);
     }
 
     /**

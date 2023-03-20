@@ -11,33 +11,62 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.stream.Collectors;
 
+/**
+ * Utility class for sending HTTP requests and reading the responses.
+ */
 public final class HttpResponse {
 
-	private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
 
-	private HttpResponse() {
-	}
+    private HttpResponse() {
+    }
 
-	public static JsonObject getJsonObject(String url) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", USER_AGENT);
-		connection.setRequestMethod("GET");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		String s = reader.lines().collect(Collectors.joining("\n"));
-		return JsonParser.parseString(s).getAsJsonObject();
-	}
+    /**
+     * Sends a request to the specified URL and returns the response body as a String.
+     *
+     * @param url The URL to send the HTTP request to.
+     * @return The response body as a String.
+     */
+    public static String sendHttpRequest(String url) throws IOException {
+        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        connection.setRequestProperty("User-Agent", USER_AGENT);
+        connection.setRequestMethod("GET");
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
+            return reader.lines().collect(Collectors.joining("\n"));
+        }
+    }
 
-	public static JsonArray getJsonArray(String url) throws IOException {
-		HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
-		connection.setRequestProperty("User-Agent", USER_AGENT);
-		connection.setRequestMethod("GET");
-		BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
-		String s = reader.lines().collect(Collectors.joining("\n"));
-		return (JsonArray) JsonParser.parseString(s);
-	}
+    /**
+     * Sends a request to the given URL and returns the response body as a JsonObject.
+     *
+     * @param url The URL to send the HTTP request to.
+     * @return The response body as a JsonObject.
+     */
+    public static JsonObject getJsonObject(String url) throws IOException {
+        String response = sendHttpRequest(url);
+        return JsonParser.parseString(response).getAsJsonObject();
+    }
 
-	public static String readLine(String url) throws IOException {
-		BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream()));
-		return reader.readLine();
-	}
+    /**
+     * Sends a request to the given URL and returns the response body as a JsonArray.
+     *
+     * @param url The URL to send the HTTP request to.
+     * @return The response body as a JsonArray.
+     */
+    public static JsonArray getJsonArray(String url) throws IOException {
+        String response = sendHttpRequest(url);
+        return JsonParser.parseString(response).getAsJsonArray();
+    }
+
+    /**
+     * Sends a request to the specified URL and returns the first line of the response body as a String.
+     *
+     * @param url The URL to send the HTTP request to.
+     * @return The first line of the response body as a String.
+     */
+    public static String readLine(String url) throws IOException {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream()))) {
+            return reader.readLine();
+        }
+    }
 }

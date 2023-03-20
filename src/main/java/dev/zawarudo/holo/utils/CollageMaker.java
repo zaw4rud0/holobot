@@ -3,6 +3,9 @@ package dev.zawarudo.holo.utils;
 import java.awt.image.BufferedImage;
 import java.util.List;
 
+/**
+ * Utility class for creating collages of multiple images.
+ */
 public final class CollageMaker {
 
 	private CollageMaker() {

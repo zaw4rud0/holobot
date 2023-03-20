@@ -47,6 +47,9 @@ public class PixelateCmd extends AbstractCommand {
             BufferedImage img = ImageIO.read(new URL(url));
             if (img == null) {
                 sendErrorEmbed(event, "I couldn't read the image. Please check your image format or try a different image.");
+                if (logger.isErrorEnabled()) {
+                    logger.error("Image is null: {}", url);
+                }
                 return;
             }
             BufferedImage result = pixelate(img, intensity);
@@ -55,7 +58,7 @@ public class PixelateCmd extends AbstractCommand {
         } catch (IOException ex) {
             sendErrorEmbed(event, "Something went wrong while pixelating your image. Please try again later.");
             if (logger.isErrorEnabled()) {
-                logger.error("Something went wrong during the pixelation of an image.", ex);
+                logger.error("Something went wrong during the pixelation of the image: {}", url, ex);
             }
         }
     }
