@@ -50,6 +50,12 @@ public final class PokemonUtils {
         };
     }
 
+    /**
+     * Draws a black silhouette of the given Pokémon on the background.
+     *
+     * @param pokemon The Pokémon whose silhouette should be drawn.
+     * @return A {@link BufferedImage} of the Pokémon silhouette on a background.
+     */
     public static BufferedImage drawHiddenPokemon(Pokemon pokemon) throws IOException {
         BufferedImage blackPokemon = getBlackPokemon(pokemon);
         BufferedImage bg = getBackgroundImage();
