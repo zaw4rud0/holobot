@@ -81,6 +81,24 @@
     ]
   },
   {
+    "name": "die",
+    "sentence": "{s} dies",
+    "directed": false,
+    "api": false,
+    "urls": [
+      "https://media.tenor.com/iU20sXcBKOAAAAAC/anime-die.gif",
+      "https://media.tenor.com/k6AtJ49Nm5AAAAAC/aharen-san-anime-dead.gif",
+      "https://media.tenor.com/9Ql_VyYvMZkAAAAC/anime-sleeping.gif",
+      "https://media.tenor.com/hjnUROOP0WkAAAAd/falling-over.gif",
+      "https://media.tenor.com/tfWDvMqBFb4AAAAC/anime-fall.gif",
+      "https://media.tenor.com/MKaKRG9739AAAAAC/no-game-no-life-faint.gif",
+      "https://media.tenor.com/PET77kMx7XQAAAAd/dizzy-fall.gif",
+      "https://media.tenor.com/GyFbT8ZoyqAAAAAC/kanokari-anime-fall.gif",
+      "https://media.tenor.com/XqaU6agJocEAAAAd/anime-death.gif",
+      "https://media.tenor.com/cialBiHBraQAAAAd/anime-engaged-to-a-stranger.gif"
+    ]
+  },
+  {
     "name": "facepalm",
     "sentence": "{s} face-palms",
     "directed": false,
