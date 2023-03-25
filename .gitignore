@@ -34,7 +34,7 @@ hs_err_pid*
 
 # Resources files
 /src/main/resources/database/
-/src/main/resources/image/
+/src/main/resources/image/template
 /src/main/resources/experimental/
 /src/main/resources/pokemon/
 
