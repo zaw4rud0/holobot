@@ -1,20 +1,21 @@
 package dev.zawarudo.holo.fun;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
-import com.google.gson.annotations.SerializedName;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
-import dev.zawarudo.pokeapi4java.utils.HttpResponse;
+import dev.zawarudo.holo.utils.FileUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
+import java.io.File;
 import java.io.IOException;
-import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.Random;
 
 @Command(name = "8ball",
         description = "Ask the Magic 8 Ball a question and get an answer.",
@@ -24,23 +25,28 @@ import java.util.concurrent.TimeUnit;
         category = CommandCategory.MISC)
 public class Magic8BallCmd extends AbstractCommand {
 
-    private static final String API_URL = "https://nekos.life/api/v2/8ball";
+    private final List<File> responses;
+
+    public Magic8BallCmd() {
+        responses = FileUtils.getAllFiles("src/main/resources/image/8ball");
+    }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent e) {
-        sendTyping(e);
-
+    public void onCommand(@NotNull MessageReceivedEvent event) {
         if (args.length == 0) {
-            sendErrorEmbed(e, "Incorrect usage of the command. Please ask a question.");
+            sendErrorEmbed(event, "Incorrect usage of the command. Please ask a question.");
             return;
         }
 
-        Answer answer;
+        int index = new Random().nextInt(responses.size());
+        File response = responses.get(index);
+
+        InputStream input;
 
         try {
-            answer = getAnswer();
+            input = Files.newInputStream(Paths.get(response.getPath()));
         } catch (IOException ex) {
-            sendErrorEmbed(e, "An error occurred while fetching an answer. Please try again later.");
+            sendErrorEmbed(event, "An error occurred while fetching an answer. Please try again later.");
             if (logger.isErrorEnabled()) {
                 logger.error("Something went wrong while getting an answer.", ex);
             }
@@ -49,35 +55,8 @@ public class Magic8BallCmd extends AbstractCommand {
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Magic 8-Ball");
-        builder.setImage(answer.url);
-
-        Message msg = e.getMessage().replyEmbeds(builder.build()).complete();
-
-        while (answer.response.toLowerCase(Locale.UK).equals("wait for it")) {
-            try {
-                answer = getAnswer();
-            } catch (IOException ex) {
-                sendErrorEmbed(e, "An error occurred while fetching an answer. Please try again later.");
-                if (logger.isErrorEnabled()) {
-                    logger.error("Something went wrong while getting an answer.", ex);
-                }
-                return;
-            }
-            builder.setTitle("Magic 8-Ball");
-            builder.setImage(answer.url);
-            msg = msg.replyEmbeds(builder.build()).completeAfter(10, TimeUnit.SECONDS);
-        }
-    }
-
-    private Answer getAnswer() throws IOException {
-        JsonObject obj = HttpResponse.getJsonObject(API_URL);
-        return new Gson().fromJson(obj, Answer.class);
-    }
-
-    static class Answer {
-        @SerializedName("response")
-        String response;
-        @SerializedName("url")
-        String url;
+        builder.setImage("attachment://8ball.png");
+        FileUpload upload = FileUpload.fromData(input, "8ball.png");
+        event.getMessage().replyFiles(upload).setEmbeds(builder.build()).queue();
     }
 }

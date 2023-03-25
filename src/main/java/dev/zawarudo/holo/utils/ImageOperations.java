@@ -221,9 +221,10 @@ public final class ImageOperations {
      * @return An {@link InputStream}
      */
     public static InputStream toInputStream(BufferedImage img) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(img, "png", outputStream);
-        return new ByteArrayInputStream(outputStream.toByteArray());
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(img, "png", outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
     }
 
     /**
