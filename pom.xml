@@ -74,6 +74,12 @@
             <version>0.0.2</version>
         </dependency>
 
+        <dependency>
+            <groupId>dev.zawarudo</groupId>
+            <artifactId>javabooru</artifactId>
+            <version>0.1.4</version>
+        </dependency>
+
         <!-- Core of the bot -->
         <dependency>
             <groupId>net.dv8tion</groupId>

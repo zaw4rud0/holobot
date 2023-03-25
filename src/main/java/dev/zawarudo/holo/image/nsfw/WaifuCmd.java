@@ -1,21 +1,21 @@
 package dev.zawarudo.holo.image.nsfw;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
-import dev.zawarudo.holo.annotations.Deactivated;
-import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.danbooru.DanbooruAPI;
+import dev.zawarudo.danbooru.DanbooruPost;
+import dev.zawarudo.exceptions.APIException;
+import dev.zawarudo.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.annotations.Command;
-import dev.zawarudo.holo.apis.GelbooruAPI;
 import dev.zawarudo.holo.core.AbstractCommand;
+import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.utils.BooruAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.Arrays;
@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
-@Deactivated
 @Command(name = "waifu",
 		description = "Sends an image of a specified tag from [Gelbooru](https://gelbooru.com/).",
 		usage = "<tag>",
@@ -110,7 +109,7 @@ public class WaifuCmd extends AbstractCommand {
 			
 			builder.setTitle(rs.getString("Title"));
 			builder.setImage(url);
-		} catch (SQLException | IOException ex) {
+		} catch (SQLException | APIException | InvalidRequestException ex) {
 			sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again in a few minutes!");
 			if (logger.isErrorEnabled()) {
 				logger.error("Something went wrong while fetching a waifu image.", ex);
@@ -125,19 +124,23 @@ public class WaifuCmd extends AbstractCommand {
 	 * Get the right image from Gelbooru
 	 */
 	@Nullable
-	private String getImage(String tag) throws IOException {
-		JsonArray array = GelbooruAPI.getJsonArray(GelbooruAPI.Rating.GENERAL, GelbooruAPI.Sort.RANDOM, 1, tag);
-		if (array == null || array.size() == 0) {
+	private String getImage(String tag) throws APIException, InvalidRequestException {
+		List<DanbooruPost> posts = new DanbooruAPI()
+				.setRating(BooruAPI.Rating.SAFE)
+				.setOrder(BooruAPI.Order.RANDOM)
+				.setLimit(1)
+				.setTags(tag)
+				.getPosts();
+		if (posts.size() == 0) {
 			return null;
 		}
-		JsonObject obj = array.get(0).getAsJsonObject();
-		return obj.has("large_file_url") ? obj.get("large_file_url").getAsString() : obj.get("file_url").getAsString();
+		return posts.get(0).getUrl();
 	}
 
 	/**
-	 * Properly display all available tags as a single String
+	 * Properly display all available tags as a single String.
 	 */
 	private String getCategoriesString() {
-		return names.toString().replace("]", "`").replace("[", "`").replace(",", "`").replace(" ", ", `");
+		return String.format("```%s```", String.join(", ", names));
 	}
 }
