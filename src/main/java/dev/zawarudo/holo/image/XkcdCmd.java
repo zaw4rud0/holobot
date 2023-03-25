@@ -10,6 +10,7 @@ import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.misc.EmbedColor;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,8 +19,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Random;
 
 @Command(name = "xkcd",
@@ -30,19 +31,18 @@ import java.util.Random;
         category = CommandCategory.IMAGE)
 public class XkcdCmd extends AbstractCommand {
 
+    private static final String ERROR_RETRIEVING = "Something went wrong while retrieving the comic. Please try again later.";
+    private static final String ERROR_DOES_NOT_EXIST = "This comic does not exist! If you think it should exist, consider using `%sxkcd new` to refresh my database.";
+
     private final Map<Integer, XkcdComic> comics;
     private int newestIssue;
 
     public XkcdCmd() {
         comics = new HashMap<>();
-
         try {
             List<XkcdComic> list = DBOperations.getXkcdComics();
             Collections.sort(list);
-
-            // Get the newest issue
             newestIssue = list.get(list.size() - 1).getIssueNr();
-
             for (XkcdComic comic : list) {
                 comics.put(comic.getIssueNr(), comic);
             }
@@ -54,72 +54,80 @@ public class XkcdCmd extends AbstractCommand {
     }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent e) {
-        deleteInvoke(e);
-        XkcdComic comic = null;
-
-        // Random issue
+    public void onCommand(@NotNull MessageReceivedEvent event) {
         if (args.length == 0) {
-            try {
-                comic = XkcdAPI.getComic(new Random().nextInt(newestIssue) + 1);
-                storeComicIfNew(comic);
-            } catch (APIException | InvalidRequestException | SQLException ex) {
-                sendErrorEmbed(e, "Something went wrong while retrieving the comic. Please try again later.");
-                return;
-            }
+            sendRandomComic(event);
+        } else if (args[0].equals("new")) {
+            sendNewestComic(event);
+        } else if (isInteger(args[0])) {
+            sendComicByIssueNumber(event);
+        } else {
+            sendComicByTitle(event);
+        }
+    }
+
+    private void sendRandomComic(MessageReceivedEvent event) {
+        try {
+            XkcdComic comic = XkcdAPI.getComic(new Random().nextInt(newestIssue) + 1);
+            storeComicIfNew(comic);
+            sendXkcd(event, comic);
+        } catch (APIException | InvalidRequestException | SQLException ex) {
+            sendErrorEmbed(event, ERROR_RETRIEVING);
+        }
+    }
+
+    private void sendNewestComic(MessageReceivedEvent event) {
+        try {
+            XkcdComic comic = XkcdAPI.getLatest();
+            storeComicIfNew(comic);
+            sendXkcd(event, comic);
+        } catch (APIException | SQLException ex) {
+            sendErrorEmbed(event, ERROR_RETRIEVING);
+        }
+    }
+
+    private void sendComicByIssueNumber(MessageReceivedEvent event) {
+        int num = Integer.parseInt(args[0]);
+        if (num > newestIssue || num < 1) {
+            sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
+            return;
         }
 
-        // Newest issue
-        else if (args[0].equals("new")) {
-            try {
-                comic = XkcdAPI.getLatest();
-                storeComicIfNew(comic);
-            } catch (APIException | SQLException ex) {
-                sendErrorEmbed(e, "Something went wrong while retrieving the comic. Please try again later.");
-                return;
-            }
+        try {
+            XkcdComic comic = XkcdAPI.getComic(num);
+            sendXkcd(event, comic);
+        } catch (APIException | InvalidRequestException ex) {
+            sendErrorEmbed(event, ERROR_RETRIEVING);
         }
+    }
 
-        // Specific issue by number
-        else if (isInteger(args[0])) {
-            int num = Integer.parseInt(args[0]);
+    private void sendComicByTitle(MessageReceivedEvent event) {
+        String title = String.join(" ", args);
 
-            if (num > newestIssue || num < 1) {
-                sendErrorEmbed(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
-                return;
-            }
+        Optional<XkcdComic> optionalComic = comics.values().stream()
+                .filter(c -> c.getTitle().equalsIgnoreCase(title))
+                .findFirst();
 
-            try {
-                comic = XkcdAPI.getComic(num);
-            } catch (APIException | InvalidRequestException ex) {
-                sendErrorEmbed(e, "Something went wrong while retrieving the comic. Please try again later.");
-                return;
-            }
+        if (optionalComic.isEmpty()) {
+            sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
+            return;
         }
+        sendXkcd(event, optionalComic.get());
+    }
 
-        // Specific issue by title
-        else {
-            String title = String.join(" ", args).toLowerCase(Locale.UK);
-            for (XkcdComic c : comics.values()) {
-                if (c.getTitle().toLowerCase(Locale.UK).equals(title)) {
-                    comic = c;
-                    break;
-                }
-            }
-            // Couldn't find the comic
-            if (comic == null) {
-                sendErrorEmbed(e, "This comic does not exist! If you think it should exist, consider using `" + getPrefix(e) + "xkcd new` to refresh ny database.");
-                return;
-            }
-        }
+    private void sendXkcd(MessageReceivedEvent event, XkcdComic comic) {
+        String alt = comic.getAlt();
+        alt = alt.length() > MessageEmbed.TEXT_MAX_LENGTH ? alt.substring(0, MessageEmbed.TEXT_MAX_LENGTH - 3) + "..." : alt;
 
-        // Builds the embed and sends it
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("xkcd " + comic.getIssueNr() + ": " + comic.getTitle());
-        builder.setDescription("[Explanation](" + comic.getExplainedUrl() + ")");
-        builder.setImage(comic.getImg());
-        builder.setFooter(comic.getAlt());
-        sendEmbed(e, builder, false, getEmbedColor());
+        event.getMessage().replyEmbeds(
+                new EmbedBuilder()
+                        .setTitle("xkcd " + comic.getIssueNr() + ": " + comic.getTitle())
+                        .setDescription("[Explanation](" + comic.getExplainedUrl() + ")")
+                        .setImage(comic.getImg())
+                        .setFooter(alt)
+                        .setColor(getEmbedColor())
+                        .build()
+        ).queue();
     }
 
     private void storeComicIfNew(XkcdComic comic) throws SQLException {
@@ -148,7 +156,6 @@ public class XkcdCmd extends AbstractCommand {
         }
         newestIssue = num;
 
-        // Store new comics in the database
         DBOperations.insertXkcdComics(newComics);
     }
 }
