@@ -148,70 +148,9 @@ public final class ImageOperations {
     }
 
     /**
-     * Cuts a {@link BufferedImage} to a square. The square will be taken from the middle of
-     * the image
-     *
-     * @param image  = {@link BufferedImage} to perform this method on
-     * @param length = Side length of the square
-     * @return A new {@link BufferedImage}
+     * Improved version of the old squarefy methods:
+     * <a href="https://gist.github.com/xHarlock/343febf77f25ce26422527cd0500adcd">Link</a>.
      */
-    public static BufferedImage squarefyCut(BufferedImage image, int length, Color color) {
-        BufferedImage temp;
-        BufferedImage res = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = res.createGraphics();
-        Color oldColor = graphics.getColor();
-        graphics.setPaint(color);
-        graphics.fillRect(0, 0, length, length);
-        graphics.setColor(oldColor);
-        if (image.getWidth() < image.getHeight()) {
-            int height = length * image.getHeight() / image.getWidth();
-            temp = resize(image, length, height);
-            graphics.drawImage(temp, null, 0, length / 2 - height / 2);
-        } else if (image.getWidth() > image.getHeight()) {
-            int width = length * image.getWidth() / image.getHeight();
-            temp = resize(image, width, length);
-            graphics.drawImage(temp, null, length / 2 - width / 2, 0);
-        } else {
-            temp = resize(image, length, length);
-            graphics.drawImage(temp, null, 0, 0);
-        }
-        graphics.dispose();
-        return res;
-    }
-
-    /**
-     * Resizes a {@link BufferedImage} to a square. If it's a rectangle, the background will
-     * be visible on the sides
-     *
-     * @param image  = {@link BufferedImage} to perform this method on
-     * @param length = Side length of the square
-     * @param color  = Background color
-     * @return A new {@link BufferedImage}
-     */
-    public static BufferedImage squarefyResize(BufferedImage image, int length, Color color) {
-        BufferedImage temp;
-        BufferedImage res = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = res.createGraphics();
-        Color oldColor = graphics.getColor();
-        graphics.setPaint(color);
-        graphics.fillRect(0, 0, length, length);
-        graphics.setColor(oldColor);
-        if (image.getWidth() > image.getHeight()) {
-            int height = length * image.getHeight() / image.getWidth();
-            temp = resize(image, length, height);
-            graphics.drawImage(temp, null, 0, length / 2 - height / 2);
-        } else if (image.getWidth() < image.getHeight()) {
-            int width = length * image.getWidth() / image.getHeight();
-            temp = resize(image, width, length);
-            graphics.drawImage(temp, null, length / 2 - width / 2, 0);
-        } else {
-            temp = resize(image, length, length);
-            graphics.drawImage(temp, null, 0, 0);
-        }
-        graphics.dispose();
-        return res;
-    }
-
     public static BufferedImage squarefy(BufferedImage image, int length, Color color, boolean cut) {
         BufferedImage result = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = result.createGraphics();
