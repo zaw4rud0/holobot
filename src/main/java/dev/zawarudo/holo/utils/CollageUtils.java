@@ -32,8 +32,10 @@ public final class CollageUtils {
             for (int j = 0; j < cols; j++) {
                 colsList.add(images.get(index++));
             }
-            rowsList.add(ImageOperations.join(ImageOperations.Direction.HORIZONTAL, colsList.toArray(BufferedImage[]::new)));
+            BufferedImage[] colArray = colsList.toArray(BufferedImage[]::new);
+            rowsList.add(ImageOperations.join(ImageOperations.Direction.HORIZONTAL, colArray));
         }
-        return ImageOperations.join(ImageOperations.Direction.VERTICAL, rowsList.toArray(BufferedImage[]::new));
+        BufferedImage[] rowsArray = rowsList.toArray(BufferedImage[]::new);
+        return ImageOperations.join(ImageOperations.Direction.VERTICAL, rowsArray);
     }
 }
