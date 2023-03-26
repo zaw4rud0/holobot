@@ -69,7 +69,7 @@ public final class PokemonUtils {
     }
 
     private static BufferedImage getBackgroundImage() throws IOException {
-        File bgFile = new File("src/main/resources/pokemon/background/battle-background.png");
+        File bgFile = new File("src/main/resources/image/pokemon/background.png");
         return ImageIO.read(bgFile);
     }
 
