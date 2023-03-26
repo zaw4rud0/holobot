@@ -5,6 +5,7 @@ import dev.zawarudo.danbooru.DanbooruPost;
 import dev.zawarudo.exceptions.APIException;
 import dev.zawarudo.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.CommandCategory;
@@ -24,6 +25,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+@Deactivated
 @Command(name = "waifu",
 		description = "Sends an image of a specified tag from [Gelbooru](https://gelbooru.com/).",
 		usage = "<tag>",
