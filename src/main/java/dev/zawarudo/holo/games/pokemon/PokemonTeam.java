@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.games.pokemon;
 
-import dev.zawarudo.holo.utils.CollageMaker;
+import dev.zawarudo.holo.utils.CollageUtils;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.ImageOperations;
 import dev.zawarudo.pokeapi4java.model.Pokemon;
@@ -62,7 +62,7 @@ public class PokemonTeam {
             BufferedImage img = draw(artwork, type1.getColor(), type2 != null ? type2.getColor() : null, string);
             images.add(img);
         }
-        return CollageMaker.create3x2Collage(images);
+        return CollageUtils.createCollage(2, 3, images);
     }
 
     /**
