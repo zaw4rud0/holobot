@@ -16,14 +16,14 @@ public final class FileUtils {
     /**
      * Fetches all files inside the given directory path.
      *
-     * @param directoryPath The directoryPath to the directory from which the files should be fetched.
+     * @param directoryPath The path to the directory from which the files should be fetched.
      * @return All files inside the given directory path, including those inside subdirectories.
      */
     public static List<File> getAllFiles(String directoryPath) {
         File directory = new File(directoryPath);
 
         if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Input directoryPath must be a directory.");
+            throw new IllegalArgumentException("Input path must be a directory.");
         }
 
         List<File> files = new ArrayList<>();
