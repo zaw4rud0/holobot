@@ -31,11 +31,14 @@ hs_err_pid*
 # My own files
 /TODO.md
 /config.json
+/config.properties
 
 # Resources files
-/src/main/resources/database/
 /src/main/resources/image/template
 /src/main/resources/experimental/
+
+# Ignore databases
+*.db
 
 /src/main/java/dev/zawarudo/holo/experimental/
 /src/main/java/dev/zawarudo/holo/development/
