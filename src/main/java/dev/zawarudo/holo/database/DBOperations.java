@@ -40,7 +40,7 @@ public final class DBOperations {
     private static final String SELECT_XKCD_COMICS_SQL = "SELECT * FROM XkcdComics;";
     private static final String INSERT_WAIFU_SQL = "INSERT INTO Gelbooru (id, tag, title) VALUES (?, ?, ?);";
     private static final String INSERT_BLACKLISTED_USER_SQL = "INSERT INTO Blacklisted (user_id, reason, date) VALUES (?, ?, ?);";
-    private static final String SQL = "INSERT INTO Submissions (type, user_id, text, date, guild_id, channel_id) VALUES (?, ?, ?, ?, ?, ?);";
+    private static final String INSERT_SUBMISSION_SQL = "INSERT INTO Submissions (type, user_id, text, date, guild_id, channel_id) VALUES (?, ?, ?, ?, ?, ?);";
 
     /**
      * Stores an emote into the database.
@@ -473,7 +473,7 @@ public final class DBOperations {
      */
     public static void insertSubmission(Submission submission) throws SQLException {
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(SQL);
+        PreparedStatement ps = conn.prepareStatement(INSERT_SUBMISSION_SQL);
         ps.setString(1, "bug report");
         ps.setString(2, submission.getAuthorId());
         ps.setString(3, submission.getMessage());
