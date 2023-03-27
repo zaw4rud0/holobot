@@ -14,8 +14,6 @@ public class BotConfig {
     // External settings
     @SerializedName("deepAI_token")
     private String deepAIKey;
-    @SerializedName("youtube_token")
-    private String youtubeToken;
     @SerializedName("aoc_token")
     private String aocToken;
 
@@ -53,16 +51,6 @@ public class BotConfig {
      */
     public String getKeyDeepAI() {
         return deepAIKey;
-    }
-
-    /**
-     * Retrieves the YouTube API key. The key is required to use the various endpoints
-     * of the YouTube API.
-     *
-     * @return The YouTube API key as a String.
-     */
-    public String getYoutubeToken() {
-        return youtubeToken;
     }
 
     /**
