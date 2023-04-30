@@ -141,6 +141,9 @@ public class WhoisCmd extends AbstractCommand {
 	 * invalid, simply return the author of the message.
 	 */
 	private User getUser(MessageReceivedEvent e) {
+		if (args.length == 0) {
+			return e.getAuthor();
+		}
 		try {
 			long id = Long.parseLong(args[0].replace("<", "")
 					.replace(">", "")
