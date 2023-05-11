@@ -61,14 +61,14 @@ public class SkipCmd extends AbstractMusicCommand {
 			return;
 		}
 
-		musicManager.setVoting(true);
-
 		AudioChannelUnion channel = getConnectedChannel(event.getGuild());
 
 		if (channel == null) {
 			sendErrorEmbed(event, "I am not connected to a voice channel!");
 			return;
 		}
+
+		musicManager.setVoting(true);
 
 		List<Member> listeners = channel.getMembers().stream()
 				.filter(m -> !m.getUser().isBot() && !getMemberVoiceState(m).isDeafened()).toList();
@@ -97,7 +97,7 @@ public class SkipCmd extends AbstractMusicCommand {
 					return false;
 				}
 
-				if (!evt.retrieveUser().complete().isBot()) {
+				if (evt.retrieveUser().complete().isBot()) {
 					return false;
 				}
 

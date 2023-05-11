@@ -149,6 +149,10 @@ public class GuildListener extends ListenerAdapter {
             return;
         }
 
+        if (event.getChannelLeft() == null) {
+            return;
+        }
+
         AudioChannelUnion botVoice = event.getGuild().getSelfMember().getVoiceState().getChannel();
 
         if (event.getChannelLeft().equals(botVoice) && botVoice.getMembers().size() <= 1) {
