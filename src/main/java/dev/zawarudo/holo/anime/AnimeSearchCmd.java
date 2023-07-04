@@ -12,6 +12,7 @@ import dev.zawarudo.nanojikan.JikanAPI;
 import dev.zawarudo.nanojikan.exception.APIException;
 import dev.zawarudo.nanojikan.exception.InvalidRequestException;
 import dev.zawarudo.nanojikan.model.Anime;
+import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
@@ -19,6 +20,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,25 +57,8 @@ public class AnimeSearchCmd extends AbstractCommand {
         }
 
         String search = String.join(" ", args);
+        List<Anime> result = performAnimeSearch(event, search);
 
-        List<Anime> result;
-        try {
-            result = JikanAPI.searchAnime(search);
-        } catch (InvalidRequestException ex) {
-            sendErrorEmbed(event, "Something went wrong while searching for the anime! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("Invalid request! This wasn't supposed to happen!", ex);
-            }
-            return;
-        } catch (APIException ex) {
-            sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("An API error occurred while trying to search for the anime: " + ex.getMessage() + " | Anime: " + search, ex);
-            }
-            return;
-        }
-
-        // No search results
         if (result.isEmpty()) {
             sendErrorEmbed(event, "I couldn't find any animes with your given search terms!");
             return;
@@ -81,46 +66,33 @@ public class AnimeSearchCmd extends AbstractCommand {
 
         deleteInvoke(event);
 
-        EmbedBuilder builder = getResultsEmbed(result);
-        Message msg = event.getChannel().sendMessageEmbeds(builder.build()).complete();
-        User caller = event.getAuthor();
-
-        HoloUtils.addReactions(msg, result.size());
-        AtomicInteger selected = new AtomicInteger(-1);
-
-        waiter.waitForEvent(
-                MessageReactionAddEvent.class,
-                evt -> {
-                    if (evt.getMessageIdLong() != msg.getIdLong()) {
-                        return false;
-                    }
-                    if (evt.retrieveUser().complete().isBot() || !caller.equals(evt.retrieveUser().complete())) {
-                        return false;
-                    }
-                    for (int i = 0; i < result.size(); i++) {
-                        if (evt.getReaction().getEmoji().equals(selection.get(i).getAsEmoji())) {
-                            selected.set(i);
-                            return true;
-                        }
-                    }
-                    return false;
-                },
-                evt -> {
-                    msg.delete().queue();
-                    sendAnime(event, result.get(selected.get()));
-                },
-                5,
-                TimeUnit.MINUTES,
-                () -> msg.delete().queue()
-        );
+        showSearchResults(event, result);
     }
 
-    private EmbedBuilder getResultsEmbed(List<Anime> result) {
+    private List<Anime> performAnimeSearch(MessageReceivedEvent event, String search) {
+        try {
+            return JikanAPI.searchAnime(search);
+        } catch (InvalidRequestException ex) {
+            sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
+            if (logger.isErrorEnabled()) {
+                logger.error("Invalid request! This wasn't supposed to happen!", ex);
+            }
+        } catch (APIException ex) {
+            sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
+            if (logger.isErrorEnabled()) {
+                logger.error("An API error occurred while trying to search for the anime. Anime: " + search, ex);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    private EmbedBuilder createSearchResultEmbed(List<Anime> result) {
         List<Emote> numbers = HoloUtils.getNumbers();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < result.size(); i++) {
             Anime anime = result.get(i);
-            String line = String.format("%s %s [%s]\n", numbers.get(i).getAsEmoji().getFormatted(), anime.getTitle(), anime.getType());
+            String line = String.format("%s %s [%s]%n",
+                    numbers.get(i).getAsEmoji().getFormatted(), anime.getTitle(), anime.getType());
             sb.append(line);
         }
         EmbedBuilder builder = new EmbedBuilder();
@@ -130,54 +102,126 @@ public class AnimeSearchCmd extends AbstractCommand {
         return builder;
     }
 
+    private void showSearchResults(MessageReceivedEvent event, List<Anime> result) {
+        EmbedBuilder builder = createSearchResultEmbed(result);
+        Message msg = event.getChannel().sendMessageEmbeds(builder.build()).complete();
+        User caller = event.getAuthor();
+
+        HoloUtils.addReactions(msg, result.size());
+        AtomicInteger selected = new AtomicInteger(-1);
+
+        waitForUserReaction(event, msg, caller, result, selected);
+    }
+
+    private void waitForUserReaction(MessageReceivedEvent event, Message msg, User caller, List<Anime> result, AtomicInteger selected) {
+        waiter.waitForEvent(
+                MessageReactionAddEvent.class,
+                evt -> isReactionValid(evt, msg, caller, result, selected),
+                evt -> handleUserReaction(event, msg, result, selected),
+                5,
+                TimeUnit.MINUTES,
+                () -> msg.delete().queue()
+        );
+    }
+
+    private boolean isReactionValid(MessageReactionAddEvent evt, Message msg, User caller, List<Anime> result, AtomicInteger selected) {
+        if (evt.getMessageIdLong() != msg.getIdLong()) {
+            return false;
+        }
+        if (evt.retrieveUser().complete().isBot() || !caller.equals(evt.retrieveUser().complete())) {
+            return false;
+        }
+        for (int i = 0; i < result.size(); i++) {
+            if (evt.getReaction().getEmoji().equals(selection.get(i).getAsEmoji())) {
+                selected.set(i);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private void handleUserReaction(MessageReceivedEvent event, Message msg, List<Anime> result, AtomicInteger selected) {
+        msg.delete().queue();
+        sendAnime(event, result.get(selected.get()));
+    }
+
     private void sendAnime(MessageReceivedEvent event, Anime anime) {
+        EmbedBuilder builder = createEmbedBuilder(anime);
+        setAnimeDetails(builder, anime);
+        sendEmbed(event, builder, true, getEmbedColor());
+    }
+
+    private EmbedBuilder createEmbedBuilder(Anime anime) {
         EmbedBuilder builder = new EmbedBuilder();
-
-        // Prepare fields
-        String genres = null;
-        String themes = null;
-        if (anime.getGenres() != null && anime.getGenres().size() != 0) {
-            genres = anime.getGenres().toString().replace("[", "").replace("]", "");
-        }
-        if (anime.getThemes() != null && anime.getThemes().size() != 0) {
-            themes = anime.getThemes().toString().replace("[", "").replace("]", "");
-        }
-        String episodes = anime.getEpisodes() == 0 ? "TBA" : String.valueOf(anime.getEpisodes());
-        String season = anime.getSeason() == null ? "TBA" : anime.getSeason();
-        String malScore = anime.getScore() == 0.0 ? "N/A" : String.valueOf(anime.getScore());
-        String malRank = anime.getRank() == 0 ? "N/A" : String.valueOf(anime.getRank());
-
-        // Set embed
-        builder.setTitle(anime.getTitle());
+        String type = anime.getType() == null ? "null" : anime.getType();
+        String title = String.format("%s [%s]", anime.getTitle(), type);
+        builder.setTitle(title);
         builder.setThumbnail(anime.getImages().getJpg().getLargeImage());
         if (anime.hasSynopsis()) {
             builder.setDescription(anime.getSynopsis());
         }
+        return builder;
+    }
+
+    private void setAnimeDetails(EmbedBuilder builder, Anime anime) {
         if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle())) {
             builder.addField("English Title", anime.getTitleEnglish(), true);
         }
         if (anime.getTitleJapanese() != null) {
             builder.addField("Japanese Title", anime.getTitleJapanese(), true);
         }
+
+        String studios = getFormattedList(anime.getStudios());
+        if (studios != null) {
+            builder.addField("Studio", studios, false);
+        }
+
+        String genres = getFormattedList(anime.getGenres());
         if (genres != null) {
             builder.addField("Genres", genres, false);
         }
+        String themes = getFormattedList(anime.getThemes());
         if (themes != null) {
             builder.addField("Themes", themes, false);
         }
-        String type = anime.getType() == null ? "null" : anime.getType();
-        builder.addField("Type", type, true);
+
+        builder.addField("Status", anime.getStatus(), true);
         if ("Movie".equals(anime.getType())) {
-            builder.addField("Season", Formatter.capitalize(season), true);
+            builder.addField("Season", getAnimeSeason(anime), true);
             builder.addBlankField(true);
         } else {
-            builder.addField("Episodes", episodes, true);
-            builder.addField("Season", Formatter.capitalize(season), true);
+            builder.addField("Episodes", getAnimeEpisodes(anime), true);
+            builder.addField("Season", getAnimeSeason(anime), true);
         }
-        builder.addField("MAL Score", malScore, true);
-        builder.addField("MAL Rank", malRank, true);
+
+        builder.addField("MAL Score", getFormattedScore(anime.getScore()), true);
+        builder.addField("MAL Rank", getFormattedRank(anime.getRank()), true);
         builder.addBlankField(true);
         builder.addField("Link", "[MyAnimeList](" + anime.getUrl() + ")", false);
-        sendEmbed(event, builder, true, getEmbedColor());
+    }
+
+    private String getFormattedList(List<Nameable> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        List<String> strings = list.stream().map(Nameable::toString).toList();
+        return String.join(", ", strings);
+    }
+
+    private String getAnimeEpisodes(Anime anime) {
+        return anime.getEpisodes() == 0 ? "TBA" : String.valueOf(anime.getEpisodes());
+    }
+
+    private String getAnimeSeason(Anime anime) {
+        String season = anime.getSeason() == null ? "TBA" : anime.getSeason();
+        return Formatter.capitalize(season);
+    }
+
+    private String getFormattedScore(double score) {
+        return score == 0.0 ? "N/A" : String.valueOf(score);
+    }
+
+    private String getFormattedRank(int rank) {
+        return rank == 0 ? "N/A" : String.valueOf(rank);
     }
 }

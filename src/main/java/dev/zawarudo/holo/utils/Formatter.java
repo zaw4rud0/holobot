@@ -1,5 +1,7 @@
 package dev.zawarudo.holo.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -60,5 +62,16 @@ public final class Formatter {
      */
     public static String encodeUrl(String link) {
         return URLEncoder.encode(link, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Formats a Japanese name properly by reversing the order.
+     */
+    public static String reverseJapaneseName(@NotNull String name) {
+        String[] nameParts = name.split(",");
+        if (nameParts.length == 1) {
+            return name;
+        }
+        return nameParts[1].trim() + " " + nameParts[0].trim();
     }
 }
