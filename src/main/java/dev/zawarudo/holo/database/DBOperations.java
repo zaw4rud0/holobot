@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.database;
 
 import dev.zawarudo.holo.apis.xkcd.XkcdComic;
+import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.misc.Submission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -23,38 +24,21 @@ public final class DBOperations {
     private DBOperations() {
     }
 
-    private static final String INSERT_EMOTE_SQL = "INSERT INTO Emotes (emote_id, emote_name, is_animated, created_at, image_url) VALUES (?, ?, ?, ?, ?);";
-    private static final String INSERT_USER_SQL = "INSERT INTO DiscordUsers (user_id, username, discriminator, is_bot) VALUES (?, ?, ?, ?);";
-    private static final String UPDATE_USER_SQL = "UPDATE DiscordUsers SET username = ?, discriminator = ?, is_bot = ? WHERE user_id = ?;";
-    private static final String SELECT_USER_SQL = "SELECT * FROM DiscordUsers WHERE user_id = ?;";
-    private static final String INSERT_GUILD_SQL = "INSERT INTO DiscordGuilds (guild_id, guild_name, owner_id) VALUES (?, ?, ?);";
-    private static final String UPDATE_GUILD_SQL = "UPDATE DiscordGuilds SET guild_name = ?, owner_id = ? WHERE guild_id = ?;";
-    private static final String SELECT_GUILD_SQL = "SELECT * FROM DiscordGuilds WHERE guild_id = ?;";
-    private static final String INSERT_MEMBER_SQL = "INSERT INTO DiscordGuildUsers (guild_id, user_id) VALUES (?, ?);";
-    private static final String DELETE_MEMBER_SQL = "DELETE FROM DiscordGuildUsers WHERE guild_id = ? AND user_id = ?;";
-    private static final String DELETE_DUPLICATE_MEMBERS_SQL = "DELETE FROM DiscordGuildUsers WHERE ROWID NOT IN (SELECT min(ROWID) FROM DiscordGuildUsers GROUP BY guild_id, user_id);";
-    private static final String INSERT_NICKNAME_SQL = "INSERT INTO DiscordNicknames (nickname, user_id, guild_id) VALUES (?, ?, ?);";
-    private static final String INSERT_BLOCKED_IMAGE_SQL = "INSERT INTO BlockedImages (url, discord_user, date, reason) VALUES (?, ?, ?, ?);";
-    private static final String SELECT_BLOCKED_IMAGE_SQL = "SELECT * FROM BlockedImages;";
-    private static final String INSERT_XKCD_COMICS_SQL = "INSERT INTO XkcdComics (id, title, alt, img, day, month, year) VALUES (?, ?, ?, ?, ?, ?, ?);";
-    private static final String SELECT_XKCD_COMICS_SQL = "SELECT * FROM XkcdComics;";
-    private static final String INSERT_WAIFU_SQL = "INSERT INTO Gelbooru (id, tag, title) VALUES (?, ?, ?);";
-    private static final String INSERT_BLACKLISTED_USER_SQL = "INSERT INTO Blacklisted (user_id, reason, date) VALUES (?, ?, ?);";
-    private static final String INSERT_SUBMISSION_SQL = "INSERT INTO Submissions (type, user_id, text, date, guild_id, channel_id) VALUES (?, ?, ?, ?, ?, ?);";
-
     /**
      * Stores an emote into the database.
      */
     public static void insertEmote(CustomEmoji emote) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_EMOTE_SQL);
-        ps.setLong(1, emote.getIdLong());
-        ps.setString(2, emote.getName());
-        ps.setBoolean(3, emote.isAnimated());
-        ps.setString(4, emote.getTimeCreated().toString());
-        ps.setString(5, emote.getImageUrl());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, emote.getIdLong());
+            ps.setString(2, emote.getName());
+            ps.setBoolean(3, emote.isAnimated());
+            ps.setString(4, emote.getTimeCreated().toString());
+            ps.setString(5, emote.getImageUrl());
+            ps.execute();
+        }
         conn.close();
     }
 
@@ -62,37 +46,39 @@ public final class DBOperations {
      * Stores the emotes of the guild into the database.
      */
     public static void insertEmotes(List<RichCustomEmoji> emotes) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
+
         // Ids of emotes that are already in the database
         List<Long> existing = getEmoteIds();
 
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_EMOTE_SQL);
-        conn.setAutoCommit(false);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            conn.setAutoCommit(false);
 
-        int batchSize = 100;
-        int i = 0;
+            int batchSize = 100;
+            int i = 0;
 
-        for (CustomEmoji emote : emotes) {
-            // Skip emotes that are already in the database
-            if (existing.contains(emote.getIdLong())) {
-                continue;
+            for (CustomEmoji emote : emotes) {
+                // Skip emotes that are already in the database
+                if (existing.contains(emote.getIdLong())) {
+                    continue;
+                }
+                // Store emote information
+                ps.setLong(1, emote.getIdLong());
+                ps.setString(2, emote.getName());
+                ps.setBoolean(3, emote.isAnimated());
+                ps.setString(4, emote.getTimeCreated().toString());
+                ps.setString(5, emote.getImageUrl());
+                ps.addBatch();
+
+                if (++i % batchSize == 0) {
+                    ps.executeBatch();
+                    conn.commit();
+                }
             }
-            // Store emote information
-            ps.setLong(1, emote.getIdLong());
-            ps.setString(2, emote.getName());
-            ps.setBoolean(3, emote.isAnimated());
-            ps.setString(4, emote.getTimeCreated().toString());
-            ps.setString(5, emote.getImageUrl());
-            ps.addBatch();
-
-            if (++i % batchSize == 0) {
-                ps.executeBatch();
-                conn.commit();
-            }
+            ps.executeBatch();
+            conn.commit();
         }
-        ps.executeBatch();
-        conn.commit();
-        ps.close();
         conn.setAutoCommit(true);
         conn.close();
     }
@@ -103,30 +89,31 @@ public final class DBOperations {
     public static List<Long> getEmoteIds() throws SQLException {
         String sql = "SELECT emote_id FROM Emotes;";
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-
-        ResultSet rs = ps.executeQuery();
-        List<Long> ids = new ArrayList<>();
-        while (rs.next()) {
-            ids.add(rs.getLong(1));
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            List<Long> ids = new ArrayList<>();
+            while (rs.next()) {
+                ids.add(rs.getLong(1));
+            }
+            conn.close();
+            return ids;
         }
-        ps.close();
-        conn.close();
-        return ids;
     }
 
     /**
      * Inserts a user into the database. Note that this method doesn't check if a user is already in the DB.
      */
     public static void insertUser(User user) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-user");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_USER_SQL);
-        ps.setLong(1, user.getIdLong());
-        ps.setString(2, user.getName());
-        ps.setString(3, user.getDiscriminator());
-        ps.setBoolean(4, user.isBot());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, user.getIdLong());
+            ps.setString(2, user.getName());
+            ps.setString(3, user.getName());
+            ps.setBoolean(4, user.isBot());
+            ps.execute();
+        }
         conn.close();
     }
 
@@ -136,29 +123,32 @@ public final class DBOperations {
     public static List<Long> getUserIds() throws SQLException {
         String sql = "SELECT user_id FROM DiscordUsers;";
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql);
-
-        ResultSet rs = ps.executeQuery();
-        List<Long> ids = new ArrayList<>();
-        while (rs.next()) {
-            ids.add(rs.getLong(1));
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            List<Long> ids = new ArrayList<>();
+            while (rs.next()) {
+                ids.add(rs.getLong(1));
+            }
+            conn.close();
+            return ids;
         }
-        ps.close();
-        return ids;
     }
 
     /**
      * Updates a user in the database.
      */
     public static void updateUser(User user) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("update-user");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(UPDATE_USER_SQL);
-        ps.setString(1, user.getName());
-        ps.setString(2, user.getDiscriminator());
-        ps.setBoolean(3, user.isBot());
-        ps.setLong(4, user.getIdLong());
-        ps.executeUpdate();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, user.getName());
+            ps.setString(2, user.getName());
+            ps.setBoolean(3, user.isBot());
+            ps.setLong(4, user.getIdLong());
+            ps.executeUpdate();
+        }
+        conn.close();
     }
 
     /**
@@ -169,67 +159,78 @@ public final class DBOperations {
         if (!hasUser(member.getIdLong())) {
             insertUser(member.getUser());
         }
+
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-member");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_MEMBER_SQL);
-        ps.setLong(1, member.getGuild().getIdLong());
-        ps.setLong(2, member.getIdLong());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, member.getGuild().getIdLong());
+            ps.setLong(2, member.getIdLong());
+            ps.execute();
+        }
+        conn.close();
     }
 
     /**
      * Stores the members of a guild into the database.
      */
     public static void insertMembers(List<Member> members) throws SQLException {
+        String insertUserSql = Bootstrap.holo.getSQLManager().getStatement("insert-user");
+        String insertMemberSql = Bootstrap.holo.getSQLManager().getStatement("insert-member");
+
         // Ids of users that are already in the database
         List<Long> existing = getUserIds();
 
         Connection conn = Database.getConnection();
-        PreparedStatement psUser = conn.prepareStatement(INSERT_USER_SQL);
-        PreparedStatement psMember = conn.prepareStatement(INSERT_MEMBER_SQL);
         conn.setAutoCommit(false);
 
-        int batchSize = 100;
-        int i = 0;
+        try (PreparedStatement psUser = conn.prepareStatement(insertUserSql);
+        PreparedStatement psMember = conn.prepareStatement(insertMemberSql)) {
 
-        for (Member member : members) {
-            User user = member.getUser();
+            int batchSize = 100;
+            int i = 0;
 
-            if (!existing.contains(user.getIdLong())) {
-                // Store user
-                psUser.setLong(1, member.getUser().getIdLong());
-                psUser.setString(2, member.getUser().getName());
-                psUser.setString(3, member.getUser().getDiscriminator());
-                psUser.setBoolean(4, member.getUser().isBot());
-                psUser.addBatch();
+            for (Member member : members) {
+                User user = member.getUser();
+
+                if (!existing.contains(user.getIdLong())) {
+                    // Store user
+                    psUser.setLong(1, member.getUser().getIdLong());
+                    psUser.setString(2, member.getUser().getName());
+                    psUser.setString(3, member.getUser().getName());
+                    psUser.setBoolean(4, member.getUser().isBot());
+                    psUser.addBatch();
+                }
+                // Store member
+                psMember.setLong(1, member.getGuild().getIdLong());
+                psMember.setLong(2, member.getUser().getIdLong());
+                psMember.addBatch();
+
+                if (++i % batchSize == 0) {
+                    psUser.executeBatch();
+                    psMember.executeBatch();
+                    conn.commit();
+                }
             }
-            // Store member
-            psMember.setLong(1, member.getGuild().getIdLong());
-            psMember.setLong(2, member.getUser().getIdLong());
-            psMember.addBatch();
-
-            if (++i % batchSize == 0) {
-                psUser.executeBatch();
-                psMember.executeBatch();
-                conn.commit();
-            }
+            psUser.executeBatch();
+            psMember.executeBatch();
         }
-        psUser.executeBatch();
-        psMember.executeBatch();
-        conn.commit();
-        psUser.close();
-        psMember.close();
-        conn.setAutoCommit(true);
 
-        // TODO: Do it smarter
+        conn.commit();
+        conn.setAutoCommit(true);
+        conn.close();
+
         deleteDuplicateMemberUsers();
     }
 
     public static void deleteDuplicateMemberUsers() throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-duplicate-members");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(DELETE_DUPLICATE_MEMBERS_SQL);
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.execute();
+        }
+        conn.close();
     }
 
     /**
@@ -237,12 +238,15 @@ public final class DBOperations {
      * but not the user and guild entries themselves.
      */
     public static void deleteMember(Member member) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-member");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(DELETE_MEMBER_SQL);
-        ps.setLong(1, member.getGuild().getIdLong());
-        ps.setLong(2, member.getIdLong());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, member.getGuild().getIdLong());
+            ps.setLong(2, member.getIdLong());
+            ps.execute();
+        }
+        conn.close();
     }
 
     /**
@@ -252,39 +256,49 @@ public final class DBOperations {
         if (hasGuild(guild.getIdLong())) {
             return;
         }
+
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-guild");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_GUILD_SQL);
-        ps.setLong(1, guild.getIdLong());
-        ps.setString(2, guild.getName());
-        ps.setString(3, guild.getOwnerId());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, guild.getIdLong());
+            ps.setString(2, guild.getName());
+            ps.setString(3, guild.getOwnerId());
+            ps.execute();
+        }
+        conn.close();
     }
 
     /**
      * Updates a guild in the DB.
      */
     public static void updateGuild(Guild guild) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("update-guild");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(UPDATE_GUILD_SQL);
-        ps.setLong(1, guild.getIdLong());
-        ps.setString(2, guild.getName());
-        ps.setLong(3, guild.getOwnerIdLong());
-        ps.executeUpdate();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, guild.getIdLong());
+            ps.setString(2, guild.getName());
+            ps.setLong(3, guild.getOwnerIdLong());
+            ps.executeUpdate();
+        }
+        conn.close();
     }
 
     /**
      * Stores the nickname of a member.
      */
     public static void insertNickname(Member member) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-nickname");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_NICKNAME_SQL);
-        ps.setString(1, member.getNickname());
-        ps.setLong(2, member.getIdLong());
-        ps.setLong(3, member.getGuild().getIdLong());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, member.getNickname());
+            ps.setLong(2, member.getIdLong());
+            ps.setLong(3, member.getGuild().getIdLong());
+            ps.execute();
+        }
+        conn.close();
     }
 
     /**
@@ -294,8 +308,10 @@ public final class DBOperations {
      * @return True if the user is already stored in the DB, false otherwise.
      */
     public static boolean hasUser(long userId) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-user");
+
         try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_USER_SQL)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, userId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -310,8 +326,10 @@ public final class DBOperations {
      * @return True if the guild is already stored in the DB, false otherwise.
      */
     public static boolean hasGuild(long guildId) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-guild");
+
         try (Connection conn = Database.getConnection();
-             PreparedStatement ps = conn.prepareStatement(SELECT_GUILD_SQL)) {
+             PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, guildId);
             try (ResultSet rs = ps.executeQuery()) {
                 return rs.next();
@@ -323,73 +341,87 @@ public final class DBOperations {
      * Returns a list of blocked images from the DB.
      */
     public static List<String> getBlockedImages() throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-all-blocked-images");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(SELECT_BLOCKED_IMAGE_SQL);
-        List<String> result = new ArrayList<>();
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            result.add(rs.getString("url"));
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            List<String> result = new ArrayList<>();
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                result.add(rs.getString("url"));
+            }
+            conn.close();
+            return result;
         }
-        ps.close();
-        return result;
     }
 
     /**
      * Inserts a new blocked image into the DB.
      */
     public static void insertBlockedImage(String image, long userId, String date, String reason) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-blocked-image");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_BLOCKED_IMAGE_SQL);
-        ps.setString(1, image);
-        ps.setLong(2, userId);
-        ps.setString(3, date);
-        ps.setString(4, reason);
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, image);
+            ps.setLong(2, userId);
+            ps.setString(3, date);
+            ps.setString(4, reason);
+            ps.execute();
+        }
+        conn.close();
     }
 
     /**
      * Returns a list of xkcd comics from the DB.
      */
     public static List<XkcdComic> getXkcdComics() throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-all-xkcd-comics");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(SELECT_XKCD_COMICS_SQL);
-        List<XkcdComic> result = new ArrayList<>();
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            XkcdComic comic = new XkcdComic();
-            comic.setIssueNr(rs.getInt("id"));
-            comic.setTitle(rs.getString("title"));
-            comic.setImg(rs.getString("img"));
-            comic.setAlt(rs.getString("alt"));
-            comic.setDate(rs.getInt("day"), rs.getInt("month"), rs.getInt("year"));
-            result.add(comic);
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            List<XkcdComic> result = new ArrayList<>();
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                XkcdComic comic = new XkcdComic();
+                comic.setIssueNr(rs.getInt("id"));
+                comic.setTitle(rs.getString("title"));
+                comic.setImg(rs.getString("img"));
+                comic.setAlt(rs.getString("alt"));
+                comic.setDate(rs.getInt("day"), rs.getInt("month"), rs.getInt("year"));
+                result.add(comic);
+            }
+            conn.close();
+            return result;
         }
-        ps.close();
-        return result;
     }
 
     /**
      * Inserts a list of xkcd comics into the DB.
      */
     public static void insertXkcdComics(List<XkcdComic> comics) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-xkcd-comic");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_XKCD_COMICS_SQL);
         conn.setAutoCommit(false);
-        for (XkcdComic comic : comics) {
-            ps.setInt(1, comic.getIssueNr());
-            ps.setString(2, comic.getTitle());
-            ps.setString(3, comic.getAlt());
-            ps.setString(4, comic.getImg());
-            ps.setInt(5, comic.getDay());
-            ps.setInt(6, comic.getMonth());
-            ps.setInt(7, comic.getYear());
-            ps.addBatch();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            for (XkcdComic comic : comics) {
+                ps.setInt(1, comic.getIssueNr());
+                ps.setString(2, comic.getTitle());
+                ps.setString(3, comic.getAlt());
+                ps.setString(4, comic.getImg());
+                ps.setInt(5, comic.getDay());
+                ps.setInt(6, comic.getMonth());
+                ps.setInt(7, comic.getYear());
+                ps.addBatch();
+            }
+            ps.executeBatch();
+            conn.commit();
         }
-        ps.executeBatch();
-        conn.commit();
-        ps.close();
+
         conn.setAutoCommit(true);
+        conn.close();
     }
 
     /**
@@ -400,13 +432,15 @@ public final class DBOperations {
      * @param title Title of the embed.
      */
     public static void insertWaifu(String name, String tag, String title) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-waifu");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_WAIFU_SQL);
-        ps.setString(1, name);
-        ps.setString(2, tag);
-        ps.setString(3, title);
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, name);
+            ps.setString(2, tag);
+            ps.setString(3, title);
+            ps.execute();
+        }
     }
 
     /**
@@ -414,20 +448,24 @@ public final class DBOperations {
      */
     public static List<String> getWaifuNames() throws SQLException {
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT id FROM Gelbooru;");
-        ResultSet rs = ps.executeQuery();
-        List<String> ids = new ArrayList<>();
-        while (rs.next()) {
-            ids.add(rs.getString("Id"));
+        try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM Gelbooru;")) {
+            ResultSet rs = ps.executeQuery();
+            List<String> ids = new ArrayList<>();
+            while (rs.next()) {
+                ids.add(rs.getString("Id"));
+            }
+            return ids;
         }
-        ps.close();
-        return ids;
     }
 
     /**
      * Returns a set of waifu entries from the DB.
      */
     public static ResultSet getWaifu(String name) throws SQLException {
+
+        // TODO: Return a list of waifu objects instead of a ResultSet.
+        //  That should decrease dependency and cohesion
+
         Connection conn = Database.getConnection();
         PreparedStatement ps = conn.prepareStatement("SELECT * FROM Gelbooru WHERE id = ?;");
         ps.setString(1, name);
@@ -442,13 +480,15 @@ public final class DBOperations {
      * @param reason The reason why the user was blacklisted.
      */
     public static void insertBlacklistedUser(long userId, String date, String reason) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-blacklisted-user");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_BLACKLISTED_USER_SQL);
-        ps.setLong(1, userId);
-        ps.setString(2, reason);
-        ps.setString(3, date);
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, userId);
+            ps.setString(2, reason);
+            ps.setString(3, date);
+            ps.execute();
+        }
     }
 
     /**
@@ -457,30 +497,34 @@ public final class DBOperations {
      * @return A {@link List} of ids of the blacklisted {@link User}s.
      */
     public static List<Long> getBlacklistedUsers() throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-blacklisted-user");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM Blacklisted;");
-        ResultSet rs = ps.executeQuery();
-        List<Long> ids = new ArrayList<>();
-        while (rs.next()) {
-            ids.add(rs.getLong("user_id"));
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ResultSet rs = ps.executeQuery();
+            List<Long> ids = new ArrayList<>();
+            while (rs.next()) {
+                ids.add(rs.getLong("user_id"));
+            }
+            return ids;
         }
-        ps.close();
-        return ids;
     }
 
     /**
      * Inserts a bug report or a suggestion into the database.
      */
     public static void insertSubmission(Submission submission) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-submission");
+
         Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement(INSERT_SUBMISSION_SQL);
-        ps.setString(1, "bug report");
-        ps.setString(2, submission.getAuthorId());
-        ps.setString(3, submission.getMessage());
-        ps.setString(4, submission.getDate());
-        ps.setString(5, submission.getGuildId());
-        ps.setString(6, submission.getChannelId());
-        ps.execute();
-        ps.close();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, "bug report");
+            ps.setString(2, submission.getAuthorId());
+            ps.setString(3, submission.getMessage());
+            ps.setString(4, submission.getDate());
+            ps.setString(5, submission.getGuildId());
+            ps.setString(6, submission.getChannelId());
+            ps.execute();
+        }
     }
 }

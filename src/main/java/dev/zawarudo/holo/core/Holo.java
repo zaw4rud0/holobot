@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.core;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.games.akinator.AkinatorManager;
 import dev.zawarudo.holo.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.config.BotConfig;
@@ -21,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.LoginException;
+import java.io.IOException;
 import java.util.EnumSet;
 
 /**
@@ -36,11 +37,13 @@ public class Holo extends ListenerAdapter {
     private PermissionManager permissionManager;
     private PokemonSpawnManager pokemonSpawnManager;
     private AkinatorManager akinatorManager;
+    private SQLManager sqlManager;
+
     private final EventWaiter waiter;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Holo.class);
 
-    public Holo(BotConfig botConfig) throws LoginException {
+    public Holo(BotConfig botConfig) {
         this.botConfig = botConfig;
         waiter = new EventWaiter();
         init();
@@ -68,6 +71,11 @@ public class Holo extends ListenerAdapter {
         akinatorManager = new AkinatorManager(waiter);
         commandManager = new CommandManager(waiter);
         permissionManager = new PermissionManager();
+        try {
+            sqlManager = new SQLManager();
+        } catch (IOException e) {
+            throw new IllegalStateException("Something went wrong while registering SQLManager", e);
+        }
     }
 
     public void registerListeners() {
@@ -107,13 +115,17 @@ public class Holo extends ListenerAdapter {
         return akinatorManager;
     }
 
+    public SQLManager getSQLManager() {
+        return sqlManager;
+    }
+
     @Override
     public void onReady(@NotNull ReadyEvent event) {
         Bootstrap.holo.registerManagers();
         Bootstrap.holo.registerListeners();
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} is ready!", event.getJDA().getSelfUser().getAsTag());
+            LOGGER.info("{} is ready!", event.getJDA().getSelfUser().getName());
         }
     }
 }
