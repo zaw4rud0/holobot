@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.general;
 
 import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,6 +21,7 @@ import java.util.stream.Collectors;
 
 // TODO: Refactor class, split each part into separate methods
 
+@Deactivated
 @Command(name = "roleinfo",
         description = "Shows information about a role.",
         usage = "<role name, id or mention>",
