@@ -497,7 +497,7 @@ public final class DBOperations {
      * @return A {@link List} of ids of the blacklisted {@link User}s.
      */
     public static List<Long> getBlacklistedUsers() throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("select-blacklisted-user");
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-all-blacklisted-users");
 
         Connection conn = Database.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {

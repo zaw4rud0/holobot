@@ -66,16 +66,17 @@ public class Holo extends ListenerAdapter {
     }
 
     public void registerManagers() {
-        guildConfigManager = new GuildConfigManager();
-        pokemonSpawnManager = new PokemonSpawnManager(jda);
-        akinatorManager = new AkinatorManager(waiter);
-        commandManager = new CommandManager(waiter);
-        permissionManager = new PermissionManager();
         try {
             sqlManager = new SQLManager();
         } catch (IOException e) {
             throw new IllegalStateException("Something went wrong while registering SQLManager", e);
         }
+
+        guildConfigManager = new GuildConfigManager();
+        pokemonSpawnManager = new PokemonSpawnManager(jda);
+        akinatorManager = new AkinatorManager(waiter);
+        commandManager = new CommandManager(waiter);
+        permissionManager = new PermissionManager();
     }
 
     public void registerListeners() {
