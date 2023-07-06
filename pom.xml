@@ -4,16 +4,16 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.zawarudo</groupId>
     <artifactId>holobot</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.7</version>
     <name>HoloBot</name>
     <description>Java Discord Bot</description>
     <packaging>jar</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>17</maven.compiler.source>
-        <maven.compiler.target>17</maven.compiler.target>
-        <java.version>17</java.version>
+        <maven.compiler.source>20</maven.compiler.source>
+        <maven.compiler.target>20</maven.compiler.target>
+        <java.version>20</java.version>
     </properties>
 
     <build>
@@ -66,7 +66,7 @@
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>nanojikan</artifactId>
-            <version>1.0.1</version>
+            <version>1.0.2</version>
         </dependency>
 
         <!-- Lightweight package for using the PokeAPI written by myself -->
@@ -92,7 +92,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.6</version>
+            <version>5.0.0-beta.12</version>
         </dependency>
 
         <!-- Maintained version of JDA Utilities -->
@@ -111,7 +111,7 @@
             <version>2.10.1</version>
         </dependency>
 
-        <!-- Guava -->
+        <!-- Guava, provides a RateLimiter -->
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
@@ -122,14 +122,14 @@
         <dependency>
             <groupId>com.github.markozajc</groupId>
             <artifactId>akiwrapper</artifactId>
-            <version>1.5.2</version>
+            <version>1.5.2-2</version>
         </dependency>
 
         <!-- LavaPlayer -->
         <dependency>
             <groupId>com.github.walkyst</groupId>
             <artifactId>lavaplayer-fork</artifactId>
-            <version>1.4.0</version>
+            <version>1.4.2</version>
         </dependency>
 
         <!-- Jsoup HTML parser -->
@@ -143,7 +143,7 @@
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>
-            <version>3.40.1.0</version>
+            <version>3.42.0.0</version>
         </dependency>
 
         <!-- JLyrics to browse lyrics and song information -->
@@ -157,12 +157,12 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-core</artifactId>
-            <version>1.4.6</version>
+            <version>1.4.7</version>
         </dependency>
         <dependency>
             <groupId>org.slf4j</groupId>
@@ -181,11 +181,10 @@
             <artifactId>imageio-tiff</artifactId>
             <version>3.9.3</version>
         </dependency>
-
         <dependency>
-            <groupId>org.bytedeco</groupId>
-            <artifactId>javacv-platform</artifactId>
-            <version>1.5.8</version>
+            <groupId>org.sejda.imageio</groupId>
+            <artifactId>webp-imageio</artifactId>
+            <version>0.1.6</version>
         </dependency>
 
         <dependency>
