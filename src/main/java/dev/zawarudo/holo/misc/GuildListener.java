@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameE
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
-import net.dv8tion.jda.api.events.user.update.UserUpdateDiscriminatorEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -35,16 +34,18 @@ public class GuildListener extends ListenerAdapter {
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         try {
+            logInfo("Joined a new guild ({}). Saving members and emotes...", event.getGuild());
+
             // Store members
             DBOperations.insertMembers(event.getGuild().getMembers());
             // Store guild information
             DBOperations.insertGuild(event.getGuild());
             // Store emotes of the guild
             DBOperations.insertEmotes(event.getGuild().getEmojis());
+
+            logInfo("Saving successful for guild ({})", event.getGuild());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing the server in the DB.", ex);
-            }
+            logError("Something went wrong while storing the server in the DB.", ex);
         }
     }
 
@@ -56,9 +57,7 @@ public class GuildListener extends ListenerAdapter {
         try {
             DBOperations.insertMember(event.getMember());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing a new member in the DB.", ex);
-            }
+            logError("Something went wrong while storing a new member in the DB.", ex);
         }
     }
 
@@ -72,9 +71,7 @@ public class GuildListener extends ListenerAdapter {
                 DBOperations.deleteMember(event.getMember());
             }
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while removing the guild member from the DB.", ex);
-            }
+            logError("Something went wrong while removing the guild member from the DB.", ex);
         }
     }
 
@@ -86,9 +83,7 @@ public class GuildListener extends ListenerAdapter {
         try {
             DBOperations.insertNickname(event.getMember());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing the new nickname of a member in the DB.", ex);
-            }
+            logError("Something went wrong while storing the new nickname of a member in the DB.", ex);
         }
     }
 
@@ -100,9 +95,7 @@ public class GuildListener extends ListenerAdapter {
         try {
             DBOperations.insertEmote(event.getEmoji());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing the new emoji in the DB.", ex);
-            }
+            logError("Something went wrong while storing the new emoji in the DB.", ex);
         }
     }
 
@@ -114,9 +107,7 @@ public class GuildListener extends ListenerAdapter {
         try {
             DBOperations.updateGuild(event.getGuild());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing the new guild owner in the DB.", ex);
-            }
+            logError("Something went wrong while storing the new guild owner in the DB.", ex);
         }
     }
 
@@ -128,9 +119,7 @@ public class GuildListener extends ListenerAdapter {
         try {
             DBOperations.updateGuild(event.getGuild());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing the new guild name in the DB.", ex);
-            }
+            logError("Something went wrong while storing the new guild name in the DB.", ex);
         }
     }
 
@@ -156,6 +145,8 @@ public class GuildListener extends ListenerAdapter {
         AudioChannelUnion botVoice = event.getGuild().getSelfMember().getVoiceState().getChannel();
 
         if (event.getChannelLeft().equals(botVoice) && botVoice.getMembers().size() <= 1) {
+            logInfo("No one is in the voice channel anymore. Leaving it...");
+
             GuildMusicManager musicManager = PlayerManager.getInstance().getMusicManager(event.getGuild());
             musicManager.clear();
             event.getGuild().getAudioManager().closeAudioConnection();
@@ -170,23 +161,19 @@ public class GuildListener extends ListenerAdapter {
         try {
             DBOperations.updateUser(event.getUser());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while the new username in the DB.", ex);
-            }
+            logError("Something went wrong while the new username in the DB.", ex);
         }
     }
 
-    /**
-     * Event that is fired when a user changes their discriminator.
-     */
-    @Override
-    public void onUserUpdateDiscriminator(@Nonnull UserUpdateDiscriminatorEvent event) {
-        try {
-            DBOperations.updateUser(event.getUser());
-        } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while storing the new discriminator of an user in the DB.", ex);
-            }
+    private void logInfo(String msg, Object... args) {
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info(msg, args);
+        }
+    }
+
+    private void logError(String msg, Throwable t) {
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error(msg, t);
         }
     }
 }
