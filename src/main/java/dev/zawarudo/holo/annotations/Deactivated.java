@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 
 /**
  * Annotation to show that an {@link AbstractCommand} has been deactivated
- * and shouldn't be registered.
+ * and shouldn't be registered on start-up.
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
