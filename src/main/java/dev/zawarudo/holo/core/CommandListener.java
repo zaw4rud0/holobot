@@ -44,12 +44,12 @@ public class CommandListener extends ListenerAdapter {
 		// Action cmd has been called
 		ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
 		if (actionCmd.isAction(invoke)) {
+			if (LOGGER.isInfoEnabled()) {
+				LOGGER.info("{} has called action ({})", e.getAuthor(), invoke);
+			}
+
 			actionCmd.args = Arrays.copyOfRange(split, 1, split.length);
 			actionCmd.displayAction(e, actionCmd.getAction(invoke));
-
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info(e.getAuthor() + " has called action");
-			}
 		}
 
 		// No valid command
@@ -65,7 +65,7 @@ public class CommandListener extends ListenerAdapter {
 		}
 
 		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info(e.getAuthor() + " has called " + cmd.getName());
+			LOGGER.info("{} has called {}", e.getAuthor(), cmd.getName());
 		}
 
 		cmd.args = Arrays.copyOfRange(split, 1, split.length);
