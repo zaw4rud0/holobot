@@ -7,7 +7,6 @@ import dev.zawarudo.holo.config.BotConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.LoginException;
 import java.io.IOException;
 
 /**
@@ -39,7 +38,7 @@ public final class Bootstrap {
         try {
             BotConfig botConfig = initializeConfig();
             holo = new Holo(botConfig);
-        } catch (IOException | LoginException ex) {
+        } catch (IOException ex) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(ex.getMessage(), ex);
             }
@@ -48,7 +47,7 @@ public final class Bootstrap {
         long totalTime = System.currentTimeMillis() - startupTime;
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info(String.format("It took %s %d ms to load!", holo.getJDA().getSelfUser().getAsTag(), totalTime));
+            LOGGER.info(String.format("It took %s %d ms to load!", holo.getJDA().getSelfUser().getName(), totalTime));
         }
     }
 
