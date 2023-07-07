@@ -44,7 +44,7 @@ public class WhoisCmd extends AbstractCommand {
 		}
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
+		builder.setTitle("@" + user.getName() + " (" + user.getIdLong() + ")");
 		builder.setThumbnail(user.getEffectiveAvatarUrl());
 
 		Member member = getMember(e, user);
@@ -145,7 +145,8 @@ public class WhoisCmd extends AbstractCommand {
 			return e.getAuthor();
 		}
 		try {
-			long id = Long.parseLong(args[0].replace("<", "")
+			long id = Long.parseLong(args[0]
+					.replace("<", "")
 					.replace(">", "")
 					.replace("!", "")
 					.replace("@", ""));
