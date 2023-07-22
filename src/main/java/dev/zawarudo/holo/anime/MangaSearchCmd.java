@@ -188,7 +188,13 @@ public class MangaSearchCmd extends AbstractCommand {
         builder.addField("Status", manga.getStatus(), true);
         int chapters = manga.getChapters();
         int volumes = manga.getVolumes();
-        builder.addField("Chapters", formatChapters(chapters, volumes), true);
+
+        if (manga.getType().equals("Light Novel")) {
+            builder.addField("Volumes", formatChapters(chapters, volumes), true);
+        } else {
+            builder.addField("Chapters", formatChapters(chapters, volumes), true);
+        }
+
         builder.addBlankField(true);
 
         builder.addField("MAL Score", formatScore(manga.getScore()), true);
