@@ -45,7 +45,7 @@ public class WhoisCmd extends AbstractCommand {
 
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle("@" + user.getName() + " (" + user.getIdLong() + ")");
-		builder.setThumbnail(user.getEffectiveAvatarUrl());
+		builder.setThumbnail(user.getEffectiveAvatarUrl() + "?size=1024");
 
 		Member member = getMember(e, user);
 
