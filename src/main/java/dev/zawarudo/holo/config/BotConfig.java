@@ -11,11 +11,13 @@ public class BotConfig {
     @SerializedName("owner_id")
     private long ownerId;
 
-    // External settings
+    // External settings and tokens
     @SerializedName("deepAI_token")
     private String deepAIKey;
     @SerializedName("aoc_token")
     private String aocToken;
+    @SerializedName("saucenao_token")
+    private String saucenaoToken;
 
     // Minor bot properties
     @SerializedName("default_prefix")
@@ -61,6 +63,13 @@ public class BotConfig {
      */
     public String getAoCToken() {
         return aocToken;
+    }
+
+    /**
+     * Returns the token of SauceNAO.
+     */
+    public String getSaucenaoToken() {
+        return saucenaoToken;
     }
 
     /**

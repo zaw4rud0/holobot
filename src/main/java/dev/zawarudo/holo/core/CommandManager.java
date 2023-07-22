@@ -4,6 +4,9 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.anime.AnimeSearchCmd;
 import dev.zawarudo.holo.anime.MangaSearchCmd;
 import dev.zawarudo.holo.annotations.Deactivated;
+import dev.zawarudo.holo.experimental.ChatCmdOld;
+import dev.zawarudo.holo.experimental.ConfigCmd;
+import dev.zawarudo.holo.experimental.SauceNAOCmd;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
 import dev.zawarudo.holo.fun.UwuCmd;
@@ -39,6 +42,7 @@ import dev.zawarudo.holo.music.cmds.ClearCmd;
 import dev.zawarudo.holo.music.cmds.CloneCmd;
 import dev.zawarudo.holo.music.cmds.JoinCmd;
 import dev.zawarudo.holo.music.cmds.LeaveCmd;
+import dev.zawarudo.holo.music.cmds.LoopCmd;
 import dev.zawarudo.holo.music.cmds.LyricsCmd;
 import dev.zawarudo.holo.music.cmds.NowPlayingCmd;
 import dev.zawarudo.holo.music.cmds.PlayCmd;
@@ -80,7 +84,7 @@ public class CommandManager extends ListenerAdapter {
 
         // General Cmds
         addCommand(new BugCmd());
-//		addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
+		addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -101,7 +105,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new CloneCmd());
         addCommand(new JoinCmd());
         addCommand(new LeaveCmd());
-//		addCommand(new LoopCmd());
+		addCommand(new LoopCmd());
         addCommand(new LyricsCmd());
         addCommand(new NowPlayingCmd());
         addCommand(new PlayCmd());
@@ -155,6 +159,8 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new StatusCmd());
 
         // Experimental Cmds
+        addCommand(new ChatCmdOld());
+        addCommand(new SauceNAOCmd());
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Loaded {} commands!", commands.values().stream().distinct().count());
@@ -209,12 +215,12 @@ public class CommandManager extends ListenerAdapter {
      */
     public List<AbstractCommand> getCommands(CommandCategory category) {
         // LinkedHashSet so the list keeps the item insertion order
-        Set<AbstractCommand> commands = new LinkedHashSet<>();
+        Set<AbstractCommand> cmdSet = new LinkedHashSet<>();
         for (AbstractCommand cmd : this.commands.values()) {
             if (cmd.getCategory() == category) {
-                commands.add(cmd);
+                cmdSet.add(cmd);
             }
         }
-        return new ArrayList<>(commands);
+        return new ArrayList<>(cmdSet);
     }
 }
