@@ -136,6 +136,17 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * Sends an embed as a reply to a given message.
+     */
+    protected void replyEmbed(MessageReceivedEvent event, Message message, EmbedBuilder embedBuilder, boolean footer, Color embedColor) {
+        if (footer) {
+            addFooter(event, embedBuilder);
+        }
+        embedBuilder.setColor(embedColor);
+        message.replyEmbeds(embedBuilder.build()).queue();
+    }
+
+    /**
      * Sends an embed stating that an error occurred with some information.
      */
     protected void sendErrorEmbed(MessageReceivedEvent event, String message) {

@@ -9,6 +9,7 @@ import dev.zawarudo.holo.experimental.ConfigCmd;
 import dev.zawarudo.holo.experimental.SauceNAOCmd;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
+import dev.zawarudo.holo.fun.UrbanDictionaryCmd;
 import dev.zawarudo.holo.fun.UwuCmd;
 import dev.zawarudo.holo.games.pokemon.CatchCmd;
 import dev.zawarudo.holo.games.pokemon.PokedexCmd;
@@ -144,6 +145,7 @@ public class CommandManager extends ListenerAdapter {
         // Misc Cmds
         addCommand(new Magic8BallCmd());
         addCommand(new CoinFlipCmd());
+        addCommand(new UrbanDictionaryCmd());
         addCommand(new UwuCmd());
 
         // Owner Cmds
