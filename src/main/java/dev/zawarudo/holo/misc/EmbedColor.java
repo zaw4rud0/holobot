@@ -22,7 +22,8 @@ public enum EmbedColor {
     /** The color of MyAnimeList. */
     MAL(new Color(46, 81, 162)),
     WHITE(Color.WHITE),
-    LIGHT_GRAY(Color.LIGHT_GRAY);
+    LIGHT_GRAY(Color.LIGHT_GRAY),
+    URBAN(new Color(27, 41, 54));
 
     private final Color color;
 
