@@ -9,7 +9,8 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 
 public class CountThreadListener extends ListenerAdapter {
-    private static int lastSent;
+    private static int lastSent, interruptCount = 60;
+    private static boolean spamPingProtection = false;
     private static ThreadChannel thread;
     public static String listenTo = "820098162013503498";
 
@@ -41,6 +42,22 @@ public class CountThreadListener extends ListenerAdapter {
                         lastSent = nextNumber;
                     }
                 } catch (Exception ignored) {}
+            }
+
+	    	if (interruptCount < 60) {
+                interruptCount++;
+            } else {
+				spamPingProtection = false;
+			}
+        } else if (event.getChannel().getId().equals("819966095070330950")) {
+            if (!spamPingProtection && --interruptCount <= 0) {
+                String botId = thread.getHistory().retrievePast(1).complete().get(0).getAuthor().getId();
+                
+				if (botId.equals(listenTo)) {
+                    checkRecentMessages();
+                }
+
+				spamPingProtection = true;
             }
         }
     }
