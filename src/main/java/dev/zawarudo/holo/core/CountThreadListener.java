@@ -44,7 +44,7 @@ public class CountThreadListener extends ListenerAdapter {
                         lastSent = nextNumber;
                     }
                 } catch (Exception ignored) {
-                    event.getJDA().getGuildById("747752542741725244").getTextChannelById("768600365602963496").sendMessage("<@858053151452823563> look, an exception. <@223932775474921472> :DinkDonk:").queue();
+                    event.getJDA().getGuildById("747752542741725244").getTextChannelById("768600365602963496").sendMessage("<@858053151452823563> look, an exception. <a:dinkdonk:1034953193307766894>").queue();
                     event.getJDA().getGuildById("747752542741725244").getTextChannelById("768600365602963496").sendMessage(ignored.toString().substring(0, 1990)).queue();
                 }
             }
