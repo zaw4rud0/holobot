@@ -84,8 +84,7 @@ public class Holo extends ListenerAdapter {
                 new CommandListener(commandManager, permissionManager),
                 new BotHandler(),
                 new MiscListener(),
-                new GuildListener(),
-                new CountThreadListener()
+                new GuildListener()
         );
     }
 
