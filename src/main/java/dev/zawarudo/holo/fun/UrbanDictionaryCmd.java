@@ -124,7 +124,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
     }
 
     /**
-     * Turns HTML links into markdown links.
+     * Turns HTML links into markdown links so they can be displayed properly in a Discord embed.
      */
     private void sanitizeLinks(@NotNull Element element) {
         for (Element child : element.children()) {
