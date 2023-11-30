@@ -15,6 +15,7 @@ import dev.zawarudo.nanojikan.model.Manga;
 import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -154,11 +155,14 @@ public class MangaSearchCmd extends AbstractCommand {
     private EmbedBuilder createEmbedBuilder(Manga manga) {
         EmbedBuilder builder = new EmbedBuilder();
         String type = manga.getType() == null ? "null" : manga.getType();
-        String title = String.format("%s [%s]", manga.getTitle(), type);
-        builder.setTitle(title);
+
+        String title = Formatter.truncateString(manga.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
+        builder.setTitle(String.format("%s [%s]", title, type));
+
         builder.setThumbnail(manga.getImages().getJpg().getLargeImage());
         if (manga.hasSynopsis()) {
-            builder.setDescription(manga.getSynopsis());
+            String synopsis = Formatter.truncateString(manga.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            builder.setDescription(synopsis);
         }
         return builder;
     }

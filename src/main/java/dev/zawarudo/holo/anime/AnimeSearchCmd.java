@@ -15,6 +15,7 @@ import dev.zawarudo.nanojikan.model.Anime;
 import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -154,11 +155,14 @@ public class AnimeSearchCmd extends AbstractCommand {
     private EmbedBuilder createEmbedBuilder(Anime anime) {
         EmbedBuilder builder = new EmbedBuilder();
         String type = anime.getType() == null ? "null" : anime.getType();
-        String title = String.format("%s [%s]", anime.getTitle(), type);
-        builder.setTitle(title);
+
+        String title = Formatter.truncateString(anime.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
+        builder.setTitle(String.format("%s [%s]", title, type));
+
         builder.setThumbnail(anime.getImages().getJpg().getLargeImage());
         if (anime.hasSynopsis()) {
-            builder.setDescription(anime.getSynopsis());
+            String synopsis = Formatter.truncateString(anime.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            builder.setDescription(synopsis);
         }
         return builder;
     }
