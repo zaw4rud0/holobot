@@ -1,8 +1,5 @@
 package dev.zawarudo.holo.games.akinator;
 
-import com.github.markozajc.akiwrapper.Akiwrapper;
-import com.github.markozajc.akiwrapper.AkiwrapperBuilder;
-import com.github.markozajc.akiwrapper.core.exceptions.ServerNotFoundException;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.misc.EmbedColor;
@@ -10,6 +7,9 @@ import dev.zawarudo.holo.misc.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.eu.zajc.akiwrapper.Akiwrapper;
+import org.eu.zajc.akiwrapper.AkiwrapperBuilder;
+import org.eu.zajc.akiwrapper.core.exceptions.ServerNotFoundException;
 
 import java.util.ArrayList;
 import java.util.List;

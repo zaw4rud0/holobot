@@ -1,6 +1,5 @@
 package dev.zawarudo.holo.games.akinator;
 
-import com.github.markozajc.akiwrapper.core.entities.Server;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
@@ -8,6 +7,7 @@ import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.misc.EmbedColor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.eu.zajc.akiwrapper.core.entities.Server;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Locale;
