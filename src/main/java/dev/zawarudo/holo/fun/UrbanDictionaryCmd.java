@@ -64,6 +64,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
             return;
         }
 
+        // TODO: Allow users to select a different definition
         EmbedBuilder builder = createUrbanEmbed(entries.get(0));
         replyEmbed(event, event.getMessage(), builder, false, getEmbedColor());
     }
@@ -124,7 +125,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
     }
 
     /**
-     * Turns HTML links into markdown links so they can be displayed properly in a Discord embed.
+     * Turns HTML links into Markdown links, so they can be displayed properly in a Discord embed.
      */
     private void sanitizeLinks(@NotNull Element element) {
         for (Element child : element.children()) {
