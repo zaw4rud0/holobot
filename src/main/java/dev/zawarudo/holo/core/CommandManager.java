@@ -27,6 +27,7 @@ import dev.zawarudo.holo.general.ServerRolesCmd;
 import dev.zawarudo.holo.general.SuggestionCmd;
 import dev.zawarudo.holo.general.WhoisCmd;
 import dev.zawarudo.holo.image.ActionCmd;
+import dev.zawarudo.holo.image.AoCStatsCmd;
 import dev.zawarudo.holo.image.AvatarCmd;
 import dev.zawarudo.holo.image.BannerCmd;
 import dev.zawarudo.holo.image.CheckNSFWCmd;
@@ -117,7 +118,7 @@ public class CommandManager extends ListenerAdapter {
 
         // Image Cmds
         addCommand(new ActionCmd());
-//		addCommand(new AoCStatsCmd());
+		addCommand(new AoCStatsCmd());
         addCommand(new AvatarCmd());
         addCommand(new BannerCmd());
         addCommand(new BlockCmd());
