@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.image;
 
-import dev.zawarudo.graph.AdventOfCodeGraph;
+import dev.zawarudo.aoc_utils.graph.AdventOfCodeGraph;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
@@ -23,17 +23,18 @@ import java.time.format.DateTimeFormatter;
         category = CommandCategory.IMAGE)
 public class AoCStatsCmd extends AbstractCommand {
 
-    private static final Color DISCORD_BACKGROUND = new Color(49, 51, 56);
-
     private static final int LEADERBOARD_ID = 1514956;
     private static final int YEAR = 2023;
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
+        deleteInvoke(event);
+        sendTyping(event);
+
         String token = Bootstrap.holo.getConfig().getAoCToken();
         AdventOfCodeGraph graph = new AdventOfCodeGraph(YEAR, LEADERBOARD_ID, token);
-        graph.setBackground(DISCORD_BACKGROUND);
-        BufferedImage image = graph.generateGraph();
+        graph.setBackground(Color.decode("#0F0F23"));
+        BufferedImage image = graph.generateImage();
 
         String name = String.format("aoc_%s.png", getCurrentDateTime());
 
