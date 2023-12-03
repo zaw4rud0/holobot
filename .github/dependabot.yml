@@ -1,13 +1,9 @@
 version: 2
 updates:
   - package-ecosystem: maven
-    directory: "/" # Location of package manifests
+    directory: "/" # pom.xml file is in the project root folder
     schedule:
       interval: "weekly"
     commit-message:
       prefix: "mvn"
-  # Maintain dependencies for GitHub Actions
-  - package-ecosystem: "github-actions"
-    directory: "/"
-    schedule:
-      interval: "weekly"
+    open-pull-requests-limit: 25 # Maximum number of open pull requests
