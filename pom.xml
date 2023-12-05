@@ -28,7 +28,9 @@
         <plugins>
             <!-- Exclude the default JAR plugin from executing in the package phase. This way it doesn't generate a jar without dependencies -->
             <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -93,7 +95,7 @@
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>aoc-utils</artifactId>
-            <version>1.0.5</version>
+            <version>1.0.0</version>
         </dependency>
 
         <dependency>
