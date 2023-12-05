@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.image;
 
 import dev.zawarudo.aoc_utils.graph.AdventOfCodeGraph;
+import dev.zawarudo.aoc_utils.graph.ChartType;
 import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
@@ -32,7 +33,7 @@ public class AoCStatsCmd extends AbstractCommand {
         sendTyping(event);
 
         String token = Bootstrap.holo.getConfig().getAoCToken();
-        AdventOfCodeGraph graph = new AdventOfCodeGraph(YEAR, LEADERBOARD_ID, token);
+        AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, YEAR, LEADERBOARD_ID, token);
         graph.setBackground(Color.decode("#0F0F23"));
         BufferedImage image = graph.generateImage();
 

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.zawarudo</groupId>
     <artifactId>holobot</artifactId>
-    <version>3.0.12</version>
+    <version>3.0.13</version>
     <name>HoloBot</name>
     <description>Java Discord Bot</description>
     <packaging>jar</packaging>
@@ -93,7 +93,7 @@
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>aoc-utils</artifactId>
-            <version>1.0.2</version>
+            <version>1.0.5</version>
         </dependency>
 
         <dependency>
@@ -256,6 +256,11 @@
         <repository>
             <id>chew-m2-snapshots</id>
             <url>https://m2.chew.pro/snapshots/</url>
+        </repository>
+        <repository>
+            <id>github</id>
+            <name>GitHub repository of my packages</name>
+            <url>https://maven.pkg.github.com/xharlock</url>
         </repository>
     </repositories>
 </project>
