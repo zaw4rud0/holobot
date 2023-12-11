@@ -34,7 +34,6 @@ public class AoCStatsCmd extends AbstractCommand {
 
         String token = Bootstrap.holo.getConfig().getAoCToken();
         AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, YEAR, LEADERBOARD_ID, token);
-        graph.setBackground(Color.decode("#0F0F23"));
         BufferedImage image = graph.generateImage();
 
         String name = String.format("aoc_%s.png", getCurrentDateTime());
