@@ -2,7 +2,6 @@ package dev.zawarudo.holo.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.annotations.Command;
-import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.misc.EmbedColor;
 import dev.zawarudo.holo.misc.Emote;
@@ -14,17 +13,12 @@ import dev.zawarudo.nanojikan.exception.InvalidRequestException;
 import dev.zawarudo.nanojikan.model.Anime;
 import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A command for searching and displaying anime information from the MyAnimeList
@@ -39,38 +33,14 @@ import java.util.concurrent.atomic.AtomicInteger;
         thumbnail = "https://upload.wikimedia.org/wikipedia/commons/7/7a/MyAnimeList_Logo.png",
         embedColor = EmbedColor.MAL,
         category = CommandCategory.ANIME)
-public class AnimeSearchCmd extends AbstractCommand {
-
-    private final EventWaiter waiter;
-    private final List<Emote> selection = HoloUtils.getNumbers();
+public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
 
     public AnimeSearchCmd(EventWaiter waiter) {
-        this.waiter = waiter;
+        super(waiter);
     }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent event) {
-        sendTyping(event);
-
-        if (args.length == 0) {
-            sendErrorEmbed(event, "Please provide a title to search for.");
-            return;
-        }
-
-        String search = String.join(" ", args);
-        List<Anime> result = performAnimeSearch(event, search);
-
-        if (result.isEmpty()) {
-            sendErrorEmbed(event, "I couldn't find any animes with your given search terms!");
-            return;
-        }
-
-        deleteInvoke(event);
-
-        showSearchResults(event, result);
-    }
-
-    private List<Anime> performAnimeSearch(MessageReceivedEvent event, String search) {
+    protected List<Anime> performSearch(MessageReceivedEvent event, String search) {
         try {
             return JikanAPI.searchAnime(search);
         } catch (InvalidRequestException ex) {
@@ -87,11 +57,12 @@ public class AnimeSearchCmd extends AbstractCommand {
         return Collections.emptyList();
     }
 
-    private EmbedBuilder createSearchResultEmbed(List<Anime> result) {
+    @Override
+    protected EmbedBuilder createSearchResultEmbed(List<Anime> results) {
         List<Emote> numbers = HoloUtils.getNumbers();
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < result.size(); i++) {
-            Anime anime = result.get(i);
+        for (int i = 0; i < results.size(); i++) {
+            Anime anime = results.get(i);
             String line = String.format("%s %s [%s]%n",
                     numbers.get(i).getAsEmoji().getFormatted(), anime.getTitle(), anime.getType());
             sb.append(line);
@@ -103,50 +74,30 @@ public class AnimeSearchCmd extends AbstractCommand {
         return builder;
     }
 
-    private void showSearchResults(MessageReceivedEvent event, List<Anime> result) {
-        EmbedBuilder builder = createSearchResultEmbed(result);
-        Message msg = event.getChannel().sendMessageEmbeds(builder.build()).complete();
-        User caller = event.getAuthor();
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        sendTyping(event);
 
-        HoloUtils.addReactions(msg, result.size());
-        AtomicInteger selected = new AtomicInteger(-1);
-
-        waitForUserReaction(event, msg, caller, result, selected);
-    }
-
-    private void waitForUserReaction(MessageReceivedEvent event, Message msg, User caller, List<Anime> result, AtomicInteger selected) {
-        waiter.waitForEvent(
-                MessageReactionAddEvent.class,
-                evt -> isReactionValid(evt, msg, caller, result, selected),
-                evt -> handleUserReaction(event, msg, result, selected),
-                5,
-                TimeUnit.MINUTES,
-                () -> msg.delete().queue()
-        );
-    }
-
-    private boolean isReactionValid(MessageReactionAddEvent evt, Message msg, User caller, List<Anime> result, AtomicInteger selected) {
-        if (evt.getMessageIdLong() != msg.getIdLong()) {
-            return false;
+        if (args.length == 0) {
+            sendErrorEmbed(event, "Please provide a title to search for.");
+            return;
         }
-        if (evt.retrieveUser().complete().isBot() || !caller.equals(evt.retrieveUser().complete())) {
-            return false;
+
+        String search = String.join(" ", args);
+        List<Anime> result = performSearch(event, search);
+
+        if (result.isEmpty()) {
+            sendErrorEmbed(event, "I couldn't find any animes with your given search terms!");
+            return;
         }
-        for (int i = 0; i < result.size(); i++) {
-            if (evt.getReaction().getEmoji().equals(selection.get(i).getAsEmoji())) {
-                selected.set(i);
-                return true;
-            }
-        }
-        return false;
+
+        deleteInvoke(event);
+
+        showSearchResults(event, result);
     }
 
-    private void handleUserReaction(MessageReceivedEvent event, Message msg, List<Anime> result, AtomicInteger selected) {
-        msg.delete().queue();
-        sendAnime(event, result.get(selected.get()));
-    }
-
-    private void sendAnime(MessageReceivedEvent event, Anime anime) {
+    @Override
+    protected void sendSelection(MessageReceivedEvent event, Anime anime) {
         EmbedBuilder builder = createEmbedBuilder(anime);
         setAnimeDetails(builder, anime);
         sendEmbed(event, builder, true, getEmbedColor());

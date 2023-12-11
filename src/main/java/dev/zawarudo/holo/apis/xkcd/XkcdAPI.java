@@ -22,10 +22,9 @@ public final class XkcdAPI {
         JsonObject obj;
         try {
             obj = HttpResponse.getJsonObject(url);
+        } catch (FileNotFoundException e) {
+            throw new InvalidRequestException("Invalid issue number: " + num, e);
         } catch (IOException e) {
-            if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid issue number: " + num, e);
-            }
             throw new APIException("Something went wrong with the API.", e);
         }
         return new Gson().fromJson(obj, XkcdComic.class);
@@ -50,14 +49,14 @@ public final class XkcdAPI {
         BY_NUMBER("%s/info.0.json");
 
         private static final String BASE_URL = "https://xkcd.com/";
-        private final String endpoint;
+        private final String suffix;
 
-        Endpoint(String endpoint){
-            this.endpoint = endpoint;
+        Endpoint(String suffix) {
+            this.suffix = suffix;
         }
 
         public String getUrl() {
-            return BASE_URL + endpoint;
+            return BASE_URL + suffix;
         }
     }
 }

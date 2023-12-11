@@ -30,7 +30,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.3.0</version>
+                <version>3.2.0</version>
                 <executions>
                     <execution>
                         <id>default-jar</id>
@@ -78,32 +78,22 @@
     </build>
 
     <dependencies>
-        <!-- Lightweight package for using Jikan API written by myself -->
+        <!-- Lightweight packages written by myself -->
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>nanojikan</artifactId>
             <version>1.0.2</version>
         </dependency>
-
-        <!-- Lightweight package for using the PokeAPI written by myself -->
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>pokeapi4java</artifactId>
             <version>1.0.2</version>
         </dependency>
-
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>aoc-utils</artifactId>
             <version>1.0.0</version>
         </dependency>
-
-        <dependency>
-            <groupId>dev.zawarudo</groupId>
-            <artifactId>wikijava</artifactId>
-            <version>0.0.2</version>
-        </dependency>
-
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>javabooru</artifactId>
@@ -175,6 +165,13 @@
             <version>0f9ac5df83</version>
         </dependency>
 
+        <!-- Dependency for GitHub API -->
+        <dependency>
+            <groupId>org.kohsuke</groupId>
+            <artifactId>github-api</artifactId>
+            <version>1.318</version>
+        </dependency>
+
         <!-- Logging stuff -->
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -229,6 +226,12 @@
             <artifactId>junit-jupiter</artifactId>
             <version>5.10.1</version>
             <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-validator</groupId>
+            <artifactId>commons-validator</artifactId>
+            <version>1.8.0</version>
         </dependency>
     </dependencies>
 

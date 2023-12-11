@@ -4,9 +4,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.anime.AnimeSearchCmd;
 import dev.zawarudo.holo.anime.MangaSearchCmd;
 import dev.zawarudo.holo.annotations.Deactivated;
-import dev.zawarudo.holo.experimental.ChatCmdOld;
-import dev.zawarudo.holo.experimental.ConfigCmd;
-import dev.zawarudo.holo.experimental.SauceNAOCmd;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
 import dev.zawarudo.holo.fun.UrbanDictionaryCmd;
@@ -86,7 +83,6 @@ public class CommandManager extends ListenerAdapter {
 
         // General Cmds
         addCommand(new BugCmd());
-		addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -123,11 +119,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new BannerCmd());
         addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
-//		addCommand(new CollageCmd());
-//		addCommand(new DanbooruCmd());
         addCommand(new DogCmd());
-//		addCommand(new DreamCmd());
-//		addCommand(new GelbooruCmd());
         addCommand(new HoloCmd());
         addCommand(new InspiroCmd());
         addCommand(new NekoCmd());
@@ -137,8 +129,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new XkcdCmd());
 
         // Game Cmds
-//		addCommand(new AkinatorCmd());
-//		addCommand(new AkinatorCmdOld(waiter));
         addCommand(new CatchCmd());
         addCommand(new PokedexCmd());
         addCommand(new PokemonTeamCmd());
@@ -160,10 +150,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new ShutdownCmd());
         addCommand(new SpawnCmd());
         addCommand(new StatusCmd());
-
-        // Experimental Cmds
-        addCommand(new ChatCmdOld());
-        addCommand(new SauceNAOCmd());
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Loaded {} commands!", commands.values().stream().distinct().count());

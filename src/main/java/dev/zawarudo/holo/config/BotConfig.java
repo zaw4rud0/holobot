@@ -18,6 +18,8 @@ public class BotConfig {
     private String aocToken;
     @SerializedName("saucenao_token")
     private String saucenaoToken;
+    @SerializedName("github_token")
+    private String githubToken;
 
     // Minor bot properties
     @SerializedName("default_prefix")
@@ -70,6 +72,13 @@ public class BotConfig {
      */
     public String getSaucenaoToken() {
         return saucenaoToken;
+    }
+
+    /**
+     * Returns the GitHub token needed to connect with the GitHub repository of the bot.
+     */
+    public String getGitHubToken() {
+        return githubToken;
     }
 
     /**

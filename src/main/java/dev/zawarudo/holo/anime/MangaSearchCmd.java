@@ -2,7 +2,6 @@ package dev.zawarudo.holo.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.annotations.Command;
-import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.misc.EmbedColor;
 import dev.zawarudo.holo.misc.Emote;
@@ -14,17 +13,12 @@ import dev.zawarudo.nanojikan.exception.InvalidRequestException;
 import dev.zawarudo.nanojikan.model.Manga;
 import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
@@ -40,15 +34,13 @@ import java.util.stream.Collectors;
         thumbnail = "https://upload.wikimedia.org/wikipedia/commons/7/7a/MyAnimeList_Logo.png",
         embedColor = EmbedColor.MAL,
         category = CommandCategory.ANIME)
-public class MangaSearchCmd extends AbstractCommand {
-
-    private final EventWaiter waiter;
-    private final List<Emote> selection = HoloUtils.getNumbers();
+public class MangaSearchCmd extends BaseSearchCmd<Manga> {
 
     public MangaSearchCmd(EventWaiter waiter) {
-        this.waiter = waiter;
+        super(waiter);
     }
 
+    @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         sendTyping(event);
 
@@ -58,7 +50,7 @@ public class MangaSearchCmd extends AbstractCommand {
         }
 
         String search = String.join(" ", args);
-        List<Manga> result = performMangaSearch(event, search);
+        List<Manga> result = performSearch(event, search);
 
         if (result.isEmpty()) {
             sendErrorEmbed(event, "I couldn't find any mangas with your given search terms!");
@@ -70,7 +62,7 @@ public class MangaSearchCmd extends AbstractCommand {
         showSearchResults(event, result);
     }
 
-    private List<Manga> performMangaSearch(MessageReceivedEvent event, String search) {
+    protected List<Manga> performSearch(MessageReceivedEvent event, String search) {
         try {
             return JikanAPI.searchManga(search);
         } catch (InvalidRequestException ex) {
@@ -87,7 +79,8 @@ public class MangaSearchCmd extends AbstractCommand {
         return Collections.emptyList();
     }
 
-    private EmbedBuilder createSearchResultEmbed(List<Manga> result) {
+    @Override
+    protected EmbedBuilder createSearchResultEmbed(List<Manga> result) {
         List<Emote> numbers = HoloUtils.getNumbers();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < result.size(); i++) {
@@ -103,55 +96,14 @@ public class MangaSearchCmd extends AbstractCommand {
         return builder;
     }
 
-    private void showSearchResults(MessageReceivedEvent event, List<Manga> result) {
-        EmbedBuilder builder = createSearchResultEmbed(result);
-        Message msg = event.getChannel().sendMessageEmbeds(builder.build()).complete();
-        User caller = event.getAuthor();
-
-        HoloUtils.addReactions(msg, result.size());
-        AtomicInteger selected = new AtomicInteger(-1);
-
-        waitForUserReaction(event, msg, caller, result, selected);
-    }
-
-    private void waitForUserReaction(MessageReceivedEvent event, Message msg, User caller, List<Manga> result, AtomicInteger selected) {
-        waiter.waitForEvent(
-                MessageReactionAddEvent.class,
-                evt -> isReactionValid(evt, msg, caller, result, selected),
-                evt -> handleUserReaction(event, msg, result, selected),
-                5,
-                TimeUnit.MINUTES,
-                () -> msg.delete().queue()
-        );
-    }
-
-    private boolean isReactionValid(MessageReactionAddEvent evt, Message msg, User caller, List<Manga> result, AtomicInteger selected) {
-        if (evt.getMessageIdLong() != msg.getIdLong()) {
-            return false;
-        }
-        if (evt.retrieveUser().complete().isBot() || !caller.equals(evt.retrieveUser().complete())) {
-            return false;
-        }
-        for (int i = 0; i < result.size(); i++) {
-            if (evt.getReaction().getEmoji().equals(selection.get(i).getAsEmoji())) {
-                selected.set(i);
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private void handleUserReaction(MessageReceivedEvent event, Message msg, List<Manga> result, AtomicInteger selected) {
-        msg.delete().queue();
-        sendManga(event, result.get(selected.get()));
-    }
-
-    private void sendManga(MessageReceivedEvent event, Manga manga) {
+    @Override
+    protected void sendSelection(MessageReceivedEvent event, Manga manga) {
         EmbedBuilder builder = createEmbedBuilder(manga);
         setMangaDetails(builder, manga);
         sendEmbed(event, builder, true, getEmbedColor());
     }
 
+    // TODO: Generalize
     private EmbedBuilder createEmbedBuilder(Manga manga) {
         EmbedBuilder builder = new EmbedBuilder();
         String type = manga.getType() == null ? "null" : manga.getType();

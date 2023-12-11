@@ -110,7 +110,14 @@ public class XkcdComic implements Comparable<XkcdComic> {
 
     @Override
     public boolean equals(Object obj) {
-        return obj instanceof XkcdComic && ((XkcdComic)obj).getIssueNr() == this.num;
+        if (this == obj) return true;
+        if (!(obj instanceof XkcdComic other)) return false;
+        return this.getIssueNr() == other.getIssueNr();
+    }
+
+    @Override
+    public int hashCode() {
+        return Integer.hashCode(num);
     }
 
     @Override
