@@ -8,15 +8,13 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import org.apache.commons.validator.routines.UrlValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -218,12 +216,7 @@ public abstract class AbstractCommand {
      * @return True if the URL is valid, false otherwise.
      */
     protected boolean isValidUrl(String url) {
-        try {
-            new URL(url).toURI();
-            return true;
-        } catch (URISyntaxException | MalformedURLException e) {
-            return false;
-        }
+        return new UrlValidator().isValid(url);
     }
 
     /**
