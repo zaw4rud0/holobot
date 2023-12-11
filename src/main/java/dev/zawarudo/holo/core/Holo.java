@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.core;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import dev.zawarudo.holo.apis.GitHubClient;
 import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.games.akinator.AkinatorManager;
 import dev.zawarudo.holo.games.pokemon.PokemonSpawnManager;
@@ -38,6 +39,7 @@ public class Holo extends ListenerAdapter {
     private PokemonSpawnManager pokemonSpawnManager;
     private AkinatorManager akinatorManager;
     private SQLManager sqlManager;
+    private GitHubClient gitHubClient;
 
     private final EventWaiter waiter;
 
@@ -68,8 +70,9 @@ public class Holo extends ListenerAdapter {
     public void registerManagers() {
         try {
             sqlManager = new SQLManager();
+            gitHubClient = new GitHubClient(botConfig.getGitHubToken());
         } catch (IOException e) {
-            throw new IllegalStateException("Something went wrong while registering SQLManager", e);
+            throw new IllegalStateException("Something went wrong while registering managers.", e);
         }
 
         guildConfigManager = new GuildConfigManager();
@@ -118,6 +121,10 @@ public class Holo extends ListenerAdapter {
 
     public SQLManager getSQLManager() {
         return sqlManager;
+    }
+
+    public GitHubClient getGitHubClient() {
+        return gitHubClient;
     }
 
     @Override

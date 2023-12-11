@@ -42,6 +42,7 @@ public final class Bootstrap {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error(ex.getMessage(), ex);
             }
+            return;
         }
 
         long totalTime = System.currentTimeMillis() - startupTime;
