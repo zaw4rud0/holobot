@@ -1,5 +1,8 @@
 package dev.zawarudo.holo.misc;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 
 /**
@@ -8,54 +11,19 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
  */
 public class Submission {
 
-    private final Type type;
-    private final String authorId;
-    private final String message;
-    private final String date;
-    private final String guildId;
-    private final String channelId;
+    public final String type;
+    public final String date;
+    public final Guild guild;
+    public final Channel channel;
+    public final User author;
+    public final String message;
 
-    public Submission(Type type, MessageReceivedEvent event, String message) {
+    public Submission(String type, MessageReceivedEvent event, String message) {
         this.type = type;
-        this.authorId = event.getAuthor().getId();
-        this.message = message;
         this.date = event.getMessage().getTimeCreated().toString();
-        this.guildId = event.getGuild().getId();
-        this.channelId = event.getChannel().getId();
-    }
-
-    public String getType() {
-        return switch (type) {
-            case SUGGESTION -> "suggestion";
-            case BUG -> "bug report";
-        };
-    }
-
-    public String getAuthorId() {
-        return authorId;
-    }
-
-    public String getMessage() {
-        return message;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public String getGuildId() {
-        return guildId;
-    }
-
-    public String getChannelId() {
-        return channelId;
-    }
-
-    /**
-     * The type of submission.
-     */
-    public enum Type {
-        BUG,
-        SUGGESTION
+        this.guild = event.getGuild();
+        this.channel = event.getChannel();
+        this.author = event.getAuthor();
+        this.message = message;
     }
 }

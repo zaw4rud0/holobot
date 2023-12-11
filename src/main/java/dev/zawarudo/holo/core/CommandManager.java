@@ -82,7 +82,7 @@ public class CommandManager extends ListenerAdapter {
         commands = new LinkedHashMap<>();
 
         // General Cmds
-        addCommand(new BugCmd());
+        addCommand(new BugCmd(Bootstrap.holo.getGitHubClient()));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -91,7 +91,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new ServerEmotesCmd());
         addCommand(new ServerInfoCmd());
         addCommand(new ServerRolesCmd());
-        addCommand(new SuggestionCmd());
+        addCommand(new SuggestionCmd(Bootstrap.holo.getGitHubClient()));
         addCommand(new WhoisCmd());
 
         // Anime Cmds

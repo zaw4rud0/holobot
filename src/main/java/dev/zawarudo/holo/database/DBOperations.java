@@ -2,7 +2,6 @@ package dev.zawarudo.holo.database;
 
 import dev.zawarudo.holo.apis.xkcd.XkcdComic;
 import dev.zawarudo.holo.core.Bootstrap;
-import dev.zawarudo.holo.misc.Submission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
@@ -507,24 +506,6 @@ public final class DBOperations {
                 ids.add(rs.getLong("user_id"));
             }
             return ids;
-        }
-    }
-
-    /**
-     * Inserts a bug report or a suggestion into the database.
-     */
-    public static void insertSubmission(Submission submission) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-submission");
-
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, "bug report");
-            ps.setString(2, submission.getAuthorId());
-            ps.setString(3, submission.getMessage());
-            ps.setString(4, submission.getDate());
-            ps.setString(5, submission.getGuildId());
-            ps.setString(6, submission.getChannelId());
-            ps.execute();
         }
     }
 }
