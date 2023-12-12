@@ -42,3 +42,5 @@ hs_err_pid*
 
 /src/main/java/dev/zawarudo/holo/experimental/
 /src/main/java/dev/zawarudo/holo/development/
+
+/out/
