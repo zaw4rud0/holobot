@@ -11,13 +11,15 @@ public class BotConfig {
     @SerializedName("owner_id")
     private long ownerId;
 
-    // External settings
+    // External settings and tokens
     @SerializedName("deepAI_token")
     private String deepAIKey;
-    @SerializedName("youtube_token")
-    private String youtubeToken;
     @SerializedName("aoc_token")
     private String aocToken;
+    @SerializedName("saucenao_token")
+    private String saucenaoToken;
+    @SerializedName("github_token")
+    private String githubToken;
 
     // Minor bot properties
     @SerializedName("default_prefix")
@@ -56,16 +58,6 @@ public class BotConfig {
     }
 
     /**
-     * Retrieves the YouTube API key. The key is required to use the various endpoints
-     * of the YouTube API.
-     *
-     * @return The YouTube API key as a String.
-     */
-    public String getYoutubeToken() {
-        return youtubeToken;
-    }
-
-    /**
      * Retrieves the API key of the Advent of Code (AoC) website. The key is required
      * to get data from there, such as the leaderboard.
      *
@@ -73,6 +65,20 @@ public class BotConfig {
      */
     public String getAoCToken() {
         return aocToken;
+    }
+
+    /**
+     * Returns the token of SauceNAO.
+     */
+    public String getSaucenaoToken() {
+        return saucenaoToken;
+    }
+
+    /**
+     * Returns the GitHub token needed to connect with the GitHub repository of the bot.
+     */
+    public String getGitHubToken() {
+        return githubToken;
     }
 
     /**

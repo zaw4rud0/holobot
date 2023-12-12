@@ -1,6 +1,5 @@
 package dev.zawarudo.holo.apis;
 
-import com.google.common.reflect.TypeToken;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -8,12 +7,14 @@ import com.google.gson.JsonObject;
 import dev.zawarudo.holo.exceptions.APIException;
 import dev.zawarudo.holo.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.utils.HttpResponse;
+import dev.zawarudo.holo.utils.TypeTokenUtils;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
@@ -55,10 +56,9 @@ public final class DogAPI {
         JsonObject obj;
         try {
             obj = HttpResponse.getJsonObject(String.format(ENDPOINT.RANDOM_BREED.getUrl(), breed));
+        } catch (FileNotFoundException e) {
+            throw new InvalidRequestException("Invalid breed: " + breed, e);
         } catch (IOException e) {
-            if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid breed: " + breed, e);
-            }
             throw new APIException(e);
         }
         return obj.get("message").getAsString();
@@ -77,14 +77,13 @@ public final class DogAPI {
         JsonObject jsonObj;
         try {
             jsonObj = HttpResponse.getJsonObject(String.format(ENDPOINT.BY_BREED.getUrl(), breed));
+        } catch (FileNotFoundException e) {
+            throw new InvalidRequestException("Invalid breed: " + breed, e);
         } catch (IOException e) {
-            if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid breed: " + breed, e);
-            }
             throw new APIException(e);
         }
         JsonArray array = jsonObj.getAsJsonArray("message");
-        Type listType = new TypeToken<List<String>>() {}.getType();
+        Type listType = TypeTokenUtils.getListTypeToken(String.class);
         return new Gson().fromJson(array, listType);
     }
 
@@ -102,10 +101,9 @@ public final class DogAPI {
         JsonObject obj;
         try {
             obj = HttpResponse.getJsonObject(String.format(ENDPOINT.RANDOM_SUB_BREED.getUrl(), breed, subBreed));
+        } catch (FileNotFoundException e) {
+            throw new InvalidRequestException("Invalid breed or sub-breed: " + breed + ", " + subBreed, e);
         } catch (IOException e) {
-            if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid breed or sub-breed: " + breed + ", " + subBreed, e);
-            }
             throw new APIException(e);
         }
         return obj.get("message").getAsString();
@@ -125,14 +123,13 @@ public final class DogAPI {
         JsonObject jsonObj;
         try {
             jsonObj = HttpResponse.getJsonObject(String.format(ENDPOINT.BY_SUB_BREED.getUrl(), breed, subBreed));
+        } catch (FileNotFoundException e) {
+            throw new InvalidRequestException("Invalid breed or sub-breed: " + breed + ", " + subBreed, e);
         } catch (IOException e) {
-            if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid breed or sub-breed: " + breed + ", " + subBreed, e);
-            }
             throw new APIException(e);
         }
         JsonArray array = jsonObj.getAsJsonArray("message");
-        Type listType = new TypeToken<List<String>>() {}.getType();
+        Type listType = TypeTokenUtils.getListTypeToken(String.class);
         return new Gson().fromJson(array, listType);
     }
 
@@ -175,10 +172,9 @@ public final class DogAPI {
         JsonObject jsonObj;
         try {
             jsonObj = HttpResponse.getJsonObject(url);
+        } catch (FileNotFoundException e) {
+            throw new InvalidRequestException("Invalid breed: " + breed, e);
         } catch (IOException e) {
-            if (e instanceof FileNotFoundException) {
-                throw new InvalidRequestException("Invalid breed: " + breed, e);
-            }
             throw new APIException(e);
         }
 
@@ -188,7 +184,7 @@ public final class DogAPI {
         }
 
         JsonArray array = jsonObj.getAsJsonArray("message");
-        Type listType = new TypeToken<List<String>>() {}.getType();
+        Type listType = TypeTokenUtils.getListTypeToken(String.class);
         return new Gson().fromJson(array, listType);
     }
 
@@ -206,6 +202,29 @@ public final class DogAPI {
          */
         public boolean hasSubBreeds() {
             return subBreeds != null && subBreeds.length > 0;
+        }
+
+        @Override
+        public String toString() {
+            return "Breed{" + "name='" + name + '\'' + ", subBreeds=" + Arrays.toString(subBreeds) + '}';
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            return this.name.equals(((Breed) o).name);
+        }
+
+        @Override
+        public int hashCode() {
+            int result = name.hashCode();
+            result = 31 * result + Arrays.hashCode(subBreeds);
+            return result;
         }
     }
 
@@ -244,10 +263,10 @@ public final class DogAPI {
         RANDOM_SUB_BREED("/breed/%s/%s/images/random");
 
         private static final String BASE_URL = "https://dog.ceo/api";
-        private final String endpoint;
+        private final String endpointUrl;
 
-        ENDPOINT(String endpoint) {
-            this.endpoint = endpoint;
+        ENDPOINT(String endpointUrl) {
+            this.endpointUrl = endpointUrl;
         }
 
         /**
@@ -256,7 +275,7 @@ public final class DogAPI {
          * @return The URL of the endpoint as a String.
          */
         public @NotNull String getUrl() {
-            return BASE_URL + endpoint;
+            return BASE_URL + endpointUrl;
         }
     }
 }

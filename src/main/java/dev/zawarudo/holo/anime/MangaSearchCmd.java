@@ -2,25 +2,24 @@ package dev.zawarudo.holo.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.annotations.Command;
-import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.misc.EmbedColor;
 import dev.zawarudo.holo.misc.Emote;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloUtils;
 import dev.zawarudo.nanojikan.JikanAPI;
 import dev.zawarudo.nanojikan.exception.APIException;
 import dev.zawarudo.nanojikan.exception.InvalidRequestException;
 import dev.zawarudo.nanojikan.model.Manga;
+import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  * A command for searching and displaying manga information from the MyAnimeList
@@ -35,13 +34,10 @@ import java.util.concurrent.atomic.AtomicInteger;
         thumbnail = "https://upload.wikimedia.org/wikipedia/commons/7/7a/MyAnimeList_Logo.png",
         embedColor = EmbedColor.MAL,
         category = CommandCategory.ANIME)
-public class MangaSearchCmd extends AbstractCommand {
-
-    private final EventWaiter waiter;
-    private final List<Emote> selection = HoloUtils.getNumbers();
+public class MangaSearchCmd extends BaseSearchCmd<Manga> {
 
     public MangaSearchCmd(EventWaiter waiter) {
-        this.waiter = waiter;
+        super(waiter);
     }
 
     @Override
@@ -54,23 +50,7 @@ public class MangaSearchCmd extends AbstractCommand {
         }
 
         String search = String.join(" ", args);
-
-        List<Manga> result;
-        try {
-            result = JikanAPI.searchManga(search);
-        } catch (InvalidRequestException ex) {
-            sendErrorEmbed(event, "Something went wrong while searching for the manga! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("Invalid request! This wasn't supposed to happen!", ex);
-            }
-            return;
-        } catch (APIException ex) {
-            sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("An API error occurred while trying to search for the manga: " + ex.getMessage() + " | Manga: " + search, ex);
-            }
-            return;
-        }
+        List<Manga> result = performSearch(event, search);
 
         if (result.isEmpty()) {
             sendErrorEmbed(event, "I couldn't find any mangas with your given search terms!");
@@ -79,46 +59,34 @@ public class MangaSearchCmd extends AbstractCommand {
 
         deleteInvoke(event);
 
-        EmbedBuilder builder = getResultsEmbed(result);
-        Message msg = event.getChannel().sendMessageEmbeds(builder.build()).complete();
-        User caller = event.getAuthor();
-
-        HoloUtils.addReactions(msg, result.size());
-        AtomicInteger selected = new AtomicInteger(-1);
-
-        waiter.waitForEvent(
-                MessageReactionAddEvent.class,
-                evt -> {
-                    if (evt.getMessageIdLong() != msg.getIdLong()) {
-                        return false;
-                    }
-                    if (evt.retrieveUser().complete().isBot() || !caller.equals(evt.retrieveUser().complete())) {
-                        return false;
-                    }
-                    for (int i = 0; i < result.size(); i++) {
-                        if (evt.getReaction().getEmoji().equals(selection.get(i).getAsEmoji())) {
-                            selected.set(i);
-                            return true;
-                        }
-                    }
-                    return false;
-                },
-                evt -> {
-                    msg.delete().queue();
-                    sendManga(event, result.get(selected.get()));
-                },
-                5,
-                TimeUnit.MINUTES,
-                () -> msg.delete().queue()
-        );
+        showSearchResults(event, result);
     }
 
-    private EmbedBuilder getResultsEmbed(List<Manga> result) {
+    protected List<Manga> performSearch(MessageReceivedEvent event, String search) {
+        try {
+            return JikanAPI.searchManga(search);
+        } catch (InvalidRequestException ex) {
+            sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
+            if (logger.isErrorEnabled()) {
+                logger.error("Invalid request! This wasn't supposed to happen!", ex);
+            }
+        } catch (APIException ex) {
+            sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
+            if (logger.isErrorEnabled()) {
+                logger.error("An API error occurred while trying to search for the anime. Manga: " + search, ex);
+            }
+        }
+        return Collections.emptyList();
+    }
+
+    @Override
+    protected EmbedBuilder createSearchResultEmbed(List<Manga> result) {
         List<Emote> numbers = HoloUtils.getNumbers();
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < result.size(); i++) {
             Manga manga = result.get(i);
-            String line = String.format("%s %s [%s]\n", numbers.get(i).getAsEmoji().getFormatted(), manga.getTitle(), manga.getType());
+            String line = String.format("%s %s [%s]%n",
+                    numbers.get(i).getAsEmoji().getFormatted(), manga.getTitle(), manga.getType());
             sb.append(line);
         }
         EmbedBuilder builder = new EmbedBuilder();
@@ -128,51 +96,100 @@ public class MangaSearchCmd extends AbstractCommand {
         return builder;
     }
 
-    private void sendManga(MessageReceivedEvent event, Manga manga) {
+    @Override
+    protected void sendSelection(MessageReceivedEvent event, Manga manga) {
+        EmbedBuilder builder = createEmbedBuilder(manga);
+        setMangaDetails(builder, manga);
+        sendEmbed(event, builder, true, getEmbedColor());
+    }
+
+    // TODO: Generalize
+    private EmbedBuilder createEmbedBuilder(Manga manga) {
         EmbedBuilder builder = new EmbedBuilder();
+        String type = manga.getType() == null ? "null" : manga.getType();
 
-        // Prepare fields
-        String genres = null;
-        String themes = null;
-        if (manga.getGenres() != null && manga.getGenres().size() != 0) {
-            genres = manga.getGenres().toString().replace("[", "").replace("]", "");
-        }
-        if (manga.getThemes() != null && manga.getThemes().size() != 0) {
-            themes = manga.getThemes().toString().replace("[", "").replace("]", "");
-        }
+        String title = Formatter.truncateString(manga.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
+        builder.setTitle(String.format("%s [%s]", title, type));
 
-        int ch = manga.getChapters();
-        int vol = manga.getVolumes();
-        String chapters = ch != 0 ? vol != 0 ? "Vol: " + vol + "\nCh: " + ch : ch + "Ch." : "TBA";
-
-        String malScore = manga.getScore() == 0.0 ? "N/A" : String.valueOf(manga.getScore());
-        String malRank = manga.getRank() == 0 ? "N/A" : String.valueOf(manga.getRank());
-
-        // Set embed
-        builder.setTitle(manga.getTitle());
         builder.setThumbnail(manga.getImages().getJpg().getLargeImage());
         if (manga.hasSynopsis()) {
-            builder.setDescription(manga.getSynopsis());
+            String synopsis = Formatter.truncateString(manga.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            builder.setDescription(synopsis);
         }
+        return builder;
+    }
+
+    private void setMangaDetails(EmbedBuilder builder, Manga manga) {
         if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle())) {
             builder.addField("English Title", manga.getTitleEnglish(), true);
         }
         if (manga.getTitleJapanese() != null) {
             builder.addField("Japanese Title", manga.getTitleJapanese(), true);
         }
+
+        String authors = formatAuthors(manga.getAuthors());
+        if (authors != null) {
+            builder.addField("Author/Mangaka", authors, false);
+        }
+
+        String genres = formatList(manga.getGenres());
         if (genres != null) {
             builder.addField("Genres", genres, false);
         }
+        String themes = formatList(manga.getThemes());
         if (themes != null) {
             builder.addField("Themes", themes, false);
         }
-        builder.addField("Type", manga.getType(), true);
-        builder.addField("Chapters", chapters, true);
+
         builder.addField("Status", manga.getStatus(), true);
-        builder.addField("MAL Score", malScore, true);
-        builder.addField("MAL Rank", malRank, true);
+        int chapters = manga.getChapters();
+        int volumes = manga.getVolumes();
+
+        if (manga.getType().equals("Light Novel")) {
+            builder.addField("Volumes", formatChapters(chapters, volumes), true);
+        } else {
+            builder.addField("Chapters", formatChapters(chapters, volumes), true);
+        }
+
+        builder.addBlankField(true);
+
+        builder.addField("MAL Score", formatScore(manga.getScore()), true);
+        builder.addField("MAL Rank", formatRank(manga.getRank()), true);
         builder.addBlankField(true);
         builder.addField("Link", "[MyAnimeList](" + manga.getUrl() + ")", false);
-        sendEmbed(event, builder, true, getEmbedColor());
+    }
+
+    private String formatAuthors(List<Nameable> list) {
+        return list.stream().map(Nameable::getName).map(Formatter::reverseJapaneseName).collect(Collectors.joining(", "));
+    }
+
+    private String formatList(List<Nameable> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        List<String> strings = list.stream().map(Nameable::toString).toList();
+        return String.join(", ", strings);
+    }
+
+    private String formatChapters(int ch, int vol) {
+        String displayText;
+        if (ch != 0) {
+            if (vol != 0) {
+                displayText = String.format("Vol: %d%nCh: %d", vol, ch);
+            } else {
+                displayText = String.format("%d Ch.", ch);
+            }
+        } else {
+            displayText = "TBA";
+        }
+        return displayText;
+    }
+
+    private String formatScore(double score) {
+        return score == 0.0 ? "N/A" : String.valueOf(score);
+    }
+
+    private String formatRank(int rank) {
+        return rank == 0 ? "N/A" : String.valueOf(rank);
     }
 }

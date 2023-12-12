@@ -9,6 +9,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+/**
+ * Utility class for applying operations on images.
+ */
 public final class ImageOperations {
 
     private static final double RED_TO_GRAY_WEIGHT = 0.2126;
@@ -35,96 +38,36 @@ public final class ImageOperations {
     }
 
     /**
-     * Sticks two {@link BufferedImage} together in the given direction
+     * Joins given images into a single image in the specified direction.
      *
-     * @param img1      = First {@link BufferedImage}
-     * @param img2      = Second {@link BufferedImage}
-     * @param direction = Direction in which the images are glued together, can either be <b>horizontal</b> or <b>vertical</b>
-     * @return The joined images
+     * @param direction The direction in which the images are to be joined.
+     * @param images    Images to be stitched together.
+     * @return A new BufferedImage object containing the stitched images.
      */
-    public static BufferedImage join(BufferedImage img1, BufferedImage img2, Direction direction) {
-        BufferedImage result;
+    public static BufferedImage join(Direction direction, BufferedImage... images) {
+        int maxWidth = 0;
+        int maxHeight = 0;
 
-        if (direction == null) {
-            throw new IllegalArgumentException();
-        } else if (direction == Direction.HORIZONTAL) {
-            int width = img1.getWidth() + img2.getWidth();
-            int height = Math.min(img1.getHeight(), img2.getHeight());
-            result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = result.createGraphics();
-            Color oldColor = graphics.getColor();
-            graphics.setPaint(Color.WHITE);
-            graphics.fillRect(0, 0, width, height);
-            graphics.setColor(oldColor);
-            graphics.drawImage(img1, null, 0, 0);
-            graphics.drawImage(img2, null, img1.getWidth(), 0);
-            graphics.dispose();
-        } else if (direction == Direction.VERTICAL) {
-            int height = img1.getHeight() + img2.getHeight();
-            int width = Math.min(img1.getWidth(), img2.getWidth());
-            result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = result.createGraphics();
-            Color oldColor = graphics.getColor();
-            graphics.setPaint(Color.WHITE);
-            graphics.fillRect(0, 0, width, height);
-            graphics.setColor(oldColor);
-            graphics.drawImage(img1, null, 0, 0);
-            graphics.drawImage(img2, null, 0, img1.getHeight());
-            graphics.dispose();
-        } else {
-            throw new IllegalArgumentException("Direction can only be either horizontal or vertical!");
+        for (BufferedImage image : images) {
+            maxWidth = Math.max(maxWidth, image.getWidth());
+            maxHeight = Math.max(maxHeight, image.getHeight());
         }
-        return result;
-    }
 
-    /**
-     * Sticks three {@link BufferedImage} together in the given direction
-     *
-     * @param img1      = First {@link BufferedImage}
-     * @param img2      = Second {@link BufferedImage}
-     * @param img3      = Third {@link BufferedImage}
-     * @param direction = Direction in which the images are glued together, can either be <b>horizontal</b> or <b>vertical</b>
-     * @return A new {@link BufferedImage}
-     */
-    public static BufferedImage join(BufferedImage img1, BufferedImage img2, BufferedImage img3, Direction direction) {
-        BufferedImage result;
-
+        BufferedImage stitchedImage;
         if (direction == Direction.HORIZONTAL) {
-            int width = img1.getWidth() + img2.getWidth() + img3.getWidth();
-            int height = Math.min(Math.min(img1.getHeight(), img2.getHeight()), img3.getHeight());
-
-            result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = result.createGraphics();
-            Color oldColor = graphics.getColor();
-
-            graphics.setPaint(Color.WHITE);
-            graphics.fillRect(0, 0, width, height);
-
-            graphics.setColor(oldColor);
-            graphics.drawImage(img1, null, 0, 0);
-            graphics.drawImage(img2, null, img1.getWidth(), 0);
-            graphics.drawImage(img3, null, img1.getWidth() + img2.getWidth(), 0);
-            graphics.dispose();
-        } else if (direction == Direction.VERTICAL) {
-            int height = img1.getHeight() + img2.getHeight() + img3.getHeight();
-            int width = Math.min(Math.min(img1.getWidth(), img2.getWidth()), img3.getWidth());
-
-            result = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-            Graphics2D graphics = result.createGraphics();
-            Color oldColor = graphics.getColor();
-
-            graphics.setPaint(Color.WHITE);
-            graphics.fillRect(0, 0, width, height);
-
-            graphics.setColor(oldColor);
-            graphics.drawImage(img1, null, 0, 0);
-            graphics.drawImage(img2, null, 0, img1.getHeight());
-            graphics.drawImage(img3, null, 0, img1.getHeight() + img2.getHeight());
-            graphics.dispose();
+            stitchedImage = new BufferedImage(maxWidth * images.length, maxHeight, BufferedImage.TYPE_INT_ARGB);
         } else {
-            throw new IllegalArgumentException("Direction can only be either horizontal or vertical!");
+            stitchedImage = new BufferedImage(maxWidth, maxHeight * images.length, BufferedImage.TYPE_INT_ARGB);
         }
-        return result;
+
+        Graphics2D graphics = stitchedImage.createGraphics();
+        for (int i = 0; i < images.length; i++) {
+            int x = direction == Direction.HORIZONTAL ? i * maxWidth : 0;
+            int y = direction == Direction.VERTICAL ? i * maxHeight : 0;
+            graphics.drawImage(images[i], x, y, null);
+        }
+        graphics.dispose();
+        return stitchedImage;
     }
 
     /**
@@ -221,9 +164,10 @@ public final class ImageOperations {
      * @return An {@link InputStream}
      */
     public static InputStream toInputStream(BufferedImage img) throws IOException {
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ImageIO.write(img, "png", outputStream);
-        return new ByteArrayInputStream(outputStream.toByteArray());
+        try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+            ImageIO.write(img, "png", outputStream);
+            return new ByteArrayInputStream(outputStream.toByteArray());
+        }
     }
 
     /**

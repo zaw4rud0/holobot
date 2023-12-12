@@ -1,5 +1,7 @@
 package dev.zawarudo.holo.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -60,5 +62,45 @@ public final class Formatter {
      */
     public static String encodeUrl(String link) {
         return URLEncoder.encode(link, StandardCharsets.UTF_8);
+    }
+
+    /**
+     * Formats a Japanese name properly by reversing the order.
+     */
+    public static String reverseJapaneseName(@NotNull String name) {
+        String[] nameParts = name.split(",");
+        if (nameParts.length == 1) {
+            return name;
+        }
+        return nameParts[1].trim() + " " + nameParts[0].trim();
+    }
+
+    /**
+     * Truncates a given string to a specified maximum length and appends three dots ("...")
+     * at the end if truncation occurs. This method is useful for ensuring that strings
+     * do not exceed a certain length while providing a visual indication that they have
+     * been shortened.
+     *
+     * @param input     The string to be truncated. If this is {@code null}, the method
+     *                  will return {@code null}.
+     * @param maxLength The maximum allowed length of the string. It must be greater than
+     *                  or equal to 4, as 3 characters are reserved for the ellipsis ("...").
+     *                  If {@code maxLength} is less than 4, the method returns the input string
+     *                  as-is, without truncation.
+     * @return A truncated string with an appended ellipsis if the original string's length
+     *         exceeded {@code maxLength}. If the original string is shorter than or equal
+     *         to {@code maxLength}, or if {@code maxLength} is less than 4, the original
+     *         string is returned as-is. Returns {@code null} if the input string is {@code null}.
+     */
+    public static String truncateString(String input, int maxLength) {
+        if (input == null || maxLength < 4) {
+            return input;
+        }
+
+        if (input.length() > maxLength) {
+            return input.substring(0, maxLength - 3) + "...";
+        }
+
+        return input;
     }
 }

@@ -63,8 +63,16 @@ public class UpscaleCmd extends AbstractCommand {
      */
     public static String process(String url) throws IOException {
         String token = Bootstrap.holo.getConfig().getKeyDeepAI();
-        Process pr = Runtime.getRuntime().exec("curl -F image=" + url + " -H api-key:" + token + " " + API_URL);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(pr.getInputStream()));
+        ProcessBuilder processBuilder = new ProcessBuilder(
+                "curl",
+                "-F",
+                "image=" + url,
+                "-H",
+                "api-key:" + token,
+                API_URL
+        );
+        Process process = processBuilder.start();
+        BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()));
         String result = reader.lines().collect(Collectors.joining("\n"));
         JsonObject obj = JsonParser.parseString(result).getAsJsonObject();
         if (obj == null || obj.get("err") != null) {

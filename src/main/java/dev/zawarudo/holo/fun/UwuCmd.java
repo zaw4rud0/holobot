@@ -15,6 +15,8 @@ import java.util.Random;
         category = CommandCategory.MISC)
 public class UwuCmd extends AbstractCommand {
 
+    private static final Random rand = new Random();
+
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
@@ -58,13 +60,12 @@ public class UwuCmd extends AbstractCommand {
     }
 
     private static String uwuify(String stringToUwuify) {
-        Random rand = new Random();
         String result = stringToUwuify
                 .toLowerCase()
                 .replaceAll("[rl]", "w")
                 .replaceAll("n([aeiou])", "ny$1")
-                .replaceAll("ove", "uve")
-                .replaceAll("uck", "uwq")
+                .replace("ove", "uve")
+                .replace("uck", "uwq")
                 .replaceFirst("i", "i-i")
                 .replaceFirst("(?s)(.*)" + "i-i-i", "$1" + "i-i");
         if (rand.nextInt(10) <= 2) {

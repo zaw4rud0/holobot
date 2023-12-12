@@ -54,12 +54,16 @@ public class AvatarCmd extends AbstractCommand {
      * invalid, simply return the author of the message.
      */
     private User getUser(MessageReceivedEvent e) {
+        if (args.length == 0) {
+            return e.getAuthor();
+        }
         try {
-            return e.getJDA().getUserById(Long.parseLong(args[0]
+            long id = Long.parseLong(args[0]
                     .replace("<", "")
                     .replace(">", "")
                     .replace("!", "")
-                    .replace("@", "")));
+                    .replace("@", ""));
+            return e.getJDA().getUserById(id);
         } catch (NumberFormatException ex) {
             return e.getAuthor();
         }

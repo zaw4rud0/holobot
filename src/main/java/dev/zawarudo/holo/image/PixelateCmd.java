@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.image;
 
 import dev.zawarudo.holo.annotations.Command;
+import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
 import dev.zawarudo.holo.utils.ImageOperations;
@@ -15,6 +16,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 
+@Deactivated
 @Command(name = "pixelate",
         description = "Pixelates a given image",
         usage = "[<intensity>]",

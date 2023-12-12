@@ -25,7 +25,7 @@ public class CoinFlipCmd extends AbstractCommand {
             return;
         }
         if (times > MAX_COIN_FLIPS) {
-            event.getMessage().reply("Hold on! My limit is 1'000'000 coin flips at once.").queue();
+            event.getMessage().reply(String.format("Hold on! My limit is %d coin flips at once.", MAX_COIN_FLIPS)).queue();
             return;
         }
 
@@ -62,8 +62,8 @@ public class CoinFlipCmd extends AbstractCommand {
 
     private String formatMessage(int times, int heads, int tails) {
         String text = "I flipped a coin **%s** times. I got **%s** heads and **%s** tails.";
-        DecimalFormat df = new DecimalFormat("#'###'###");
-        return String.format(text, df.format(times), df.format(heads), df.format(tails));
+        DecimalFormat df = new DecimalFormat("###,###,###");
+        return String.format(text, df.format(times), df.format(heads), df.format(tails)).replace(",", "'");
     }
 
     private void sendErrorMessage(MessageReceivedEvent event) {

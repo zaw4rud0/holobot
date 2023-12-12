@@ -44,8 +44,8 @@ public class WhoisCmd extends AbstractCommand {
 		}
 
 		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("@" + user.getAsTag() + " (" + user.getIdLong() + ")");
-		builder.setThumbnail(user.getEffectiveAvatarUrl());
+		builder.setTitle("@" + user.getName() + " (" + user.getIdLong() + ")");
+		builder.setThumbnail(user.getEffectiveAvatarUrl() + "?size=1024");
 
 		Member member = getMember(e, user);
 
@@ -141,8 +141,12 @@ public class WhoisCmd extends AbstractCommand {
 	 * invalid, simply return the author of the message.
 	 */
 	private User getUser(MessageReceivedEvent e) {
+		if (args.length == 0) {
+			return e.getAuthor();
+		}
 		try {
-			long id = Long.parseLong(args[0].replace("<", "")
+			long id = Long.parseLong(args[0]
+					.replace("<", "")
 					.replace(">", "")
 					.replace("!", "")
 					.replace("@", ""));

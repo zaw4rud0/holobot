@@ -96,7 +96,7 @@ public class ClearCmd extends AbstractMusicCommand {
 					return false;
 				}
 
-				if (!evt.retrieveUser().complete().isBot()) {
+				if (evt.retrieveUser().complete().isBot()) {
 					return false;
 				}
 

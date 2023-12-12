@@ -6,6 +6,7 @@ import dev.zawarudo.holo.anime.MangaSearchCmd;
 import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.fun.CoinFlipCmd;
 import dev.zawarudo.holo.fun.Magic8BallCmd;
+import dev.zawarudo.holo.fun.UrbanDictionaryCmd;
 import dev.zawarudo.holo.fun.UwuCmd;
 import dev.zawarudo.holo.games.pokemon.CatchCmd;
 import dev.zawarudo.holo.games.pokemon.PokedexCmd;
@@ -23,6 +24,7 @@ import dev.zawarudo.holo.general.ServerRolesCmd;
 import dev.zawarudo.holo.general.SuggestionCmd;
 import dev.zawarudo.holo.general.WhoisCmd;
 import dev.zawarudo.holo.image.ActionCmd;
+import dev.zawarudo.holo.image.AoCStatsCmd;
 import dev.zawarudo.holo.image.AvatarCmd;
 import dev.zawarudo.holo.image.BannerCmd;
 import dev.zawarudo.holo.image.CheckNSFWCmd;
@@ -39,6 +41,7 @@ import dev.zawarudo.holo.music.cmds.ClearCmd;
 import dev.zawarudo.holo.music.cmds.CloneCmd;
 import dev.zawarudo.holo.music.cmds.JoinCmd;
 import dev.zawarudo.holo.music.cmds.LeaveCmd;
+import dev.zawarudo.holo.music.cmds.LoopCmd;
 import dev.zawarudo.holo.music.cmds.LyricsCmd;
 import dev.zawarudo.holo.music.cmds.NowPlayingCmd;
 import dev.zawarudo.holo.music.cmds.PlayCmd;
@@ -79,8 +82,7 @@ public class CommandManager extends ListenerAdapter {
         commands = new LinkedHashMap<>();
 
         // General Cmds
-        addCommand(new BugCmd());
-//		addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
+        addCommand(new BugCmd(Bootstrap.holo.getGitHubClient()));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -89,7 +91,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new ServerEmotesCmd());
         addCommand(new ServerInfoCmd());
         addCommand(new ServerRolesCmd());
-        addCommand(new SuggestionCmd());
+        addCommand(new SuggestionCmd(Bootstrap.holo.getGitHubClient()));
         addCommand(new WhoisCmd());
 
         // Anime Cmds
@@ -101,7 +103,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new CloneCmd());
         addCommand(new JoinCmd());
         addCommand(new LeaveCmd());
-//		addCommand(new LoopCmd());
+		addCommand(new LoopCmd());
         addCommand(new LyricsCmd());
         addCommand(new NowPlayingCmd());
         addCommand(new PlayCmd());
@@ -112,16 +114,12 @@ public class CommandManager extends ListenerAdapter {
 
         // Image Cmds
         addCommand(new ActionCmd());
-//		addCommand(new AoCStatsCmd());
+		addCommand(new AoCStatsCmd());
         addCommand(new AvatarCmd());
         addCommand(new BannerCmd());
         addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
-//		addCommand(new CollageCmd());
-//		addCommand(new DanbooruCmd());
         addCommand(new DogCmd());
-//		addCommand(new DreamCmd());
-//		addCommand(new GelbooruCmd());
         addCommand(new HoloCmd());
         addCommand(new InspiroCmd());
         addCommand(new NekoCmd());
@@ -131,8 +129,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new XkcdCmd());
 
         // Game Cmds
-//		addCommand(new AkinatorCmd());
-//		addCommand(new AkinatorCmdOld(waiter));
         addCommand(new CatchCmd());
         addCommand(new PokedexCmd());
         addCommand(new PokemonTeamCmd());
@@ -140,6 +136,7 @@ public class CommandManager extends ListenerAdapter {
         // Misc Cmds
         addCommand(new Magic8BallCmd());
         addCommand(new CoinFlipCmd());
+        addCommand(new UrbanDictionaryCmd());
         addCommand(new UwuCmd());
 
         // Owner Cmds
@@ -153,8 +150,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new ShutdownCmd());
         addCommand(new SpawnCmd());
         addCommand(new StatusCmd());
-
-        // Experimental Cmds
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Loaded {} commands!", commands.values().stream().distinct().count());
@@ -209,12 +204,12 @@ public class CommandManager extends ListenerAdapter {
      */
     public List<AbstractCommand> getCommands(CommandCategory category) {
         // LinkedHashSet so the list keeps the item insertion order
-        Set<AbstractCommand> commands = new LinkedHashSet<>();
+        Set<AbstractCommand> cmdSet = new LinkedHashSet<>();
         for (AbstractCommand cmd : this.commands.values()) {
             if (cmd.getCategory() == category) {
-                commands.add(cmd);
+                cmdSet.add(cmd);
             }
         }
-        return new ArrayList<>(commands);
+        return new ArrayList<>(cmdSet);
     }
 }
