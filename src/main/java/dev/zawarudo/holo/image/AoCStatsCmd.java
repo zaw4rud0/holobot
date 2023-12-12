@@ -6,6 +6,7 @@ import dev.zawarudo.holo.annotations.Command;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.CommandCategory;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.ImageOperations;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -15,8 +16,6 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 
 @Command(name = "aoc",
         description = "Displays the graph of Advent of Code",
@@ -35,7 +34,7 @@ public class AoCStatsCmd extends AbstractCommand {
         AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, YEAR, LEADERBOARD_ID, token);
         BufferedImage image = graph.generateImage();
 
-        String name = String.format("aoc_%s.png", getCurrentDateTime());
+        String name = String.format("aoc_%s.png", Formatter.getCurrentDateTimeString());
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Advent of Code 2023 Stats");
@@ -48,11 +47,5 @@ public class AoCStatsCmd extends AbstractCommand {
         } catch (IOException ignored) {
             // TODO: Properly handle exceptions
         }
-    }
-
-    private static String getCurrentDateTime() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
-        return now.format(formatter);
     }
 }
