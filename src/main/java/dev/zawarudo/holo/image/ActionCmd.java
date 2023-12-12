@@ -39,7 +39,7 @@ public class ActionCmd extends AbstractCommand {
         try {
             initializeActions();
         } catch (IOException ex) {
-            throw new RuntimeException("Something went wrong while initializing the actions!", ex);
+            throw new IllegalStateException("Something went wrong while initializing the actions!", ex);
         }
     }
 

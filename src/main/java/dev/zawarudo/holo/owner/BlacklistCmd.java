@@ -73,7 +73,7 @@ public class BlacklistCmd extends AbstractCommand {
 		}
 
 		String description = String.format("**Name:** %s\n**Tag:** %s\n**Id:** %s\n**Reason:** %s",
-				toBlacklist.getAsMention(), toBlacklist.getAsTag(), toBlacklist.getId(), reason);
+				toBlacklist.getAsMention(), toBlacklist.getName(), toBlacklist.getId(), reason);
 		sendSuccessEmbed(description);
 	}
 
