@@ -28,6 +28,7 @@ import dev.zawarudo.holo.image.AoCStatsCmd;
 import dev.zawarudo.holo.image.AvatarCmd;
 import dev.zawarudo.holo.image.BannerCmd;
 import dev.zawarudo.holo.image.CheckNSFWCmd;
+import dev.zawarudo.holo.image.PaletteCmd;
 import dev.zawarudo.holo.image.DogCmd;
 import dev.zawarudo.holo.image.InspiroCmd;
 import dev.zawarudo.holo.image.PixelateCmd;
@@ -123,6 +124,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new HoloCmd());
         addCommand(new InspiroCmd());
         addCommand(new NekoCmd());
+        addCommand(new PaletteCmd());
         addCommand(new PixelateCmd());
         addCommand(new UpscaleCmd());
         addCommand(new WaifuCmd());
