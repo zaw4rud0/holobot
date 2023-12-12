@@ -2,6 +2,7 @@ package dev.zawarudo.holo.utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
@@ -121,5 +122,22 @@ public final class Formatter {
         LocalDateTime now = LocalDateTime.now();
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
         return now.format(formatter);
+    }
+
+    /**
+     * Converts a Color object into its hexadecimal color code representation.
+     * <p>
+     * This method takes a Color object and converts it to a string representing its
+     * hexadecimal color code. The format of the hexadecimal code is "#RRGGBB", where
+     * RR, GG, and BB are two-digit hexadecimal values for the red, green, and blue
+     * components of the color, respectively.
+     * <p>
+     * Example: If the Color object represents the color red (255,0,0), the output will be "#ff0000".
+     *
+     * @param color The Color object to be converted into a hexadecimal color code.
+     * @return A string representing the hexadecimal color code of the provided Color object.
+     */
+    public static String getColorHexString(Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }
