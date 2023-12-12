@@ -43,7 +43,7 @@ public class DogCmd extends AbstractCommand {
                 formattedNames.put(name, formatted);
             });
         } catch (IOException ex) {
-            throw new RuntimeException("Something went wrong while reading the dog breeds file!", ex);
+            throw new IllegalStateException("Something went wrong while reading the dog breeds file!", ex);
         }
     }
 

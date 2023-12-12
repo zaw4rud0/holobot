@@ -1,78 +1,127 @@
 package dev.zawarudo.holo.image;
 
+import de.androidpit.colorthief.ColorThief;
 import dev.zawarudo.holo.annotations.Command;
-import dev.zawarudo.holo.annotations.Deactivated;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.core.CommandCategory;
+import dev.zawarudo.holo.utils.Formatter;
+import dev.zawarudo.holo.utils.ImageOperations;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
-@Deactivated
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 @Command(name = "palette",
-        description = "",
+        description = "Creates a palette of representative colors for a given image.",
+        usage = "[<color count>] [<image url>]",
+        thumbnail = "https://www.pinclipart.com/picdir/big/141-1416768_painting-clipart-paint-palette-art-emoji-png-transparent.png",
         category = CommandCategory.IMAGE)
 public class PaletteCmd extends AbstractCommand {
 
-    public static void main(String[] args) {
-        PaletteCmd cmd = new PaletteCmd();
-        cmd.doStuff();
-    }
+    private static final int DEFAULT_COLOR_COUNT = 5;
+    private static final String PALETTE_IMAGE_FORMAT = "palette_%s.png";
+    private static final int DEFAULT_BOX_SIZE = 200;
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
-        event.getChannel().sendMessage("This feature is not implemented yet!").queue();
-    }
+        Message msg = event.getMessage();
+        String url = msg.getReferencedMessage() == null ? getImage(msg) : getImage(msg.getReferencedMessage());
 
-    /**
-     *         <dependency>
-     *             <groupId>org.bytedeco</groupId>
-     *             <artifactId>javacv-platform</artifactId>
-     *             <version>1.5.8</version>
-     *         </dependency>
-     */
-
-    private void doStuff() {
-        /*
-        BufferedImage inputImage;
-        try {
-            inputImage = ImageIO.read(new URL("https://media.discordapp.net/attachments/873558142624075826/1086744813543620638/25.png"));
-        } catch (IOException ex) {
-            if (logger.isErrorEnabled()) {
-                logger.error("Something went wrong while reading the image.", ex);
-            }
+        if (url == null || url.contains("gif")) {
+            sendErrorEmbed(event, "Incorrect usage! Please provide an image, either as an attachment or as an url.");
             return;
         }
 
-        // Convert BufferedImage to Mat
-        Mat matInputImage = new Mat(inputImage.getHeight(), inputImage.getWidth(), CvType.CV_8UC3);
-        byte[] data = ((DataBufferByte) inputImage.getRaster().getDataBuffer()).getData();
-        matInputImage.put(0, 0, data);
+        deleteInvoke(event);
+        String name = String.format(PALETTE_IMAGE_FORMAT, Formatter.getCurrentDateTimeString());
 
-        Mat grayImage = new Mat();
-        Imgproc.cvtColor(matInputImage, grayImage, Imgproc.COLOR_BGR2GRAY);
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("Color Palette");
+        builder.setThumbnail(url);
+        builder.setImage("attachment://" + name);
+        builder.setFooter("Invoked by " + event.getMember().getEffectiveName(), event.getAuthor().getEffectiveAvatarUrl());
 
-        Mat blurredImage = new Mat();
-        Imgproc.GaussianBlur(grayImage, blurredImage, new Size(5, 5), 0);
+        ColorResult result;
+        InputStream imageStream;
 
-        Mat binaryImage = new Mat();
-        Imgproc.threshold(blurredImage, binaryImage, 0, 255, Imgproc.THRESH_BINARY_INV + Imgproc.THRESH_OTSU);
-
-        Mat contourImage = matInputImage.clone();
-        Mat hierarchy = new Mat();
-        List<MatOfPoint> contours = new ArrayList<>();
-        Imgproc.findContours(binaryImage, contours, hierarchy, Imgproc.RETR_EXTERNAL, Imgproc.CHAIN_APPROX_SIMPLE);
-
-        for (Mat mat : contours) {
-            Rect boundingRect = Imgproc.boundingRect(mat);
-            //Mat segment = matInputImage.submat(boundingRect);
-
-            //Scalar averagePixel = Core.mean(segment);
-            //System.out.println("Average pixel value of segment " + i + ": " + averagePixel);
-
-            Imgproc.rectangle(contourImage, boundingRect, new Scalar(0, 255, 0), 2);
+        try {
+            BufferedImage image = readImage(url);
+            result = analyzeColors(image, parseColorCount());
+            BufferedImage paletteImage = createPaletteImage(result.representativeColors);
+            imageStream = ImageOperations.toInputStream(paletteImage);
+        } catch (IOException | URISyntaxException e) {
+            logger.error("Something went wrong while creating a color palette.", e);
+            sendErrorEmbed(event, "Something went wrong. Please try again later.");
+            return;
         }
 
-        // Save output image with bounding boxes
-        Imgcodecs.imwrite("output_image.jpg", contourImage);*/
+        builder.setColor(result.dominantColor);
+        builder.setDescription(result.formatColors());
+        FileUpload upload = FileUpload.fromData(imageStream, name);
+        event.getChannel().sendFiles(upload).setEmbeds(builder.build()).queue();
+    }
+
+    private BufferedImage readImage(String url) throws URISyntaxException, IOException {
+        return ImageIO.read(new URI(url).toURL());
+    }
+
+    private ColorResult analyzeColors(BufferedImage image, int count) {
+        int[][] array = ColorThief.getPalette(image, count);
+        List<Color> colors = convertToIntColorList(array);
+
+        int[] dominantColor = ColorThief.getColor(image);
+        Color dominant = convertToIntColorList(dominantColor).get(0);
+
+        return new ColorResult(dominant, colors);
+    }
+
+    private List<Color> convertToIntColorList(int[]... rgbArray) {
+        return Arrays.stream(rgbArray)
+                .filter(rgb -> rgb.length == 3)
+                .map(rgb -> new Color(rgb[0], rgb[1], rgb[2]))
+                .toList();
+    }
+
+    private BufferedImage createPaletteImage(List<Color> colors) {
+        int stripeWidth = colors.size() > 10 ? DEFAULT_BOX_SIZE / 2 : DEFAULT_BOX_SIZE;
+        int stripeHeight = DEFAULT_BOX_SIZE;
+
+        BufferedImage image = new BufferedImage(stripeWidth * colors.size(), stripeHeight, BufferedImage.TYPE_INT_RGB);
+        Graphics g = image.getGraphics();
+        for (int i = 0; i < colors.size(); i++) {
+            g.setColor(colors.get(i));
+            g.fillRect(i * stripeWidth, 0, stripeWidth, stripeHeight);
+        }
+        g.dispose();
+        return image;
+    }
+
+    private int parseColorCount() {
+        if (args.length > 0 && isInteger(args[0])) {
+            int count = Math.max(2, Integer.parseInt(args[0]));
+            return Math.min(count, 20);
+        }
+        return DEFAULT_COLOR_COUNT;
+    }
+
+    record ColorResult(Color dominantColor, List<Color> representativeColors) {
+        public String formatColors() {
+            return representativeColors.stream()
+                    .map(Formatter::getColorHexString)
+                    .map(hex -> "* " + hex)
+                    .collect(Collectors.joining("\n"));
+        }
     }
 }

@@ -2,9 +2,12 @@ package dev.zawarudo.holo.utils;
 
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -102,5 +105,39 @@ public final class Formatter {
         }
 
         return input;
+    }
+
+    /**
+     * Retrieves the current date and time as a formatted string.
+     * <p>
+     * This method generates a string representation of the current local date and time,
+     * formatted as "yyyy-MM-dd_HH.mm.ss". This format includes the year, month, day,
+     * hours, minutes, and seconds, separated by underscores and periods for readability.
+     * <p>
+     * Example output: "2023-12-10_15.30.45" for December 10, 2023, at 3:30:45 PM.
+     *
+     * @return A string representing the current date and time in the format "yyyy-MM-dd_HH.mm.ss".
+     */
+    public static String getCurrentDateTimeString() {
+        LocalDateTime now = LocalDateTime.now();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
+        return now.format(formatter);
+    }
+
+    /**
+     * Converts a Color object into its hexadecimal color code representation.
+     * <p>
+     * This method takes a Color object and converts it to a string representing its
+     * hexadecimal color code. The format of the hexadecimal code is "#RRGGBB", where
+     * RR, GG, and BB are two-digit hexadecimal values for the red, green, and blue
+     * components of the color, respectively.
+     * <p>
+     * Example: If the Color object represents the color red (255,0,0), the output will be "#ff0000".
+     *
+     * @param color The Color object to be converted into a hexadecimal color code.
+     * @return A string representing the hexadecimal color code of the provided Color object.
+     */
+    public static String getColorHexString(Color color) {
+        return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
 }
