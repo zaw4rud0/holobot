@@ -2,8 +2,8 @@ package dev.zawarudo.holo.apis.xkcd;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dev.zawarudo.holo.exceptions.APIException;
-import dev.zawarudo.holo.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.utils.HttpResponse;
 
 import java.io.FileNotFoundException;

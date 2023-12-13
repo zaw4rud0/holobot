@@ -1,8 +1,8 @@
 package apis;
 
 import dev.zawarudo.holo.apis.DogAPI;
-import dev.zawarudo.holo.exceptions.APIException;
-import dev.zawarudo.holo.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;

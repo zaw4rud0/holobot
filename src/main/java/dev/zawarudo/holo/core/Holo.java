@@ -2,11 +2,11 @@ package dev.zawarudo.holo.core;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.apis.GitHubClient;
+import dev.zawarudo.holo.commands.CommandListener;
+import dev.zawarudo.holo.commands.CommandManager;
 import dev.zawarudo.holo.database.SQLManager;
-import dev.zawarudo.holo.games.akinator.AkinatorManager;
-import dev.zawarudo.holo.games.pokemon.PokemonSpawnManager;
-import dev.zawarudo.holo.config.BotConfig;
-import dev.zawarudo.holo.config.GuildConfigManager;
+import dev.zawarudo.holo.commands.games.akinator.AkinatorManager;
+import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.misc.BotHandler;
 import dev.zawarudo.holo.misc.GuildListener;
 import dev.zawarudo.holo.misc.MiscListener;

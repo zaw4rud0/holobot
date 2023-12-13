@@ -3,7 +3,6 @@ package dev.zawarudo.holo.core;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.zawarudo.holo.utils.Reader;
-import dev.zawarudo.holo.config.BotConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
