@@ -3,9 +3,13 @@ package dev.zawarudo.holo.anime;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.core.AbstractCommand;
 import dev.zawarudo.holo.misc.Emote;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloUtils;
+import dev.zawarudo.nanojikan.model.AbstractMedium;
+import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
@@ -14,8 +18,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public abstract class BaseSearchCmd<T> extends AbstractCommand {
-
+public abstract class BaseSearchCmd<T extends AbstractMedium<T>> extends AbstractCommand {
     protected final EventWaiter waiter;
     protected final List<Emote> selection = HoloUtils.getNumbers();
 
@@ -24,8 +27,10 @@ public abstract class BaseSearchCmd<T> extends AbstractCommand {
     }
 
     protected abstract List<T> performSearch(MessageReceivedEvent event, String search);
+
     protected abstract EmbedBuilder createSearchResultEmbed(List<T> results);
-    protected abstract void sendSelection(MessageReceivedEvent event, T selected);
+
+    protected abstract void setEmbedDetails(EmbedBuilder builder, T selected);
 
     protected void showSearchResults(MessageReceivedEvent event, List<T> result) {
         EmbedBuilder builder = createSearchResultEmbed(result);
@@ -68,5 +73,42 @@ public abstract class BaseSearchCmd<T> extends AbstractCommand {
     private void handleUserReaction(MessageReceivedEvent event, Message msg, List<T> result, AtomicInteger selected) {
         msg.delete().queue();
         sendSelection(event, result.get(selected.get()));
+    }
+
+    protected void sendSelection(MessageReceivedEvent event, T selected) {
+        EmbedBuilder builder = createEmbedBuilder(selected);
+        setEmbedDetails(builder, selected);
+        sendEmbed(event, builder, true, getEmbedColor());
+    }
+
+    protected EmbedBuilder createEmbedBuilder(T selected) {
+        EmbedBuilder builder = new EmbedBuilder();
+        String type = selected.getType() == null ? "null" : selected.getType();
+
+        String title = Formatter.truncateString(selected.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
+        builder.setTitle(String.format("%s [%s]", title, type));
+
+        builder.setThumbnail(selected.getImages().getJpg().getLargeImage());
+        if (selected.hasSynopsis()) {
+            String synopsis = Formatter.truncateString(selected.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            builder.setDescription(synopsis);
+        }
+        return builder;
+    }
+
+    protected String formatList(List<Nameable> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        List<String> strings = list.stream().map(Nameable::toString).toList();
+        return String.join(", ", strings);
+    }
+
+    protected String formatScore(double score) {
+        return score == 0.0 ? "N/A" : String.valueOf(score);
+    }
+
+    protected String formatRank(int rank) {
+        return rank == 0 ? "N/A" : String.valueOf(rank);
     }
 }

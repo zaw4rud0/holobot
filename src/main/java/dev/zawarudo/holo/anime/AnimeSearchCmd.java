@@ -11,9 +11,7 @@ import dev.zawarudo.nanojikan.JikanAPI;
 import dev.zawarudo.nanojikan.exception.APIException;
 import dev.zawarudo.nanojikan.exception.InvalidRequestException;
 import dev.zawarudo.nanojikan.model.Anime;
-import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -37,6 +35,27 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
 
     public AnimeSearchCmd(EventWaiter waiter) {
         super(waiter);
+    }
+
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        sendTyping(event);
+
+        if (args.length == 0) {
+            sendErrorEmbed(event, "Please provide a title to search for.");
+            return;
+        }
+
+        String search = String.join(" ", args);
+        List<Anime> result = performSearch(event, search);
+
+        if (result.isEmpty()) {
+            sendErrorEmbed(event, "I couldn't find any animes with your given search terms!");
+            return;
+        }
+
+        deleteInvoke(event);
+        showSearchResults(event, result);
     }
 
     @Override
@@ -75,50 +94,7 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
     }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent event) {
-        sendTyping(event);
-
-        if (args.length == 0) {
-            sendErrorEmbed(event, "Please provide a title to search for.");
-            return;
-        }
-
-        String search = String.join(" ", args);
-        List<Anime> result = performSearch(event, search);
-
-        if (result.isEmpty()) {
-            sendErrorEmbed(event, "I couldn't find any animes with your given search terms!");
-            return;
-        }
-
-        deleteInvoke(event);
-
-        showSearchResults(event, result);
-    }
-
-    @Override
-    protected void sendSelection(MessageReceivedEvent event, Anime anime) {
-        EmbedBuilder builder = createEmbedBuilder(anime);
-        setAnimeDetails(builder, anime);
-        sendEmbed(event, builder, true, getEmbedColor());
-    }
-
-    private EmbedBuilder createEmbedBuilder(Anime anime) {
-        EmbedBuilder builder = new EmbedBuilder();
-        String type = anime.getType() == null ? "null" : anime.getType();
-
-        String title = Formatter.truncateString(anime.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
-        builder.setTitle(String.format("%s [%s]", title, type));
-
-        builder.setThumbnail(anime.getImages().getJpg().getLargeImage());
-        if (anime.hasSynopsis()) {
-            String synopsis = Formatter.truncateString(anime.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
-            builder.setDescription(synopsis);
-        }
-        return builder;
-    }
-
-    private void setAnimeDetails(EmbedBuilder builder, Anime anime) {
+    protected void setEmbedDetails(EmbedBuilder builder, Anime anime) {
         if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle())) {
             builder.addField("English Title", anime.getTitleEnglish(), true);
         }
@@ -126,57 +102,41 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
             builder.addField("Japanese Title", anime.getTitleJapanese(), true);
         }
 
-        String studios = getFormattedList(anime.getStudios());
+        String studios = formatList(anime.getStudios());
         if (studios != null) {
             builder.addField("Studio", studios, false);
         }
 
-        String genres = getFormattedList(anime.getGenres());
+        String genres = formatList(anime.getGenres());
         if (genres != null) {
             builder.addField("Genres", genres, false);
         }
-        String themes = getFormattedList(anime.getThemes());
+        String themes = formatList(anime.getThemes());
         if (themes != null) {
             builder.addField("Themes", themes, false);
         }
 
         builder.addField("Status", anime.getStatus(), true);
         if ("Movie".equals(anime.getType())) {
-            builder.addField("Season", getAnimeSeason(anime), true);
+            builder.addField("Season", formatAnimeSeason(anime), true);
             builder.addBlankField(true);
         } else {
-            builder.addField("Episodes", getAnimeEpisodes(anime), true);
-            builder.addField("Season", getAnimeSeason(anime), true);
+            builder.addField("Episodes", formatAnimeEpisodes(anime), true);
+            builder.addField("Season", formatAnimeSeason(anime), true);
         }
 
-        builder.addField("MAL Score", getFormattedScore(anime.getScore()), true);
-        builder.addField("MAL Rank", getFormattedRank(anime.getRank()), true);
+        builder.addField("MAL Score", formatScore(anime.getScore()), true);
+        builder.addField("MAL Rank", formatRank(anime.getRank()), true);
         builder.addBlankField(true);
         builder.addField("Link", "[MyAnimeList](" + anime.getUrl() + ")", false);
     }
 
-    private String getFormattedList(List<Nameable> list) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-        List<String> strings = list.stream().map(Nameable::toString).toList();
-        return String.join(", ", strings);
-    }
-
-    private String getAnimeEpisodes(Anime anime) {
+    private String formatAnimeEpisodes(Anime anime) {
         return anime.getEpisodes() == 0 ? "TBA" : String.valueOf(anime.getEpisodes());
     }
 
-    private String getAnimeSeason(Anime anime) {
+    private String formatAnimeSeason(Anime anime) {
         String season = anime.getSeason() == null ? "TBA" : anime.getSeason();
         return Formatter.capitalize(season);
-    }
-
-    private String getFormattedScore(double score) {
-        return score == 0.0 ? "N/A" : String.valueOf(score);
-    }
-
-    private String getFormattedRank(int rank) {
-        return rank == 0 ? "N/A" : String.valueOf(rank);
     }
 }

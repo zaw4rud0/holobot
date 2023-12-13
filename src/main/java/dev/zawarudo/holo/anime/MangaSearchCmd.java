@@ -13,7 +13,6 @@ import dev.zawarudo.nanojikan.exception.InvalidRequestException;
 import dev.zawarudo.nanojikan.model.Manga;
 import dev.zawarudo.nanojikan.model.Nameable;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,10 +57,10 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
         }
 
         deleteInvoke(event);
-
         showSearchResults(event, result);
     }
 
+    @Override
     protected List<Manga> performSearch(MessageReceivedEvent event, String search) {
         try {
             return JikanAPI.searchManga(search);
@@ -97,29 +96,7 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
     }
 
     @Override
-    protected void sendSelection(MessageReceivedEvent event, Manga manga) {
-        EmbedBuilder builder = createEmbedBuilder(manga);
-        setMangaDetails(builder, manga);
-        sendEmbed(event, builder, true, getEmbedColor());
-    }
-
-    // TODO: Generalize
-    private EmbedBuilder createEmbedBuilder(Manga manga) {
-        EmbedBuilder builder = new EmbedBuilder();
-        String type = manga.getType() == null ? "null" : manga.getType();
-
-        String title = Formatter.truncateString(manga.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
-        builder.setTitle(String.format("%s [%s]", title, type));
-
-        builder.setThumbnail(manga.getImages().getJpg().getLargeImage());
-        if (manga.hasSynopsis()) {
-            String synopsis = Formatter.truncateString(manga.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
-            builder.setDescription(synopsis);
-        }
-        return builder;
-    }
-
-    private void setMangaDetails(EmbedBuilder builder, Manga manga) {
+    protected void setEmbedDetails(EmbedBuilder builder, Manga manga) {
         if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle())) {
             builder.addField("English Title", manga.getTitleEnglish(), true);
         }
@@ -163,14 +140,6 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
         return list.stream().map(Nameable::getName).map(Formatter::reverseJapaneseName).collect(Collectors.joining(", "));
     }
 
-    private String formatList(List<Nameable> list) {
-        if (list == null || list.isEmpty()) {
-            return null;
-        }
-        List<String> strings = list.stream().map(Nameable::toString).toList();
-        return String.join(", ", strings);
-    }
-
     private String formatChapters(int ch, int vol) {
         String displayText;
         if (ch != 0) {
@@ -183,13 +152,5 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
             displayText = "TBA";
         }
         return displayText;
-    }
-
-    private String formatScore(double score) {
-        return score == 0.0 ? "N/A" : String.valueOf(score);
-    }
-
-    private String formatRank(int rank) {
-        return rank == 0 ? "N/A" : String.valueOf(rank);
     }
 }
