@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.games.pokemon;
 
 import dev.zawarudo.holo.utils.CollageUtils;
+import dev.zawarudo.holo.utils.FontUtils;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.ImageOperations;
 import dev.zawarudo.pokeapi4java.model.Pokemon;
@@ -99,7 +100,7 @@ public class PokemonTeam {
         g2.setColor(oldColor);
         temp = ImageOperations.resize(img, 420, 420);
         g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
-        drawName(g2, name, new Rectangle(width, height), new Font("Comic Sans MS", Font.BOLD, 30));
+        drawName(g2, name, new Rectangle(width, height), FontUtils.loadFontFromFile(30));
         g2.dispose();
         return res;
     }
