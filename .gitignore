@@ -29,7 +29,6 @@ hs_err_pid*
 *.iml
 
 # My own files
-/TODO.md
 /config.json
 /config.properties
 

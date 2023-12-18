@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.core;
 
+import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.database.DBOperations;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;

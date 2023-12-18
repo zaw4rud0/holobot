@@ -4,8 +4,8 @@ import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
 import dev.zawarudo.holo.apis.xkcd.XkcdComic;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.database.Database;
-import dev.zawarudo.holo.exceptions.APIException;
-import dev.zawarudo.holo.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,7 +26,7 @@ public final class XkcdScraper {
     private XkcdScraper() {
     }
 
-    public void scrape() throws APIException {
+    public static void scrape() throws APIException {
         int newest = XkcdAPI.getLatest().getIssueNr();
         int last = 0;
         try {

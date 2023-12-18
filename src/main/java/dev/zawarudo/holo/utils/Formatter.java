@@ -140,4 +140,25 @@ public final class Formatter {
     public static String getColorHexString(Color color) {
         return String.format("#%02x%02x%02x", color.getRed(), color.getGreen(), color.getBlue());
     }
+
+    public static String checkWindowsCompatibleName(@NotNull String fileName) {
+        String invalidCharsRegex = "[/\\\\:*?\"<>|]";
+        String invalidEndRegex = "[ .]+$";
+
+        String windowsCompatibleName = fileName.replaceAll(invalidCharsRegex, "_");
+        windowsCompatibleName = windowsCompatibleName.replaceAll(invalidEndRegex, "_");
+
+
+        if (windowsCompatibleName.matches("^(?i)(con|prn|aux|nul|com[1-9]|lpt[1-9])\\.png$")) {
+            windowsCompatibleName = "_" + windowsCompatibleName;
+        }
+
+        // Shouldn't exceed 255 characters (Windows file name limit)
+        int maxFileNameLength = 255 - ".png".length();
+        if (windowsCompatibleName.length() > maxFileNameLength) {
+            windowsCompatibleName = windowsCompatibleName.substring(0, maxFileNameLength);
+        }
+
+        return windowsCompatibleName + ".png";
+    }
 }
