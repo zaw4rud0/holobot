@@ -8,7 +8,7 @@ import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
-import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.EmbedColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

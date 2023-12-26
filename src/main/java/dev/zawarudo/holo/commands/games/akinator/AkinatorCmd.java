@@ -5,7 +5,7 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.exceptions.APIException;
-import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.EmbedColor;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.eu.zajc.akiwrapper.core.entities.Server;
 import org.jetbrains.annotations.NotNull;

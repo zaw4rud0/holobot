@@ -10,7 +10,7 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;
-import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.utils.BooruAPI;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

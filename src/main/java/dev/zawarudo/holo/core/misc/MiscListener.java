@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.misc;
+package dev.zawarudo.holo.core.misc;
 
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Message;

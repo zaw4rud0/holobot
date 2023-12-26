@@ -6,7 +6,7 @@ import dev.zawarudo.holo.commands.music.AbstractMusicCommand;
 import dev.zawarudo.holo.commands.music.GuildMusicManager;
 import dev.zawarudo.holo.commands.music.PlayerManager;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.misc.Emote;
+import dev.zawarudo.holo.core.misc.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;

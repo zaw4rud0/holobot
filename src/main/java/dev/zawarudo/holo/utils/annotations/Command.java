@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.utils.annotations;
 
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.EmbedColor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

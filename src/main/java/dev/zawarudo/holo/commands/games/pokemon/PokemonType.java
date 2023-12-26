@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
-import dev.zawarudo.holo.misc.Emote;
+import dev.zawarudo.holo.core.misc.Emote;
 
 import java.awt.*;
 

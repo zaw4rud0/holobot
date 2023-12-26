@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.apis;
 
-import dev.zawarudo.holo.misc.Submission;
+import dev.zawarudo.holo.core.misc.Submission;
 import org.kohsuke.github.GHIssueBuilder;
 import org.kohsuke.github.GHRepository;
 import org.kohsuke.github.GitHub;

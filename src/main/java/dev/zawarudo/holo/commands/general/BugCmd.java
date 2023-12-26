@@ -4,7 +4,7 @@ import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.apis.GitHubClient;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.misc.Submission;
+import dev.zawarudo.holo.core.misc.Submission;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;

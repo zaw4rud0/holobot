@@ -8,7 +8,7 @@ import com.google.gson.annotations.SerializedName;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.HttpResponse;
 import dev.zawarudo.holo.utils.Reader;
 import net.dv8tion.jda.api.EmbedBuilder;

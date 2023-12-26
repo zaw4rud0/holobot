@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.misc;
+package dev.zawarudo.holo.core.misc;
 
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.commands.music.GuildMusicManager;

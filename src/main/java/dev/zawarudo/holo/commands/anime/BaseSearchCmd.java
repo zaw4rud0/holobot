@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.AbstractCommand;
-import dev.zawarudo.holo.misc.Emote;
+import dev.zawarudo.holo.core.misc.Emote;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloUtils;
 import dev.zawarudo.nanojikan.model.AbstractMedium;

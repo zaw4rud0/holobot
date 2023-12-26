@@ -2,8 +2,8 @@ package dev.zawarudo.holo.commands.games.akinator;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.utils.exceptions.APIException;
-import dev.zawarudo.holo.misc.EmbedColor;
-import dev.zawarudo.holo.misc.Emote;
+import dev.zawarudo.holo.core.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.Emote;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;

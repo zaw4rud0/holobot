@@ -4,7 +4,7 @@ import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.misc.EmbedColor;
+import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.pokeapi4java.exception.PokemonNotFoundException;
 import dev.zawarudo.pokeapi4java.model.Pokemon;
 import dev.zawarudo.pokeapi4java.model.PokemonSpecies;
