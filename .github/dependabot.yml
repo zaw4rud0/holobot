@@ -4,6 +4,14 @@ updates:
     directory: "/" # pom.xml file is in the project root folder
     schedule:
       interval: "weekly"
+    groups:
+      maven-dependencies:
+        patterns:
+          - '*'
     commit-message:
       prefix: "mvn"
     open-pull-requests-limit: 25 # Maximum number of open pull requests
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
