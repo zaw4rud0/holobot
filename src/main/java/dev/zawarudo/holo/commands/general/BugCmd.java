@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.general;
 
 import dev.zawarudo.holo.utils.annotations.Command;
-import dev.zawarudo.holo.apis.GitHubClient;
+import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.Submission;

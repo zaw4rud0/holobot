@@ -1,8 +1,8 @@
 package dev.zawarudo.holo.commands.image;
 
 import dev.zawarudo.holo.utils.annotations.Command;
-import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
-import dev.zawarudo.holo.apis.xkcd.XkcdComic;
+import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
+import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;

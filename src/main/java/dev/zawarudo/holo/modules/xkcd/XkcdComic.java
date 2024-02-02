@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.apis.xkcd;
+package dev.zawarudo.holo.modules.xkcd;
 
 import com.google.gson.annotations.SerializedName;
 

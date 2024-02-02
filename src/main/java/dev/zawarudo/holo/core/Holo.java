@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.core;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.apis.GitHubClient;
+import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.commands.CommandListener;
 import dev.zawarudo.holo.commands.CommandManager;
 import dev.zawarudo.holo.database.SQLManager;

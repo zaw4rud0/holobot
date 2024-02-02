@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.apis;
+package dev.zawarudo.holo.modules;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;

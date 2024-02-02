@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.scripts;
 
-import dev.zawarudo.holo.apis.xkcd.XkcdAPI;
-import dev.zawarudo.holo.apis.xkcd.XkcdComic;
+import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
+import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.database.Database;
 import dev.zawarudo.holo.utils.exceptions.APIException;

@@ -78,33 +78,17 @@
     </build>
 
     <dependencies>
-        <!-- Lightweight packages written by myself -->
-        <dependency>
-            <groupId>dev.zawarudo</groupId>
-            <artifactId>nanojikan</artifactId>
-            <version>1.0.3</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.zawarudo</groupId>
-            <artifactId>pokeapi4java</artifactId>
-            <version>1.0.2</version>
-        </dependency>
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>aoc-utils</artifactId>
-            <version>1.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>dev.zawarudo</groupId>
-            <artifactId>javabooru</artifactId>
-            <version>0.1.4</version>
+            <version>1.0.2</version>
         </dependency>
 
         <!-- Core of the bot -->
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.18</version>
+            <version>5.0.0-beta.20</version>
         </dependency>
 
         <!-- Maintained version of JDA Utilities -->
@@ -273,7 +257,7 @@
         <repository>
             <id>github</id>
             <name>GitHub repository of my packages</name>
-            <url>https://maven.pkg.github.com/xharlock</url>
+            <url>https://maven.pkg.github.com/zaw4rud0</url>
         </repository>
     </repositories>
 </project>

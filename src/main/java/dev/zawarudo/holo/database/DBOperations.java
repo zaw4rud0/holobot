@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.database;
 
-import dev.zawarudo.holo.apis.xkcd.XkcdComic;
+import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;

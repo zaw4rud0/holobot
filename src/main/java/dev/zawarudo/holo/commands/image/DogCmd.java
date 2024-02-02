@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.image;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.zawarudo.holo.utils.annotations.Command;
-import dev.zawarudo.holo.apis.DogAPI;
+import dev.zawarudo.holo.modules.DogAPI;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.exceptions.APIException;
