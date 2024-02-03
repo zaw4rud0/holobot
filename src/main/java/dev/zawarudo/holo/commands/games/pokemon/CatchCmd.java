@@ -1,13 +1,13 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
+import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
+import dev.zawarudo.holo.modules.pokeapi.model.PokemonSpecies;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
-import dev.zawarudo.pokeapi4java.exception.PokemonNotFoundException;
-import dev.zawarudo.pokeapi4java.model.Pokemon;
-import dev.zawarudo.pokeapi4java.model.PokemonSpecies;
+import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -58,7 +58,7 @@ public class CatchCmd extends AbstractCommand {
 				logger.error("There has been an API error.", ex);
 			}
 			return;
-		} catch (PokemonNotFoundException ex) {
+		} catch (NotFoundException ex) {
 			sendErrorEmbed(event, "There has been an internal error that wasn't supposed to " +
 					"happen. Please submit a bug report with the name of this Pokémon and the id of " +
 					"the channel where this happened.");

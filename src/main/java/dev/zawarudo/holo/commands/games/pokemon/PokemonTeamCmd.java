@@ -1,11 +1,11 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
+import dev.zawarudo.holo.modules.pokeapi.PokeAPI;
+import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.pokeapi4java.PokeAPI;
-import dev.zawarudo.pokeapi4java.model.Pokemon;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -51,7 +51,7 @@ public class PokemonTeamCmd extends AbstractCommand {
 					ids.add(new Random().nextInt(PokeAPI.pokemonCount) + 1);
 				}
 
-				List<Pokemon> pokemons = PokeAPI.getPokemons(ids.stream().mapToInt(k -> k).toArray());
+				List<Pokemon> pokemons = PokeAPI.getPokemon(ids.stream().mapToInt(k -> k).toArray());
 				PokemonTeam team = new PokemonTeam(pokemons.toArray(new Pokemon[0]));
 
 				BufferedImage img = team.generateTeamImage();

@@ -8,9 +8,11 @@ import java.nio.charset.StandardCharsets;
 import java.text.DateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 public final class Formatter {
 
@@ -160,5 +162,21 @@ public final class Formatter {
         }
 
         return windowsCompatibleName + ".png";
+    }
+
+    public static String removeStartingChar(String string, String character) {
+        return string.substring(0, string.indexOf(character));
+    }
+
+    // TODO: Better documentation
+    /**
+     * Formats a given String the following way: lightning-rod -> Lightning Rod
+     */
+    public static String formatPokemonName(String name) {
+        return Arrays.stream(name.replace("--", "-").split("-"))
+                .map(Formatter::capitalize)
+                .collect(Collectors.joining(" "))
+                .replace("Mr", "Mr.")
+                .replace("Jr", "Jr.");
     }
 }

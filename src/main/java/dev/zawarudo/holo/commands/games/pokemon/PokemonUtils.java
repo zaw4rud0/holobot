@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
+import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.pokeapi4java.model.Pokemon;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;

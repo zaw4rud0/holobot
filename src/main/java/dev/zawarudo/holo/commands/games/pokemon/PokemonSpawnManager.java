@@ -1,10 +1,10 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
 import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.modules.pokeapi.PokeAPI;
+import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.pokeapi4java.PokeAPI;
-import dev.zawarudo.pokeapi4java.exception.InvalidPokedexIdException;
-import dev.zawarudo.pokeapi4java.model.Pokemon;
+import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -66,7 +66,7 @@ public class PokemonSpawnManager {
                 pokemon = PokeAPI.getRandomPokemon();
                 BufferedImage image = PokemonUtils.drawHiddenPokemon(pokemon);
                 upload = FileUpload.fromData(ImageOperations.toInputStream(image), "pokemon.png");
-            } catch (IOException | InvalidPokedexIdException ex) {
+            } catch (IOException | InvalidIdException ex) {
                 if (LOGGER.isErrorEnabled()) {
                     LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", id, ex);
                 }
@@ -87,7 +87,7 @@ public class PokemonSpawnManager {
         Pokemon pokemon;
         try {
             pokemon = PokeAPI.getRandomPokemon();
-        } catch (IOException | InvalidPokedexIdException ex) {
+        } catch (IOException | InvalidIdException ex) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", channelId, ex);
             }

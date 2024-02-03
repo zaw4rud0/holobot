@@ -1,14 +1,14 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
+import dev.zawarudo.holo.modules.pokeapi.PokeAPI;
+import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
+import dev.zawarudo.holo.modules.pokeapi.model.PokemonSpecies;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.pokeapi4java.PokeAPI;
-import dev.zawarudo.pokeapi4java.exception.InvalidPokedexIdException;
-import dev.zawarudo.pokeapi4java.exception.PokemonNotFoundException;
-import dev.zawarudo.pokeapi4java.model.Pokemon;
-import dev.zawarudo.pokeapi4java.model.PokemonSpecies;
+import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
+import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -58,7 +58,7 @@ public class SpawnCmd extends AbstractCommand {
 			builder.setDescription("API error. Please try again later.");
 			sendToOwner(builder);
 			return;
-		} catch (InvalidPokedexIdException | PokemonNotFoundException ex) {
+		} catch (InvalidIdException | NotFoundException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Pokémon not found. Please check for typos.");
 			sendToOwner(builder);

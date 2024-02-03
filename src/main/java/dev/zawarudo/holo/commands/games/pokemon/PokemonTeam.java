@@ -1,10 +1,10 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
+import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
 import dev.zawarudo.holo.utils.CollageUtils;
 import dev.zawarudo.holo.utils.FontUtils;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.pokeapi4java.model.Pokemon;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
