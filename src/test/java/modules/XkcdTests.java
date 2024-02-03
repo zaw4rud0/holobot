@@ -1,4 +1,4 @@
-package apis;
+package modules;
 
 import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;

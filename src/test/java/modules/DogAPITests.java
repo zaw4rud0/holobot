@@ -1,4 +1,4 @@
-package apis;
+package modules;
 
 import dev.zawarudo.holo.modules.DogAPI;
 import dev.zawarudo.holo.utils.exceptions.APIException;
