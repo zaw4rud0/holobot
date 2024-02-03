@@ -230,8 +230,8 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub xHarlock Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/xharlock/holobot</url>
+            <name>GitHub zaw4rud0 Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/zaw4rud0/holobot</url>
         </repository>
     </distributionManagement>
 

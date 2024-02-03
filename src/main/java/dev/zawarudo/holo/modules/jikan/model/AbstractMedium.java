@@ -163,7 +163,7 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        AbstractMedium<T> media = (AbstractMedium<T>) obj;
+        AbstractMedium<?> media = (AbstractMedium<?>) obj;
         return id == media.id;
     }
 
