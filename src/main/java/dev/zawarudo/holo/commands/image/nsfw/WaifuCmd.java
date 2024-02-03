@@ -1,9 +1,8 @@
 package dev.zawarudo.holo.commands.image.nsfw;
 
-import dev.zawarudo.danbooru.DanbooruAPI;
-import dev.zawarudo.danbooru.DanbooruPost;
-import dev.zawarudo.exceptions.APIException;
-import dev.zawarudo.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.modules.booru.BooruAPI;
+import dev.zawarudo.holo.modules.booru.danbooru.DanbooruAPI;
+import dev.zawarudo.holo.modules.booru.danbooru.DanbooruPost;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.AbstractCommand;
@@ -11,7 +10,8 @@ import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.core.misc.EmbedColor;
-import dev.zawarudo.utils.BooruAPI;
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -133,7 +133,7 @@ public class WaifuCmd extends AbstractCommand {
 				.setLimit(1)
 				.setTags(tag)
 				.getPosts();
-		if (posts.size() == 0) {
+		if (posts.isEmpty()) {
 			return null;
 		}
 		return posts.get(0).getUrl();
