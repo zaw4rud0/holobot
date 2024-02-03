@@ -1,17 +1,17 @@
 package dev.zawarudo.holo.commands.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.model.Manga;
+import dev.zawarudo.holo.modules.jikan.model.Nameable;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.core.misc.Emote;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloUtils;
-import dev.zawarudo.nanojikan.JikanAPI;
-import dev.zawarudo.nanojikan.exception.APIException;
-import dev.zawarudo.nanojikan.exception.InvalidRequestException;
-import dev.zawarudo.nanojikan.model.Manga;
-import dev.zawarudo.nanojikan.model.Nameable;
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
