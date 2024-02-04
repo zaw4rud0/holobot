@@ -23,9 +23,9 @@ import java.util.stream.Collectors;
 public final class PokeAPI {
 
 	/** The base URL for the PokeAPI. */
-	public static final String baseUrl = "https://pokeapi.co/api/v2/";
+	public static final String BASE_URL = "https://pokeapi.co/api/v2/";
 	/** The number of Pokémon that exist. */
-	public static final int pokemonCount = 905;
+	public static final int POKEMON_COUNT = 905;
 
 	private PokeAPI() {
 	}
@@ -37,7 +37,7 @@ public final class PokeAPI {
 	 * @return A {@link PokemonSpecies} object
 	 */
 	public static PokemonSpecies getPokemonSpecies(int id) throws IOException, InvalidIdException {
-		String url = baseUrl + "pokemon-species/" + id + "/";
+		String url = BASE_URL + "pokemon-species/" + id + "/";
 		JsonObject obj;
 		try {
 			obj = getJsonObject(url);
@@ -54,7 +54,7 @@ public final class PokeAPI {
 	 * @return A {@link PokemonSpecies} object
 	 */
 	public static PokemonSpecies getPokemonSpecies(String name) throws IOException, NotFoundException {
-		String url = baseUrl + "pokemon-species/" + escape(name) + "/";
+		String url = BASE_URL + "pokemon-species/" + escape(name) + "/";
 		JsonObject obj;
 		try {
 			obj = getJsonObject(url);
@@ -71,7 +71,7 @@ public final class PokeAPI {
 	 * @return A {@link Pokemon} object
 	 */
 	public static Pokemon getPokemon(int id) throws IOException, InvalidIdException {
-		String url = baseUrl + "pokemon/" + id + "/";
+		String url = BASE_URL + "pokemon/" + id + "/";
 		JsonObject obj;
 		try {
 			obj = getJsonObject(url);
@@ -88,7 +88,7 @@ public final class PokeAPI {
 	 * @return A {@link Pokemon} object
 	 */
 	public static Pokemon getPokemon(String name) throws IOException, NotFoundException {
-		String url = baseUrl + "pokemon/" + escape(name) + "/";
+		String url = BASE_URL + "pokemon/" + escape(name) + "/";
 		JsonObject obj;
 		try {
 			obj = getJsonObject(url);
@@ -100,7 +100,7 @@ public final class PokeAPI {
 
 	// TODO: JavaDoc
 	public static PokemonType getType(int id) throws IOException, IllegalArgumentException {
-		String url = String.format("%s/type/%d/", baseUrl, id);
+		String url = String.format("%s/type/%d/", BASE_URL, id);
 		JsonObject obj;
 		try {
 			obj = getJsonObject(url);
@@ -112,7 +112,7 @@ public final class PokeAPI {
 
 	// TODO: JavaDoc
 	public static PokemonType getType(String name) throws IOException, IllegalArgumentException {
-		String url = String.format("%s/type/%s/", baseUrl, escape(name));
+		String url = String.format("%s/type/%s/", BASE_URL, escape(name));
 		JsonObject obj;
 		try {
 			obj = getJsonObject(url);
@@ -195,7 +195,7 @@ public final class PokeAPI {
 	}
 	
 	private static int getRandomNumber() throws IOException {
-		String url = "https://www.random.org/integers/?num=1&min=1&max=" + pokemonCount + "&col=1&base=10&format=plain";
+		String url = "https://www.random.org/integers/?num=1&min=1&max=" + POKEMON_COUNT + "&col=1&base=10&format=plain";
 		return Integer.parseInt(HttpResponse.readLine(url));
 	}
 	

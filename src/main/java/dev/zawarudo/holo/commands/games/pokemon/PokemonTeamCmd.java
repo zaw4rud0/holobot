@@ -48,7 +48,7 @@ public class PokemonTeamCmd extends AbstractCommand {
 				// Generate 6 random Pokémon ids
 				List<Integer> ids = new ArrayList<>();
 				for (int i = 0; i < 6; i++) {
-					ids.add(new Random().nextInt(PokeAPI.pokemonCount) + 1);
+					ids.add(new Random().nextInt(PokeAPI.POKEMON_COUNT) + 1);
 				}
 
 				List<Pokemon> pokemons = PokeAPI.getPokemon(ids.stream().mapToInt(k -> k).toArray());
