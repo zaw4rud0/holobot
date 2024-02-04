@@ -10,7 +10,13 @@ public final class TypeTokenUtils {
     private TypeTokenUtils() {
     }
 
+    /**
+     * Creates a List of the given class.
+     *
+     * @param ignoredClazz The class to create a List of.
+     * @return The list type.
+     */
     public static <T> Type getListTypeToken(Class<T> ignoredClazz) {
-        return new TypeToken<List<T>>() {}.getType();
+        return TypeToken.getParameterized(List.class, ignoredClazz).getType();
     }
 }

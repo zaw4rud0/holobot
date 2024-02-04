@@ -3,25 +3,39 @@ package dev.zawarudo.holo.modules.jikan;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonParser;
 import dev.zawarudo.holo.modules.jikan.model.*;
 import dev.zawarudo.holo.modules.jikan.model.Character;
-import dev.zawarudo.holo.utils.HttpResponse;
+import dev.zawarudo.holo.utils.Formatter;
+import dev.zawarudo.holo.utils.MyRateLimiter;
+import dev.zawarudo.holo.utils.TypeTokenUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 public final class JikanAPI {
 
+    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(JikanAPI.class);
+
     private static final String BASE_URL = "https://api.jikan.moe/v4";
     private static int limit = 10;
+
+    private static final MyRateLimiter RATE_LIMITER = new MyRateLimiter(1);
 
     private JikanAPI() {
     }
@@ -32,7 +46,8 @@ public final class JikanAPI {
      * @param limit The limit of the results.
      */
     public static void setLimit(int limit) {
-        JikanAPI.limit = limit;
+        // Jikan has a configured max value of 25
+        JikanAPI.limit = Math.min(25, limit);
     }
 
     /**
@@ -42,13 +57,17 @@ public final class JikanAPI {
      * @return A {@link List} of {@link Anime} objects.
      */
     public static List<Anime> searchAnime(String name) throws InvalidRequestException, APIException {
-        String url = BASE_URL + "/anime?q=" + encode(name) + "&limit=" + limit;
-        JsonObject obj = HttpResponse.getJsonObject2(url);
-        if (obj == null) {
+        String url = BASE_URL + "/anime?q=" + Formatter.encodeUrl(name) + "&limit=" + limit;
+
+        RATE_LIMITER.acquire();
+
+        Optional<JsonObject> result = fetchJsonData(url);
+        if (result.isEmpty()) {
             throw new APIException();
         }
-        JsonArray array = obj.getAsJsonArray("data");
-        return new Gson().fromJson(array, new TypeToken<List<Anime>>() {}.getType());
+
+        JsonArray array = result.get().getAsJsonArray("data");
+        return new Gson().fromJson(array, TypeTokenUtils.getListTypeToken(Anime.class));
     }
 
     /**
@@ -58,103 +77,114 @@ public final class JikanAPI {
      * @return A {@link List} of {@link Manga} objects.
      */
     public static List<Manga> searchManga(String name) throws InvalidRequestException, APIException {
-        String url = BASE_URL + "/manga?q=" + encode(name) + "&limit=" + limit;
-        JsonObject obj = HttpResponse.getJsonObject2(url);
-        if (obj == null) {
+        String url = BASE_URL + "/manga?q=" + Formatter.encodeUrl(name) + "&limit=" + limit;
+
+        RATE_LIMITER.acquire();
+
+        Optional<JsonObject> result = fetchJsonData(url);
+        if (result.isEmpty()) {
             throw new APIException();
         }
-        JsonArray array = obj.getAsJsonArray("data");
-        return new Gson().fromJson(array, new TypeToken<List<Manga>>() {
-        }.getType());
+
+        JsonArray array = result.get().getAsJsonArray("data");
+        return new Gson().fromJson(array, TypeTokenUtils.getListTypeToken(Manga.class));
     }
 
     /**
-     * Get an {@link Anime} object using the id from MyAnimeList.
+     * Fetches an {@link Anime} object using the id from MyAnimeList.
      *
      * @param id MyAnimeList id of the anime.
      * @return An {@link Anime} object.
      */
     public static Anime getAnime(int id) throws InvalidIdException, APIException {
-        String url = BASE_URL + "/anime/" + id;
-        JsonObject obj;
         try {
-            obj = HttpResponse.getJsonObject2(url);
-        } catch (InvalidRequestException e) {
-            throw new InvalidIdException(e.getMessage());
-        }
-        if (obj == null) {
-            throw new APIException();
-        }
-        return new Gson().fromJson(obj.getAsJsonObject("data"), Anime.class);
-    }
+            String url = BASE_URL + "/anime/" + id;
 
-    /**
-     * Returns a list of the best animes according to MyAnimeList.
-     *
-     * @param limit The number of animes to retrieve.
-     */
-    public static List<Anime> getTopAnimes(int limit) throws APIException {
-        String url = BASE_URL + "/top/anime?page=";
+            RATE_LIMITER.acquire();
 
-        List<Anime> result = new ArrayList<>();
-        int count = 0;
-        int page = 1;
-
-        Type type = new TypeToken<List<Anime>>() {}.getType();
-
-        while (count < limit) {
-
-            JsonObject obj;
-            try {
-                obj = HttpResponse.getJsonObject2(url + page);
-            } catch (InvalidRequestException e) {
-                throw new IllegalStateException("This wasn't supposed to happen!");
-            }
-
-            if (obj == null) {
+            Optional<JsonObject> result = fetchJsonData(url);
+            if (result.isEmpty()) {
                 throw new APIException();
             }
 
-            List<Anime> temp = new Gson().fromJson(obj.getAsJsonArray("data"), type);
-
-            if (count + temp.size() > limit) {
-                int i = 0;
-                while (count < limit) {
-                    result.add(temp.get(i));
-                    count++;
-                    i++;
-                }
-            } else {
-                result.addAll(temp);
-                page++;
-                count += temp.size();
-            }
+            return new Gson().fromJson(result.get().getAsJsonObject("data"), Anime.class);
+        } catch (InvalidRequestException e) {
+            throw new InvalidIdException(e);
         }
-        return result;
     }
 
     /**
-     * Get a {@link Manga} object using the id from MyAnimeList.
+     * Fetches a {@link Manga} object using the id from MyAnimeList.
      *
      * @param id MyAnimeList id of the manga.
      * @return A {@link Manga} object.
      */
     public static Manga getManga(int id) throws InvalidIdException, APIException {
-        String url = BASE_URL + "/manga/" + id;
-        JsonObject obj;
         try {
-            obj = HttpResponse.getJsonObject2(url);
+            String url = BASE_URL + "/manga/" + id;
+
+            RATE_LIMITER.acquire();
+
+            Optional<JsonObject> result = fetchJsonData(url);
+            if (result.isEmpty()) {
+                throw new APIException();
+            }
+
+            return new Gson().fromJson(result.get().getAsJsonObject("data"), Manga.class);
         } catch (InvalidRequestException e) {
             throw new InvalidIdException();
         }
-        if (obj == null) {
-            throw new APIException();
-        }
-        return new Gson().fromJson(obj.getAsJsonObject("data"), Manga.class);
     }
 
     /**
-     * Returns the relations of a given media.
+     * Fetches a list of the best anime according to MyAnimeList.
+     *
+     * @param limit The number of anime to retrieve.
+     */
+    public static List<Anime> getTopAnime(int limit) throws APIException {
+        String url = BASE_URL + "/top/anime?page=";
+
+        List<Anime> topAnime = new ArrayList<>();
+        int count = 0;
+        int page = 1;
+
+        Type type = TypeTokenUtils.getListTypeToken(Anime.class);
+
+        while (count < limit) {
+
+            JsonObject json;
+            try {
+                RATE_LIMITER.acquire();
+                Optional<JsonObject> result = fetchJsonData(url + page);
+                if (result.isEmpty()) {
+                    throw new APIException();
+                }
+
+                json = result.get();
+            } catch (InvalidRequestException e) {
+                throw new IllegalStateException("This wasn't supposed to happen!");
+            }
+
+            List<Anime> temp = new Gson().fromJson(json.getAsJsonArray("data"), type);
+
+            if (count + temp.size() > limit) {
+                int i = 0;
+                while (count < limit) {
+                    topAnime.add(temp.get(i));
+                    count++;
+                    i++;
+                }
+            } else {
+                topAnime.addAll(temp);
+                page++;
+                count += temp.size();
+            }
+        }
+        return topAnime;
+    }
+
+    /**
+     * Fetches the relations of a given media.
      *
      * @param id   The id of the media.
      * @param type The type of the media.
@@ -162,17 +192,20 @@ public final class JikanAPI {
      */
     public static List<Related> getRelated(int id, MediaType type) throws APIException, InvalidRequestException {
         String url = BASE_URL + "/" + type.getType() + "/" + id + "/relations";
-        JsonObject obj = HttpResponse.getJsonObject2(url);
-        if (obj == null) {
+
+        RATE_LIMITER.acquire();
+
+        Optional<JsonObject> result = fetchJsonData(url);
+        if (result.isEmpty()) {
             throw new APIException();
         }
-        JsonArray array = obj.getAsJsonArray("data");
-        return new Gson().fromJson(array, new TypeToken<List<Related>>() {
-        }.getType());
+
+        JsonArray array = result.get().getAsJsonArray("data");
+        return new Gson().fromJson(array, TypeTokenUtils.getListTypeToken(Related.class));
     }
 
     /**
-     * Returns a list of {@link Anime}s of the current anime season.
+     * Fetches a list of {@link Anime} of the current anime season.
      *
      * @return A {@link List} of {@link Anime} objects.
      */
@@ -182,7 +215,7 @@ public final class JikanAPI {
     }
 
     /**
-     * Returns a list of {@link Anime}s of the given anime season.
+     * Fetches a list of {@link Anime} of the given anime season.
      *
      * @param season The season to get the anime from.
      * @param year   The year to get the anime from.
@@ -193,23 +226,26 @@ public final class JikanAPI {
     }
 
     private static List<Anime> collectAnime(String url) throws APIException {
-        JsonObject obj;
+        JsonObject json;
         List<Anime> list = new ArrayList<>();
 
-        Type type = new TypeToken<List<Anime>>() {}.getType();
+        Type type = TypeTokenUtils.getListTypeToken(Anime.class);
 
         int i = 1;
         do {
             try {
-                obj = HttpResponse.getJsonObject2(url + "?page=" + i++);
+                RATE_LIMITER.acquire();
+                Optional<JsonObject> result = fetchJsonData(url + "?page=" + i++);
+                if (result.isEmpty()) {
+                    throw new APIException();
+                }
+
+                json = result.get();
             } catch (InvalidRequestException e) {
                 throw new IllegalStateException("This wasn't supposed to happen!");
             }
-            if (obj == null) {
-                throw new APIException();
-            }
-            list.addAll(new Gson().fromJson(obj.getAsJsonArray("data"), type));
-        } while (obj.getAsJsonObject("pagination").get("has_next_page").getAsBoolean());
+            list.addAll(new Gson().fromJson(json.getAsJsonArray("data"), type));
+        } while (json.getAsJsonObject("pagination").get("has_next_page").getAsBoolean());
         return list;
     }
 
@@ -220,14 +256,17 @@ public final class JikanAPI {
      * @return A {@link List} of {@link Character} objects.
      */
     public static List<Character> searchCharacter(String name) throws APIException, InvalidRequestException {
-        String url = BASE_URL + "/characters?q=" + encode(name) + "&order_by=favorites&sort=desc";
-        JsonObject obj = HttpResponse.getJsonObject2(url);
-        if (obj == null) {
+        String url = BASE_URL + "/characters?q=" + Formatter.encodeUrl(name) + "&order_by=favorites&sort=desc";
+
+        RATE_LIMITER.acquire();
+
+        Optional<JsonObject> result = fetchJsonData(url);
+        if (result.isEmpty()) {
             throw new APIException();
         }
-        JsonArray array = obj.getAsJsonArray("data");
-        return new Gson().fromJson(array, new TypeToken<List<Character>>() {
-        }.getType());
+
+        JsonArray array = result.get().getAsJsonArray("data");
+        return new Gson().fromJson(array, TypeTokenUtils.getListTypeToken(Character.class));
     }
 
     /**
@@ -236,87 +275,128 @@ public final class JikanAPI {
      * @param id MyAnimeList id of the character. See also <a href="https://myanimelist.net/character.php">MyAnimeList</a>.
      * @return A {@link Character} object.
      */
-    public static Character getCharacter(long id) throws APIException, InvalidIdException {
-        String url = BASE_URL + "/characters/" + id;
-        JsonObject obj;
+    public static Character getCharacter(long id) throws InvalidIdException, APIException {
         try {
-            obj = HttpResponse.getJsonObject2(url);
+            String url = BASE_URL + "/characters/" + id;
+
+            RATE_LIMITER.acquire();
+
+            Optional<JsonObject> result = fetchJsonData(url);
+            if (result.isEmpty()) {
+                throw new APIException();
+            }
+
+            return new Gson().fromJson(result.get().getAsJsonObject("data"), Character.class);
         } catch (InvalidRequestException e) {
             throw new InvalidIdException();
         }
-        if (obj == null) {
-            throw new APIException();
-        }
-        return new Gson().fromJson(obj.getAsJsonObject("data"), Character.class);
     }
 
     /**
-     * Returns the appearance of a character in an anime or manga.
+     * Fetches the anime or manga in which a specified character had an appearance.
      *
      * @param id   MyAnimeList id of the character
      * @param type Anime or manga. See also {@link MediaType}
      * @return A {@link List} of {@link Appearance} objects.
      */
     public static List<Appearance> getCharacter(long id, MediaType type) throws APIException, InvalidIdException {
-        String url = BASE_URL + "/characters/" + id + "/" + type.getType();
-        JsonObject obj;
         try {
-            obj = HttpResponse.getJsonObject2(url);
+            String url = BASE_URL + "/characters/" + id + "/" + type.getType();
+
+            RATE_LIMITER.acquire();
+
+            Optional<JsonObject> result = fetchJsonData(url);
+            if (result.isEmpty()) {
+                throw new APIException();
+            }
+
+            JsonArray array = result.get().getAsJsonArray("data");
+            return new Gson().fromJson(array, TypeTokenUtils.getListTypeToken(Appearance.class));
         } catch (InvalidRequestException e) {
             throw new InvalidIdException();
         }
-        if (obj == null) {
-            throw new APIException();
-        }
-        JsonArray array = obj.getAsJsonArray("data");
-        return new Gson().fromJson(array, new TypeToken<List<Appearance>>() {
-        }.getType());
     }
 
     /**
-     * Returns a random {@link Anime}.
+     * Fetches a random {@link Anime} from MyAnimeList.
      *
      * @return A {@link Anime} object.
      */
     public static Anime getRandomAnime() throws APIException {
-        String url = BASE_URL + "/random/anime";
-        JsonObject obj;
-
         try {
-            obj = HttpResponse.getJsonObject2(url);
+            String url = BASE_URL + "/random/anime";
+
+            RATE_LIMITER.acquire();
+
+            Optional<JsonObject> result = fetchJsonData(url);
+            if (result.isEmpty()) {
+                throw new APIException();
+            } else {
+                return new Gson().fromJson(result.get().getAsJsonObject("data"), Anime.class);
+            }
         } catch (InvalidRequestException e) {
             throw new IllegalStateException("This wasn't supposed to happen!");
         }
-        if (obj == null) {
-            throw new APIException();
-        }
-        return new Gson().fromJson(obj.getAsJsonObject("data"), Anime.class);
     }
 
     /**
-     * Returns a random {@link Manga}.
+     * Fetches a random {@link Manga} from MyAnimeList.
      *
      * @return A {@link Manga} object.
      */
     public static Manga getRandomManga() throws APIException {
-        String url = BASE_URL + "/random/manga";
-        JsonObject obj;
-
         try {
-            obj = HttpResponse.getJsonObject2(url);
+            String url = BASE_URL + "/random/manga";
+
+            RATE_LIMITER.acquire();
+
+            Optional<JsonObject> result = fetchJsonData(url);
+            if (result.isEmpty()) {
+                throw new APIException();
+            } else {
+                return new Gson().fromJson(result.get().getAsJsonObject("data"), Manga.class);
+            }
         } catch (InvalidRequestException e) {
             throw new IllegalStateException("This wasn't supposed to happen!");
         }
-        if (obj == null) {
-            throw new APIException();
-        }
-        return new Gson().fromJson(obj.getAsJsonObject("data"), Manga.class);
     }
 
-    /**
-     * Encodes a given String using the ASCII character set to ensure a working URL.
-     */
-    private static String encode(String s) {
-        return URLEncoder.encode(s, StandardCharsets.US_ASCII).toLowerCase(Locale.UK);
+    private static Optional<JsonObject> fetchJsonData(String url) throws InvalidRequestException, APIException {
+
+        System.out.println(url);
+
+        try {
+            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            connection.setRequestProperty("User-Agent", USER_AGENT);
+
+            // Follow redirects
+            String redirect = connection.getHeaderField("Location");
+            while (redirect != null) {
+                connection = (HttpURLConnection) new URL(redirect).openConnection();
+                redirect = connection.getHeaderField("Location");
+            }
+
+            // Check the response code
+            switch (connection.getResponseCode()) {
+                case 400 -> throw new InvalidRequestException("400: Invalid Request");
+                case 404 -> throw new InvalidRequestException("404: Not Found");
+                case 405 -> throw new InvalidRequestException("405: Method Not Allowed");
+                case 429 -> throw new InvalidRequestException("429: Too Many Requests");
+                case 500 -> throw new APIException("500: Internal Server Error");
+                case 503 -> throw new APIException("503: Service Unavailable");
+            }
+
+            BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()));
+            String jsonString = reader.lines().collect(Collectors.joining("\n"));
+            reader.close();
+            connection.disconnect();
+
+            return Optional.of(JsonParser.parseString(jsonString).getAsJsonObject());
+        } catch (IOException e) {
+            if (LOGGER.isErrorEnabled()) {
+                LOGGER.error("An error occurred while fetching the json data!", e);
+            }
+            return Optional.empty();
+        }
     }
 }

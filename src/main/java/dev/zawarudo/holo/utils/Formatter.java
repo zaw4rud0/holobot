@@ -66,7 +66,7 @@ public final class Formatter {
      * @return The encoded URL string.
      */
     public static String encodeUrl(String link) {
-        return URLEncoder.encode(link, StandardCharsets.UTF_8);
+        return URLEncoder.encode(link, StandardCharsets.US_ASCII).toLowerCase(Locale.UK);
     }
 
     /**

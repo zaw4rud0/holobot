@@ -50,7 +50,7 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
         List<Anime> result = performSearch(event, search);
 
         if (result.isEmpty()) {
-            sendErrorEmbed(event, "I couldn't find any animes with your given search terms!");
+            sendErrorEmbed(event, "I couldn't find any anime with your given search terms!");
             return;
         }
 

@@ -66,15 +66,15 @@ class AnimeTests {
     void testRandomAnime() throws APIException {
         Anime randomAnime = JikanAPI.getRandomAnime();
         assertNotNull(randomAnime);
-        assertTrue(randomAnime.getId() != 0);
+        assertNotEquals(0, randomAnime.getId());
         assertNotNull(randomAnime.getTitle());
     }
 
     @ParameterizedTest
     @ValueSource(ints = {5, 30, 100})
-    void testTopAnimes(int number) throws APIException {
-        List<Anime> topAnimes = JikanAPI.getTopAnimes(number);
-        assertNotNull(topAnimes);
-        assertEquals(number, topAnimes.size());
+    void testTopAnime(int number) throws APIException {
+        List<Anime> topAnime = JikanAPI.getTopAnime(number);
+        assertNotNull(topAnime);
+        assertEquals(number, topAnime.size());
     }
 }
