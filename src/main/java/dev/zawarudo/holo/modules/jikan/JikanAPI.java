@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -361,18 +361,16 @@ public final class JikanAPI {
         }
     }
 
+    // TODO: Extract this method and move it to HttpResponse
     private static Optional<JsonObject> fetchJsonData(String url) throws InvalidRequestException, APIException {
-
-        System.out.println(url);
-
         try {
-            HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+            HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
             connection.setRequestProperty("User-Agent", USER_AGENT);
 
             // Follow redirects
             String redirect = connection.getHeaderField("Location");
             while (redirect != null) {
-                connection = (HttpURLConnection) new URL(redirect).openConnection();
+                connection = (HttpURLConnection) URI.create(redirect).toURL().openConnection();
                 redirect = connection.getHeaderField("Location");
             }
 
