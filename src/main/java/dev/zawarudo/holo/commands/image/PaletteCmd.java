@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.commands.image;
 
 import de.androidpit.colorthief.ColorThief;
+import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -45,7 +46,7 @@ public class PaletteCmd extends AbstractCommand {
         }
 
         deleteInvoke(event);
-        String name = String.format(PALETTE_IMAGE_FORMAT, Formatter.getCurrentDateTimeString());
+        String name = String.format(PALETTE_IMAGE_FORMAT, DateTimeUtils.getCurrentDateTimeString());
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Color Palette");

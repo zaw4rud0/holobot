@@ -5,11 +5,7 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.*;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
-import java.text.DateFormat;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -42,14 +38,6 @@ public final class Formatter {
             formatted.append(minutes).append(" minutes and ");
         }
         return formatted.append(seconds).append(" seconds").toString();
-    }
-
-    /**
-     * Turns a given amount of milliseconds to a date and time.
-     */
-    public static String formatDateTime(long millis) {
-        DateFormat dateFormat = DateFormat.getDateTimeInstance(DateFormat.SHORT, DateFormat.SHORT, Locale.GERMANY);
-        return dateFormat.format(new Date(millis));
     }
 
     /**
@@ -107,23 +95,6 @@ public final class Formatter {
         }
 
         return input;
-    }
-
-    /**
-     * Retrieves the current date and time as a formatted string.
-     * <p>
-     * This method generates a string representation of the current local date and time,
-     * formatted as "yyyy-MM-dd_HH.mm.ss". This format includes the year, month, day,
-     * hours, minutes, and seconds, separated by underscores and periods for readability.
-     * <p>
-     * Example output: "2023-12-10_15.30.45" for December 10, 2023, at 3:30:45 PM.
-     *
-     * @return A string representing the current date and time in the format "yyyy-MM-dd_HH.mm.ss".
-     */
-    public static String getCurrentDateTimeString() {
-        LocalDateTime now = LocalDateTime.now();
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd_HH.mm.ss");
-        return now.format(formatter);
     }
 
     /**

@@ -2,12 +2,12 @@ package dev.zawarudo.holo.commands.image;
 
 import dev.zawarudo.aoc_utils.graph.AdventOfCodeGraph;
 import dev.zawarudo.aoc_utils.graph.ChartType;
-import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
-import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.utils.Formatter;
+import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.ImageOperations;
+import dev.zawarudo.holo.utils.annotations.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -34,7 +34,7 @@ public class AoCStatsCmd extends AbstractCommand {
         AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, YEAR, LEADERBOARD_ID, token);
         BufferedImage image = graph.generateImage();
 
-        String name = String.format("aoc_%s.png", Formatter.getCurrentDateTimeString());
+        String name = String.format("aoc_%s.png", DateTimeUtils.getCurrentDateTimeString());
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Advent of Code 2023 Stats");
