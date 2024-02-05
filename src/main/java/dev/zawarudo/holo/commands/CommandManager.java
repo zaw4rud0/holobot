@@ -3,6 +3,8 @@ package dev.zawarudo.holo.commands;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.anime.AnimeSearchCmd;
 import dev.zawarudo.holo.commands.anime.MangaSearchCmd;
+import dev.zawarudo.holo.commands.general.*;
+import dev.zawarudo.holo.commands.image.*;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.fun.CoinFlipCmd;
 import dev.zawarudo.holo.commands.fun.Magic8BallCmd;
@@ -12,28 +14,6 @@ import dev.zawarudo.holo.commands.games.pokemon.CatchCmd;
 import dev.zawarudo.holo.commands.games.pokemon.PokedexCmd;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonTeamCmd;
 import dev.zawarudo.holo.commands.games.pokemon.SpawnCmd;
-import dev.zawarudo.holo.commands.general.BugCmd;
-import dev.zawarudo.holo.commands.general.HelpCmd;
-import dev.zawarudo.holo.commands.general.InfoBotCmd;
-import dev.zawarudo.holo.commands.general.PermCmd;
-import dev.zawarudo.holo.commands.general.PingCmd;
-import dev.zawarudo.holo.commands.general.RoleInfoCmd;
-import dev.zawarudo.holo.commands.general.ServerEmotesCmd;
-import dev.zawarudo.holo.commands.general.ServerInfoCmd;
-import dev.zawarudo.holo.commands.general.ServerRolesCmd;
-import dev.zawarudo.holo.commands.general.SuggestionCmd;
-import dev.zawarudo.holo.commands.general.WhoisCmd;
-import dev.zawarudo.holo.commands.image.ActionCmd;
-import dev.zawarudo.holo.commands.image.AoCStatsCmd;
-import dev.zawarudo.holo.commands.image.AvatarCmd;
-import dev.zawarudo.holo.commands.image.BannerCmd;
-import dev.zawarudo.holo.commands.image.CheckNSFWCmd;
-import dev.zawarudo.holo.commands.image.PaletteCmd;
-import dev.zawarudo.holo.commands.image.DogCmd;
-import dev.zawarudo.holo.commands.image.InspiroCmd;
-import dev.zawarudo.holo.commands.image.PixelateCmd;
-import dev.zawarudo.holo.commands.image.UpscaleCmd;
-import dev.zawarudo.holo.commands.image.XkcdCmd;
 import dev.zawarudo.holo.commands.image.nsfw.BlockCmd;
 import dev.zawarudo.holo.commands.image.nsfw.HoloCmd;
 import dev.zawarudo.holo.commands.image.nsfw.NekoCmd;
@@ -105,7 +85,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new CloneCmd());
         addCommand(new JoinCmd());
         addCommand(new LeaveCmd());
-		addCommand(new LoopCmd());
+        addCommand(new LoopCmd());
         addCommand(new LyricsCmd());
         addCommand(new NowPlayingCmd());
         addCommand(new PlayCmd());
@@ -116,13 +96,14 @@ public class CommandManager extends ListenerAdapter {
 
         // Image Cmds
         addCommand(new ActionCmd());
-		addCommand(new AoCStatsCmd());
+        addCommand(new AoCStatsCmd());
         addCommand(new AvatarCmd());
         addCommand(new BannerCmd());
         addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
         addCommand(new DogCmd());
         addCommand(new HoloCmd());
+        addCommand(new HttpCmd());
         addCommand(new InspiroCmd());
         addCommand(new NekoCmd());
         addCommand(new PaletteCmd());
@@ -137,8 +118,9 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new PokemonTeamCmd());
 
         // Misc Cmds
-        addCommand(new Magic8BallCmd());
         addCommand(new CoinFlipCmd());
+        addCommand(new CountdownCmd());
+        addCommand(new Magic8BallCmd());
         addCommand(new UrbanDictionaryCmd());
         addCommand(new UwuCmd());
 
