@@ -14,12 +14,12 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DanbooruTests {
+class DanbooruTests {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(DanbooruTests.class);
 
     @Test
-    public void testPostCount() throws APIException, InvalidRequestException {
+    void testPostCount() throws APIException, InvalidRequestException {
         assertTrue(DanbooruAPI.getPostCount("holo") > 2500);
         assertTrue(DanbooruAPI.getPostCount() > 5000000);
         assertEquals(0, DanbooruAPI.getPostCount("holo", "yae_miko"));
@@ -29,7 +29,7 @@ public class DanbooruTests {
      * Test for the basic functionality and the default settings of Danbooru.
      */
     @Test
-    public void testBasic() {
+    void testBasic() {
         DanbooruAPI danbooru = new DanbooruAPI();
 
         assertEquals(10, danbooru.getLimit());
@@ -59,7 +59,7 @@ public class DanbooruTests {
     }
 
     @Test
-    public void testLimit() throws APIException, InvalidRequestException {
+    void testLimit() throws APIException, InvalidRequestException {
         DanbooruAPI danbooru = new DanbooruAPI();
 
         List<DanbooruPost> posts = danbooru.getPosts();
@@ -80,7 +80,7 @@ public class DanbooruTests {
     }
 
     @Test
-    public void testRatingSafe() throws APIException, InvalidRequestException {
+    void testRatingSafe() throws APIException, InvalidRequestException {
         DanbooruAPI danbooru = new DanbooruAPI();
         List<DanbooruPost> posts = danbooru.setRating(DanbooruAPI.Rating.SAFE).getPosts();
 
@@ -93,7 +93,7 @@ public class DanbooruTests {
     }
 
     @Test
-    public void testRatingQuestionable() throws APIException, InvalidRequestException {
+    void testRatingQuestionable() throws APIException, InvalidRequestException {
         DanbooruAPI danbooru = new DanbooruAPI();
         List<DanbooruPost> posts = danbooru.setRating(DanbooruAPI.Rating.QUESTIONABLE).getPosts();
 
@@ -106,7 +106,7 @@ public class DanbooruTests {
     }
 
     @Test
-    public void testRatingExplicit() throws APIException, InvalidRequestException {
+    void testRatingExplicit() throws APIException, InvalidRequestException {
         DanbooruAPI danbooru = new DanbooruAPI();
         List<DanbooruPost> posts = danbooru.setRating(DanbooruAPI.Rating.EXPLICIT).getPosts();
 
@@ -119,7 +119,7 @@ public class DanbooruTests {
     }
 
     @Test
-    public void testOrderById() throws APIException, InvalidRequestException {
+    void testOrderById() throws APIException, InvalidRequestException {
         DanbooruAPI danbooru = new DanbooruAPI();
         List<DanbooruPost> posts = danbooru.setOrder(DanbooruAPI.Order.ID_ASC).getPosts();
         assertNotNull(posts);

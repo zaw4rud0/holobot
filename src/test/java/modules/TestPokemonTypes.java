@@ -11,7 +11,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class TestPokemonTypes {
+class TestPokemonTypes {
 
     @Test
     void testTypeNormal() throws IOException {

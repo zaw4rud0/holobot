@@ -8,10 +8,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-public class DanbooruPostTest {
+class DanbooruPostTest {
 
     @Test
-    public void testPost() throws APIException, InvalidRequestException {
+    void testPost() throws APIException, InvalidRequestException {
         DanbooruPost post = DanbooruAPI.getPost(1);
 
         // Basic data
