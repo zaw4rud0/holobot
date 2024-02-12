@@ -37,20 +37,30 @@ public class InfoBotCmd extends AbstractCommand {
 			cpuPercentage = "N/A";
 		} else {
 			double avg = os.getSystemLoadAverage();
-			double cpuUsage = avg * 100.0 / (double) cores;
+			double cpuUsage = avg / cores * 100;
 			cpuPercentage = (cpuUsage * 100 / 100.0) + "%";
 		}
 		
-		long heap = memory.getHeapMemoryUsage().getUsed();
-		long max = memory.getHeapMemoryUsage().getMax();
-		double heapPercentage = (double)((heap * 10_000) / max) / 100.0;
+		long usedMemoryBytes = memory.getHeapMemoryUsage().getUsed();
+		long maxMemoryBytes = memory.getHeapMemoryUsage().getMax();
+
+		double usedMemoryMB = usedMemoryBytes / (1024.0 * 1024);
+		double maxMemoryMB = maxMemoryBytes / (1024.0 * 1024);
+
+		double usedMemoryPercentage = (usedMemoryBytes / (double) maxMemoryBytes) * 100;
 		
 		String systemInfo = "**CPU:** `" + cpuPercentage + " on " + cores + " core(s)`\n"
-						+ "**Memory:** `" + heap / 1024 / 1024 + "MB / " + max / 1024 / 1024 + "MB (" + heapPercentage + "%)`\n"
+						+ "**Memory:** `" + String.format("%.2f MB / %.2f MB (%.2f%%)", usedMemoryMB, maxMemoryMB, usedMemoryPercentage) + "`\n"
 						+ "**Uptime:** `" + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startupTime) + "`";
 
 		String description = "Use `" + getPrefix(e) + "help` to see all commands";
-		
+
+		EmbedBuilder builder = getInfoEmbed(e, description, systemInfo);
+		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
+	}
+
+	@NotNull
+	private static EmbedBuilder getInfoEmbed(@NotNull MessageReceivedEvent e, String description, String systemInfo) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(e.getJDA().getSelfUser().getName() + " | Information");
 		builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"));
@@ -61,6 +71,6 @@ public class InfoBotCmd extends AbstractCommand {
 		builder.addField("System Information", systemInfo, false);
 		builder.addField("Database Size", "`" + new File(Database.PATH_DB).length() / 1024 / 1024 + "MB`", false);
 		builder.addField("Source", "[GitHub](https://github.com/xHarlock/HoloBot)", false);
-		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
+		return builder;
 	}
 }
