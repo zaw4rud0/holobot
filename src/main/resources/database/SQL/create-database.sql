@@ -19,6 +19,19 @@ CREATE TABLE BlockedImages
     PRIMARY KEY (id AUTOINCREMENT)
 );
 
+CREATE TABLE Countdowns
+(
+    id           INTEGER,
+    name         TEXT,
+    time_created INTEGER,
+    date_time    INTEGER,
+    user_id      INTEGER,
+    guild_id     INTEGER,
+    PRIMARY KEY (id AUTOINCREMENT),
+    FOREIGN KEY (user_id) REFERENCES DiscordUsers,
+    FOREIGN KEY (guild_id) REFERENCES DiscordGuilds
+);
+
 CREATE TABLE DiscordGuildUsers
 (
     guild_id INTEGER,
@@ -71,20 +84,6 @@ CREATE TABLE Waifu
     id    TEXT,
     tag   TEXT,
     title TEXT,
-    PRIMARY KEY (id AUTOINCREMENT)
-);
-
-CREATE TABLE Submissions
-(
-    id         INTEGER,
-    type       TEXT,
-    user_id    INTEGER,
-    text       TEXT,
-    date       TEXT,
-    guild_id   INTEGER,
-    channel_id INTEGER,
-    FOREIGN KEY (user_id) references DiscordUsers,
-    FOREIGN KEY (guild_id) references DiscordGuilds,
     PRIMARY KEY (id AUTOINCREMENT)
 );
 
