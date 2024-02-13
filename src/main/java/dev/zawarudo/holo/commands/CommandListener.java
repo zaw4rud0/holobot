@@ -8,8 +8,10 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
@@ -18,73 +20,98 @@ import java.util.regex.Pattern;
  */
 public class CommandListener extends ListenerAdapter {
 
-	private final CommandManager cmdManager;
-	private final PermissionManager permManager;
+    private final CommandManager cmdManager;
+    private final PermissionManager permManager;
 
-	private static final Logger LOGGER = LoggerFactory.getLogger(CommandListener.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CommandListener.class);
 
-	public CommandListener(CommandManager cmdManager, PermissionManager permManager) {
-		this.cmdManager = cmdManager;
-		this.permManager = permManager;
-	}
+    public CommandListener(CommandManager cmdManager, PermissionManager permManager) {
+        this.cmdManager = cmdManager;
+        this.permManager = permManager;
+    }
 
-	@Override
-	public void onMessageReceived(MessageReceivedEvent e) {
-		// Ignore webhooks and bots
-		if (e.isWebhookMessage() || e.getAuthor().isBot()) {
-			return;
-		}
+    @Override
+    public void onMessageReceived(MessageReceivedEvent e) {
+        // Ignore webhooks and bots
+        if (e.isWebhookMessage() || e.getAuthor().isBot()) {
+            return;
+        }
 
-		// Ignore messages without the set prefix
-		if (!e.getMessage().getContentRaw().startsWith(getPrefix(e))) {
-			return;
-		}
+        // Ignore messages without the bot prefix
+        if (!e.getMessage().getContentRaw().startsWith(getPrefix(e))) {
+            return;
+        }
 
-		String[] split = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(e)), "").split("\\s+");
-		String invoke = split[0].toLowerCase(Locale.UK);
+        String rawMessage = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(e)), "");
+        List<String> split = parseArguments(rawMessage);
 
-		// Action cmd has been called
-		ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
-		if (actionCmd.isAction(invoke)) {
-			if (LOGGER.isInfoEnabled()) {
-				LOGGER.info("{} has called action ({})", e.getAuthor(), invoke);
-			}
+        String invoke = split.get(0).toLowerCase(Locale.UK);
 
-			actionCmd.args = Arrays.copyOfRange(split, 1, split.length);
-			actionCmd.displayAction(e, actionCmd.getAction(invoke));
-		}
+        // Action cmd has been called
+        ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
+        if (actionCmd.isAction(invoke)) {
+            if (LOGGER.isInfoEnabled()) {
+                LOGGER.info("{} has called action ({})", e.getAuthor(), invoke);
+            }
 
-		// No valid command
-		if (!cmdManager.isValidName(invoke)) {
-			return;
-		}
+            actionCmd.args = split.subList(1, split.size()).toArray(new String[0]);
+            actionCmd.displayAction(e, actionCmd.getAction(invoke));
+        }
 
-		AbstractCommand cmd = cmdManager.getCommand(invoke);
+        // No valid command
+        if (!cmdManager.isValidName(invoke)) {
+            return;
+        }
 
-		// Check if user can do anything
-		if (!permManager.hasUserPermission(e, cmd) || !permManager.hasChannelPermission(e, cmd)) {
-			return;
-		}
+        AbstractCommand cmd = cmdManager.getCommand(invoke);
 
-		if (LOGGER.isInfoEnabled()) {
-			LOGGER.info("{} has called {}", e.getAuthor(), cmd.getName());
-		}
+        // Check if user can do anything
+        if (!permManager.hasUserPermission(e, cmd) || !permManager.hasChannelPermission(e, cmd)) {
+            return;
+        }
 
-		cmd.args = Arrays.copyOfRange(split, 1, split.length);
-		cmd.onCommand(e);
-	}
+        if (LOGGER.isInfoEnabled()) {
+            LOGGER.info("{} has called {}", e.getAuthor(), cmd.getName());
+        }
 
-	/**
-	 * Retrieves the prefix for the given guild or the default prefix if the event is from a DM Channel.
-	 *
-	 * @param e The {@link MessageReceivedEvent} to get the prefix for.
-	 * @return The prefix of the bot.
-	 */
-	private String getPrefix(MessageReceivedEvent e) {
-		if (e.isFromGuild()) {
-			return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getPrefix();
-		} else {
-			return Bootstrap.holo.getConfig().getDefaultPrefix();
-		}
-	}
+        if (split.size() > 1) {
+            cmd.args = split.subList(1, split.size()).toArray(new String[0]);
+        } else {
+            cmd.args = new String[0];
+        }
+        cmd.onCommand(e);
+    }
+
+    /**
+     * Retrieves the prefix for the given guild or the default prefix if the event is from a DM Channel.
+     *
+     * @param e The {@link MessageReceivedEvent} to get the prefix for.
+     * @return The prefix of the bot.
+     */
+    private String getPrefix(MessageReceivedEvent e) {
+        if (e.isFromGuild()) {
+            return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getPrefix();
+        } else {
+            return Bootstrap.holo.getConfig().getDefaultPrefix();
+        }
+    }
+
+    /**
+     * Ensures that text inside quotes is seen as a single argument
+     */
+    private List<String> parseArguments(String input) {
+        List<String> arguments = new ArrayList<>();
+        Pattern pattern = Pattern.compile("[^\\s\"']+|\"([^\"]*)\"");
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            if (matcher.group(1) != null) {
+                arguments.add(matcher.group(1));
+            } else {
+                arguments.add(matcher.group());
+            }
+        }
+
+        return arguments;
+    }
 }
