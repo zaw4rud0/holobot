@@ -6,7 +6,9 @@ import org.junit.jupiter.api.Test;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class DateTimeTests {
@@ -18,7 +20,7 @@ class DateTimeTests {
         ZonedDateTime zonedDateTime = ZonedDateTime.of(2024, 2, 26, 23, 59, 0, 0, ZoneId.of("UTC+8"));
         long expected = zonedDateTime.toInstant().toEpochMilli();
 
-        assertEquals(expected, DateTimeUtils.convertToMillis(input));
+        assertEquals(expected, DateTimeUtils.parseDateTime(input));
     }
 
     @Test
@@ -28,7 +30,7 @@ class DateTimeTests {
         LocalDateTime localDateTime = LocalDateTime.of(2024, 2, 26, 23, 59);
         long expected = localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        assertEquals(expected, DateTimeUtils.convertToMillis(input));
+        assertEquals(expected, DateTimeUtils.parseDateTime(input));
     }
 
     @Test
@@ -38,7 +40,7 @@ class DateTimeTests {
         LocalDateTime localDateTime = LocalDateTime.of(2024, 2, 26, 0, 0);
         long expected = localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        assertEquals(expected, DateTimeUtils.convertToMillis(input));
+        assertEquals(expected, DateTimeUtils.parseDateTime(input));
     }
 
     @Test
@@ -48,6 +50,28 @@ class DateTimeTests {
         LocalDateTime localDateTime = LocalDateTime.of(2024, 2, 26, 23, 59);
         long expected = localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
 
-        assertEquals(expected, DateTimeUtils.convertToMillis(input));
+        assertEquals(expected, DateTimeUtils.parseDateTime(input));
+    }
+
+    @Test
+    void testMillis() {
+        String input = "1708988340000";
+
+        LocalDateTime localDateTime = LocalDateTime.of(2024, 2, 26, 23, 59);
+        long expected = localDateTime.atZone(ZoneId.systemDefault()).toInstant().toEpochMilli();
+
+        assertEquals(expected, DateTimeUtils.parseDateTime(input));
+    }
+
+    @Test
+    void testEuropean() {
+        List<String> inputs = List.of(
+                "14.02.24 18:00",
+                "14.02.24"
+        );
+
+        for (String input : inputs) {
+            assertDoesNotThrow(() -> DateTimeUtils.parseDateTime(input));
+        }
     }
 }

@@ -1,10 +1,18 @@
 package dev.zawarudo.holo.utils;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.text.DateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The DateTimeUtils class provides utility methods for working with date and time operations. This class contains
@@ -41,11 +49,111 @@ public final class DateTimeUtils {
         return now.format(formatter);
     }
 
-    public static long convertToMillis(String dateTime, String timeZoneId) {
-        throw new UnsupportedOperationException();
+    public static long parseDateTime(@NotNull String input) {
+        input = input.trim();
+
+        Pattern pattern = Pattern.compile("\\(UTC([+-]\\d+)\\)");
+        Matcher matcher = pattern.matcher(input);
+        if (matcher.find()) {
+            String sign = matcher.group(1).startsWith("+") ? "+" : "-";
+            String hours = matcher.group(1).substring(1);
+            hours = hours.length() == 1 ? "0" + hours : hours;
+            String replacement = sign + hours + "00";
+            input = matcher.replaceAll(replacement);
+        }
+
+        DateTimeFormatter[] dateTimeFormatters = new DateTimeFormatter[]{
+                // European date time formats
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"),
+                DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"),
+                DateTimeFormatter.ofPattern("dd.MM.yy HH:mm"),
+
+                // ISO 8601
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
+
+                // American
+                DateTimeFormatter.ofPattern("MMMM d, yyyy HH:mm"),
+
+                // With timezone
+                DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm Z"),
+                DateTimeFormatter.ofPattern("dd/MM/yy HH:mm Z"),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm Z"),
+                DateTimeFormatter.ofPattern("dd.MM.yy HH:mm Z"),
+                DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm Z"),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy HH:mm Z"),
+        };
+
+        DateTimeFormatter[] dateFormatters = new DateTimeFormatter[]{
+                // TODO: Add support for entering just a year or month
+
+                // European date time formats
+                DateTimeFormatter.ofPattern("dd/MM/yyyy"),
+                DateTimeFormatter.ofPattern("dd/MM/yy"),
+                DateTimeFormatter.ofPattern("dd.MM.yyyy"),
+                DateTimeFormatter.ofPattern("dd.MM.yy"),
+
+                // ISO 8601
+                DateTimeFormatter.ofPattern("yyyy-MM-dd"),
+
+                // American
+                DateTimeFormatter.ofPattern("MMMM d, yyyy"),
+        };
+
+        for (DateTimeFormatter formatter : dateTimeFormatters) {
+            try {
+                if (formatter.toString().contains("Offset")) {
+                    ZonedDateTime zonedDateTime = ZonedDateTime.parse(input, formatter);
+                    return zonedDateTime.toInstant().toEpochMilli();
+                } else {
+                    LocalDateTime localDateTime = LocalDateTime.parse(input, formatter);
+                    ZonedDateTime zonedDateTime = localDateTime.atZone(ZoneId.systemDefault());
+                    return zonedDateTime.toInstant().toEpochMilli();
+                }
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        for (DateTimeFormatter formatter : dateFormatters) {
+            try {
+                LocalDate localDate = LocalDate.parse(input, formatter);
+                ZonedDateTime zonedDateTime = localDate.atStartOfDay(ZoneId.systemDefault());
+                return zonedDateTime.toInstant().toEpochMilli();
+            } catch (DateTimeParseException ignored) {
+            }
+        }
+
+        try {
+            return Long.parseLong(input);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("Unsupported date time format: " + input);
+        }
     }
 
-    public static long convertToMillis(String dateTime) {
-        throw new UnsupportedOperationException();
+    /**
+     * Creates a Discord timestamp with the given milliseconds.
+     * <p>
+     * For more information, refer to the <a href=https://discord.com/developers/docs/reference#message-formatting-timestamp-styles>official Discord docs</a>.
+     */
+    public enum DiscordTimestamp {
+
+        DEFAULT("<t:%d>"),
+        SHORT_TIME("<t:%d:t>"),
+        LONG_TIME("<t:%d:T>"),
+        SHORT_DATE("<t:%d:d>"),
+        LONG_DATE("<t:%d:D>"),
+        SHORT_DATE_TIME("<t:%d:f>"),
+        LONG_DATE_TIME("<t:%d:F>"),
+        RELATIVE_TIME("<t:%d:R>");
+
+        private final String format;
+
+        DiscordTimestamp(String format) {
+            this.format = format;
+        }
+
+        public String getTimestamp(long millis) {
+            return String.format(format, millis / 1000L);
+        }
     }
 }
