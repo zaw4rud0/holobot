@@ -15,7 +15,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Command(name = "countdown",
-        description = "Shows your countdowns.",
+        description = "Create, view and remove countdowns.",
+        usage = "WIP",
         alias = {"cd"},
         category = CommandCategory.MISC
 )
