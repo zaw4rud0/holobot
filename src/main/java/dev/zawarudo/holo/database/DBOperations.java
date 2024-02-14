@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.database;
 
+import dev.zawarudo.holo.commands.general.CountdownCmd;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
@@ -506,6 +507,74 @@ public final class DBOperations {
                 ids.add(rs.getLong("user_id"));
             }
             return ids;
+        }
+    }
+
+    /**
+     * Stores a countdown instance in the database.
+     *
+     * @param countdown The countdown instance with all the information.
+     * @throws SQLException When something went wrong while inserting the countdown into the database.
+     */
+    public static void insertCountdown(CountdownCmd.Countdown countdown) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-countdown");
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, countdown.name());
+            ps.setLong(2, countdown.timeCreated());
+            ps.setLong(3, countdown.dateTime());
+            ps.setLong(4, countdown.userId());
+            ps.setLong(5, countdown.serverId());
+            ps.execute();
+        }
+        conn.close();
+    }
+
+    /**
+     * Removes a given countdown from the database.
+     *
+     * @param countdownId The id of the countdown to be deleted.
+     * @throws SQLException When something went wrong while removing the countdown from the database.
+     */
+    public static void deleteCountdown(long countdownId) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-countdown");
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, countdownId);
+            ps.execute();
+        }
+    }
+
+    /**
+     * Retrieves all countdowns of a given user from the database.
+     *
+     * @param userId The id of the given user.
+     * @return All the countdown instances created by the given user.
+     * @throws SQLException When something wrong while fetching the countdowns from the database.
+     */
+    public static List<CountdownCmd.Countdown> fetchCountdowns(long userId) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-countdown");
+
+        Connection conn = Database.getConnection();
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            List<CountdownCmd.Countdown> countdowns = new ArrayList<>();
+
+            ps.setLong(1, userId);
+            ResultSet rs = ps.executeQuery();
+
+            while (rs.next()) {
+                long id = rs.getLong("id");
+                String name = rs.getString("name");
+                long timeCreated = rs.getLong("time_created");
+                long dateTime = rs.getLong("date_time");
+                long serverId = rs.getLong("guild_id");
+
+                CountdownCmd.Countdown countdown = new CountdownCmd.Countdown(id, name, timeCreated, dateTime, userId, serverId);
+                countdowns.add(countdown);
+            }
+            conn.close();
+            return countdowns;
         }
     }
 }

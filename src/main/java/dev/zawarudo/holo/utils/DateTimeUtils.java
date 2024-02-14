@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -68,6 +69,7 @@ public final class DateTimeUtils {
                 DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"),
                 DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"),
                 DateTimeFormatter.ofPattern("dd.MM.yy HH:mm"),
+                DateTimeFormatter.ofPattern("dd. MMMM yyyy HH:mm"),
 
                 // ISO 8601
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
@@ -128,6 +130,43 @@ public final class DateTimeUtils {
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Unsupported date time format: " + input);
         }
+    }
+
+    public static String getRelativeTime(long millis) {
+        long diff = millis - System.currentTimeMillis();
+
+        diff = Math.abs(diff);
+
+        long days = TimeUnit.MILLISECONDS.toDays(diff);
+        diff -= TimeUnit.DAYS.toMillis(days);
+        long hours = TimeUnit.MILLISECONDS.toHours(diff);
+        diff -= TimeUnit.HOURS.toMillis(hours);
+        long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
+        diff -= TimeUnit.MINUTES.toMillis(minutes);
+        long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
+
+        StringBuilder sb = new StringBuilder();
+        if (days > 0) {
+            sb.append(days).append(" day").append(days > 1 ? "s" : "");
+            if (hours > 0 || minutes > 0 || seconds > 0) sb.append(", ");
+        }
+        if (hours > 0) {
+            sb.append(hours).append(" hour").append(hours > 1 ? "s" : "");
+            if (minutes > 0 || seconds > 0) sb.append(", ");
+        }
+        if (minutes > 0) {
+            sb.append(minutes).append(" minute").append(minutes > 1 ? "s" : "");
+            if (seconds > 0) sb.append(", ");
+        }
+        if (seconds > 0) {
+            sb.append(seconds).append(" second").append(seconds > 1 ? "s" : "");
+        }
+
+        if (sb.isEmpty()) {
+            sb.append("less than a second");
+        }
+
+        return Formatter.capitalize(sb.toString());
     }
 
     /**
