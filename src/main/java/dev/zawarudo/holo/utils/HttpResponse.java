@@ -8,7 +8,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
-import java.net.URL;
+import java.net.URI;
 import java.util.stream.Collectors;
 
 /**
@@ -28,7 +28,7 @@ public final class HttpResponse {
      * @return The response body as a String.
      */
     public static String sendHttpRequest(String url) throws IOException {
-        HttpURLConnection connection = (HttpURLConnection) new URL(url).openConnection();
+        HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
         connection.setRequestProperty("User-Agent", USER_AGENT);
         connection.setRequestMethod("GET");
         try (BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream()))) {
@@ -65,7 +65,7 @@ public final class HttpResponse {
      * @return The first line of the response body as a String.
      */
     public static String readLine(String url) throws IOException {
-        try (BufferedReader reader = new BufferedReader(new InputStreamReader(new URL(url).openConnection().getInputStream()))) {
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(URI.create(url).toURL().openConnection().getInputStream()))) {
             return reader.readLine();
         }
     }
