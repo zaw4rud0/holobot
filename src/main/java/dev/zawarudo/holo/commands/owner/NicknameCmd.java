@@ -9,7 +9,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-@Deactivated
 @Command(name = "nickname",
         description = "Changes the nickname of the bot or of a specified user.",
         usage = "<user> <nickname>",

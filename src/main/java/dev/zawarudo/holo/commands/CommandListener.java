@@ -3,8 +3,12 @@ package dev.zawarudo.holo.commands;
 import dev.zawarudo.holo.commands.image.ActionCmd;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.PermissionManager;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.internal.utils.PermissionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -31,18 +35,18 @@ public class CommandListener extends ListenerAdapter {
     }
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent e) {
+    public void onMessageReceived(MessageReceivedEvent event) {
         // Ignore webhooks and bots
-        if (e.isWebhookMessage() || e.getAuthor().isBot()) {
+        if (event.isWebhookMessage() || event.getAuthor().isBot()) {
             return;
         }
 
         // Ignore messages without the bot prefix
-        if (!e.getMessage().getContentRaw().startsWith(getPrefix(e))) {
+        if (!event.getMessage().getContentRaw().startsWith(getPrefix(event))) {
             return;
         }
 
-        String rawMessage = e.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(e)), "");
+        String rawMessage = event.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(event)), "");
         List<String> split = parseArguments(rawMessage);
 
         String invoke = split.get(0).toLowerCase(Locale.UK);
@@ -51,11 +55,11 @@ public class CommandListener extends ListenerAdapter {
         ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
         if (actionCmd.isAction(invoke)) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} has called action ({})", e.getAuthor(), invoke);
+                LOGGER.info("{} has called action ({})", event.getAuthor(), invoke);
             }
 
             actionCmd.args = split.subList(1, split.size()).toArray(new String[0]);
-            actionCmd.displayAction(e, actionCmd.getAction(invoke));
+            actionCmd.displayAction(event, actionCmd.getAction(invoke));
         }
 
         // No valid command
@@ -66,12 +70,12 @@ public class CommandListener extends ListenerAdapter {
         AbstractCommand cmd = cmdManager.getCommand(invoke);
 
         // Check if user can do anything
-        if (!permManager.hasUserPermission(e, cmd) || !permManager.hasChannelPermission(e, cmd)) {
+        if (!permManager.hasUserPermission(event, cmd) || !permManager.hasChannelPermission(event, cmd)) {
             return;
         }
 
         if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} has called {}", e.getAuthor(), cmd.getName());
+            LOGGER.info("{} has called {}", event.getAuthor(), cmd.getName());
         }
 
         if (split.size() > 1) {
@@ -79,7 +83,12 @@ public class CommandListener extends ListenerAdapter {
         } else {
             cmd.args = new String[0];
         }
-        cmd.onCommand(e);
+
+        try {
+            cmd.onCommand(event);
+        } catch (InsufficientPermissionException ex) {
+            handlePermissionError(event, ex);
+        }
     }
 
     /**
@@ -113,5 +122,27 @@ public class CommandListener extends ListenerAdapter {
         }
 
         return arguments;
+    }
+
+    private void handlePermissionError(MessageReceivedEvent event, InsufficientPermissionException ex) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("Missing Permission");
+        builder.setDescription("Cannot perform action due to a lack of permission.");
+        builder.addField("Permissions", ex.getPermission().getName(), false);
+
+        boolean hasWritePermission = PermissionUtil.checkPermission(
+                event.getGuildChannel().getPermissionContainer(),
+                event.getGuild().getSelfMember(),
+                Permission.MESSAGE_SEND
+        );
+
+        if (hasWritePermission) {
+            event.getChannel().sendMessage(event.getAuthor().getAsMention()).addEmbeds(builder.build()).queue();
+        } else {
+            builder.addField("Server", ex.getGuild(event.getJDA()).getName(), false);
+            String channelName = ex.getChannel(event.getJDA()) != null ? ex.getChannel(event.getJDA()).getName() : "N/A";
+            builder.addField("Channel", channelName, false);
+            event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue());
+        }
     }
 }
