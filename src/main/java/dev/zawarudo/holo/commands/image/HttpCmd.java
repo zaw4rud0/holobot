@@ -9,7 +9,9 @@ import org.jetbrains.annotations.NotNull;
 
 @Deactivated
 @Command(name = "http",
-        description = "Shows a silly cat image with the specified HTTP error code",
+        description = "Shows a silly cat image with the specified HTTP error code.",
+        usage = "<http code>",
+        example = "404",
         category = CommandCategory.IMAGE,
         guildOnly = false
 )
