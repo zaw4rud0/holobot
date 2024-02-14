@@ -116,6 +116,11 @@ public abstract class AbstractCommand {
         event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue();
     }
 
+    protected void sendReplyEmbed(Message replyTo, EmbedBuilder embedBuilder, Color embedColor) {
+        embedBuilder.setColor(embedColor);
+        replyTo.replyEmbeds(embedBuilder.build()).queue();
+    }
+
     /**
      * Sends an embed to the channel the command was invoked in and deletes it after a given amount of time.
      */

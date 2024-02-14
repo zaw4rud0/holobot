@@ -12,6 +12,7 @@ import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.HttpResponse;
 import dev.zawarudo.holo.utils.Reader;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +26,8 @@ import java.util.concurrent.TimeUnit;
  * reaction or action gif.
  */
 @Command(name = "action",
-        description = "Sends an action GIF.",
+        description = "Sends an action GIF. For directed actions you can either mention an user or reply to a " +
+                "message to direct the action towards them.",
         usage = "[<action> | list]",
         example = "blush",
         embedColor = EmbedColor.LIGHT_GRAY,
@@ -33,6 +35,7 @@ import java.util.concurrent.TimeUnit;
 public class ActionCmd extends AbstractCommand {
 
     private final Map<String, Action> actions;
+    private static final Random RANDOM = new Random();
 
     public ActionCmd() {
         actions = new HashMap<>();
@@ -72,42 +75,63 @@ public class ActionCmd extends AbstractCommand {
      * Displays the action gif or image in an embed and sends it.
      */
     public void displayAction(@NotNull MessageReceivedEvent event, @NotNull Action action) {
-        deleteInvoke(event);
-
-        String url;
-
-        if (action.isApi()) {
-            try {
-                JsonObject obj = HttpResponse.getJsonObject(action.getRandomUrl());
-                url = obj.getAsJsonArray("results").get(0).getAsJsonObject().get("url").getAsString();
-            } catch (IOException ex) {
-                sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again later.");
-                return;
-            }
-        } else {
-            url = action.getRandomUrl();
-        }
-
-        String mention = "nothing";
-
-        if (args.length != 0) {
-            if (event.getMessage().getMentions().getMembers().isEmpty()) {
-                mention = String.join(" ", args);
-            } else {
-                mention = event.getMessage().getMentions().getMembers().get(0).getEffectiveName();
-            }
-        }
-
         // In case the member is a webhook
         if (event.getMember() == null) {
             return;
         }
 
-        EmbedBuilder builder = new EmbedBuilder();
+        deleteInvoke(event);
+
+        Optional<String> result = fetchActionUrl(action);
+        if (result.isEmpty()) {
+            sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again later.");
+            return;
+        }
+        String url = result.get();
+
+        String mention = determineMention(event);
         String title = action.getSentence().replace("{s}", event.getMember().getEffectiveName()).replace("{u}", mention);
-        builder.setTitle(title);
-        builder.setImage(url);
-        sendEmbed(event, builder, false, getEmbedColor());
+
+        sendActionEmbed(event, url, title);
+    }
+
+    private Optional<String> fetchActionUrl(Action action) {
+        if (action.isApi()) {
+            try {
+                JsonObject obj = HttpResponse.getJsonObject(action.getRandomUrl());
+                String url = obj.getAsJsonArray("results").get(0).getAsJsonObject().get("url").getAsString();
+                return Optional.of(url);
+            } catch (IOException ex) {
+                return Optional.empty();
+            }
+        } else {
+            return Optional.of(action.getRandomUrl());
+        }
+    }
+
+    private String determineMention(MessageReceivedEvent event) {
+        Message repliedTo = event.getMessage().getReferencedMessage();
+        if (repliedTo != null) {
+            return "you";
+        } else if (args.length != 0) {
+            return event.getMessage().getMentions().getMembers().isEmpty() ?
+                    String.join(" ", args) :
+                    event.getMessage().getMentions().getMembers().get(0).getEffectiveName();
+        } else {
+            return "nothing";
+        }
+    }
+
+    private void sendActionEmbed(MessageReceivedEvent event, String url, String title) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setImage(url).setTitle(title);
+
+        Message repliedTo = event.getMessage().getReferencedMessage();
+        if (repliedTo != null) {
+            sendReplyEmbed(repliedTo, builder, getEmbedColor());
+        } else {
+            sendEmbed(event, builder, false, getEmbedColor());
+        }
     }
 
     /**
@@ -130,7 +154,8 @@ public class ActionCmd extends AbstractCommand {
     private void initializeActions() throws IOException {
         String path = "./src/main/resources/misc/actions.json";
         JsonArray array = Reader.readJsonArray(path);
-        Type listType = new TypeToken<List<Action>>() {}.getType();
+        Type listType = new TypeToken<List<Action>>() {
+        }.getType();
         List<Action> actionList = new Gson().fromJson(array, listType);
         actionList.forEach(action -> actions.put(action.getName(), action));
     }
@@ -146,7 +171,7 @@ public class ActionCmd extends AbstractCommand {
     /**
      * Class representing an action. Serves as a container for all the information.
      */
-    private static class Action {
+    public static class Action {
         @SerializedName("name")
         private String name;
         @SerializedName("sentence")
@@ -156,24 +181,32 @@ public class ActionCmd extends AbstractCommand {
         @SerializedName("urls")
         private List<String> urls;
 
-        /** Gets the name of the action. */
+        /**
+         * Gets the name of the action.
+         */
         public String getName() {
             return name;
         }
 
-        /** Gets the sentence associated with the action. */
+        /**
+         * Gets the sentence associated with the action.
+         */
         public String getSentence() {
             return sentence;
         }
 
-        /** Checks whether the images or gifs are fetched from an API. */
+        /**
+         * Checks whether the images or gifs are fetched from an API.
+         */
         public boolean isApi() {
             return api;
         }
 
-        /** Gets a random URL to a gif or image of this action. */
+        /**
+         * Gets a random URL to a gif or image of this action.
+         */
         public String getRandomUrl() {
-            return urls.get(new Random().nextInt(urls.size()));
+            return urls.get(RANDOM.nextInt(urls.size()));
         }
     }
 }
