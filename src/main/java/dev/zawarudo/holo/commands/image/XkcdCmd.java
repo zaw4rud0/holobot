@@ -31,6 +31,8 @@ import java.util.Random;
         category = CommandCategory.IMAGE)
 public class XkcdCmd extends AbstractCommand {
 
+    private static final Random RANDOM = new Random();
+
     private static final String ERROR_RETRIEVING = "Something went wrong while retrieving the comic. Please try again later.";
     private static final String ERROR_DOES_NOT_EXIST = "This comic does not exist! If you think it should exist, consider using `%sxkcd new` to refresh my database.";
 
@@ -57,7 +59,7 @@ public class XkcdCmd extends AbstractCommand {
     public void onCommand(@NotNull MessageReceivedEvent event) {
         if (args.length == 0) {
             sendRandomComic(event);
-        } else if (args[0].equals("new")) {
+        } else if (args.length == 1 && args[0].equals("new")) {
             sendNewestComic(event);
         } else if (isInteger(args[0])) {
             sendComicByIssueNumber(event);
@@ -68,7 +70,7 @@ public class XkcdCmd extends AbstractCommand {
 
     private void sendRandomComic(MessageReceivedEvent event) {
         try {
-            XkcdComic comic = XkcdAPI.getComic(new Random().nextInt(newestIssue) + 1);
+            XkcdComic comic = XkcdAPI.getComic(RANDOM.nextInt(newestIssue) + 1);
             storeComicIfNew(comic);
             sendXkcd(event, comic);
         } catch (APIException | InvalidRequestException | SQLException ex) {
