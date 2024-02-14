@@ -12,6 +12,8 @@ import java.util.Random;
  */
 public class BotHandler extends ListenerAdapter {
 
+	private static final Random RANDOM = new Random();
+
 	@Override
 	public void onMessageReceived(@NotNull MessageReceivedEvent e) {
 		// Ignore every message from non-bots and ignore self
@@ -21,7 +23,7 @@ public class BotHandler extends ListenerAdapter {
 
 		// General Kenobi meme
 		String[] replies = {"General Kenobi", "Genewal Kenowi UwU", "General Kenobi-chan", "OwO"};
-		String msg = replies[new Random().nextInt(replies.length)];
+		String msg = replies[RANDOM.nextInt(replies.length)];
 		if (e.getMessage().getContentRaw().toLowerCase(Locale.UK).contains("hello there")) {
 			e.getMessage().reply(msg).queue();
 		}
