@@ -22,8 +22,8 @@ public final class FontUtils {
         return font.deriveFont(affineTransform);
     }
 
-    public static Font loadFontFromFile(float fontSize) {
-        try (InputStream is = FontUtils.class.getResourceAsStream("/ComicSans.ttf")) {
+    public static Font loadFontFromFile(String fontName, float fontSize) {
+        try (InputStream is = FontUtils.class.getResourceAsStream(String.format("/%s.ttf", fontName))) {
             if (is == null) {
                 throw new IllegalStateException("Font file not found at ./src/main/resources/ComicSansBold.ttf");
             }

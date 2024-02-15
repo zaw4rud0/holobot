@@ -10,7 +10,7 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +53,8 @@ public class PokemonTeam {
                 continue;
             }
 
-            BufferedImage artwork = ImageIO.read(new URL(pokemon.getSprites().getOther().getArtwork().getFrontDefault()));
+            String url = pokemon.getSprites().getOther().getArtwork().getFrontDefault();
+            BufferedImage artwork = ImageIO.read(URI.create(url).toURL());
 
             List<String> types = pokemon.getTypes();
             PokemonType type1 = PokemonUtils.getType(types.get(0));
@@ -100,7 +101,7 @@ public class PokemonTeam {
         g2.setColor(oldColor);
         temp = ImageOperations.resize(img, 420, 420);
         g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
-        drawName(g2, name, new Rectangle(width, height), FontUtils.loadFontFromFile(30));
+        drawName(g2, name, new Rectangle(width, height), FontUtils.loadFontFromFile("ComicSansBold", 30));
         g2.dispose();
         return res;
     }
