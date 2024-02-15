@@ -16,7 +16,7 @@ import org.jsoup.select.Elements;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URL;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,7 +80,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
 
         String url = String.format("%s/define.php?term=%s", BASE_URL, Formatter.encodeUrl(searchTerm));
 
-        Document doc = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
+        Document doc = Jsoup.parse(URI.create(url).toURL().openStream(), "UTF-8", url);
         Elements elements = doc.select("div.definition");
 
         for (Element element : elements) {
