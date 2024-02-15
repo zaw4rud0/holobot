@@ -23,7 +23,7 @@ class AnimeTests {
         assertNotNull(onePiece);
         assertEquals(21, onePiece.getId());
         assertEquals("one piece", onePiece.getTitle().toLowerCase(Locale.UK));
-        assertEquals("Sundays", onePiece.getBroadcast().getDay());
+        assertEquals("Sundays", onePiece.getBroadcast().getDay().get());
     }
 
     @Test
