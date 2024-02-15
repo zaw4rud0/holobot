@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.text.DecimalFormat;
+import java.util.Random;
 
 @Command(name = "coinflip",
         description = "Flips a coin. You can provide an additional argument as the number of times I should flip a coin with the limit being 1'000'000 coin flips at once.",
@@ -15,6 +16,7 @@ import java.text.DecimalFormat;
 public class CoinFlipCmd extends AbstractCommand {
 
     private static final int MAX_COIN_FLIPS = 1_000_000;
+    private static final Random RANDOM = new Random();
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
@@ -52,7 +54,7 @@ public class CoinFlipCmd extends AbstractCommand {
     private int flipCoins(int times) {
         int heads = 0;
         for (int i = 0; i < times; i++) {
-            int result = (int) (Math.random() * 2);
+            int result = RANDOM.nextInt(2);
             if (result == 0) {
                 heads++;
             }
