@@ -31,12 +31,12 @@ cd holobot
 mvn clean install
 ```
 4. Run `Setup` inside `src\main\java\dev.zawarudo.holo\scripts` in your favorite IDE to create the necessary files and configure the project.
-5. In the newly created `config.json` file, set the value of `token` with the token of your bot.
-6. Now you can either run `Bootstrap` inside your IDE or execute
+5. In the newly created `config.json` file, set the value of `token` with your bot token.
+6. Now you can either run `Bootstrap` in your IDE or execute
 ```
 java -jar holobot-VERSION.jar
 ```
-where `VERSION` is the current version of your bot which is defined inside `pom.xml`.
+where `VERSION` is the current version of the bot which is defined inside `pom.xml`.
 
 ## Usage
 
