@@ -4,10 +4,10 @@ import com.google.gson.annotations.SerializedName;
 import dev.zawarudo.holo.modules.jikan.JikanAPI;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Comparable<T> {
 
@@ -56,6 +56,9 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     @SerializedName(value = "released", alternate = {"published", "aired"})
     protected Released released;
 
+    /**
+     * MyAnimeList ID of this medium.
+     */
     public int getId() {
         return id;
     }
@@ -76,20 +79,18 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
         return title;
     }
 
-    @Nullable
-    public String getTitleEnglish() {
-        if (titleEn != null && titleEn.equals("null")) {
-            return null;
+    public Optional<String> getTitleEnglish() {
+        if (titleEn == null || titleEn.equals("null")) {
+            return Optional.empty();
         }
-        return titleEn;
+        return Optional.of(titleEn);
     }
 
-    @Nullable
-    public String getTitleJapanese() {
-        if (titleJp != null && titleJp.equals("null")) {
-            return null;
+    public Optional<String> getTitleJapanese() {
+        if (titleJp == null || titleJp.equals("null")) {
+            return Optional.empty();
         }
-        return titleJp;
+        return Optional.of(titleJp);
     }
 
     public List<String> getTitleSynonyms() {
@@ -112,6 +113,9 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
         return scoredBy;
     }
 
+    /**
+     * The all-time MyAnimeList rank of this medium.
+     */
     public int getRank() {
         return rank;
     }
@@ -120,23 +124,25 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
         return popularity;
     }
 
+    /**
+     * The number of MyAnimeList users who have added this medium in their list.
+     */
     public long getMembers() {
         return members;
     }
 
+    /**
+     * The number of  MyAnimeList users who have marked this medium as their favorite.
+     */
     public long getFavorites() {
         return favorites;
     }
 
-    public boolean hasSynopsis() {
-        return synopsis != null;
-    }
-
-    public String getSynopsis() {
+    public Optional<String> getSynopsis() {
         if (synopsis != null) {
-            return synopsis.replace("[Written by MAL Rewrite]", "").strip();
+            return Optional.of(synopsis.replace("[Written by MAL Rewrite]", "").strip());
         }
-        return null;
+        return Optional.empty();
     }
 
     public String getBackground() {

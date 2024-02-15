@@ -5,7 +5,7 @@ import com.google.gson.annotations.SerializedName;
 import java.util.List;
 
 /**
- * Represents an anime
+ * Represents an anime.
  */
 public final class Anime extends AbstractMedium<Anime> {
     @SerializedName("source")
@@ -39,6 +39,9 @@ public final class Anime extends AbstractMedium<Anime> {
         return episodes;
     }
 
+    /**
+     * Whether this anime is currently airing.
+     */
     public boolean isAiring() {
         return airing;
     }
@@ -60,6 +63,10 @@ public final class Anime extends AbstractMedium<Anime> {
 
     public Broadcast getBroadcast() {
         return broadcast;
+    }
+
+    public void changeBroadcastTimeZone(String timeZone) {
+        broadcast = broadcast.convertToTimeZone(timeZone);
     }
 
     public List<Nameable> getProducers() {

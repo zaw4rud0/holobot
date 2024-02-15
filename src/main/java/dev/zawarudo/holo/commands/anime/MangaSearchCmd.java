@@ -97,11 +97,11 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
 
     @Override
     protected void setEmbedDetails(EmbedBuilder builder, Manga manga) {
-        if (manga.getTitleEnglish() != null && !manga.getTitleEnglish().equals(manga.getTitle())) {
-            builder.addField("English Title", manga.getTitleEnglish(), true);
+        if (manga.getTitleEnglish().isPresent() && !manga.getTitleEnglish().equals(manga.getTitle())) {
+            builder.addField("English Title", manga.getTitleEnglish().get(), true);
         }
-        if (manga.getTitleJapanese() != null) {
-            builder.addField("Japanese Title", manga.getTitleJapanese(), true);
+        if (manga.getTitleJapanese().isPresent()) {
+            builder.addField("Japanese Title", manga.getTitleJapanese().get(), true);
         }
 
         String authors = formatAuthors(manga.getAuthors());
@@ -116,6 +116,10 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
         String themes = formatList(manga.getThemes());
         if (themes != null) {
             builder.addField("Themes", themes, false);
+        }
+        String demographics = formatList(manga.getDemographics());
+        if (demographics != null) {
+            builder.addField("Demographics", demographics, false);
         }
 
         builder.addField("Status", manga.getStatus(), true);

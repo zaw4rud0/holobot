@@ -95,11 +95,11 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
 
     @Override
     protected void setEmbedDetails(EmbedBuilder builder, Anime anime) {
-        if (anime.getTitleEnglish() != null && !anime.getTitleEnglish().equals(anime.getTitle())) {
-            builder.addField("English Title", anime.getTitleEnglish(), true);
+        if (anime.getTitleEnglish().isPresent() && !anime.getTitleEnglish().equals(anime.getTitle())) {
+            builder.addField("English Title", anime.getTitleEnglish().get(), true);
         }
-        if (anime.getTitleJapanese() != null) {
-            builder.addField("Japanese Title", anime.getTitleJapanese(), true);
+        if (anime.getTitleJapanese().isPresent()) {
+            builder.addField("Japanese Title", anime.getTitleJapanese().get(), true);
         }
 
         String studios = formatList(anime.getStudios());
@@ -114,6 +114,10 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
         String themes = formatList(anime.getThemes());
         if (themes != null) {
             builder.addField("Themes", themes, false);
+        }
+        String demographics = formatList(anime.getDemographics());
+        if (demographics != null) {
+            builder.addField("Demographics", demographics, false);
         }
 
         builder.addField("Status", anime.getStatus(), true);

@@ -89,8 +89,8 @@ public abstract class BaseSearchCmd<T extends AbstractMedium<T>> extends Abstrac
         builder.setTitle(String.format("%s [%s]", title, type));
 
         builder.setThumbnail(selected.getImages().getJpg().getLargeImage());
-        if (selected.hasSynopsis()) {
-            String synopsis = Formatter.truncateString(selected.getSynopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+        if (selected.getSynopsis().isPresent()) {
+            String synopsis = Formatter.truncateString(selected.getSynopsis().get(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
             builder.setDescription(synopsis);
         }
         return builder;
