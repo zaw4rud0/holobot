@@ -23,7 +23,6 @@ import dev.zawarudo.holo.commands.music.cmds.CloneCmd;
 import dev.zawarudo.holo.commands.music.cmds.JoinCmd;
 import dev.zawarudo.holo.commands.music.cmds.LeaveCmd;
 import dev.zawarudo.holo.commands.music.cmds.LoopCmd;
-import dev.zawarudo.holo.commands.music.cmds.LyricsCmd;
 import dev.zawarudo.holo.commands.music.cmds.NowPlayingCmd;
 import dev.zawarudo.holo.commands.music.cmds.PlayCmd;
 import dev.zawarudo.holo.commands.music.cmds.QueueCmd;
@@ -86,7 +85,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new JoinCmd());
         addCommand(new LeaveCmd());
         addCommand(new LoopCmd());
-        addCommand(new LyricsCmd());
         addCommand(new NowPlayingCmd());
         addCommand(new PlayCmd());
         addCommand(new QueueCmd());
