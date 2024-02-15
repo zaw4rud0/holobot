@@ -1,59 +1,64 @@
-<img align="right" src="src/main/resources/logo.png" height="220" width="220" alt="Holo's profile picture">
+<img align="right" src="src/main/resources/logo.png" height="200" width="200" alt="Holo's profile picture">
 
 # HoloBot (Java Discord Bot)
 
-Holo is a Discord bot based on Holo the Wisewolf from the series [Spice & Wolf](https://en.wikipedia.org/wiki/Spice_and_Wolf). Not only can it provide music, it also lets you search for anime and manga information and can provide numerous images of nekos and different waifus. To see all features of Holo, jump to this [section](#features).
-<br>Note that this bot is still in development and that many features will be added in the future. If you encounter a bug, please report it by opening an issue in this repository or by using the `bug` command of Holo in your server.
-
-## Overview
-
-1. [Features](#features)
-2. [Dependencies](#dependencies)
-3. [Changes](#changes)
+HoloBot is a Discord bot written in Java and backed by [JDA (Java Discord API)](https://github.com/discord-jda/JDA). This bot started as a personal project to learn Java and programming in general and is now an active bot that provides its services and features to several Discord servers.
 
 ## Features
 
-### General
-* Anime & Manga Search
-* Image Provider
-* Music Player
+Coming soon!
 
-### Games
-* Pokédex
-* Akinator
+## Running locally
 
-### Music
+### Prerequisites
 
-* At the moment, only YouTube videos are supported for music in voice channels.
+- Java JDK 17
+- Maven
+- Discord developer account and a Discord bot token
 
-## Dependencies
+### Installation
 
-This Discord bot uses the following dependencies for its functionalities:
+1. Clone this repository:
+```
+git clone https://github.com/zaw4rud0/holobot.git
+```
+2. Navigate to the project directory: 
+```
+cd holobot
+```
+3. Build the project:
+```
+mvn clean install
+```
+4. Run `Setup` inside `src\main\java\dev.zawarudo.holo\scripts` in your favorite IDE to create the necessary files and configure the project.
+5. In the newly created `config.json` file, set the value of `token` with the token of your bot.
+6. Now you can either run `Bootstrap` inside your IDE or execute
+```
+java -jar holobot-VERSION.jar
+```
+where `VERSION` is the current version of your bot which is defined inside `pom.xml`.
 
-### [NanoJikan](https://github.com/xHarlock/NanoJikan)
+## Usage
 
-A simple and lightweight wrapper written by me for Jikan API to fetch Anime and Manga data from MyAnimeList.
+You can add a Discord bot to your server using the following invitation link where you replace `YOUR_BOT` with the ID of your bot:
+```
+https://discord.com/oauth2/authorize?client_id=YOUR_BOT&scope=bot
+```
 
-### [PokeAPI4Java](https://github.com/xHarlock/PokeAPI4Java)
+The default prefix of this bot is `<`, and you can see all the commands using `<help`.
 
-A simple wrapper written in Java by me for the [PokeAPI](https://pokeapi.co/) to fetch Pokémon information.
+## Contributing
 
-### [JDA](https://github.com/DV8FromTheWorld/JDA)
+Support and contributions are always welcome. Pull requests are the best way to propose changes to the codebase.
 
-JDA (Java Discord API) makes up the core of this bot. This popular library is used to facilitate the usage of the official Discord API that is required for a bot to send and receive messages and provide different functionalities in Discord.
+1. Fork the repository and create your branch from `main`.
+2. Add code or changes.
+3. Ensure the test suite passes.
+4. Make sure the code is clean and functional.
+5. Open a PR in this repository with your branch.
 
-### [JDA-Utilities](https://github.com/JDA-Applications/JDA-Utilities)
+If you encounter a bug or want to suggest new features, feel free to open a new issue. Please make sure to provide a detailed description, so we don't have to scratch our head.
 
-Library with many useful features for JDA bots.
+## License
 
-### [LavaPlayer](https://github.com/sedmelluq/lavaplayer)
-
-A rather popular library used by Java bots to provide music playback.
-
-### [AkiWrapper](https://github.com/markozajc/Akiwrapper)
-
-A wrapper that does most of the heavy lifting with Akinator games.
-
-## Changes
-
-To see all changes and updates, please refer to this [file](https://github.com/xHarlock/HoloBot/blob/master/CHANGELOG.md).
+This project is licensed under the [MIT License](LICENSE).
