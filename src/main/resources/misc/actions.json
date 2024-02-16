@@ -2,7 +2,6 @@
   {
     "name": "baka",
     "sentence": "{s} calls {u} a baka",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/baka"
@@ -11,7 +10,6 @@
   {
     "name": "bite",
     "sentence": "{s} bites {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/bite"
@@ -20,7 +18,6 @@
   {
     "name": "blush",
     "sentence": "{s} blushes",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/blush"
@@ -29,7 +26,6 @@
   {
     "name": "bonk",
     "sentence": "{s} bonks {u}",
-    "directed": true,
     "api": false,
     "urls": [
       "https://media.tenor.com/mXwNLMSQRN8AAAAC/yuru-yuri-chinatsu-yoshikawa.gif",
@@ -47,7 +43,6 @@
   {
     "name": "bored",
     "sentence": "{s} is bored",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/bored"
@@ -56,7 +51,6 @@
   {
     "name": "cry",
     "sentence": "{s} cries",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/cry"
@@ -65,7 +59,6 @@
   {
     "name": "cuddle",
     "sentence": "{s} cuddles {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/cuddle"
@@ -74,7 +67,6 @@
   {
     "name": "dance",
     "sentence": "{s} dances",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/dance"
@@ -83,7 +75,6 @@
   {
     "name": "die",
     "sentence": "{s} dies",
-    "directed": false,
     "api": false,
     "urls": [
       "https://media.tenor.com/iU20sXcBKOAAAAAC/anime-die.gif",
@@ -99,9 +90,18 @@
     ]
   },
   {
+    "name": "eat",
+    "sentence": "{s} is eating",
+    "api": false,
+    "urls": [
+      "https://media1.tenor.com/m/ZBO4pyuseVcAAAAC/engage-kiss-kanna.gif",
+      "https://media1.tenor.com/m/ZJltjT6QMBwAAAAC/eating-anime.gif",
+      "https://media1.tenor.com/m/K3XUYZG1cUEAAAAd/sweetdreams-eat.gif"
+    ]
+  },
+  {
     "name": "facepalm",
     "sentence": "{s} face-palms",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/facepalm"
@@ -110,7 +110,6 @@
   {
     "name": "feed",
     "sentence": "{s} feeds {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/feed"
@@ -119,7 +118,6 @@
   {
     "name": "handhold",
     "sentence": "{s} holds the hand of {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/handhold"
@@ -128,7 +126,6 @@
   {
     "name": "happy",
     "sentence": "{s} is happy",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/happy"
@@ -137,7 +134,6 @@
   {
     "name": "highfive",
     "sentence": "{s} highfives {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/highfive"
@@ -146,16 +142,22 @@
   {
     "name": "hug",
     "sentence": "{s} hugs {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/hug"
     ]
   },
   {
+    "name": "hungry",
+    "sentence": "{s} is hungry",
+    "api": false,
+    "urls": [
+      "https://media1.tenor.com/m/8e0zlax0OTgAAAAC/anime-hungry.gif"
+    ]
+  },
+  {
     "name": "kick",
     "sentence": "{s} kicks {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/kick"
@@ -164,7 +166,6 @@
   {
     "name": "kiss",
     "sentence": "{s} kisses {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/kiss"
@@ -173,7 +174,6 @@
   {
     "name": "laugh",
     "sentence": "{s} laughs",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/laugh"
@@ -182,7 +182,6 @@
   {
     "name": "pat",
     "sentence": "{s} pats {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/pat"
@@ -191,7 +190,6 @@
   {
     "name": "poke",
     "sentence": "{s} pokes {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/poke"
@@ -200,7 +198,6 @@
   {
     "name": "pout",
     "sentence": "{s} pouts",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/pout"
@@ -209,7 +206,6 @@
   {
     "name": "punch",
     "sentence": "{s} punches {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/punch"
@@ -218,7 +214,6 @@
   {
     "name": "shoot",
     "sentence": "{s} shoots {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/shoot"
@@ -227,7 +222,6 @@
   {
     "name": "shrug",
     "sentence": "{s} shrugs",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/shrug"
@@ -236,7 +230,6 @@
   {
     "name": "slap",
     "sentence": "{s} slaps {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/slap"
@@ -245,7 +238,6 @@
   {
     "name": "sleep",
     "sentence": "{s} sleeps",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/sleep"
@@ -254,7 +246,6 @@
   {
     "name": "smile",
     "sentence": "{s} smiles",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/smile"
@@ -263,7 +254,6 @@
   {
     "name": "smug",
     "sentence": "{s} is smug",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/smug"
@@ -272,7 +262,6 @@
   {
     "name": "stare",
     "sentence": "{s} stares at {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/stare"
@@ -281,7 +270,6 @@
   {
     "name": "study",
     "sentence": "{s} is studying",
-    "directed": false,
     "api": false,
     "urls": [
       "https://media.tenor.com/0IudfCinoWgAAAAC/study-anime.gif",
@@ -307,7 +295,6 @@
   {
     "name": "think",
     "sentence": "{s} thinks",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/think"
@@ -316,7 +303,6 @@
   {
     "name": "thumbsup",
     "sentence": "{s} gives a thumbs-up",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/thumbsup"
@@ -325,7 +311,6 @@
   {
     "name": "tickle",
     "sentence": "{s} tickles {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/tickle"
@@ -334,7 +319,6 @@
   {
     "name": "wave",
     "sentence": "{s} waves",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/wave"
@@ -343,7 +327,6 @@
   {
     "name": "wink",
     "sentence": "{s} winks",
-    "directed": false,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/wink"
@@ -352,7 +335,6 @@
   {
     "name": "yeet",
     "sentence": "{s} yeets {u}",
-    "directed": true,
     "api": true,
     "urls": [
       "https://nekos.best/api/v2/yeet"

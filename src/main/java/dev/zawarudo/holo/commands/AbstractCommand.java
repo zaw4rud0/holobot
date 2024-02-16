@@ -19,6 +19,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static net.dv8tion.jda.api.entities.Message.Attachment;
@@ -213,6 +214,16 @@ public abstract class AbstractCommand {
         } catch (NumberFormatException ex) {
             return false;
         }
+    }
+
+    /**
+     * Checks whether a String is a boolean.
+     *
+     * @param s The String to check.
+     * @return True if the String is a boolean, false otherwise.
+     */
+    protected boolean isBoolean(String s) {
+        return "true".equals(s.toLowerCase(Locale.UK)) || "false".equals(s.toLowerCase(Locale.UK));
     }
 
     /**

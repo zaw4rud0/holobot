@@ -6,6 +6,7 @@ import com.google.gson.JsonObject;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -24,5 +25,9 @@ public final class Writer {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filepath))) {
             new Gson().toJson(array, writer);
         }
+    }
+
+    public static void writeToFile(String content, String filepath) throws IOException {
+        Files.writeString(Paths.get(filepath), content);
     }
 }
