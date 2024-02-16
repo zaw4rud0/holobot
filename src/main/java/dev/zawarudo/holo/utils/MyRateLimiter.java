@@ -3,7 +3,7 @@ package dev.zawarudo.holo.utils;
 import com.google.common.util.concurrent.RateLimiter;
 
 /**
- * A simple class to set a limit as to how many times a specific action can be executed.
+ * A wrapper class around the unstable API.
  */
 @SuppressWarnings({"UnstableApiUsage", "unused"})
 public class MyRateLimiter {
