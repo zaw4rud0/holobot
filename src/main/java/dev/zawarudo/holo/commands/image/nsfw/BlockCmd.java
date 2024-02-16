@@ -11,6 +11,7 @@ import org.jetbrains.annotations.NotNull;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "block",
@@ -66,15 +67,15 @@ public class BlockCmd extends AbstractCommand {
             return;
         }
 
-        String url = getImage(event.getMessage().getReferencedMessage());
+        Optional<String> url = getImage(event.getMessage().getReferencedMessage());
 
-        if (url == null) {
+        if (url.isEmpty()) {
             sendErrorEmbed(event, "Image not found! Please make sure the message you replied to contains an image.");
             return;
         }
 
         try {
-            DBOperations.insertBlockedImage(url, event.getAuthor().getIdLong(), event.getMessage().getTimeCreated().toString(), "None given");
+            DBOperations.insertBlockedImage(url.get(), event.getAuthor().getIdLong(), event.getMessage().getTimeCreated().toString(), "None given");
         } catch (SQLException ex) {
             sendErrorEmbed(event, "Something went wrong.");
             if (logger.isErrorEnabled()) {
@@ -83,7 +84,7 @@ public class BlockCmd extends AbstractCommand {
             return;
         }
 
-        blocked.add(url);
+        blocked.add(url.get());
 
         if (event.isFromGuild()) {
             event.getMessage().getReferencedMessage().delete().queue();

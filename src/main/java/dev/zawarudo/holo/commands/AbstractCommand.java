@@ -16,10 +16,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
-import java.util.ArrayList;
-import java.util.Collection;
+import java.util.*;
 import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
 import static net.dv8tion.jda.api.entities.Message.Attachment;
@@ -254,14 +252,13 @@ public abstract class AbstractCommand {
      * @param msg The message to get the image from.
      * @return The image link from the message, or null if no image could be found.
      */
-    @Nullable
-    protected String getImage(@NotNull Message msg) {
+    protected Optional<String> getImage(@NotNull Message msg) {
         // Image as attachment
         List<Attachment> attachments = msg.getAttachments();
         if (!attachments.isEmpty()) {
             for (Attachment attachment : attachments) {
                 if (attachment.isImage()) {
-                    return attachment.getUrl();
+                    return Optional.of(attachment.getUrl());
                 }
             }
         }
@@ -271,18 +268,18 @@ public abstract class AbstractCommand {
             for (MessageEmbed embed : embeds) {
                 MessageEmbed.ImageInfo image = embed.getImage();
                 if (image != null) {
-                    return image.getUrl();
+                    return Optional.ofNullable(image.getUrl());
                 }
             }
         }
         // Image url as message text
-        String[] args = msg.getContentRaw().split(" ");
-        String content = args[args.length - 1];
+        String[] parts = msg.getContentRaw().split(" ");
+        String content = parts[parts.length - 1];
         if (isValidUrl(content)) {
-            return content;
+            return Optional.of(content);
         }
         // No image found
-        return null;
+        return Optional.empty();
     }
 
     /**

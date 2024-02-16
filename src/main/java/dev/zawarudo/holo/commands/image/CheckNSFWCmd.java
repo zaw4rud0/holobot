@@ -21,7 +21,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URL;
+import java.net.URI;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -43,9 +44,9 @@ public class CheckNSFWCmd extends AbstractCommand {
         deleteInvoke(event);
 
         Message reply = event.getMessage().getReferencedMessage();
-        String imageUrl = reply != null ? getImage(reply) : getImage(event.getMessage());
+        Optional<String> imageUrl = reply != null ? getImage(reply) : getImage(event.getMessage());
 
-        if (imageUrl == null) {
+        if (imageUrl.isEmpty()) {
             sendErrorEmbed(event, "Use `" + getPrefix(event) + "help check` to see the correct usage of this command.");
             return;
         }
@@ -54,7 +55,7 @@ public class CheckNSFWCmd extends AbstractCommand {
         JsonObject obj;
 
         try {
-            obj = getEvaluation(imageUrl);
+            obj = getEvaluation(imageUrl.get());
         } catch (IOException ex) {
             sendErrorEmbed(event, "Something went wrong while communicating with the API");
             return;
@@ -72,7 +73,7 @@ public class CheckNSFWCmd extends AbstractCommand {
                 builder.setImage("attachment://check.png");
 
                 // Get url as a BufferedImage to draw the boxes into it
-                BufferedImage img = ImageIO.read(new URL(imageUrl));
+                BufferedImage img = ImageIO.read(URI.create(imageUrl.get()).toURL());
 
                 int boxes = obj.getAsJsonObject("output").getAsJsonArray("detections").size();
 

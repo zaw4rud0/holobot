@@ -14,7 +14,8 @@ import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
+import java.net.URI;
+import java.util.Optional;
 
 @Deactivated
 @Command(name = "pixelate",
@@ -27,10 +28,10 @@ public class PixelateCmd extends AbstractCommand {
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         Message referenced = event.getMessage().getReferencedMessage();
-        String url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
+        Optional<String> url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
 
         // User didn't provide an image
-        if (url == null) {
+        if (url.isEmpty()) {
             sendErrorEmbed(event, "You need to provide an image to pixelate!");
             return;
         }
@@ -46,7 +47,7 @@ public class PixelateCmd extends AbstractCommand {
         }
 
         try {
-            BufferedImage img = ImageIO.read(new URL(url));
+            BufferedImage img = ImageIO.read(URI.create(url.get()).toURL());
             if (img == null) {
                 sendErrorEmbed(event, "I couldn't read the image. Please check your image format or try a different image.");
                 if (logger.isErrorEnabled()) {

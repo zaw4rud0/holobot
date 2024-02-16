@@ -14,6 +14,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -32,18 +33,19 @@ public class UpscaleCmd extends AbstractCommand {
         deleteInvoke(event);
 
         Message referenced = event.getMessage().getReferencedMessage();
-        String url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
+        Optional<String> url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
 
         // User didn't provide an image
-        if (url == null) {
+        if (url.isEmpty()) {
             sendErrorEmbed(event, "You need to provide an image to upscale!");
             return;
         }
 
         sendTyping(event);
 
+        String imageUrl;
         try {
-            url = process(url);
+            imageUrl = process(url.get());
         } catch (IOException ex) {
             sendErrorEmbed(event, "Something went wrong while processing your image! Please make sure it's an image and try again.");
             return;
@@ -51,7 +53,7 @@ public class UpscaleCmd extends AbstractCommand {
 
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setTitle("Upscaled Image");
-        embedBuilder.setImage(url);
+        embedBuilder.setImage(imageUrl);
         sendEmbed(event, embedBuilder, true, 5, TimeUnit.MINUTES, getEmbedColor());
     }
 

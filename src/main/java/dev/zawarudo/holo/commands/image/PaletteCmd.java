@@ -22,6 +22,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Command(name = "palette",
@@ -38,9 +39,9 @@ public class PaletteCmd extends AbstractCommand {
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         Message msg = event.getMessage();
-        String url = msg.getReferencedMessage() == null ? getImage(msg) : getImage(msg.getReferencedMessage());
+        Optional<String> url = msg.getReferencedMessage() == null ? getImage(msg) : getImage(msg.getReferencedMessage());
 
-        if (url == null || url.contains("gif")) {
+        if (url.isEmpty() || url.get().contains("gif")) {
             sendErrorEmbed(event, "Incorrect usage! Please provide an image, either as an attachment or as an url.");
             return;
         }
@@ -50,7 +51,7 @@ public class PaletteCmd extends AbstractCommand {
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Color Palette");
-        builder.setThumbnail(url);
+        builder.setThumbnail(url.get());
         builder.setImage("attachment://" + name);
         builder.setFooter("Invoked by " + event.getMember().getEffectiveName(), event.getAuthor().getEffectiveAvatarUrl());
 
@@ -58,7 +59,7 @@ public class PaletteCmd extends AbstractCommand {
         InputStream imageStream;
 
         try {
-            BufferedImage image = readImage(url);
+            BufferedImage image = readImage(url.get());
             result = analyzeColors(image, parseColorCount());
             BufferedImage paletteImage = createPaletteImage(result.representativeColors);
             imageStream = ImageOperations.toInputStream(paletteImage);
