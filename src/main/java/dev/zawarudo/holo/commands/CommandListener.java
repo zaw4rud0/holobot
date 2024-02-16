@@ -15,6 +15,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -27,11 +29,15 @@ public class CommandListener extends ListenerAdapter {
     private final CommandManager cmdManager;
     private final PermissionManager permManager;
 
+    private final ExecutorService executorService;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListener.class);
 
     public CommandListener(CommandManager cmdManager, PermissionManager permManager) {
         this.cmdManager = cmdManager;
         this.permManager = permManager;
+
+        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
     }
 
     @Override
@@ -85,7 +91,7 @@ public class CommandListener extends ListenerAdapter {
         }
 
         try {
-            cmd.onCommand(event);
+            executorService.submit(() -> cmd.onCommand(event));
         } catch (InsufficientPermissionException ex) {
             handlePermissionError(event, ex);
         }
