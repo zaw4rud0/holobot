@@ -4,6 +4,7 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.utils.DateTimeUtils;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -73,7 +74,7 @@ public class CountdownCmd extends AbstractCommand {
                 embedBuilder.addField("ID", String.valueOf(cd.id), false);
                 embedBuilder.addField("Name", cd.name, false);
                 embedBuilder.addField("Date", DateTimeUtils.formatDateTime(cd.dateTime), false);
-                embedBuilder.addField("Remaining Time", DateTimeUtils.getRelativeTime(cd.dateTime), false);
+                embedBuilder.addField("Remaining Time", Formatter.getRelativeTime(cd.dateTime), false);
                 embedBuilder.addField("Time Created", DateTimeUtils.formatDateTime(cd.timeCreated), false);
 
                 event.getMessage().replyEmbeds(embedBuilder.build()).queue();
@@ -95,7 +96,7 @@ public class CountdownCmd extends AbstractCommand {
             for (Countdown cd : countdowns) {
                 sb.append("* ").append(String.format("**%s** ", cd.name)).append(String.format("`[ID: %d]`", cd.id)).append("\n")
                         .append(DateTimeUtils.formatDateTime(cd.dateTime)).append("\n")
-                        .append(DateTimeUtils.getRelativeTime(cd.dateTime)).append("\n");
+                        .append(Formatter.getRelativeTime(cd.dateTime)).append("\n");
             }
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -124,7 +125,7 @@ public class CountdownCmd extends AbstractCommand {
             embedBuilder.setTitle("Created countdown");
             embedBuilder.addField("Name", name, false);
             embedBuilder.addField("Date", dateTime, false);
-            embedBuilder.addField("Remaining time", DateTimeUtils.getRelativeTime(millis), false);
+            embedBuilder.addField("Remaining time", Formatter.getRelativeTime(millis), false);
 
             event.getMessage().replyEmbeds(embedBuilder.build()).queue();
         } catch (SQLException e) {

@@ -2,12 +2,17 @@ package dev.zawarudo.holo.modules.jikan.model;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
  * Represents an anime.
  */
 public final class Anime extends AbstractMedium<Anime> {
+
     @SerializedName("source")
     private String source;
     @SerializedName("episodes")
@@ -79,5 +84,23 @@ public final class Anime extends AbstractMedium<Anime> {
 
     public List<Nameable> getStudios() {
         return studios;
+    }
+
+    /**
+     * Returns the start date of the anime in ISO-8601 format. The timezone is JST (Asia/Tokyo).
+     * <p>
+     * Make sure to call this method before Broadcast#changeBroadcastTimeZone!
+     */
+    public String getStartDate() {
+        String time = broadcast.getTime().isPresent() ? broadcast.getTime().get() : "00:00";
+        String timeZone = "Asia/Tokyo";
+
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(released.from);
+        LocalDateTime newLocalDateTime = LocalDateTime.of(
+                zonedDateTime.toLocalDate(), // Keep the original date
+                LocalDateTime.parse("1970-01-01T" + time + ":00").toLocalTime()
+        );
+        ZonedDateTime newZonedDateTime = newLocalDateTime.atZone(ZoneId.of(timeZone));
+        return newZonedDateTime.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME);
     }
 }

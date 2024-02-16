@@ -180,14 +180,10 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
 
     @Override
     public String toString() {
-        return title;
+        return getTitleEnglish().isPresent() ? titleEn : title;
     }
 
     public List<Related> getRelated() throws APIException, InvalidRequestException {
         return JikanAPI.getRelated(id, MediaType.ANIME);
-    }
-
-    public Released getReleased() {
-        return released;
     }
 }

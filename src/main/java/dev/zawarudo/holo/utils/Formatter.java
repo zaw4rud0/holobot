@@ -81,9 +81,9 @@ public final class Formatter {
      *                  If {@code maxLength} is less than 4, the method returns the input string
      *                  as-is, without truncation.
      * @return A truncated string with an appended ellipsis if the original string's length
-     *         exceeded {@code maxLength}. If the original string is shorter than or equal
-     *         to {@code maxLength}, or if {@code maxLength} is less than 4, the original
-     *         string is returned as-is. Returns {@code null} if the input string is {@code null}.
+     * exceeded {@code maxLength}. If the original string is shorter than or equal
+     * to {@code maxLength}, or if {@code maxLength} is less than 4, the original
+     * string is returned as-is. Returns {@code null} if the input string is {@code null}.
      */
     public static String truncateString(String input, int maxLength) {
         if (input == null || maxLength < 4) {
@@ -139,7 +139,6 @@ public final class Formatter {
         return string.substring(0, string.indexOf(character));
     }
 
-    // TODO: Better documentation
     /**
      * Formats a given String the following way: lightning-rod -> Lightning Rod
      */
@@ -149,5 +148,31 @@ public final class Formatter {
                 .collect(Collectors.joining(" "))
                 .replace("Mr", "Mr.")
                 .replace("Jr", "Jr.");
+    }
+
+    public static String getRelativeTime(long millis) {
+        long diff = Math.abs(millis - System.currentTimeMillis());
+
+        long[] timeUnits = {
+                TimeUnit.MILLISECONDS.toDays(diff),
+                TimeUnit.MILLISECONDS.toHours(diff) % 24,
+                TimeUnit.MILLISECONDS.toMinutes(diff) % 60,
+                TimeUnit.MILLISECONDS.toSeconds(diff) % 60
+        };
+        String[] unitNames = {" day", " hour", " minute", " second"};
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < timeUnits.length; i++) {
+            if (timeUnits[i] > 0) {
+                if (!sb.isEmpty()) sb.append(", ");
+                sb.append(timeUnits[i]).append(unitNames[i]).append(timeUnits[i] > 1 ? "s" : "");
+            }
+        }
+
+        if (sb.isEmpty()) {
+            sb.append("less than a second");
+        }
+
+        return Formatter.capitalize(sb.toString());
     }
 }

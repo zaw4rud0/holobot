@@ -4,9 +4,9 @@ import com.google.gson.annotations.SerializedName;
 
 public class Released {
     @SerializedName("from")
-    public String from;
+    public String from; // Warning: In UTC+0, even though it's in JST!
     @SerializedName("to")
-    public String to;
+    public String to; // Warning: In UTC+0, even though it's in JST!
     @SerializedName("prop")
     public Prop prop;
     @SerializedName("string")

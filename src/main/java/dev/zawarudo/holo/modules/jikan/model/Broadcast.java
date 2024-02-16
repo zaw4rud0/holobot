@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.modules.jikan.model;
 
 import com.google.gson.annotations.SerializedName;
+import dev.zawarudo.holo.utils.DateTimeUtils;
 
 import java.time.*;
 import java.time.format.DateTimeFormatter;
@@ -9,13 +10,13 @@ import java.util.*;
 
 public final class Broadcast {
     @SerializedName("day")
-    private String day;
+    String day;
     @SerializedName("time")
-    private String time;
+    String time;
     @SerializedName("timezone")
-    private String timeZone;
+    String timeZone;
     @SerializedName("string")
-    private String string;
+    String string;
 
     /**
      * The weekday when episodes of this anime are or were being released.
@@ -53,9 +54,7 @@ public final class Broadcast {
      * Creates a new Broadcast object with the adjusted fields for the given time zone ID.
      */
     Broadcast convertToTimeZone(String timeZone) {
-        if (!isValidTimeZone(timeZone)) {
-            throw new IllegalArgumentException("Not a valid time zone ID: " + timeZone);
-        }
+        DateTimeUtils.checkTimeZone(timeZone);
 
         DateTimeFormatter dayFormatter = DateTimeFormatter.ofPattern("EEEE", Locale.ENGLISH);
         DateTimeFormatter timeFormatter = DateTimeFormatter.ofPattern("HH:mm");
@@ -80,16 +79,6 @@ public final class Broadcast {
         newBroadcast.string = String.format("%s at %s (%s)", convertedDay, convertedTime, timeZone);
 
         return newBroadcast;
-    }
-
-    private boolean isValidTimeZone(String timeZoneId) {
-        String[] availableIDs = TimeZone.getAvailableIDs();
-        for (String id : availableIDs) {
-            if (id.equals(timeZoneId)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     private static String getSingularDay(String day) {

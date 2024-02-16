@@ -11,7 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Locale;
-import java.util.concurrent.TimeUnit;
+import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -132,91 +132,44 @@ public final class DateTimeUtils {
         }
     }
 
-    public static String getRelativeTime(long millis) {
-        long diff = millis - System.currentTimeMillis();
-
-        diff = Math.abs(diff);
-
-        long days = TimeUnit.MILLISECONDS.toDays(diff);
-        diff -= TimeUnit.DAYS.toMillis(days);
-        long hours = TimeUnit.MILLISECONDS.toHours(diff);
-        diff -= TimeUnit.HOURS.toMillis(hours);
-        long minutes = TimeUnit.MILLISECONDS.toMinutes(diff);
-        diff -= TimeUnit.MINUTES.toMillis(minutes);
-        long seconds = TimeUnit.MILLISECONDS.toSeconds(diff);
-
-        StringBuilder sb = new StringBuilder();
-        if (days > 0) {
-            sb.append(days).append(" day").append(days > 1 ? "s" : "");
-            if (hours > 0 || minutes > 0 || seconds > 0) sb.append(", ");
-        }
-        if (hours > 0) {
-            sb.append(hours).append(" hour").append(hours > 1 ? "s" : "");
-            if (minutes > 0 || seconds > 0) sb.append(", ");
-        }
-        if (minutes > 0) {
-            sb.append(minutes).append(" minute").append(minutes > 1 ? "s" : "");
-            if (seconds > 0) sb.append(", ");
-        }
-        if (seconds > 0) {
-            sb.append(seconds).append(" second").append(seconds > 1 ? "s" : "");
-        }
-
-        if (sb.isEmpty()) {
-            sb.append("less than a second");
-        }
-
-        return Formatter.capitalize(sb.toString());
+    /**
+     * Retrieves the week day from a given date String in ISO-8601 format.
+     */
+    public static String getWeekDayFromDate(String dateString) {
+        ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE");
+        return zonedDateTime.format(formatter);
     }
 
     /**
-     * Creates a Discord timestamp with the given milliseconds.
-     * <p>
-     * For more information, refer to the <a href=https://discord.com/developers/docs/reference#message-formatting-timestamp-styles>official Discord docs</a>.
+     * Converts a given date String in ISO-8601 format from one given time zone to another.
      */
-    public enum DiscordTimestamp {
+    public static String convertDate(String dateString, String targetTimeZone) {
+        checkTimeZone(targetTimeZone);
 
-        /**
-         * Example: 13 February 2024 21:57
-         */
-        DEFAULT("<t:%d>"),
-        /**
-         * Example: 21:57
-         */
-        SHORT_TIME("<t:%d:t>"),
-        /**
-         * Example: 21:57:00
-         */
-        LONG_TIME("<t:%d:T>"),
-        /**
-         * Example: 13/02/24
-         */
-        SHORT_DATE("<t:%d:d>"),
-        /**
-         * Example: 13 February 2024
-         */
-        LONG_DATE("<t:%d:D>"),
-        /**
-         * Example: 13 February 2024 21:57
-         */
-        SHORT_DATE_TIME("<t:%d:f>"),
-        /**
-         * Example: Tuesday, 13 February 2024 21:57
-         */
-        LONG_DATE_TIME("<t:%d:F>"),
-        /**
-         * Example: 2 years ago
-         */
-        RELATIVE_TIME("<t:%d:R>");
+        ZonedDateTime source = ZonedDateTime.parse(dateString);
+        ZonedDateTime target = source.withZoneSameInstant(ZoneId.of(targetTimeZone));
+        return target.format(DateTimeFormatter.ISO_DATE_TIME);
+    }
 
-        private final String format;
-
-        DiscordTimestamp(String format) {
-            this.format = format;
+    /**
+     * Checks whether a time zone is valid, otherwise throws a {@link IllegalArgumentException}
+     *
+     * @param timeZoneId The time zone ID as string.
+     */
+    public static void checkTimeZone(String timeZoneId) {
+        if (!isValidTimeZone(timeZoneId)) {
+            throw new IllegalArgumentException("Not a valid time zone ID: " + timeZoneId);
         }
+    }
 
-        public String getTimestamp(long millis) {
-            return String.format(format, millis / 1000L);
+    public static boolean isValidTimeZone(String timeZoneId) {
+        String[] availableIDs = TimeZone.getAvailableIDs();
+        for (String id : availableIDs) {
+            if (id.equals(timeZoneId)) {
+                return true;
+            }
         }
+        return false;
     }
 }
