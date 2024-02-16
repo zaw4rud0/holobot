@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.utils;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -17,13 +18,13 @@ public final class Writer {
 
     public static void writeToFile(JsonObject obj, String filepath) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filepath))) {
-            new Gson().toJson(obj, writer);
+            new GsonBuilder().setPrettyPrinting().create().toJson(obj, writer);
         }
     }
 
     public static void writeToFile(JsonArray array, String filepath) throws IOException {
         try (BufferedWriter writer = Files.newBufferedWriter(Paths.get(filepath))) {
-            new Gson().toJson(array, writer);
+            new GsonBuilder().setPrettyPrinting().create().toJson(array, writer);
         }
     }
 
