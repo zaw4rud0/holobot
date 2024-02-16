@@ -4,13 +4,12 @@ import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.util.Arrays;
 
 /**
- * Utility class for applying operations on images.
+ * A utility class for performing various image operations such as cropping,
+ * joining, resizing, and more.
  */
 public final class ImageOperations {
 
@@ -19,139 +18,147 @@ public final class ImageOperations {
     private static final double BLUE_TO_GRAY_WEIGHT = 0.0722;
 
     private ImageOperations() {
+        throw new UnsupportedOperationException();
     }
 
     /**
-     * Crops an image to a circle
+     * Crops an image to a circular shape.
+     *
+     * @param img The source BufferedImage.
+     * @return A BufferedImage cropped to a circular shape.
      */
     public static BufferedImage cropToCircle(BufferedImage img) {
         int width = img.getWidth();
         int height = img.getHeight();
         BufferedImage output = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = output.createGraphics();
-        graphics.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        graphics.fill(new Ellipse2D.Double(0, 0, width, height));
-        graphics.setComposite(AlphaComposite.SrcAtop);
-        graphics.drawImage(img, 0, 0, null);
-        graphics.dispose();
+        Graphics2D g2d = output.createGraphics();
+
+        // Improve rendering quality
+        g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+
+        g2d.fill(new Ellipse2D.Double(0, 0, width, height));
+        g2d.setComposite(AlphaComposite.SrcAtop);
+        g2d.drawImage(img, 0, 0, null);
+        g2d.dispose();
+
         return output;
     }
 
     /**
      * Joins given images into a single image in the specified direction.
      *
-     * @param direction The direction in which the images are to be joined.
-     * @param images    Images to be stitched together.
-     * @return A new BufferedImage object containing the stitched images.
+     * @param direction The direction to join the images (HORIZONTAL or VERTICAL).
+     * @param images    An array of BufferedImage objects to join.
+     * @return A new BufferedImage containing all the provided images joined in the specified direction.
      */
     public static BufferedImage join(Direction direction, BufferedImage... images) {
-        int maxWidth = 0;
-        int maxHeight = 0;
-
-        for (BufferedImage image : images) {
-            maxWidth = Math.max(maxWidth, image.getWidth());
-            maxHeight = Math.max(maxHeight, image.getHeight());
+        if (images == null || images.length == 0) {
+            throw new IllegalArgumentException("Images array must not be empty");
         }
 
-        BufferedImage stitchedImage;
-        if (direction == Direction.HORIZONTAL) {
-            stitchedImage = new BufferedImage(maxWidth * images.length, maxHeight, BufferedImage.TYPE_INT_ARGB);
-        } else {
-            stitchedImage = new BufferedImage(maxWidth, maxHeight * images.length, BufferedImage.TYPE_INT_ARGB);
-        }
+        int totalWidth = direction == Direction.HORIZONTAL ?
+                Arrays.stream(images).mapToInt(BufferedImage::getWidth).sum() :
+                Arrays.stream(images).mapToInt(BufferedImage::getWidth).max().orElse(0);
+        int totalHeight = direction == Direction.VERTICAL ?
+                Arrays.stream(images).mapToInt(BufferedImage::getHeight).sum() :
+                Arrays.stream(images).mapToInt(BufferedImage::getHeight).max().orElse(0);
 
-        Graphics2D graphics = stitchedImage.createGraphics();
-        for (int i = 0; i < images.length; i++) {
-            int x = direction == Direction.HORIZONTAL ? i * maxWidth : 0;
-            int y = direction == Direction.VERTICAL ? i * maxHeight : 0;
-            graphics.drawImage(images[i], x, y, null);
+        BufferedImage combined = new BufferedImage(totalWidth, totalHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2d = combined.createGraphics();
+
+        // Draw each image in sequence, adjusting offset for each
+        int offset = 0;
+        for (BufferedImage img : images) {
+            if (direction == Direction.HORIZONTAL) {
+                g2d.drawImage(img, offset, 0, null);
+                offset += img.getWidth();
+            } else {
+                g2d.drawImage(img, 0, offset, null);
+                offset += img.getHeight();
+            }
         }
-        graphics.dispose();
-        return stitchedImage;
+        g2d.dispose();
+        return combined;
     }
 
     /**
-     * Method to downsize, upsize, stretch, etc. a {@link BufferedImage}.
+     * Resizes a BufferedImage to the specified width and height.
      *
-     * @param img       = The {@link BufferedImage} to resize.
-     * @param newWidth  = New width of the image.
-     * @param newHeight = New height of the image.
-     * @return The resized {@link BufferedImage}.
+     * @param img       = The BufferedImage to resize.
+     * @param newWidth  = The desired width.
+     * @param newHeight = The desired height.
+     * @return The resized BufferedImage.
      */
     public static BufferedImage resize(BufferedImage img, int newWidth, int newHeight) {
-        Image scaledImage = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
-        BufferedImage newImage = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = newImage.createGraphics();
-        try {
-            graphics.drawImage(scaledImage, 0, 0, null);
-        } finally {
-            graphics.dispose();
-        }
-        return newImage;
+        Image temp = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+        BufferedImage resizedImg = new BufferedImage(newWidth, newHeight, BufferedImage.TYPE_INT_ARGB);
+
+        Graphics2D g2d = resizedImg.createGraphics();
+        g2d.drawImage(temp, 0, 0, null);
+        g2d.dispose();
+
+        return resizedImg;
     }
 
     /**
-     * Improved version of the old squarefy methods:
-     * <a href="https://gist.github.com/xHarlock/343febf77f25ce26422527cd0500adcd">Link</a>.
+     * Converts an image into a square by either cropping or scaling it.
+     *
+     * @param image           The image to transform.
+     * @param length          The desired side length of the square.
+     * @param backgroundColor Background color for scaling without cropping.
+     * @param cropToFit       True to crop the image, false to scale.
+     * @return A squared version of the original image.
      */
-    public static BufferedImage squarefy(BufferedImage image, int length, Color color, boolean cut) {
+    public static BufferedImage squarefy(BufferedImage image, int length, Color backgroundColor, boolean cropToFit) {
         BufferedImage result = new BufferedImage(length, length, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = result.createGraphics();
-        graphics.setPaint(color);
+        graphics.setPaint(backgroundColor);
         graphics.fillRect(0, 0, length, length);
 
-        int x = 0;
-        int y = 0;
-        int width = image.getWidth();
-        int height = image.getHeight();
+        int imageWidth = image.getWidth();
+        int imageHeight = image.getHeight();
+        int newX = 0, newY = 0, newWidth = imageWidth, newHeight = imageHeight;
 
-        if (cut) {
-            if (width > height) {
-                x = (width - height) / 2;
-                width = height;
+        if (cropToFit) {
+            if (imageWidth > imageHeight) {
+                newX = (imageWidth - imageHeight) / 2;
+                newWidth = imageHeight;
             } else {
-                y = (height - width) / 2;
-                height = width;
+                newY = (imageHeight - imageWidth) / 2;
+                newHeight = imageWidth;
             }
         } else {
-            if (width > height) {
-                height = length * height / width;
-                width = length;
-                y = (length - height) / 2;
-            } else if (height > width) {
-                width = length * width / height;
-                height = length;
-                x = (length - width) / 2;
-            } else {
-                width = height = length;
-            }
+            float widthRatio = length / (float) imageWidth;
+            float heightRatio = length / (float) imageHeight;
+            float ratio = Math.min(widthRatio, heightRatio);
+            newWidth = (int) (imageWidth * ratio);
+            newHeight = (int) (imageHeight * ratio);
+            newX = (length - newWidth) / 2;
+            newY = (length - newHeight) / 2;
         }
 
-        try {
-            graphics.drawImage(image, x, y, width, height, null);
-        } finally {
-            graphics.dispose();
-        }
+        graphics.drawImage(image, newX, newY, newWidth, newHeight, null);
+        graphics.dispose();
         return result;
     }
 
     /**
-     * Turns an image completely black while ignoring fully transparent pixels.
+     * Converts all non-transparent pixels of an image to black.
      *
-     * @param img The {@link BufferedImage} to turn black.
-     * @return The image but in black.
+     * @param img The image to modify.
+     * @return The image with all non-transparent pixels turned black.
      */
     public static BufferedImage turnBlack(BufferedImage img) {
-        int blackRGB = Color.BLACK.getRGB() & 0x00FFFFFF;
+        int width = img.getWidth();
+        int height = img.getHeight();
 
-        for (int i = 0; i < img.getWidth(); i++) {
-            for (int j = 0; j < img.getHeight(); j++) {
-                int rgb = img.getRGB(i, j);
-                int alpha = (rgb >> 24) & 0xFF;
-                if (alpha == 0) {
-                    continue;
+        for (int x = 0; x < width; x++) {
+            for (int y = 0; y < height; y++) {
+                int rgb = img.getRGB(x, y);
+                int alpha = (rgb >> 24) & 0xff;
+                if (alpha != 0) {
+                    img.setRGB(x, y, (alpha << 24));
                 }
-                img.setRGB(i, j, (alpha << 24) | blackRGB);
             }
         }
         return img;
@@ -171,26 +178,27 @@ public final class ImageOperations {
     }
 
     /**
-     * Turns a given image to grayscale.
+     * Converts an image to grayscale, maintaining original transparency.
      *
-     * @param image The {@link BufferedImage} to grayscale.
-     * @return The grayscaled image.
+     * @param image The image to convert.
+     * @return A grayscale version of the image.
      */
     public static BufferedImage convertToGrayScale(BufferedImage image) {
         int width = image.getWidth();
         int height = image.getHeight();
 
-        BufferedImage grayscaleImage = new BufferedImage(width, height, BufferedImage.TYPE_BYTE_GRAY);
-
-        for (int row = 0; row < height; row++) {
-            for (int col = 0; col < width; col++) {
-                int pixel = image.getRGB(col, row);
+        BufferedImage grayscaleImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        for (int y = 0; y < height; y++) {
+            for (int x = 0; x < width; x++) {
+                int pixel = image.getRGB(x, y);
+                int alpha = (pixel >> 24) & 0xff;
                 int red = (pixel >> 16) & 0xff;
                 int green = (pixel >> 8) & 0xff;
                 int blue = pixel & 0xff;
+
                 int grayscaleValue = calculateGrayscaleValue(red, green, blue);
-                Color grayscaleColor = new Color(grayscaleValue, grayscaleValue, grayscaleValue);
-                grayscaleImage.setRGB(col, row, grayscaleColor.getRGB());
+                int grayscaleARGB = (alpha << 24) | (grayscaleValue << 16) | (grayscaleValue << 8) | grayscaleValue;
+                grayscaleImage.setRGB(x, y, grayscaleARGB);
             }
         }
         return grayscaleImage;
