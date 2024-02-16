@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.commands.image;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
@@ -234,7 +235,7 @@ public class ActionCmd extends AbstractCommand {
     private void writeActionsToFile() throws IOException {
         List<Action> actionList = new ArrayList<>(actions.values());
         Collections.sort(actionList);
-        String jsonString = new Gson().toJson(actionList);
+        String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(actionList);
         Writer.writeToFile(jsonString, FILE_PATH);
     }
 
