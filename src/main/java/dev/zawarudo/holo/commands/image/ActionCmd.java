@@ -68,6 +68,7 @@ public class ActionCmd extends AbstractCommand {
             createNewAction(event);
         }
 
+        // Add image or API to action
         else if (args[0].equals("add") && isBotOwner(event.getAuthor())) {
             args = Arrays.copyOfRange(args, 1, args.length);
             addImageToAction(event);
