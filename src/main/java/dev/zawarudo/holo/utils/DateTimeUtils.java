@@ -11,7 +11,6 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.Date;
 import java.util.Locale;
-import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,6 +21,7 @@ import java.util.regex.Pattern;
 public final class DateTimeUtils {
 
     private DateTimeUtils() {
+        throw new UnsupportedOperationException();
     }
 
     /**
@@ -137,8 +137,7 @@ public final class DateTimeUtils {
      */
     public static String getWeekDayFromDate(String dateString) {
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(dateString, DateTimeFormatter.ISO_DATE_TIME);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("EEEE");
-        return zonedDateTime.format(formatter);
+        return zonedDateTime.format(DateTimeFormatter.ofPattern("EEEE"));
     }
 
     /**
@@ -163,13 +162,12 @@ public final class DateTimeUtils {
         }
     }
 
+    /**
+     * Checks whether a time zone is valid.
+     *
+     * @return True if it is a valid time zone, false otherwise.
+     */
     public static boolean isValidTimeZone(String timeZoneId) {
-        String[] availableIDs = TimeZone.getAvailableIDs();
-        for (String id : availableIDs) {
-            if (id.equals(timeZoneId)) {
-                return true;
-            }
-        }
-        return false;
+        return ZoneId.getAvailableZoneIds().contains(timeZoneId);
     }
 }
