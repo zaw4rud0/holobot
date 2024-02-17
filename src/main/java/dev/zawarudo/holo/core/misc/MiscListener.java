@@ -1,15 +1,19 @@
 package dev.zawarudo.holo.core.misc;
 
 import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.database.DBOperations;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -17,10 +21,25 @@ import java.util.Locale;
  */
 public class MiscListener extends ListenerAdapter {
 
+    private final List<Long> existingEmotes;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(MiscListener.class);
+
+    public MiscListener() {
+        try {
+            existingEmotes = DBOperations.getEmoteIds();
+        } catch (SQLException ex) {
+            throw new IllegalStateException("Something went wrong while fetching the emote ids from the database.");
+        }
+    }
 
     @Override
     public void onMessageReceived(@NotNull MessageReceivedEvent e) {
+        List<CustomEmoji> messageEmotes = e.getMessage().getMentions().getCustomEmojis();
+        if (!messageEmotes.isEmpty()) {
+            storeNewEmotesInDatabase(messageEmotes);
+        }
+
         String content = e.getMessage().getContentRaw().toLowerCase(Locale.UK);
 
         // Add ❤ as reaction
@@ -59,6 +78,15 @@ public class MiscListener extends ListenerAdapter {
     private void logInfo(String msg, Object... args) {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(msg, args);
+        }
+    }
+
+    private void storeNewEmotesInDatabase(List<CustomEmoji> emotes) {
+        List<CustomEmoji> newEmotes = emotes.stream().filter(e -> !existingEmotes.contains(e.getIdLong())).toList();
+        try {
+            DBOperations.insertEmotes(newEmotes);
+        } catch (SQLException ex) {
+            LOGGER.error("Something went wrong while storing new emotes.", ex);
         }
     }
 }

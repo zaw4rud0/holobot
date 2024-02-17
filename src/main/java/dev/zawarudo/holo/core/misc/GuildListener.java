@@ -4,6 +4,7 @@ import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.commands.music.GuildMusicManager;
 import dev.zawarudo.holo.commands.music.PlayerManager;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
@@ -41,7 +42,7 @@ public class GuildListener extends ListenerAdapter {
             // Store guild information
             DBOperations.insertGuild(event.getGuild());
             // Store emotes of the guild
-            DBOperations.insertEmotes(event.getGuild().getEmojis());
+            DBOperations.insertEmotes(event.getGuild().getEmojis().stream().map(e -> (CustomEmoji) e).toList());
 
             logInfo("Saving successful for guild ({})", event.getGuild());
         } catch (SQLException ex) {

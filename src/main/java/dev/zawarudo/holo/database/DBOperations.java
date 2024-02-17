@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -45,7 +44,7 @@ public final class DBOperations {
     /**
      * Stores the emotes of the guild into the database.
      */
-    public static void insertEmotes(List<RichCustomEmoji> emotes) throws SQLException {
+    public static void insertEmotes(List<CustomEmoji> emotes) throws SQLException {
         String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
 
         // Ids of emotes that are already in the database
