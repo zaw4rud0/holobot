@@ -5,7 +5,6 @@ import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.commands.CommandListener;
 import dev.zawarudo.holo.commands.CommandManager;
 import dev.zawarudo.holo.database.SQLManager;
-import dev.zawarudo.holo.commands.games.akinator.AkinatorManager;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.core.misc.BotHandler;
 import dev.zawarudo.holo.core.misc.GuildListener;
@@ -37,7 +36,6 @@ public class Holo extends ListenerAdapter {
     private CommandManager commandManager;
     private PermissionManager permissionManager;
     private PokemonSpawnManager pokemonSpawnManager;
-    private AkinatorManager akinatorManager;
     private SQLManager sqlManager;
     private GitHubClient gitHubClient;
 
@@ -77,7 +75,6 @@ public class Holo extends ListenerAdapter {
 
         guildConfigManager = new GuildConfigManager();
         pokemonSpawnManager = new PokemonSpawnManager(jda);
-        akinatorManager = new AkinatorManager(waiter);
         commandManager = new CommandManager(waiter);
         permissionManager = new PermissionManager();
     }
@@ -113,10 +110,6 @@ public class Holo extends ListenerAdapter {
 
     public PokemonSpawnManager getPokemonSpawnManager() {
         return pokemonSpawnManager;
-    }
-
-    public AkinatorManager getAkinatorManager() {
-        return akinatorManager;
     }
 
     public SQLManager getSQLManager() {
