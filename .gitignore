@@ -22,15 +22,17 @@ hs_err_pid*
 /.settings/
 /rulesets/
 /.eclipse-pmd
-/target/
 
 # IntelliJ Files
+/target/
 /.idea/
 *.iml
+/out/
 
 # My own files
-/config.json
-/config.properties
+config.json
+config.properties
+/conventions.md
 
 # Resources files
 /src/main/resources/image/template
@@ -41,5 +43,3 @@ hs_err_pid*
 
 /src/main/java/dev/zawarudo/holo/experimental/
 /src/main/java/dev/zawarudo/holo/development/
-
-/out/
