@@ -25,6 +25,7 @@ import java.util.Random;
         category = CommandCategory.MISC)
 public class Magic8BallCmd extends AbstractCommand {
 
+    private static final Random RANDOM = new Random();
     private final List<File> responses;
 
     public Magic8BallCmd() {
@@ -38,7 +39,7 @@ public class Magic8BallCmd extends AbstractCommand {
             return;
         }
 
-        int index = new Random().nextInt(responses.size());
+        int index = RANDOM.nextInt(responses.size());
         File response = responses.get(index);
 
         InputStream input;

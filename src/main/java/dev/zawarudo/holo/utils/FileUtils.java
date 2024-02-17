@@ -1,9 +1,12 @@
 package dev.zawarudo.holo.utils;
 
 import java.io.File;
-import java.util.ArrayList;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
-import java.util.Objects;
+import java.util.stream.Stream;
 
 /**
  * Utility class for working with files and directories.
@@ -20,21 +23,12 @@ public final class FileUtils {
      * @return All files inside the given directory path, including those inside subdirectories.
      */
     public static List<File> getAllFiles(String directoryPath) {
-        File directory = new File(directoryPath);
-
-        if (!directory.isDirectory()) {
-            throw new IllegalArgumentException("Input path must be a directory.");
+        try (Stream<Path> paths = Files.walk(Paths.get(directoryPath))) {
+            return paths.filter(Files::isRegularFile)
+                    .map(Path::toFile)
+                    .toList();
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to walk through directory.", e);
         }
-
-        List<File> files = new ArrayList<>();
-
-        for (File file : Objects.requireNonNull(directory.listFiles())) {
-            if (file.isFile()) {
-                files.add(file);
-            } else {
-                files.addAll(getAllFiles(file.getAbsolutePath()));
-            }
-        }
-        return files;
     }
 }
