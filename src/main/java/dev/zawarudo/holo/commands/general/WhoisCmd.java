@@ -8,162 +8,126 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.jetbrains.annotations.NotNull;
 
-import java.awt.*;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "whois",
-		description = "Returns information about a user or bot.",
-		usage = "[user]",
-		example = "@Holo",
-		alias = {"stalk"},
-		category = CommandCategory.GENERAL)
+        description = "Returns information about a user or bot.",
+        usage = "[user]",
+        example = "@Holo",
+        alias = {"stalk"},
+        category = CommandCategory.GENERAL)
 public class WhoisCmd extends AbstractCommand {
 
-	@Override
-	public void onCommand(@NotNull MessageReceivedEvent e) {
-		deleteInvoke(e);
+    @Override
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        deleteInvoke(event);
 
-		if (args.length > 1) {
-			sendErrorEmbed(e, "Incorrect usage. Please provide at most one argument.");
-			return;
-		}
+        if (args.length > 1) {
+            sendErrorEmbed(event, "Incorrect usage. Please provide at most one argument.");
+            return;
+        }
 
-		User user = getUser(e);
+        Optional<User> userOptional = fetchMentionedUser(event);
+        if (userOptional.isEmpty()) {
+            sendErrorEmbed(event, "I couldn't find the given user! Please make sure you provided the correct user id or mentioned them!");
+            return;
+        }
+        User user = userOptional.get();
 
-		if (user == null) {
-			sendErrorEmbed(e, "I couldn't find the given user! Please make sure you provided the correct user id or mentioned them!");
-			return;
-		}
+        Optional<Member> memberOptional = getAsGuildMember(user, event.getGuild());
+        EmbedBuilder builder = setEmbedWithUserDetails(user, memberOptional.isPresent());
 
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("@" + user.getName() + " (" + user.getIdLong() + ")");
-		builder.setThumbnail(user.getEffectiveAvatarUrl() + "?size=1024");
+        if (memberOptional.isEmpty()) {
+            sendEmbed(event, builder, true, 5, TimeUnit.MINUTES);
+            return;
+        }
 
-		Member member = getMember(e, user);
+        Member member = memberOptional.get();
+        setEmbedWithMemberDetails(builder, member);
+        sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, member.getColor());
+    }
 
-		// User isn't in guild
-		if (member == null) {
-			// Not applicable fields
-			builder.addField("Nickname", "`N/A`", false);
-			builder.addField("Join Date", "`N/A`", false);
-			builder.addField("Highest Role", "`N/A`", true);
-			builder.addField("Hoisted Role", "`N/A`", true);
-			builder.addField("Roles", "`N/A`", false);
+    private EmbedBuilder setEmbedWithUserDetails(User user, boolean hasMember) {
+        EmbedBuilder builder = new EmbedBuilder();
+        builder.setTitle("@" + user.getName() + " (" + user.getIdLong() + ")");
+        builder.setThumbnail(user.getEffectiveAvatarUrl() + "?size=1024");
 
-			// Account information
-			var localDateTime = LocalDateTime.ofInstant(user.getTimeCreated().toInstant(), ZoneId.of("Europe/Zurich"));
-			String s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
-			String type = user.isBot() ? "Bot" : "User";
-			builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
+        // Account information
+        String accountType = user.isBot() ? "Bot" : "User";
+        String creationDate = formatDateTime(user.getTimeCreated().toInstant());
 
-			sendEmbed(e, builder, true, 5, TimeUnit.MINUTES);
-			return;
-		}
+        if (!hasMember) {
+            addNonApplicableFields(builder);
+        }
 
-		builder.setDescription("`" + member.getEffectiveName() + "` " + member.getAsMention());
+        builder.addField("Additional Checks", "Account Type: `" + accountType + "`\n" + "Creation Date: `" + creationDate + "`", false);
+        return builder;
+    }
 
-		var localDateTime = LocalDateTime.ofInstant(member.getTimeJoined().toInstant(), ZoneId.of("Europe/Zurich"));
-		String s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
+    private void addNonApplicableFields(EmbedBuilder builder) {
+        String naField = "`N/A`";
+        builder.addField("Nickname", naField, false)
+                .addField("Join Date", naField, false)
+                .addField("Highest Role", naField, true)
+                .addField("Hoisted Role", naField, true)
+                .addField("Roles", naField, false);
+    }
 
-		builder.addField("Join Date", "`" + s + "`", false);
+    private void setEmbedWithMemberDetails(EmbedBuilder builder, Member member) {
+        builder.setDescription("`" + member.getEffectiveName() + "` " + member.getAsMention());
+        builder.addField("Join Date", "`" + formatDateTime(member.getTimeJoined().toInstant()) + "`", false);
 
-		Color embedColor = member.getColor();
+        List<Role> roles = member.getRoles();
+        if (roles.isEmpty()) {
+            builder.addField("Highest Role", "@everyone", true)
+                    .addField("Hoisted Role", "`Unhoisted`", true)
+                    .addField("Roles", "@everyone", false);
+        } else {
+            addRoleFields(builder, roles);
+        }
+    }
 
-		List<Role> roles = member.getRoles();
+    private void addRoleFields(EmbedBuilder builder, List<Role> roles) {
+        Role highest = Collections.max(roles, Comparator.comparingInt(Role::getPosition));
+        Role hoisted = roles.stream().filter(Role::isHoisted).max(Comparator.comparingInt(Role::getPosition)).orElse(null);
 
-		// Member has no roles in this guild
-		if (roles.isEmpty()) {
-			builder.addField("Highest Role", "@everyone", true);
-			builder.addField("Hoisted Role", "`Unhoisted`", true);
-			builder.addField("Roles", "@everyone", false);
-		}
+        builder.addField("Highest Role", highest.getAsMention(), true)
+                .addField("Hoisted Role", hoisted != null ? hoisted.getAsMention() : "`Unhoisted`", true)
+                .addBlankField(true);
 
-		// Member has roles
-		else {
-			Role highest = roles.get(0);
-			Role hoisted = null;
+        StringBuilder rolesString = buildRolesString(roles);
+        builder.addField("Roles", rolesString.toString(), false);
+    }
 
-			for (Role role : roles) {
-				if (role.getPosition() > highest.getPosition()) {
-					highest = role;
-				}
+    private StringBuilder buildRolesString(List<Role> roles) {
+        StringBuilder rolesString = new StringBuilder();
+        int displayedRoles = Math.min(roles.size(), 10);
 
-				if (hoisted != null || !role.isHoisted()) {
-					if (!role.isHoisted() || role.getPosition() <= hoisted.getPosition()) {
-						continue;
-					}
-				}
-				hoisted = role;
-			}
+        for (int i = 0; i < displayedRoles; i++) {
+            Role role = roles.get(i);
+            if (i > 0) rolesString.append(", ");
+            rolesString.append(role.getAsMention());
 
-			builder.addField("Highest Role", highest.getAsMention(), true);
+            if (i == displayedRoles - 1 && roles.size() > 10) {
+                rolesString.append(", `and ").append(roles.size() - displayedRoles).append(" more...`");
+            }
+        }
+        return rolesString;
+    }
 
-			if (hoisted == null) {
-				builder.addField("Hoisted Role", "`Unhoisted`", true);
-			} else {
-				builder.addField("Hoisted Role", hoisted.getAsMention(), true);
-			}
-
-			builder.addBlankField(true);
-
-			StringBuilder rolesString = new StringBuilder(roles.get(0).getAsMention());
-
-			int counter = 1;
-			for (int i = 1; i < roles.size(); ++i) {
-				if (counter == 10) {
-					rolesString.append(", `and ").append(roles.size() - counter).append(" more...`");
-					break;
-				}
-				rolesString.append(", ").append(roles.get(i).getAsMention());
-				counter++;
-			}
-			builder.addField("Roles", rolesString.toString(), false);
-		}
-
-		localDateTime = LocalDateTime.ofInstant(user.getTimeCreated().toInstant(), ZoneId.of("Europe/Zurich"));
-		s = localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
-		String type = user.isBot() ? "Bot" : "User";
-
-		builder.addField("Additional Checks", "Account Type: `" + type + "`\n" + "Creation Date: `" + s + "`", false);
-		sendEmbed(e, builder, true, 5, TimeUnit.MINUTES, embedColor);
-	}
-
-	/**
-	 * Returns the given user, either as mention or as id. If the argument is
-	 * invalid, simply return the author of the message.
-	 */
-	private User getUser(MessageReceivedEvent e) {
-		if (args.length == 0) {
-			return e.getAuthor();
-		}
-		try {
-			long id = Long.parseLong(args[0]
-					.replace("<", "")
-					.replace(">", "")
-					.replace("!", "")
-					.replace("@", ""));
-			return e.getJDA().getUserById(id);
-		} catch (NumberFormatException ex) {
-			return e.getAuthor();
-		}
-	}
-
-	/**
-	 * Returns the user as a member of the guild.
-	 */
-	private Member getMember(MessageReceivedEvent e, User user) {
-		try {
-			return e.getGuild().retrieveMember(user).complete();
-		} catch (ErrorResponseException | IllegalArgumentException ex) {
-			return null;
-		}
-	}
+    private String formatDateTime(Instant instant) {
+        LocalDateTime localDateTime = LocalDateTime.ofInstant(instant, ZoneId.of("Europe/Zurich"));
+        return localDateTime.format(DateTimeFormatter.ofLocalizedDateTime(FormatStyle.FULL, FormatStyle.SHORT));
+    }
 }

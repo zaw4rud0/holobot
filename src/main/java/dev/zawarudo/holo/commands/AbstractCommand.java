@@ -3,12 +3,10 @@ package dev.zawarudo.holo.commands;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Mentions;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import org.apache.commons.validator.routines.UrlValidator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -283,21 +281,53 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * Tries to get the given user, either from a mention or from the given id. If there is none to be
+     * found, simply return the author of the message.
+     */
+    protected Optional<User> fetchMentionedUser(MessageReceivedEvent event) {
+        if (args.length == 0) {
+            return Optional.of(event.getAuthor());
+        }
+
+        String userId = args[0].replaceAll("\\D", ""); // Remove all non-digits
+        if (!userId.isEmpty()) {
+            try {
+                long id = Long.parseLong(userId);
+                User user = event.getJDA().getUserById(id);
+                return Optional.ofNullable(user);
+            } catch (NumberFormatException ignored) {}
+        }
+        return Optional.of(event.getAuthor());
+    }
+
+    /**
+     * Tries to get the given user as a member of the guild. If the user is not a member of the given
+     * guild, then the Optional will be empty.
+     */
+    protected Optional<Member> getAsGuildMember(@NotNull User user, @NotNull Guild guild) {
+        try {
+            return Optional.of(guild.retrieveMember(user).complete());
+        } catch (ErrorResponseException ex) {
+            return Optional.empty();
+        }
+    }
+
+    /**
      * Method to get an embed with multiple images (up to four images). This method works because embeds with the same
      * settings will be merged so that their images are displayed in one embed.
      *
      * @param builder The {@link EmbedBuilder} with the settings the final embed should have.
-     * @param images  A list of image links that should be added to the embed. Note that the list can only contain up
+     * @param images  An array of image links that should be added to the embed. Note that the array can only contain up
      *                to four images. At least one image is required.
      * @return A list of {@link MessageEmbed} that will be merged to one final embed with multiple images. The list
      * should be passed to the {@link MessageChannelUnion#sendMessageEmbeds(Collection)} method that will then
      * automatically merge the embeds.
      */
-    protected List<MessageEmbed> getEmbedWithMultipleImages(@NotNull EmbedBuilder builder, @NotNull List<String> images) {
-        if (images.size() > 4) {
-            throw new IllegalArgumentException("A single embed can only display four images! Given: " + images.size());
+    protected List<MessageEmbed> getEmbedWithMultipleImages(@NotNull EmbedBuilder builder, @NotNull String... images) {
+        if (images.length > 4) {
+            throw new IllegalArgumentException("A single embed can only display four images at most! Given: " + images.length);
         }
-        if (images.isEmpty()) {
+        if (images.length == 0) {
             throw new IllegalArgumentException("This method requires at least one image!");
         }
         List<MessageEmbed> embeds = new ArrayList<>();
