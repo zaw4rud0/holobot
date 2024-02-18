@@ -33,6 +33,7 @@ hs_err_pid*
 config.json
 config.properties
 /conventions.md
+*.ppk
 
 # Resources files
 /src/main/resources/image/template

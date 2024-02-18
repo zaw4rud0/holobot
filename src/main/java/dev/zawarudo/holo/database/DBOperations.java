@@ -42,7 +42,7 @@ public final class DBOperations {
     }
 
     /**
-     * Stores the emotes of the guild into the database.
+     * Stores the emotes of the guild into the database. Check beforehand that those emotes are new.
      */
     public static void insertEmotes(List<CustomEmoji> emotes) throws SQLException {
         String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
