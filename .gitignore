@@ -25,9 +25,9 @@ hs_err_pid*
 
 # IntelliJ Files
 /target/
+/out/
 /.idea/
 *.iml
-/out/
 
 # My own files
 config.json

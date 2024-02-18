@@ -11,10 +11,10 @@ import java.sql.SQLException;
 public final class Database {
 
 	/** The path to the database file. */
-	public static final String PATH_DB = "./src/main/resources/database/Holo.db";
-	//public static final String PATH_DB = "./src/main/resources/database/HoloTest.db";
+	public static final String PATH_DB = "./Holo.db";
 
 	private Database() {
+		throw new UnsupportedOperationException();
 	}
 
 	/**
