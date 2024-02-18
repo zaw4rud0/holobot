@@ -66,9 +66,10 @@ public class MiscListener extends ListenerAdapter {
     private void addReaction(@NotNull Message msg, @NotNull Emote emote) {
         msg.addReaction(emote.getAsEmoji()).queue(
                 s -> LOGGER.info("REACTION: Reacted with {}.", emote.getAsText()),
-                err -> LOGGER.warn("REACTION: Can't react with {} because I have been blocked by {}.",
+                err -> LOGGER.warn("REACTION: Can't react with {} because I have been blocked by {} (ID: {}).",
                         emote.getAsText(),
-                        msg.getAuthor().getName()));
+                        msg.getAuthor().getName(),
+                        msg.getAuthor().getId()));
     }
 
     private void storeNewEmotesInDatabase(CustomEmoji... emotes) {

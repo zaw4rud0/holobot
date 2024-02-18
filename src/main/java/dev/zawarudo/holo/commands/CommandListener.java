@@ -158,6 +158,8 @@ public class CommandListener extends ListenerAdapter {
         String messageLink = String.format("%s/%s", channelLink, messageId);
         builder.addField("Message", messageLink, false);
 
-        event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue(s -> {}, e -> {}));
+        event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue(s -> {},
+                err -> LOGGER.warn("Can't send a private message because I have been blocked by {} (ID: {}).",
+                event.getAuthor().getName(), event.getAuthor().getId())));
     }
 }
