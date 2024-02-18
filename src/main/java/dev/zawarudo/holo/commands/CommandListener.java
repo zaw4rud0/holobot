@@ -90,11 +90,13 @@ public class CommandListener extends ListenerAdapter {
             cmd.args = new String[0];
         }
 
-        try {
-            executorService.submit(() -> cmd.onCommand(event));
-        } catch (InsufficientPermissionException ex) {
-            handlePermissionError(event, ex);
-        }
+        executorService.submit(() -> {
+            try {
+                cmd.onCommand(event);
+            } catch (InsufficientPermissionException ex) {
+                handlePermissionError(event, ex);
+            }
+        });
     }
 
     /**
@@ -133,8 +135,8 @@ public class CommandListener extends ListenerAdapter {
     private void handlePermissionError(MessageReceivedEvent event, InsufficientPermissionException ex) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Missing Permission");
-        builder.setDescription("Cannot perform action due to a lack of permission.");
-        builder.addField("Permissions", ex.getPermission().getName(), false);
+        builder.setDescription("Cannot perform action due to a lack of permission. Please update my permissions so I can run the called command.");
+        builder.addField("Permission", String.format("```%s```", ex.getPermission().getName()), false);
 
         boolean hasWritePermission = PermissionUtil.checkPermission(
                 event.getGuildChannel().getPermissionContainer(),
@@ -144,11 +146,18 @@ public class CommandListener extends ListenerAdapter {
 
         if (hasWritePermission) {
             event.getChannel().sendMessage(event.getAuthor().getAsMention()).addEmbeds(builder.build()).queue();
-        } else {
-            builder.addField("Server", ex.getGuild(event.getJDA()).getName(), false);
-            String channelName = ex.getChannel(event.getJDA()) != null ? ex.getChannel(event.getJDA()).getName() : "N/A";
-            builder.addField("Channel", channelName, false);
-            event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue());
+            return;
         }
+
+        String serverId = event.getGuild().getId();
+        String channelId = event.getChannel().getId();
+        String messageId = event.getMessageId();
+
+        String channelLink = String.format("https://discord.com/channels/%s/%s", serverId, channelId);
+        builder.addField("Channel", channelLink, false);
+        String messageLink = String.format("%s/%s", channelLink, messageId);
+        builder.addField("Message", messageLink, false);
+
+        event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue(s -> {}, e -> {}));
     }
 }

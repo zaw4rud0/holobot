@@ -54,19 +54,21 @@ public class MiscListener extends ListenerAdapter {
 
         // Add ❤ as reaction
         if (content.contains(":heart:") || content.contains("<3") || content.contains("❤")) {
-            LOGGER.info("REACTION: Reacting to heart");
             addReaction(event.getMessage(), Emote.HEART);
         }
 
         // Add 💀 as reaction
         if (Arrays.stream(content.split(" ")).anyMatch(s -> s.contains("forgor"))) {
-            LOGGER.info("REACTION: Reacting to forgor");
             addReaction(event.getMessage(), Emote.SKULL);
         }
     }
 
     private void addReaction(@NotNull Message msg, @NotNull Emote emote) {
-        msg.addReaction(emote.getAsEmoji()).queue(s -> {}, err -> {});
+        msg.addReaction(emote.getAsEmoji()).queue(
+                s -> LOGGER.info("REACTION: Reacted with {}.", emote.getAsText()),
+                err -> LOGGER.warn("REACTION: Can't react with {} because I have been blocked by {}.",
+                        emote.getAsText(),
+                        msg.getAuthor().getName()));
     }
 
     private void storeNewEmotesInDatabase(CustomEmoji... emotes) {
