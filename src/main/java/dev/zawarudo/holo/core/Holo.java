@@ -6,7 +6,6 @@ import dev.zawarudo.holo.commands.CommandListener;
 import dev.zawarudo.holo.commands.CommandManager;
 import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
-import dev.zawarudo.holo.core.misc.BotHandler;
 import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
 import net.dv8tion.jda.api.JDA;
@@ -82,7 +81,6 @@ public class Holo extends ListenerAdapter {
     public void registerListeners() {
         jda.addEventListener(
                 new CommandListener(commandManager, permissionManager),
-                new BotHandler(),
                 new MiscListener(),
                 new GuildListener()
         );
