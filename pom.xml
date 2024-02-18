@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.zawarudo</groupId>
     <artifactId>holobot</artifactId>
-    <version>3.0.16</version>
+    <version>3.1.0</version>
     <name>HoloBot</name>
     <description>Java Discord Bot</description>
     <packaging>jar</packaging>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>dev.zawarudo</groupId>
             <artifactId>aoc-utils</artifactId>
-            <version>1.0.3</version>
+            <version>1.1.0</version>
         </dependency>
 
         <!-- Core of the bot -->
