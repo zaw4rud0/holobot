@@ -1,0 +1,53 @@
+name: GitHub holobot
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'src/**'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout the main branch on GitHub
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+          cache: 'maven'
+
+      - name: Build with Maven
+        run: mvn clean package
+
+      - name: Get the version
+        id: get_version
+        run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
+
+      - name: Set JAR filename
+        run: echo "JAR_NAME=holobot-${{ env.VERSION }}.jar" >> $GITHUB_ENV
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy Holo to server
+        uses: garygrossgarten/github-action-scp@release
+        with:
+          local: target/${{ env.JAR_NAME }}
+          remote: ~/holo/${{ env.JAR_NAME }}
+          host: ${{ secrets.VM_IP_ADDRESS }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_KEY }}
+
+      - name: Restart Holo
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: sudo systemctl restart holobot
+          host: ${{ secrets.VM_IP_ADDRESS }}
+          username: ${{ secrets.USERNAME }}
+          privateKey: ${{ secrets.SSH_KEY }}
