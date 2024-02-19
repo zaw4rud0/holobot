@@ -3,7 +3,7 @@
 # Navigate to the directory containing the JAR files
 cd /home/ubuntu/holo
 
-# Find the latest JAR file
+# Pick JAR file with latest version
 JAR_FILE=$(ls -Art holobot-*.jar | tail -n 1)
 
 # Start the JAR file
