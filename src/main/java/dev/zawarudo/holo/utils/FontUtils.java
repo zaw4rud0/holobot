@@ -23,9 +23,10 @@ public final class FontUtils {
     }
 
     public static Font loadFontFromFile(String fontName, float fontSize) {
-        try (InputStream is = FontUtils.class.getResourceAsStream(String.format("/%s.ttf", fontName))) {
+        String path = String.format("/fonts/%s.ttf", fontName);
+        try (InputStream is = FontUtils.class.getResourceAsStream(path)) {
             if (is == null) {
-                throw new IllegalStateException("Font file not found at ./src/main/resources/ComicSansBold.ttf");
+                throw new IllegalStateException(String.format("Resource not found in %s.", path));
             }
             return Font.createFont(Font.TRUETYPE_FONT, is).deriveFont(fontSize);
         } catch (IOException | FontFormatException e) {

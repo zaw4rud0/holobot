@@ -73,41 +73,40 @@ public class PokemonTeam {
      * @param img    = Picture of the Pokémon
      * @param color1 = Color of the first type
      * @param color2 = Color of the second type
-     * @param name   = Name of the Pokémon and its Pok�dex id
-     * @return A BufferedImage displaying the Pok�mon with background and name
+     * @param name   = Name of the Pokémon and its Pokédex id
+     * @return A BufferedImage displaying the Pokémon with background and name
      */
     private static BufferedImage draw(BufferedImage img, Color color1, Color color2, String name) {
         int width = 500;
         int height = 500;
         BufferedImage temp;
         BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g2 = res.createGraphics();
+        Graphics2D g2d = res.createGraphics();
 
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        FontUtils.setSmoothFont(g2d);
 
-        Color oldColor = g2.getColor();
+        Color oldColor = g2d.getColor();
 
         // Draw first type
-        g2.setPaint(color1);
-        g2.fillRect(0, 0, width, height);
+        g2d.setPaint(color1);
+        g2d.fillRect(0, 0, width, height);
 
         // Draw second type (if available)
         if (color2 != null) {
-            g2.setPaint(color2);
-            g2.fillPolygon(new int[]{width, 0, width}, new int[]{0, height, height}, 3);
+            g2d.setPaint(color2);
+            g2d.fillPolygon(new int[]{width, 0, width}, new int[]{0, height, height}, 3);
         }
 
-        g2.setColor(oldColor);
+        g2d.setColor(oldColor);
         temp = ImageOperations.resize(img, 420, 420);
-        g2.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
-        drawName(g2, name, new Rectangle(width, height), FontUtils.loadFontFromFile("ComicSansBold", 30));
-        g2.dispose();
+        g2d.drawImage(temp, null, width / 2 - temp.getWidth() / 2, 20);
+        drawName(g2d, name, new Rectangle(width, height), FontUtils.loadFontFromFile("ComicSansBold", 30));
+        g2d.dispose();
         return res;
     }
 
     /**
-     * Helper method to draw the name of the Pok�mon in the right position
+     * Helper method to draw the name of the Pokémon in the right position
      *
      * @param g2   = Graphics2D
      * @param text = Name and id of the Pok�mon

@@ -17,6 +17,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 @Command(name = "pokemonteam",
@@ -51,12 +52,12 @@ public class PokemonTeamCmd extends AbstractCommand {
 					ids.add(new Random().nextInt(PokeAPI.POKEMON_COUNT) + 1);
 				}
 
-				List<Pokemon> pokemons = PokeAPI.getPokemon(ids.stream().mapToInt(k -> k).toArray());
-				PokemonTeam team = new PokemonTeam(pokemons.toArray(new Pokemon[0]));
+                List<Pokemon> pokemon = PokeAPI.getPokemon(ids.stream().mapToInt(k -> k).toArray());
+                PokemonTeam team = new PokemonTeam(pokemon.toArray(new Pokemon[0]));
 
 				BufferedImage img = team.generateTeamImage();
 				input = ImageOperations.toInputStream(img);
-			} catch (IOException | InterruptedException ex) {
+			} catch (IOException | InterruptedException | ExecutionException ex) {
 				builder.setTitle("Error");
 				builder.setDescription("Something went wrong while creating a Pokémon team. Please try again in a few minutes!");
 				sendEmbed(event, builder, false, 15, TimeUnit.SECONDS);
