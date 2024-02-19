@@ -7,6 +7,7 @@ import com.google.gson.JsonParser;
 import dev.zawarudo.holo.modules.jikan.model.*;
 import dev.zawarudo.holo.modules.jikan.model.Character;
 import dev.zawarudo.holo.utils.Formatter;
+import dev.zawarudo.holo.utils.HttpResponse;
 import dev.zawarudo.holo.utils.MyRateLimiter;
 import dev.zawarudo.holo.utils.TypeTokenUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -27,8 +28,6 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 public final class JikanAPI {
-
-    private static final String USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/74.0.3729.169 Safari/537.36";
 
     private static final Logger LOGGER = LoggerFactory.getLogger(JikanAPI.class);
 
@@ -365,7 +364,7 @@ public final class JikanAPI {
     private static Optional<JsonObject> fetchJsonData(String url) throws InvalidRequestException, APIException {
         try {
             HttpURLConnection connection = (HttpURLConnection) URI.create(url).toURL().openConnection();
-            connection.setRequestProperty("User-Agent", USER_AGENT);
+            connection.setRequestProperty("User-Agent", HttpResponse.USER_AGENT);
 
             // Follow redirects
             String redirect = connection.getHeaderField("Location");
