@@ -24,7 +24,7 @@ jobs:
       - name: Build with Maven
         run: mvn clean package
 
-      # Necessary since JAR files have the structure holobot-x.x.x.jar, e.g. holobot-3.1.1.jar
+      # Necessary since JAR file has variable version, e.g. holobot-3.1.1.jar
       - name: Get the version
         id: get_version
         run: echo "VERSION=$(mvn help:evaluate -Dexpression=project.version -q -DforceStdout)" >> $GITHUB_ENV
