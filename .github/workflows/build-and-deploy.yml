@@ -31,10 +31,6 @@ jobs:
       - name: Set JAR filename
         run: echo "JAR_NAME=holobot-${{ env.VERSION }}.jar" >> $GITHUB_ENV
 
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
       - name: Deploy Holo to server
         uses: garygrossgarten/github-action-scp@release
         with:
