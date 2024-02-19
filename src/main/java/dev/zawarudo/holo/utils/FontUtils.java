@@ -9,6 +9,7 @@ import java.io.InputStream;
 public final class FontUtils {
 
     private FontUtils() {
+        throw new UnsupportedOperationException();
     }
 
     public static void setSmoothFont(Graphics2D g2d) {
