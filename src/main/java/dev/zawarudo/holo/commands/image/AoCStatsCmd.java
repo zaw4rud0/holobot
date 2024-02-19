@@ -1,10 +1,10 @@
 package dev.zawarudo.holo.commands.image;
 
-import dev.zawarudo.aoc_utils.graph.AdventOfCodeGraph;
-import dev.zawarudo.aoc_utils.graph.ChartType;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.modules.aoc.graph.AdventOfCodeGraph;
+import dev.zawarudo.holo.modules.aoc.graph.ChartType;
 import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.ImageOperations;
 import dev.zawarudo.holo.utils.annotations.Command;
