@@ -13,6 +13,7 @@ import java.util.Locale;
  */
 public class GitHubClient {
 
+    // The repository of the bot
     private final GHRepository repository;
 
     /**
@@ -23,7 +24,7 @@ public class GitHubClient {
      */
     public GitHubClient(String token) throws IOException {
         GitHub gitHub = GitHub.connectUsingOAuth(token);
-        repository = gitHub.getRepository("xHarlock/holobot");
+        repository = gitHub.getRepository("zaw4rud0/holobot");
     }
 
     /**
