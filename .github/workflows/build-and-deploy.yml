@@ -35,10 +35,19 @@ jobs:
         with:
           atomicPut: true
           local: target/${{ env.JAR_NAME }}
-          remote: ~/holo/${{ env.JAR_NAME }}
+          remote: holo/${{ env.JAR_NAME }}
           host: ${{ secrets.VM_IP_ADDRESS }}
           username: ${{ secrets.VM_USER_NAME }}
           privateKey: ${{ secrets.SSH_KEY }}
+
+      - name: Update config.json
+        uses: garygrossgarten/github-action-ssh@release
+        with:
+          command: jq '.version = "${{ env.VERSION }}"' ~/holo/config.json > ~/holo/temp_config.json && mv ~/holo/temp_config.json ~/holo/config.json
+          host: ${{ secrets.VM_IP_ADDRESS }}
+          username: ${{ secrets.VM_USER_NAME }}
+          privateKey: ${{ secrets.SSH_KEY }}
+
       - name: Restart Holo
         uses: garygrossgarten/github-action-ssh@release
         with:
