@@ -8,6 +8,7 @@ import dev.zawarudo.holo.modules.aoc.graph.ChartType;
 import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.ImageOperations;
 import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -32,7 +33,15 @@ public class AoCStatsCmd extends AbstractCommand {
 
         String token = Bootstrap.holo.getConfig().getAoCToken();
         AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, YEAR, LEADERBOARD_ID, token);
-        BufferedImage image = graph.generateImage();
+
+        BufferedImage image;
+
+        try {
+            image = graph.generateImage();
+        } catch (APIException ex) {
+            sendErrorEmbed(event, "Something went wrong while fetching the AOC data. Please try again later.");
+            return;
+        }
 
         String name = String.format("aoc_%s.png", DateTimeUtils.getCurrentDateTimeString());
 
@@ -45,7 +54,6 @@ public class AoCStatsCmd extends AbstractCommand {
             FileUpload upload = FileUpload.fromData(input, name);
             event.getChannel().sendFiles(upload).setEmbeds(builder.build()).queue();
         } catch (IOException ignored) {
-            // TODO: Properly handle exceptions
         }
     }
 }

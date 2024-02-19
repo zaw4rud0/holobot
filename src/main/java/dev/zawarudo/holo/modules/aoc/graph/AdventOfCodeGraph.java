@@ -2,6 +2,7 @@ package dev.zawarudo.holo.modules.aoc.graph;
 
 import dev.zawarudo.holo.modules.aoc.data.AdventDay;
 import dev.zawarudo.holo.modules.aoc.data.AdventOfCodeAPI;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -80,7 +81,7 @@ public abstract class AdventOfCodeGraph {
         this.theme = theme.load();
     }
 
-    public BufferedImage generateImage() {
+    public BufferedImage generateImage() throws APIException {
         BufferedImage result = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g2d = result.createGraphics();
 

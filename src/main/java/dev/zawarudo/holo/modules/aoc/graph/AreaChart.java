@@ -13,6 +13,6 @@ public class AreaChart extends AdventOfCodeGraph {
 
     @Override
     protected BufferedImage generateChart(List<AdventDay> days) {
-        return null;
+        throw new UnsupportedOperationException("This chart is not implemented yet!");
     }
 }

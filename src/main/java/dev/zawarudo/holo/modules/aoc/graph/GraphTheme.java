@@ -2,7 +2,7 @@ package dev.zawarudo.holo.modules.aoc.graph;
 
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
-import com.google.gson.reflect.TypeToken;
+import dev.zawarudo.holo.utils.TypeTokenUtils;
 
 import java.awt.*;
 import java.io.*;
@@ -20,19 +20,22 @@ public enum GraphTheme {
     }
 
     Theme load() {
-        try {
-            InputStream inputStream = getClass().getClassLoader().getResourceAsStream("graph_themes.json");
-            if (inputStream == null) {
-                throw new IllegalStateException("Failed to load graph_themes.json! Check that the file is at the right location.");
-            }
+        return loadThemes().stream()
+                .filter(t -> name.equals(t.getName()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("Theme '" + name + "' not found in graph_themes.json"));
+    }
 
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-            Type listType = new TypeToken<List<Theme>>() {}.getType();
-            List<Theme> themes = new Gson().fromJson(reader, listType);
-
-            return themes.stream().filter(t -> name.equals(t.getName())).findFirst().orElseThrow();
+    private static List<Theme> loadThemes() {
+        InputStream inputStream = GraphTheme.class.getClassLoader().getResourceAsStream("graph_themes.json");
+        if (inputStream == null) {
+            throw new IllegalStateException("Failed to load graph_themes.json! Check that the file is at the right location.");
+        }
+        try (BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream))) {
+            Type listType = TypeTokenUtils.getListTypeToken(Theme.class);
+            return new Gson().fromJson(reader, listType);
         } catch (Exception e) {
-            throw new IllegalStateException("Failed to load graph_themes.json! Check that the file is at the right location.", e);
+            throw new IllegalStateException("Failed to process graph_themes.json", e);
         }
     }
 }

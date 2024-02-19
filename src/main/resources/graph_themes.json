@@ -1,0 +1,20 @@
+[
+  {
+    "name" : "theme_aoc",
+    "background_color": "#0F0F23",
+    "text_color": "#FFFFFF",
+    "grid_color": "#FFFFFF",
+    "two_stars_color": "#FFFF66",
+    "one_star_color": "#9999CC",
+    "no_stars_color": "#ff8080"
+  },
+  {
+    "name": "theme_wood",
+    "background_color": "#E7D2B8",
+    "text_color": "#3E2723",
+    "grid_color": "#A1887F",
+    "two_stars_color": "#B8860B",
+    "one_star_color": "#806B7E",
+    "no_stars_color": "#A0522D"
+  }
+]
