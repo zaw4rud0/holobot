@@ -30,7 +30,7 @@ jobs:
       - name: Set JAR filename
         run: echo "JAR_NAME=holobot-${{ env.VERSION }}.jar" >> $GITHUB_ENV
 
-      - name: Deploy Holo to server
+      - name: Move JAR to VM
         uses: garygrossgarten/github-action-scp@release
         with:
           local: target/${{ env.JAR_NAME }}
@@ -38,6 +38,7 @@ jobs:
           host: ${{ secrets.VM_IP_ADDRESS }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
 
       - name: Restart Holo
         uses: garygrossgarten/github-action-ssh@release
@@ -46,3 +47,4 @@ jobs:
           host: ${{ secrets.VM_IP_ADDRESS }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_KEY }}
+          passphrase: ${{ secrets.SSH_PASSPHRASE }}
