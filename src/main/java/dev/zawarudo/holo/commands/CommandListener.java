@@ -114,7 +114,8 @@ public class CommandListener extends ListenerAdapter {
     }
 
     /**
-     * Ensures that text inside quotes is seen as a single argument
+     * Parses the given input string into a list of arguments, recognizing spaces as delimiters. Arguments
+     * enclosed in double quotes are treated as single arguments.
      */
     private List<String> parseArguments(String input) {
         List<String> arguments = new ArrayList<>();
@@ -128,7 +129,6 @@ public class CommandListener extends ListenerAdapter {
                 arguments.add(matcher.group());
             }
         }
-
         return arguments;
     }
 
