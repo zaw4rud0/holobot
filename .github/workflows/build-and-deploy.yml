@@ -38,8 +38,6 @@ jobs:
           host: ${{ secrets.VM_IP_ADDRESS }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
-
       - name: Restart Holo
         uses: garygrossgarten/github-action-ssh@release
         with:
@@ -47,4 +45,3 @@ jobs:
           host: ${{ secrets.VM_IP_ADDRESS }}
           username: ${{ secrets.USERNAME }}
           privateKey: ${{ secrets.SSH_KEY }}
-          passphrase: ${{ secrets.SSH_PASSPHRASE }}
