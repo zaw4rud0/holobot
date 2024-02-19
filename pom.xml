@@ -78,7 +78,6 @@
     </build>
 
     <dependencies>
-
         <!-- Core of the bot -->
         <dependency>
             <groupId>net.dv8tion</groupId>
