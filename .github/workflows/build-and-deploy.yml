@@ -48,6 +48,7 @@ jobs:
           username: ${{ secrets.VM_USER_NAME }}
           privateKey: ${{ secrets.SSH_KEY }}
 
+      # Restarts the systemctl service that contains the bot JAR
       - name: Restart Holo
         uses: garygrossgarten/github-action-ssh@release
         with:
