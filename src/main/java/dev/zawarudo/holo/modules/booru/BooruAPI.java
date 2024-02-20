@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
-import dev.zawarudo.holo.utils.MyRateLimiter;
+import dev.zawarudo.holo.utils.RateLimiter;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
@@ -16,7 +16,7 @@ import java.util.Objects;
 
 public abstract class BooruAPI<T> {
 
-    protected static final MyRateLimiter rateLimiter = new MyRateLimiter(3);
+    protected static final RateLimiter rateLimiter = new RateLimiter(3);
 
     protected int limit;
     protected final List<String> tags;

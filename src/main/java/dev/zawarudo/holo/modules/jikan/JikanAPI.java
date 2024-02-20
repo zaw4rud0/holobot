@@ -8,7 +8,7 @@ import dev.zawarudo.holo.modules.jikan.model.*;
 import dev.zawarudo.holo.modules.jikan.model.Character;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HttpResponse;
-import dev.zawarudo.holo.utils.MyRateLimiter;
+import dev.zawarudo.holo.utils.RateLimiter;
 import dev.zawarudo.holo.utils.TypeTokenUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
@@ -34,7 +34,7 @@ public final class JikanAPI {
     private static final String BASE_URL = "https://api.jikan.moe/v4";
     private static int limit = 10;
 
-    private static final MyRateLimiter RATE_LIMITER = new MyRateLimiter(1);
+    private static final RateLimiter RATE_LIMITER = new RateLimiter(1);
 
     private JikanAPI() {
     }
