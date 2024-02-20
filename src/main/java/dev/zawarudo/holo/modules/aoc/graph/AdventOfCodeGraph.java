@@ -2,6 +2,7 @@ package dev.zawarudo.holo.modules.aoc.graph;
 
 import dev.zawarudo.holo.modules.aoc.data.AdventDay;
 import dev.zawarudo.holo.modules.aoc.data.AdventOfCodeAPI;
+import dev.zawarudo.holo.utils.FontUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 
 import java.awt.*;
@@ -108,7 +109,7 @@ public abstract class AdventOfCodeGraph {
     }
 
     protected void drawTitle(Graphics2D g2d) {
-        Font font = FontUtils.loadFontFromFile(FONT_SIZE * 2);
+        Font font = FontUtils.loadFontFromFile("ComicSansBold", FONT_SIZE * 2);
         g2d.setFont(font);
         g2d.setPaint(theme.getTextColor());
 
@@ -149,7 +150,7 @@ public abstract class AdventOfCodeGraph {
     }
 
     protected void drawLegends(Graphics2D g2d) {
-        Font font = FontUtils.loadFontFromFile(FONT_SIZE);
+        Font font = FontUtils.loadFontFromFile("ComicSansBold", FONT_SIZE);
         g2d.setFont(font);
         g2d.setPaint(theme.getTextColor());
 
@@ -165,7 +166,7 @@ public abstract class AdventOfCodeGraph {
     }
 
     protected void drawAxisValues(Graphics2D g2d, int graphWidth, int graphHeight) {
-        Font font = FontUtils.loadFontFromFile(FONT_SIZE);
+        Font font = FontUtils.loadFontFromFile("ComicSansBold", FONT_SIZE);
         g2d.setFont(font);
         g2d.setPaint(theme.getTextColor());
 
@@ -197,7 +198,7 @@ public abstract class AdventOfCodeGraph {
     }
 
     protected void drawAxisLabels(Graphics2D g2d, int graphWidth, int graphHeight) {
-        Font font = FontUtils.loadFontFromFile(FONT_SIZE);
+        Font font = FontUtils.loadFontFromFile("ComicSansBold", FONT_SIZE);
         g2d.setFont(font);
         g2d.setPaint(theme.getTextColor());
 

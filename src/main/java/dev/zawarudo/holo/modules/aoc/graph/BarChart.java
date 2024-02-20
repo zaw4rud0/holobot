@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.modules.aoc.graph;
 
 import dev.zawarudo.holo.modules.aoc.data.AdventDay;
+import dev.zawarudo.holo.utils.FontUtils;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
