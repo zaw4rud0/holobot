@@ -1,55 +1,49 @@
 package dev.zawarudo.holo.core;
 
-import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.concrete.VoiceChannel;
 
 /**
  * Represents the configuration of Holo for a specific {@link Guild}.
  */
 public class GuildConfig {
-	
-	private Role adminRole;
-	private VoiceChannel musicChannel;
+
+	private final long guildId;
 	private String prefix;
 	private boolean nsfw;
 
-	private boolean autoDelete;
-
-	public GuildConfig() {
+	/**
+	 * Creates a new GuildConfig instance with the default configurations.
+	 */
+	public GuildConfig(long guildId) {
+		this.guildId = guildId;
 		prefix = Bootstrap.holo.getConfig().getDefaultPrefix();
 	}
 
-	public Role getAdminRole() {
-		return adminRole;
+	/**
+	 * Returns the guild this bot configuration is for.
+	 */
+	public long getGuildId() {
+		return guildId;
 	}
 
-	public void setAdminRole(Role adminRole) {
-		this.adminRole = adminRole;
-	}
-	
-	public VoiceChannel getMusicChannel() {
-		return musicChannel;
-	}
-	
-	public void setMusicChannel(VoiceChannel channel) {
-		this.musicChannel = channel;
-	}
-	
+	/**
+	 * Returns the current prefix of the bot for this guild.
+	 */
 	public String getPrefix() {
 		return prefix;
 	}
 
+	/**
+	 * Changes the bot prefix for this guild to the specified string.
+	 */
 	public void setPrefix(String prefix) {
 		this.prefix = prefix;
 	}
 
-	public void setGuildPrefix(String prefix) {
-		this.prefix = prefix;
-	}
-	
-	public void setDefaultPrefix() {
+	/**
+	 * Reverts the prefix of the bot to the default one.
+	 */
+	public void revertPrefix() {
 		prefix = Bootstrap.holo.getConfig().getDefaultPrefix();
 	}
 
@@ -65,19 +59,5 @@ public class GuildConfig {
 	 */
 	public void setAllowNSFW(boolean nsfw) {
 		this.nsfw = nsfw;
-	}
-
-	/**
-	 * Checks whether the bot should auto-delete its messages.
-	 */
-	public boolean isAutoDeleteEnabled() {
-		return autoDelete;
-	}
-
-	/**
-	 * Sets whether the bot should auto-delete its messages.
-	 */
-	public void setAutoDelete(boolean autoDelete) {
-		this.autoDelete = autoDelete;
 	}
 }

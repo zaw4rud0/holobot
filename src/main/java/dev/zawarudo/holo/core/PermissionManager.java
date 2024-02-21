@@ -2,8 +2,11 @@ package dev.zawarudo.holo.core;
 
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.database.DBOperations;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.attribute.IAgeRestrictedChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -11,9 +14,11 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Handles the permissions and checks if a user is allowed to use a command.
@@ -36,27 +41,45 @@ public class PermissionManager {
         }
     }
 
-    /**
-     * Checks if a user is allowed to use a command in the channel.
-     *
-     * @param event The event that triggered the command.
-     * @param cmd   The command that was called.
-     * @return True if the user is allowed to use the command, false otherwise.
-     */
-    public boolean hasChannelPermission(@NotNull MessageReceivedEvent event, @NotNull AbstractCommand cmd) {
-        boolean hasPermission = true;
+    public boolean hasChannelPermission(MessageReceivedEvent event, AbstractCommand cmd) {
+        return isCommandAllowedInChannelType(event, cmd) && checkIsNSFWCommandAllowed(event, cmd);
+    }
 
-        // Guild commands can't be used in DMs
-        if (event.isFromType(ChannelType.PRIVATE) && cmd.isGuildOnly()) {
-            hasPermission = false;
+    private boolean isCommandAllowedInChannelType(MessageReceivedEvent event, AbstractCommand cmd) {
+        return !event.isFromType(ChannelType.PRIVATE) || !cmd.isGuildOnly();
+    }
+
+    private boolean checkIsNSFWCommandAllowed(MessageReceivedEvent event, AbstractCommand cmd) {
+        // Users can use NSFW commands in DMs without restrictions
+        if (event.isFromType(ChannelType.PRIVATE)) {
+            return true;
         }
 
-        // NSFW commands can't be used in non-NSFW channels
-        if (cmd.isNSFW() && !isNsfwAllowed(event.getChannel())) {
-            hasPermission = false;
+        GuildConfig config = getGuildConfig(event.getGuild());
+
+        if (cmd.isNSFW() && !isNSFWConfigEnabled(event.getGuild())) {
+            sendErrorEmbed(event, String.format("NSFW commands are disabled in this server. You can change it via ```%sconfig nsfw true```", config.getPrefix()));
+            return false;
         }
 
-        return hasPermission;
+        if (cmd.isNSFW() && !isChannelNSFW(event.getChannel())) {
+            sendErrorEmbed(event, "You can't use NSFW commands outside NSFW channels. If you want to use this command, move to a NSFW channel.");
+            return false;
+        }
+        return true;
+    }
+
+    private boolean isNSFWConfigEnabled(Guild guild) {
+        return getGuildConfig(guild).isNSFWEnabled();
+    }
+
+    private boolean isChannelNSFW(@NotNull MessageChannelUnion channel) {
+        // Thread channel inherits settings from parent channel
+        if (channel.getType().isThread()) {
+            ThreadChannel thread = channel.asThreadChannel();
+            return thread.getParentChannel().asTextChannel().isNSFW();
+        }
+        return channel instanceof IAgeRestrictedChannel c && c.isNSFW();
     }
 
     /**
@@ -86,38 +109,6 @@ public class PermissionManager {
     }
 
     /**
-     * Checks if a channel allows NSFW commands.
-     *
-     * @param channel The {@link MessageChannelUnion} to check.
-     * @return True if the channel allows NSFW commands, false otherwise.
-     */
-    public boolean isNsfwAllowed(@NotNull MessageChannelUnion channel) {
-        // Thread channel
-        if (channel.getType().isThread()) {
-            ThreadChannel thread = channel.asThreadChannel();
-            return thread.getParentChannel().asTextChannel().isNSFW();
-        }
-
-        // Text channel
-        if (channel.getType() == ChannelType.TEXT) {
-            return channel.asTextChannel().isNSFW();
-        }
-
-        // Voice channel
-        if (channel.getType() == ChannelType.VOICE) {
-            return channel.asVoiceChannel().isNSFW();
-        }
-
-        // News channel
-        if (channel.getType() == ChannelType.NEWS) {
-            return channel.asNewsChannel().isNSFW();
-        }
-
-        // Private channel
-        return false;
-    }
-
-    /**
      * Checks if a user is blacklisted from using the bot.
      *
      * @param user The {@link User} to check.
@@ -138,5 +129,19 @@ public class PermissionManager {
     public void blacklist(@NotNull User user, @NotNull String reason, @NotNull String date) throws SQLException {
         blacklisted.add(user.getIdLong());
         DBOperations.insertBlacklistedUser(user.getIdLong(), date, reason);
+    }
+
+    private GuildConfig getGuildConfig(Guild guild) {
+        return Bootstrap.holo.getGuildConfigManager().getGuildConfig(guild);
+    }
+
+    private void sendErrorEmbed(MessageReceivedEvent event, String message) {
+        event.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
+
+        EmbedBuilder builder = new EmbedBuilder()
+                .setTitle("Error")
+                .setDescription(message)
+                .setColor(Color.RED);
+        event.getChannel().sendMessageEmbeds(builder.build()).queue(msg -> msg.delete().queueAfter(30, TimeUnit.SECONDS));
     }
 }

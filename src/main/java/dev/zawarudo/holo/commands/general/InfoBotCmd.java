@@ -51,7 +51,7 @@ public class InfoBotCmd extends AbstractCommand {
 		
 		String systemInfo = "**CPU:** `" + cpuPercentage + " on " + cores + " core(s)`\n"
 						+ "**Memory:** `" + String.format("%.2f MB / %.2f MB (%.2f%%)", usedMemoryMB, maxMemoryMB, usedMemoryPercentage) + "`\n"
-						+ "**Uptime:** `" + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.startupTime) + "`";
+						+ "**Uptime:** `" + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.getStartupTime()) + "`";
 
 		String description = "Use `" + getPrefix(e) + "help` to see all commands";
 

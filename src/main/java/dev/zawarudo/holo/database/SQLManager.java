@@ -13,7 +13,7 @@ import java.util.Map;
 public class SQLManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLManager.class);
-    private static final Path SQL_DIRECTORY_PATH = Path.of("./src/main/resources/database/SQL/");
+    private static final Path SQL_DIRECTORY_PATH = Path.of("./src/main/resources/database/");
     private final Map<String, String> sqlStatements;
 
     /**
@@ -34,11 +34,11 @@ public class SQLManager {
      * @throws IllegalArgumentException If there is no SQL statement with the given name.
      */
     public String getStatement(String name) {
-        String adjustedName = name.endsWith(".sql") ? name.substring(0, name.length() - 4) : name;
-        if (!sqlStatements.containsKey(adjustedName)) {
-            throw new IllegalArgumentException("There is no SQL file with name: " + name);
+        String formattedName = name.replace(" ", "-").replaceAll("\\.sql$", "");
+        if (!sqlStatements.containsKey(formattedName)) {
+            throw new IllegalArgumentException("There is no SQL file with name: " + formattedName);
         }
-        return sqlStatements.get(name);
+        return sqlStatements.get(formattedName);
     }
 
     private Map<String, String> loadSQLStatements() throws IOException {

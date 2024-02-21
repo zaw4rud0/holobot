@@ -3,9 +3,6 @@ package dev.zawarudo.holo.commands;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.anime.AnimeSearchCmd;
 import dev.zawarudo.holo.commands.anime.MangaSearchCmd;
-import dev.zawarudo.holo.commands.general.*;
-import dev.zawarudo.holo.commands.image.*;
-import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.fun.CoinFlipCmd;
 import dev.zawarudo.holo.commands.fun.Magic8BallCmd;
 import dev.zawarudo.holo.commands.fun.UrbanDictionaryCmd;
@@ -14,41 +11,18 @@ import dev.zawarudo.holo.commands.games.pokemon.CatchCmd;
 import dev.zawarudo.holo.commands.games.pokemon.PokedexCmd;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonTeamCmd;
 import dev.zawarudo.holo.commands.games.pokemon.SpawnCmd;
+import dev.zawarudo.holo.commands.general.*;
+import dev.zawarudo.holo.commands.image.*;
 import dev.zawarudo.holo.commands.image.nsfw.BlockCmd;
-import dev.zawarudo.holo.commands.image.nsfw.HoloCmd;
-import dev.zawarudo.holo.commands.image.nsfw.NekoCmd;
-import dev.zawarudo.holo.commands.image.nsfw.WaifuCmd;
-import dev.zawarudo.holo.commands.music.cmds.ClearCmd;
-import dev.zawarudo.holo.commands.music.cmds.CloneCmd;
-import dev.zawarudo.holo.commands.music.cmds.JoinCmd;
-import dev.zawarudo.holo.commands.music.cmds.LeaveCmd;
-import dev.zawarudo.holo.commands.music.cmds.LoopCmd;
-import dev.zawarudo.holo.commands.music.cmds.NowPlayingCmd;
-import dev.zawarudo.holo.commands.music.cmds.PlayCmd;
-import dev.zawarudo.holo.commands.music.cmds.QueueCmd;
-import dev.zawarudo.holo.commands.music.cmds.ShuffleCmd;
-import dev.zawarudo.holo.commands.music.cmds.SkipCmd;
-import dev.zawarudo.holo.commands.music.cmds.StopCmd;
-import dev.zawarudo.holo.commands.owner.BlacklistCmd;
-import dev.zawarudo.holo.commands.owner.CancelCmd;
-import dev.zawarudo.holo.commands.owner.DeleteCmd;
-import dev.zawarudo.holo.commands.owner.EchoCmd;
-import dev.zawarudo.holo.commands.owner.NicknameCmd;
-import dev.zawarudo.holo.commands.owner.NukeCmd;
-import dev.zawarudo.holo.commands.owner.RestartCmd;
-import dev.zawarudo.holo.commands.owner.ShutdownCmd;
-import dev.zawarudo.holo.commands.owner.StatusCmd;
+import dev.zawarudo.holo.commands.music.cmds.*;
+import dev.zawarudo.holo.commands.owner.*;
 import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Creates instances of all the commands and manages them
@@ -64,6 +38,7 @@ public class CommandManager extends ListenerAdapter {
 
         // General Cmds
         addCommand(new BugCmd(Bootstrap.holo.getGitHubClient()));
+        addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -100,14 +75,11 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
         addCommand(new DogCmd());
-        addCommand(new HoloCmd());
         addCommand(new HttpCmd());
         addCommand(new InspiroCmd());
-        addCommand(new NekoCmd());
         addCommand(new PaletteCmd());
         addCommand(new PixelateCmd());
         addCommand(new UpscaleCmd());
-        addCommand(new WaifuCmd());
         addCommand(new XkcdCmd());
 
         // Game Cmds
@@ -160,7 +132,8 @@ public class CommandManager extends ListenerAdapter {
     }
 
     /**
-     * Returns the command that matches the given name.
+     * Returns the command that matches the given name. To avoid null-check, use
+     * {@link CommandManager#isValidName(String)} beforehand.
      *
      * @param name The name of the command.
      * @return The command that matches the given name, or <code>null</code> if no command matches.
@@ -170,20 +143,20 @@ public class CommandManager extends ListenerAdapter {
     }
 
     /**
-     * Check if given name is linked to a {@link AbstractCommand}.
+     * Checks if given name is linked to a command.
      *
-     * @param name = The name to check.
-     * @return True if the name is linked to a {@link AbstractCommand}. False otherwise.
+     * @param name The name to check.
+     * @return True if a command exists with the given name, false otherwise.
      */
     public boolean isValidName(String name) {
         return commands.containsKey(name);
     }
 
     /**
-     * Get every {@link AbstractCommand} of a given {@link CommandCategory} as a {@link List}.
+     * Get every command of a given category as a list.
      *
-     * @param category = The {@link CommandCategory} to get the commands from.
-     * @return A {@link List} of {@link AbstractCommand}s.
+     * @param category The {@link CommandCategory} to get the commands from.
+     * @return A list of commands.
      */
     public List<AbstractCommand> getCommands(CommandCategory category) {
         // LinkedHashSet so the list keeps the item insertion order

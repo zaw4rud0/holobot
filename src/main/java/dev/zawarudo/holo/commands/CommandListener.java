@@ -48,11 +48,13 @@ public class CommandListener extends ListenerAdapter {
         }
 
         // Ignore messages without the bot prefix
-        if (!event.getMessage().getContentRaw().startsWith(getPrefix(event))) {
+        if (!event.getMessage().getContentRaw().startsWith(getPrefix(event))
+                || event.getMessage().getContentRaw().equals(getPrefix(event))) {
             return;
         }
 
-        String rawMessage = event.getMessage().getContentRaw().replaceFirst("(?i)" + Pattern.quote(getPrefix(event)), "");
+        String rawMessage = event.getMessage().getContentRaw()
+                .replaceFirst("(?i)" + Pattern.quote(getPrefix(event)), "");
         List<String> split = parseArguments(rawMessage);
 
         String invoke = split.get(0).toLowerCase(Locale.UK);
@@ -60,9 +62,7 @@ public class CommandListener extends ListenerAdapter {
         // Action cmd has been called
         ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
         if (actionCmd.isAction(invoke)) {
-            if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("{} has called action ({})", event.getAuthor(), invoke);
-            }
+            LOGGER.info("{} has called action ({})", event.getAuthor(), invoke);
 
             actionCmd.args = split.subList(1, split.size()).toArray(new String[0]);
             actionCmd.displayAction(event, actionCmd.getAction(invoke));
@@ -80,9 +80,7 @@ public class CommandListener extends ListenerAdapter {
             return;
         }
 
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("{} has called {}", event.getAuthor(), cmd.getName());
-        }
+        LOGGER.info("{} has called {}", event.getAuthor(), cmd.getName());
 
         if (split.size() > 1) {
             cmd.args = split.subList(1, split.size()).toArray(new String[0]);
@@ -95,16 +93,12 @@ public class CommandListener extends ListenerAdapter {
                 cmd.onCommand(event);
             } catch (InsufficientPermissionException ex) {
                 handlePermissionError(event, ex);
+            } catch (Exception ex) {
+                LOGGER.error("An error occurred while executing a command.", ex);
             }
         });
     }
 
-    /**
-     * Retrieves the prefix for the given guild or the default prefix if the event is from a DM Channel.
-     *
-     * @param e The {@link MessageReceivedEvent} to get the prefix for.
-     * @return The prefix of the bot.
-     */
     private String getPrefix(MessageReceivedEvent e) {
         if (e.isFromGuild()) {
             return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getPrefix();
@@ -135,7 +129,8 @@ public class CommandListener extends ListenerAdapter {
     private void handlePermissionError(MessageReceivedEvent event, InsufficientPermissionException ex) {
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Missing Permission");
-        builder.setDescription("Cannot perform action due to a lack of permission. Please update my permissions so I can run the called command.");
+        builder.setDescription("Cannot perform action due to a lack of permission. Please update my permissions " +
+                "so I can run the called command.");
         builder.addField("Permission", String.format("```%s```", ex.getPermission().getName()), false);
 
         boolean hasWritePermission = PermissionUtil.checkPermission(

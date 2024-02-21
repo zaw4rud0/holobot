@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.database;
 
 import dev.zawarudo.holo.commands.general.CountdownCmd;
+import dev.zawarudo.holo.core.GuildConfig;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
@@ -13,12 +14,16 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Class that handles all the operations on the database. Note that the connection to the database is automatically established.
  */
 public final class DBOperations {
+
+    private static final int BATCH_SIZE = 100;
 
     private DBOperations() {
     }
@@ -47,14 +52,12 @@ public final class DBOperations {
     public static void insertEmotes(List<CustomEmoji> emotes) throws SQLException {
         String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
 
-        // Ids of emotes that are already in the database
         List<Long> existing = getEmoteIds();
 
         Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            conn.setAutoCommit(false);
+        conn.setAutoCommit(false);
 
-            int batchSize = 100;
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
             int i = 0;
 
             for (CustomEmoji emote : emotes) {
@@ -70,7 +73,7 @@ public final class DBOperations {
                 ps.setString(5, emote.getImageUrl());
                 ps.addBatch();
 
-                if (++i % batchSize == 0) {
+                if (++i % BATCH_SIZE == 0) {
                     ps.executeBatch();
                     conn.commit();
                 }
@@ -184,9 +187,7 @@ public final class DBOperations {
         conn.setAutoCommit(false);
 
         try (PreparedStatement psUser = conn.prepareStatement(insertUserSql);
-        PreparedStatement psMember = conn.prepareStatement(insertMemberSql)) {
-
-            int batchSize = 100;
+             PreparedStatement psMember = conn.prepareStatement(insertMemberSql)) {
             int i = 0;
 
             for (Member member : members) {
@@ -205,7 +206,7 @@ public final class DBOperations {
                 psMember.setLong(2, member.getUser().getIdLong());
                 psMember.addBatch();
 
-                if (++i % batchSize == 0) {
+                if (++i % BATCH_SIZE == 0) {
                     psUser.executeBatch();
                     psMember.executeBatch();
                     conn.commit();
@@ -220,6 +221,32 @@ public final class DBOperations {
         conn.close();
 
         deleteDuplicateMemberUsers();
+    }
+
+    public static void deleteMembers(List<Member> members) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-member");
+
+        Connection conn = Database.getConnection();
+        conn.setAutoCommit(false);
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            int i = 0;
+
+            for (Member member : members) {
+                ps.setLong(1, member.getGuild().getIdLong());
+                ps.setLong(2, member.getUser().getIdLong());
+                ps.addBatch();
+
+                if (++i % BATCH_SIZE == 0) {
+                    ps.executeBatch();
+                    conn.commit();
+                }
+            }
+            ps.executeBatch();
+        }
+        conn.commit();
+        conn.setAutoCommit(true);
+        conn.close();
     }
 
     public static void deleteDuplicateMemberUsers() throws SQLException {
@@ -262,7 +289,6 @@ public final class DBOperations {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, guild.getIdLong());
             ps.setString(2, guild.getName());
-            ps.setString(3, guild.getOwnerId());
             ps.execute();
         }
         conn.close();
@@ -278,8 +304,18 @@ public final class DBOperations {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, guild.getIdLong());
             ps.setString(2, guild.getName());
-            ps.setLong(3, guild.getOwnerIdLong());
             ps.executeUpdate();
+        }
+        conn.close();
+    }
+
+    public static void deleteGuild(Guild guild) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-guild");
+
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, guild.getIdLong());
+            ps.execute();
         }
         conn.close();
     }
@@ -575,5 +611,57 @@ public final class DBOperations {
             conn.close();
             return countdowns;
         }
+    }
+
+    public static void insertGuildConfig(GuildConfig config) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-guild-config.sql");
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, config.getGuildId());
+            ps.setString(2, config.getPrefix());
+            ps.setBoolean(3, config.isNSFWEnabled());
+            ps.execute();
+        }
+    }
+
+    public static Map<Long, GuildConfig> selectGuildConfigs() throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("select-all-guild-configs");
+
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            Map<Long, GuildConfig> map = new HashMap<>();
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                long guildId = rs.getLong("guild_id");
+                GuildConfig config = new GuildConfig(guildId);
+                config.setAllowNSFW(rs.getBoolean("nsfw"));
+                config.setPrefix(rs.getString("prefix"));
+                map.put(guildId, config);
+            }
+            conn.close();
+            return map;
+        }
+    }
+
+    public static void updateGuildConfig(GuildConfig config) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("update-guild-config.sql");
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, config.getPrefix());
+            ps.setBoolean(2, config.isNSFWEnabled());
+            ps.setLong(3, config.getGuildId());
+            ps.executeUpdate();
+            conn.close();
+        }
+    }
+
+    public static void deleteGuildConfig(GuildConfig config) throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-guild-config.sql");
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setLong(1, config.getGuildId());
+            ps.execute();
+        }
+        conn.close();
     }
 }

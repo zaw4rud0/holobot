@@ -1,8 +1,8 @@
 package dev.zawarudo.holo.database;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class required for database connection. To use operations on the database, see
@@ -32,5 +32,25 @@ public final class Database {
 		}
 		String url = "jdbc:sqlite:" + PATH_DB;
 		return DriverManager.getConnection(url);
+	}
+
+	private static DatabaseMetaData getDBMetaData() throws SQLException {
+		return getConnection().getMetaData();
+	}
+
+	public static boolean tableExists(String tableName) throws SQLException {
+		try (ResultSet rs = getDBMetaData().getTables(null, null, tableName, null)) {
+			return rs.next();
+		}
+	}
+
+	public static List<String> getColumnNames(String tableName) throws SQLException {
+		List<String> columns = new ArrayList<>();
+		try (ResultSet rs = getDBMetaData().getColumns(null, null, tableName, null)) {
+			while (rs.next()) {
+				columns.add(rs.getString("COLUMN_NAME"));
+			}
+		}
+		return columns;
 	}
 }

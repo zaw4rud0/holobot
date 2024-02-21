@@ -82,7 +82,7 @@ public class Holo extends ListenerAdapter {
         jda.addEventListener(
                 new CommandListener(commandManager, permissionManager),
                 new MiscListener(),
-                new GuildListener()
+                new GuildListener(guildConfigManager)
         );
     }
 

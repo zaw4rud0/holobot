@@ -44,9 +44,15 @@ CREATE TABLE DiscordGuilds
 (
     guild_id   INTEGER,
     guild_name TEXT,
-    owner_id   INTEGER,
-    FOREIGN KEY (owner_id) REFERENCES DiscordUsers (user_id),
     PRIMARY KEY (guild_id)
+);
+
+CREATE TABLE DiscordGuildConfigs
+(
+    guild_id INTEGER PRIMARY KEY,
+    prefix TEXT,
+    nsfw TEXT,
+    FOREIGN KEY (guild_id) REFERENCES DiscordGuilds
 );
 
 CREATE TABLE DiscordNicknames

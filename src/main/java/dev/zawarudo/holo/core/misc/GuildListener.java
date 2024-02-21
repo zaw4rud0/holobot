@@ -1,5 +1,7 @@
 package dev.zawarudo.holo.core.misc;
 
+import dev.zawarudo.holo.core.GuildConfig;
+import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.commands.music.GuildMusicManager;
 import dev.zawarudo.holo.commands.music.PlayerManager;
@@ -7,11 +9,11 @@ import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
 import net.dv8tion.jda.api.events.guild.GuildJoinEvent;
+import net.dv8tion.jda.api.events.guild.GuildLeaveEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberRemoveEvent;
 import net.dv8tion.jda.api.events.guild.member.update.GuildMemberUpdateNicknameEvent;
 import net.dv8tion.jda.api.events.guild.update.GuildUpdateNameEvent;
-import net.dv8tion.jda.api.events.guild.update.GuildUpdateOwnerEvent;
 import net.dv8tion.jda.api.events.guild.voice.GuildVoiceUpdateEvent;
 import net.dv8tion.jda.api.events.user.update.UserUpdateNameEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -29,24 +31,50 @@ public class GuildListener extends ListenerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuildListener.class);
 
+    private final GuildConfigManager manager;
+
+    public GuildListener(GuildConfigManager manager) {
+        this.manager = manager;
+    }
+
     /**
      * Event that is fired when this bot instance joins a guild.
      */
     @Override
     public void onGuildJoin(@NotNull GuildJoinEvent event) {
         try {
-            logInfo("Joined a new guild ({}). Saving members and emotes...", event.getGuild());
+            logInfo("Joined a new server ({}). Saving members and emotes...", event.getGuild().getId());
 
-            // Store members
             DBOperations.insertMembers(event.getGuild().getMembers());
-            // Store guild information
             DBOperations.insertGuild(event.getGuild());
-            // Store emotes of the guild
             DBOperations.insertEmotes(event.getGuild().getEmojis().stream().map(e -> (CustomEmoji) e).toList());
+
+            // Create new guild configuration and save it in the DB
+            GuildConfig config = manager.getGuildConfig(event.getGuild());
+            DBOperations.insertGuildConfig(config);
 
             logInfo("Saving successful for guild ({})", event.getGuild());
         } catch (SQLException ex) {
             logError("Something went wrong while storing the server in the DB.", ex);
+        }
+    }
+
+    /**
+     * Event that is fired when this bot instance leaves a guild.
+     */
+    @Override
+    public void onGuildLeave(@NotNull GuildLeaveEvent event) {
+        try {
+            logInfo("Left the server ({}). Removing members and config from the DB...", event.getGuild().getId());
+
+            DBOperations.deleteMembers(event.getGuild().getMembers());
+            DBOperations.deleteGuild(event.getGuild());
+
+            DBOperations.deleteGuildConfig(manager.getGuildConfig(event.getGuild()));
+
+            logInfo("Successful removed guild ({}) from the database.", event.getGuild());
+        } catch (SQLException ex) {
+            logError("Something went wrong while removing the server from the DB.", ex);
         }
     }
 
@@ -97,18 +125,6 @@ public class GuildListener extends ListenerAdapter {
             DBOperations.insertEmote(event.getEmoji());
         } catch (SQLException ex) {
             logError("Something went wrong while storing the new emoji in the DB.", ex);
-        }
-    }
-
-    /**
-     * Event that is fired when the owner of a guild changes.
-     */
-    @Override
-    public void onGuildUpdateOwner(@NotNull GuildUpdateOwnerEvent event) {
-        try {
-            DBOperations.updateGuild(event.getGuild());
-        } catch (SQLException ex) {
-            logError("Something went wrong while storing the new guild owner in the DB.", ex);
         }
     }
 

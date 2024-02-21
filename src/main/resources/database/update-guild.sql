@@ -1,4 +1,3 @@
 UPDATE DiscordGuilds
-SET guild_name = ?,
-    owner_id   = ?
+SET guild_name = ?
 WHERE guild_id = ?;

@@ -20,7 +20,7 @@ public final class Bootstrap {
     /**
      * The exact time at which the bot started up in milliseconds.
      */
-    public static long startupTime;
+    private static long startupTime;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(Bootstrap.class);
 
@@ -44,9 +44,8 @@ public final class Bootstrap {
             return;
         }
 
-        long totalTime = System.currentTimeMillis() - startupTime;
-
         if (LOGGER.isInfoEnabled()) {
+            long totalTime = System.currentTimeMillis() - startupTime;
             LOGGER.info(String.format("It took %s %d ms to load!", holo.getJDA().getSelfUser().getName(), totalTime));
         }
     }
@@ -65,9 +64,7 @@ public final class Bootstrap {
      * Restarts the bot.
      */
     public static void restart() {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Restarting...");
-        }
+        LOGGER.info("Restarting...");
         init();
     }
 
@@ -75,9 +72,11 @@ public final class Bootstrap {
      * Shuts the bot down.
      */
     public static void shutdown() {
-        if (LOGGER.isInfoEnabled()) {
-            LOGGER.info("Shutting down...");
-        }
+        LOGGER.info("Shutting down...");
         holo.getJDA().shutdown();
+    }
+
+    public static long getStartupTime() {
+        return startupTime;
     }
 }
