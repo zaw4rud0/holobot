@@ -1,5 +1,7 @@
 package dev.zawarudo.holo.commands.fun;
 
+import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
+import dev.zawarudo.holo.core.misc.Emote;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -7,7 +9,10 @@ import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -19,6 +24,7 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 @Command(name = "urban",
         description = "Searches for a term in the Urban Dictionary",
@@ -32,14 +38,10 @@ public class UrbanDictionaryCmd extends AbstractCommand {
 
     private static final String BASE_URL = "https://www.urbandictionary.com";
 
-    record UrbanEntry(String term, String definition, String example, String link) {
-        public boolean hasValidDefinition() {
-            return definition != null && !definition.trim().isEmpty();
-        }
+    private final EventWaiter waiter;
 
-        public boolean hasValidExample() {
-            return example != null && !example.trim().isEmpty();
-        }
+    public UrbanDictionaryCmd(EventWaiter waiter) {
+        this.waiter = waiter;
     }
 
     @Override
@@ -56,17 +58,76 @@ public class UrbanDictionaryCmd extends AbstractCommand {
             if (entries.isEmpty()) {
                 throw new FileNotFoundException();
             }
+
+            sendUrbanDictionaryEntries(event, entries);
         } catch (FileNotFoundException e) {
             sendErrorEmbed(event, "Couldn't find any Urban Dictionary entries with the given search terms.");
-            return;
         } catch (IOException e) {
             sendErrorEmbed(event, "Something went wrong while searching your term. Please try again at a later time.");
-            return;
         }
+    }
 
-        // TODO: Allow users to select a different definition
-        EmbedBuilder builder = createUrbanEmbed(entries.get(0));
-        replyEmbed(event, event.getMessage(), builder, false, getEmbedColor());
+    private void sendUrbanDictionaryEntries(MessageReceivedEvent event, List<UrbanEntry> entries) {
+        Button[] buttons = {
+                Button.primary("prev", Emote.ARROW_LEFT.getAsEmoji()),
+                //Button.danger("exit", "❌"),
+                Button.primary("next", Emote.ARROW_RIGHT.getAsEmoji())
+        };
+        setButtonStates(buttons, 0, entries.size() - 1);
+        EmbedBuilder builder = createUrbanEmbed(entries.get(0), 0, entries.size());
+        Message msg = event.getMessage().replyEmbeds(builder.build()).setActionRow(buttons).complete();
+        awaitUserSelection(msg, event.getAuthor(), 0, entries, buttons);
+    }
+
+    private void awaitUserSelection(Message msg, User caller, int index, List<UrbanEntry> entries, Button[] buttons) {
+        waiter.waitForEvent(
+                ButtonInteractionEvent.class,
+                evt -> isReactionValid(evt, msg, caller),
+                evt -> handleReaction(evt, index, entries, buttons, caller),
+                5, TimeUnit.MINUTES,
+                () -> msg.delete().queue()
+        );
+    }
+
+    private boolean isReactionValid(ButtonInteractionEvent buttonEvent, Message msg, User caller) {
+        // Ignore interactions on other messages
+        if (!buttonEvent.getMessage().equals(msg)) {
+            return false;
+        }
+        if (!buttonEvent.getUser().equals(caller)) {
+            buttonEvent.reply("This command was not called by you!").setEphemeral(true).queue();
+            return false;
+        }
+        return true;
+    }
+
+    private void handleReaction(ButtonInteractionEvent buttonEvent, int index, List<UrbanEntry> entries, Button[] buttons, User caller) {
+        index = buttonEvent.getButton().getId().equals("prev") ? Math.max(0, index - 1) : Math.min(entries.size() - 1, index + 1);
+        setButtonStates(buttons, index, entries.size() - 1);
+        EmbedBuilder builder = createUrbanEmbed(entries.get(index), index, entries.size());
+        buttonEvent.deferEdit().queue(s -> {}, e -> {});
+        Message msg = buttonEvent.getMessage().editMessageEmbeds(builder.build()).setActionRow(buttons).complete();
+        awaitUserSelection(msg, caller, index, entries, buttons);
+    }
+
+    private void setButtonStates(Button[] buttons, int index, int maxIndex) {
+        buttons[0] = buttons[0].withDisabled(index == 0);
+        buttons[1] = buttons[1].withDisabled(index == maxIndex);
+    }
+
+    private EmbedBuilder createUrbanEmbed(UrbanEntry entry, int index, int total) {
+        EmbedBuilder embedBuilder = new EmbedBuilder();
+        embedBuilder.setThumbnail(getThumbnail());
+        embedBuilder.setTitle(entry.term(), entry.link());
+        embedBuilder.setFooter(String.format("Page %d / %d", index + 1, total));
+        embedBuilder.setColor(getEmbedColor());
+        if (entry.hasValidDefinition()) {
+            embedBuilder.setDescription(entry.definition());
+        }
+        if (entry.hasValidExample()) {
+            embedBuilder.addField("Example", entry.example(), false);
+        }
+        return embedBuilder;
     }
 
     private String getSearchTerm(Message message) {
@@ -83,7 +144,14 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         Document doc = Jsoup.parse(URI.create(url).toURL().openStream(), "UTF-8", url);
         Elements elements = doc.select("div.definition");
 
+        int max = Math.max(10, elements.size());
+        int counter = 0;
+
         for (Element element : elements) {
+            if (counter == max) {
+                break;
+            }
+
             String title = extractTitle(element);
             String meaning = extractMeaning(element);
             String example = extractExample(element);
@@ -91,6 +159,8 @@ public class UrbanDictionaryCmd extends AbstractCommand {
 
             UrbanEntry entry = new UrbanEntry(title, meaning, example, link);
             list.add(entry);
+
+            counter++;
         }
 
         return list;
@@ -138,20 +208,13 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         }
     }
 
-    private EmbedBuilder createUrbanEmbed(UrbanEntry entry) {
-        EmbedBuilder embedBuilder = new EmbedBuilder();
-
-        embedBuilder.setThumbnail(getThumbnail());
-        embedBuilder.setTitle(entry.term(), entry.link());
-
-        if (entry.hasValidDefinition()) {
-            embedBuilder.setDescription(entry.definition());
+    private record UrbanEntry(String term, String definition, String example, String link) {
+        public boolean hasValidDefinition() {
+            return definition != null && !definition.trim().isEmpty();
         }
 
-        if (entry.hasValidExample()) {
-            embedBuilder.addField("Example", entry.example(), false);
+        public boolean hasValidExample() {
+            return example != null && !example.trim().isEmpty();
         }
-
-        return embedBuilder;
     }
 }

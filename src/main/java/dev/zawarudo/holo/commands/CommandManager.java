@@ -91,7 +91,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new CoinFlipCmd());
         addCommand(new CountdownCmd());
         addCommand(new Magic8BallCmd());
-        addCommand(new UrbanDictionaryCmd());
+        addCommand(new UrbanDictionaryCmd(waiter));
         addCommand(new UwuCmd());
 
         // Owner Cmds
