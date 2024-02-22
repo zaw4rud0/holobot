@@ -9,6 +9,7 @@ import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -122,10 +123,12 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         embedBuilder.setFooter(String.format("Page %d / %d", index + 1, total));
         embedBuilder.setColor(getEmbedColor());
         if (entry.hasValidDefinition()) {
-            embedBuilder.setDescription(entry.definition());
+            String description = Formatter.truncate(entry.definition, MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            embedBuilder.setDescription(description);
         }
         if (entry.hasValidExample()) {
-            embedBuilder.addField("Example", entry.example(), false);
+            String example = Formatter.truncate(entry.example(), MessageEmbed.VALUE_MAX_LENGTH);
+            embedBuilder.addField("Example", example, false);
         }
         return embedBuilder;
     }

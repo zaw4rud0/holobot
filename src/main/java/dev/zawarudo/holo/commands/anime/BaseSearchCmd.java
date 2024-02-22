@@ -85,12 +85,12 @@ public abstract class BaseSearchCmd<T extends AbstractMedium<T>> extends Abstrac
         EmbedBuilder builder = new EmbedBuilder();
         String type = selected.getType() == null ? "null" : selected.getType();
 
-        String title = Formatter.truncateString(selected.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
+        String title = Formatter.truncate(selected.getTitle(), MessageEmbed.TITLE_MAX_LENGTH - (type.length() + 3));
         builder.setTitle(String.format("%s [%s]", title, type));
 
         builder.setThumbnail(selected.getImages().getJpg().getLargeImage());
         if (selected.getSynopsis().isPresent()) {
-            String synopsis = Formatter.truncateString(selected.getSynopsis().get(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            String synopsis = Formatter.truncate(selected.getSynopsis().get(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
             builder.setDescription(synopsis);
         }
         return builder;

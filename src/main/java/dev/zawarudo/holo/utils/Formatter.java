@@ -85,7 +85,7 @@ public final class Formatter {
      * to {@code maxLength}, or if {@code maxLength} is less than 4, the original
      * string is returned as-is. Returns {@code null} if the input string is {@code null}.
      */
-    public static String truncateString(String input, int maxLength) {
+    public static String truncate(String input, int maxLength) {
         if (input == null || maxLength < 4) {
             return input;
         }
