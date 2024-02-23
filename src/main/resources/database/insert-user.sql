@@ -1,2 +1,2 @@
-INSERT INTO DiscordUsers (user_id, username, discriminator, is_bot)
-VALUES (?, ?, ?, ?);
+INSERT INTO DiscordUsers (user_id, username, is_bot)
+VALUES (?, ?, ?);

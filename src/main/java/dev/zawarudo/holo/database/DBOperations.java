@@ -29,29 +29,10 @@ public final class DBOperations {
     }
 
     /**
-     * Stores an emote into the database.
+     * Stores one or more emotes into the database.
      */
-    public static void insertEmote(CustomEmoji emote) throws SQLException {
+    public static void insertEmotes(CustomEmoji... emotes) throws SQLException {
         String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
-
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, emote.getIdLong());
-            ps.setString(2, emote.getName());
-            ps.setBoolean(3, emote.isAnimated());
-            ps.setString(4, emote.getTimeCreated().toString());
-            ps.setString(5, emote.getImageUrl());
-            ps.execute();
-        }
-        conn.close();
-    }
-
-    /**
-     * Stores the emotes of the guild into the database. Check beforehand that those emotes are new.
-     */
-    public static void insertEmotes(List<CustomEmoji> emotes) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
-
         List<Long> existing = getEmoteIds();
 
         Connection conn = Database.getConnection();
@@ -61,11 +42,10 @@ public final class DBOperations {
             int i = 0;
 
             for (CustomEmoji emote : emotes) {
-                // Skip emotes that are already in the database
                 if (existing.contains(emote.getIdLong())) {
                     continue;
                 }
-                // Store emote information
+
                 ps.setLong(1, emote.getIdLong());
                 ps.setString(2, emote.getName());
                 ps.setBoolean(3, emote.isAnimated());
@@ -112,8 +92,7 @@ public final class DBOperations {
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setLong(1, user.getIdLong());
             ps.setString(2, user.getName());
-            ps.setString(3, user.getName());
-            ps.setBoolean(4, user.isBot());
+            ps.setBoolean(3, user.isBot());
             ps.execute();
         }
         conn.close();
@@ -145,9 +124,8 @@ public final class DBOperations {
         Connection conn = Database.getConnection();
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, user.getName());
-            ps.setString(2, user.getName());
-            ps.setBoolean(3, user.isBot());
-            ps.setLong(4, user.getIdLong());
+            ps.setBoolean(2, user.isBot());
+            ps.setLong(3, user.getIdLong());
             ps.executeUpdate();
         }
         conn.close();

@@ -122,7 +122,7 @@ public class GuildListener extends ListenerAdapter {
     @Override
     public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         try {
-            DBOperations.insertEmote(event.getEmoji());
+            DBOperations.insertEmotes(event.getEmoji());
         } catch (SQLException ex) {
             logError("Something went wrong while storing the new emoji in the DB.", ex);
         }
