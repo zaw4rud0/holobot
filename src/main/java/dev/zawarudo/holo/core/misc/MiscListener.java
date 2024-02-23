@@ -73,9 +73,12 @@ public class MiscListener extends ListenerAdapter {
     }
 
     private void storeNewEmotesInDatabase(CustomEmoji... emotes) {
-        List<CustomEmoji> newEmotes = Arrays.stream(emotes).filter(e -> !existingEmotes.contains(e.getIdLong())).toList();
         try {
-            DBOperations.insertEmotes(newEmotes);
+            DBOperations.insertEmotes(
+                    Arrays.stream(emotes)
+                            .filter(e -> !existingEmotes.contains(e.getIdLong()))
+                            .toArray(CustomEmoji[]::new)
+            );
         } catch (SQLException ex) {
             LOGGER.error("Something went wrong while storing new emotes.", ex);
         }

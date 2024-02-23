@@ -47,7 +47,9 @@ public class GuildListener extends ListenerAdapter {
 
             DBOperations.insertMembers(event.getGuild().getMembers());
             DBOperations.insertGuild(event.getGuild());
-            DBOperations.insertEmotes(event.getGuild().getEmojis().stream().map(e -> (CustomEmoji) e).toList());
+            DBOperations.insertEmotes(event.getGuild().getEmojis().stream()
+                    .map(e -> (CustomEmoji) e)
+                    .toArray(CustomEmoji[]::new));
 
             // Create new guild configuration and save it in the DB
             GuildConfig config = manager.getGuildConfig(event.getGuild());
