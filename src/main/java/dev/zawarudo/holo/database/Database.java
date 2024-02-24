@@ -1,6 +1,10 @@
 package dev.zawarudo.holo.database;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.DatabaseMetaData;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +14,10 @@ import java.util.List;
  */
 public final class Database {
 
-	/** The path to the database file. */
-	public static final String PATH_DB = "./Holo.db";
+	/**
+	 * The path to the database file.
+	 */
+	public static final String DB_PATH = "./Holo.db";
 
 	private Database() {
 		throw new UnsupportedOperationException();
@@ -30,7 +36,7 @@ public final class Database {
 			// This error should never occur.
 			throw new NoClassDefFoundError("Could not find SQLite JDBC driver. " + e.getMessage());
 		}
-		String url = "jdbc:sqlite:" + PATH_DB;
+		String url = "jdbc:sqlite:" + DB_PATH;
 		return DriverManager.getConnection(url);
 	}
 

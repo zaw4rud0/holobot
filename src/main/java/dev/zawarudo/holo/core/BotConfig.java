@@ -7,25 +7,25 @@ import com.google.gson.annotations.SerializedName;
  */
 public class BotConfig {
     @SerializedName("token")
-    private String botToken;
+    private String botToken = "BOT_TOKEN";
     @SerializedName("owner_id")
     private long ownerId;
 
     // External settings and tokens
     @SerializedName("deepAI_token")
-    private String deepAIKey;
+    private String deepAIKey = "DEEP_AI_KEY";
     @SerializedName("aoc_token")
-    private String aocToken;
+    private String aocToken = "AOC_SESSION_KEY";
     @SerializedName("saucenao_token")
-    private String saucenaoToken;
+    private String saucenaoToken = "SAUCENAO_TOKEN";
     @SerializedName("github_token")
-    private String githubToken;
+    private String githubToken = "GITHUB_TOKEN";
 
     // Minor bot properties
     @SerializedName("default_prefix")
-    private String defaultPrefix;
+    private String defaultPrefix = "<";
     @SerializedName("version")
-    private String version;
+    private String version = "1.0.0";
 
     /**
      * Retrieves the Discord bot token. Each bot has a unique token which should

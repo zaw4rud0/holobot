@@ -69,7 +69,7 @@ public class InfoBotCmd extends AbstractCommand {
 		builder.addField("Bot Version", "`" + Bootstrap.holo.getConfig().getVersion() + "`", false);
 		builder.addField("JDA Version", "`" + JDAInfo.VERSION.replace("_" + JDAInfo.COMMIT_HASH, "") + "`", false);
 		builder.addField("System Information", systemInfo, false);
-		builder.addField("Database Size", "`" + new File(Database.PATH_DB).length() / 1024 / 1024 + "MB`", false);
+		builder.addField("Database Size", "`" + new File(Database.DB_PATH).length() / 1024 / 1024 + "MB`", false);
 		builder.addField("Source", "[GitHub](https://github.com/xHarlock/HoloBot)", false);
 		return builder;
 	}

@@ -642,4 +642,13 @@ public final class DBOperations {
         }
         conn.close();
     }
+
+    public static void createNewDatabase() throws SQLException {
+        String sql = Bootstrap.holo.getSQLManager().getStatement("create-database");
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.execute();
+        }
+        conn.close();
+    }
 }
