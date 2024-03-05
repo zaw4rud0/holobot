@@ -3,17 +3,15 @@ package dev.zawarudo.holo.database;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 
 public class SQLManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLManager.class);
-    private static final Path SQL_DIRECTORY_PATH = Path.of("./src/main/resources/database/");
+    private static final String SQL_DIRECTORY_PATH = "/dev/zawarudo/holo/database";
     private final Map<String, String> sqlStatements;
 
     /**
@@ -43,19 +41,29 @@ public class SQLManager {
 
     private Map<String, String> loadSQLStatements() throws IOException {
         Map<String, String> statements = new HashMap<>();
-        try (DirectoryStream<Path> directoryStream = Files.newDirectoryStream(SQL_DIRECTORY_PATH, "*.sql")) {
-            for (Path filePath : directoryStream) {
-                String name = getFileNameWithoutExtension(filePath);
-                String content = Files.readString(filePath);
-                statements.put(name, content);
+
+        try (InputStream is = getClass().getResourceAsStream(SQL_DIRECTORY_PATH)) {
+            if (is == null) {
+                throw new IOException("Resource directory not found: " + SQL_DIRECTORY_PATH);
+            }
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8));
+            String resourceName;
+            while ((resourceName = reader.readLine()) != null) {
+                if (resourceName.endsWith(".sql")) {
+                    String content = loadResourceContent(SQL_DIRECTORY_PATH + "/" + resourceName);
+                    statements.put(resourceName.replace(".sql", ""), content);
+                }
             }
         }
         return statements;
     }
 
-    private String getFileNameWithoutExtension(Path filePath) {
-        String fileName = filePath.getFileName().toString();
-        int lastDotIndex = fileName.lastIndexOf('.');
-        return lastDotIndex > 0 ? fileName.substring(0, lastDotIndex) : fileName;
+    private String loadResourceContent(String resourcePath) throws IOException {
+        try (InputStream is = getClass().getResourceAsStream(resourcePath)) {
+            if (is == null) {
+                throw new IOException("Resource file not found: " + resourcePath);
+            }
+            return new String(is.readAllBytes(), StandardCharsets.UTF_8);
+        }
     }
 }

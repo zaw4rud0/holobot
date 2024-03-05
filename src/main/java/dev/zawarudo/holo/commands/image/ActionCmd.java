@@ -36,7 +36,7 @@ import java.util.concurrent.TimeUnit;
         category = CommandCategory.IMAGE)
 public class ActionCmd extends AbstractCommand {
 
-    private static final String FILE_PATH = "./src/main/resources/misc/actions.json";
+    private static final String FILE_PATH = "./resources/actions.json";
 
     private final Map<String, Action> actions;
     private static final Random RANDOM = new Random();

@@ -27,7 +27,7 @@ public enum GraphTheme {
     }
 
     private static List<Theme> loadThemes() {
-        InputStream inputStream = GraphTheme.class.getClassLoader().getResourceAsStream("graph_themes.json");
+        InputStream inputStream = GraphTheme.class.getResourceAsStream("graph_themes.json");
         if (inputStream == null) {
             throw new IllegalStateException("Failed to load graph_themes.json! Check that the file is at the right location.");
         }

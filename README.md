@@ -1,4 +1,4 @@
-<img align="right" src="src/main/resources/logo.png" height="200" width="200" alt="Holo's profile picture">
+<img align="right" src="resources/logo.png" height="200" width="200" alt="Holo's profile picture">
 
 # HoloBot (Java Discord Bot)
 

@@ -36,7 +36,7 @@ config.properties
 *.ppk
 
 # Resources files
-/src/main/resources/image/template
+/src/main/resources/dev/zawarudo/holo/image/template
 /src/main/resources/experimental/
 
 # Ignore databases
