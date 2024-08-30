@@ -49,7 +49,7 @@ public class ServerRolesCmd extends AbstractCommand {
 			}
 		}
 
-		if (fieldContent.length() > 0) {
+		if (!fieldContent.isEmpty()) {
 			builder.addField(Integer.toString(counter), fieldContent.toString(), true);
 		}
 
