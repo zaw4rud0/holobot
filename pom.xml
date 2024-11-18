@@ -101,6 +101,13 @@
             <version>2.11.0</version>
         </dependency>
 
+        <!-- Dependency to work with .env files -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
+        </dependency>
+
         <!-- Guava, provides a RateLimiter -->
         <dependency>
             <groupId>com.google.guava</groupId>

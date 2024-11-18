@@ -29,12 +29,6 @@ hs_err_pid*
 /.idea/
 *.iml
 
-# My own files
-config.json
-config.properties
-/conventions.md
-*.ppk
-
 # Resources files
 /src/main/resources/dev/zawarudo/holo/image/template
 /src/main/resources/experimental/
@@ -44,3 +38,10 @@ config.properties
 
 /src/main/java/dev/zawarudo/holo/experimental/
 /src/main/java/dev/zawarudo/holo/development/
+
+# Sensitive files
+.env
+config.json
+config.properties
+/conventions.md
+*.ppk
