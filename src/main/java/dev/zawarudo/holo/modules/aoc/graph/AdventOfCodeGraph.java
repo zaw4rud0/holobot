@@ -193,7 +193,7 @@ public abstract class AdventOfCodeGraph {
         for (int i = 0; i <= rows; i++) {
             String text = String.valueOf(count);
             g2d.drawString(text, posX - metrics.stringWidth(text) / 2, posY - i * rowHeight - metrics.getHeight() / 2 + metrics.getAscent());
-            count += 10;
+            count += maxCount > 100 ? 10 : 5;
         }
     }
 

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.zawarudo</groupId>
     <artifactId>holobot</artifactId>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
     <name>HoloBot</name>
     <description>Java Discord Bot</description>
     <packaging>jar</packaging>
@@ -99,6 +99,13 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.11.0</version>
+        </dependency>
+
+        <!-- Dependency to work with .env files -->
+        <dependency>
+            <groupId>io.github.cdimascio</groupId>
+            <artifactId>dotenv-java</artifactId>
+            <version>3.0.0</version>
         </dependency>
 
         <!-- Guava, provides a RateLimiter -->

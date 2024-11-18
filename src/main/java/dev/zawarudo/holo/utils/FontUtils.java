@@ -24,8 +24,8 @@ public final class FontUtils {
     }
 
     public static Font loadFontFromFile(String fontName, float fontSize) {
-        String path = String.format("/fonts/%s.ttf", fontName);
-        try (InputStream is = FontUtils.class.getClassLoader().getResourceAsStream(path)) {
+        String path = String.format("fonts/%s.ttf", fontName);
+        try (InputStream is = FontUtils.class.getResourceAsStream(path)) {
             if (is == null) {
                 throw new IllegalStateException(String.format("Resource not found in %s.", path));
             }
