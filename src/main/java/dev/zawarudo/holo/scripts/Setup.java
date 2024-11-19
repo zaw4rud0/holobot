@@ -22,6 +22,8 @@ public class Setup {
     }
 
     private static void createConfigIfMissing() throws IOException {
+        // TODO: Make copy of .env.example instead
+
         File file = new File("config.json");
         if (!file.exists()) {
             logInfo("Config file is missing. Creating a new one with default settings...");
@@ -32,6 +34,7 @@ public class Setup {
         }
     }
 
+    @Deprecated
     private static String getDefaultConfigString() {
         return """
                 {
