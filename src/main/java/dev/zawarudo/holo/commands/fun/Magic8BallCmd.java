@@ -29,7 +29,7 @@ public class Magic8BallCmd extends AbstractCommand {
     private final List<File> responses;
 
     public Magic8BallCmd() {
-        responses = FileUtils.getAllFiles("src/main/resources/image/8ball");
+        responses = FileUtils.getAllFiles("src/main/resources/dev/zawarudo/holo/image/8ball");
     }
 
     @Override
