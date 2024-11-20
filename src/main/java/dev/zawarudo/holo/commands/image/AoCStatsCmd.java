@@ -49,7 +49,7 @@ public class AoCStatsCmd extends AbstractCommand {
         String name = String.format("aoc_%s.png", DateTimeUtils.getCurrentDateTimeString());
 
         EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Advent of Code 2023 Stats");
+        builder.setTitle(String.format("Advent of Code %d Stats", year));
         builder.setImage("attachment://" + name);
         builder.setFooter("Invoked by " + event.getMember().getEffectiveName(), event.getAuthor().getEffectiveAvatarUrl());
 
@@ -64,6 +64,17 @@ public class AoCStatsCmd extends AbstractCommand {
 
     private int getYear() {
         ZonedDateTime current = ZonedDateTime.now(ZoneId.of("Europe/Zurich"));
+        int currentYear = current.getYear();
+
+        if (args.length > 0) {
+            try {
+                int parsedYear = Integer.parseInt(args[0]);
+                return (parsedYear >= 2015 && parsedYear <= currentYear) ? parsedYear : currentYear;
+            } catch (NumberFormatException ignored) {
+                // Fall through to default year logic
+            }
+        }
+
         return current.getMonthValue() == 12
                 ? current.getYear()
                 : current.getYear() - 1;
