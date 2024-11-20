@@ -17,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 
 @Command(name = "aoc",
         description = "Displays the graph of Advent of Code",
@@ -24,15 +26,16 @@ import java.io.InputStream;
 public class AoCStatsCmd extends AbstractCommand {
 
     private static final int LEADERBOARD_ID = 1501119;
-    private static final int YEAR = 2023;
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
         sendTyping(event);
 
+        int year = getYear();
+
         String token = Bootstrap.holo.getConfig().getAoCToken();
-        AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, YEAR, LEADERBOARD_ID, token);
+        AdventOfCodeGraph graph = AdventOfCodeGraph.createGraph(ChartType.STACKED_BAR_CHART, year, LEADERBOARD_ID, token);
 
         BufferedImage image;
 
@@ -53,7 +56,16 @@ public class AoCStatsCmd extends AbstractCommand {
         try (InputStream input = ImageOperations.toInputStream(image)) {
             FileUpload upload = FileUpload.fromData(input, name);
             event.getChannel().sendFiles(upload).setEmbeds(builder.build()).queue();
-        } catch (IOException ignored) {
+        } catch (IOException ex) {
+            sendErrorEmbed(event, "An error occurred while sending the image. Please try again later.");
+            ex.printStackTrace();
         }
+    }
+
+    private int getYear() {
+        ZonedDateTime current = ZonedDateTime.now(ZoneId.of("Europe/Zurich"));
+        return current.getMonthValue() == 12
+                ? current.getYear()
+                : current.getYear() - 1;
     }
 }
