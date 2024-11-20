@@ -23,7 +23,7 @@ import java.io.InputStream;
         category = CommandCategory.IMAGE)
 public class AoCStatsCmd extends AbstractCommand {
 
-    private static final int LEADERBOARD_ID = 1514956;
+    private static final int LEADERBOARD_ID = 1501119;
     private static final int YEAR = 2023;
 
     @Override
