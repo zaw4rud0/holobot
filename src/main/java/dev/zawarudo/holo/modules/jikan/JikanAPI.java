@@ -96,6 +96,10 @@ public final class JikanAPI {
      * @return An {@link Anime} object.
      */
     public static Anime getAnime(int id) throws InvalidIdException, APIException {
+        if (id <= 0) {
+            throw new InvalidIdException("Id must be at least 1.");
+        }
+
         try {
             String url = BASE_URL + "/anime/" + id;
 

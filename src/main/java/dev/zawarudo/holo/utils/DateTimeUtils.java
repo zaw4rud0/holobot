@@ -69,13 +69,13 @@ public final class DateTimeUtils {
                 DateTimeFormatter.ofPattern("dd/MM/yy HH:mm"),
                 DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"),
                 DateTimeFormatter.ofPattern("dd.MM.yy HH:mm"),
-                DateTimeFormatter.ofPattern("dd. MMMM yyyy HH:mm"),
+                DateTimeFormatter.ofPattern("dd. MMMM yyyy HH:mm", Locale.ENGLISH),
 
                 // ISO 8601
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"),
 
                 // American
-                DateTimeFormatter.ofPattern("MMMM d, yyyy HH:mm"),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy HH:mm", Locale.ENGLISH),
 
                 // With timezone
                 DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm Z"),
@@ -83,7 +83,7 @@ public final class DateTimeUtils {
                 DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm Z"),
                 DateTimeFormatter.ofPattern("dd.MM.yy HH:mm Z"),
                 DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm Z"),
-                DateTimeFormatter.ofPattern("MMMM d, yyyy HH:mm Z"),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy HH:mm Z", Locale.ENGLISH),
         };
 
         DateTimeFormatter[] dateFormatters = new DateTimeFormatter[]{
@@ -99,7 +99,7 @@ public final class DateTimeUtils {
                 DateTimeFormatter.ofPattern("yyyy-MM-dd"),
 
                 // American
-                DateTimeFormatter.ofPattern("MMMM d, yyyy"),
+                DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH),
         };
 
         for (DateTimeFormatter formatter : dateTimeFormatters) {
