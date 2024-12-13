@@ -64,7 +64,7 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     }
 
     public String getUrl() {
-        return url;
+        return url.strip();
     }
 
     public String getImageUrl() {
@@ -76,21 +76,21 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     }
 
     public String getTitle() {
-        return title;
+        return title.strip();
     }
 
     public Optional<String> getTitleEnglish() {
         if (titleEn == null || titleEn.equals("null")) {
             return Optional.empty();
         }
-        return Optional.of(titleEn);
+        return Optional.of(titleEn.strip());
     }
 
     public Optional<String> getTitleJapanese() {
         if (titleJp == null || titleJp.equals("null")) {
             return Optional.empty();
         }
-        return Optional.of(titleJp);
+        return Optional.of(titleJp.strip());
     }
 
     public List<String> getTitleSynonyms() {
@@ -98,11 +98,11 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     }
 
     public String getType() {
-        return type;
+        return type.strip();
     }
 
     public String getStatus() {
-        return status;
+        return status.strip();
     }
 
     public double getScore() {
@@ -146,7 +146,7 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     }
 
     public String getBackground() {
-        return background;
+        return background.strip();
     }
 
     public List<Nameable> getGenres() {

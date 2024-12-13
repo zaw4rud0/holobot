@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -80,6 +81,23 @@ public final class DBOperations {
             conn.close();
             return ids;
         }
+    }
+
+    /**
+     * TODO: Implement
+     *
+     * @param name The name of the emote to search for.
+     * @return A list of emotes that fit the specified name.
+     */
+    public static List<CustomEmoji> getEmotesByName(@NotNull String name) {
+
+        // TODO:
+        //  - Use "select-emote-with-suffix.sql"
+        //  - Strip suffix and search with just name
+        //  - Pick from "display_name" the emote + suffix
+        //  - Send "image_url" in channel as webhook
+
+        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     /**

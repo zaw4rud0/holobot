@@ -18,7 +18,7 @@ public class AnimeSeason {
     private static final String TARGET_TIME_ZONE = "Europe/Zurich";
 
     public static void main(String[] args) throws APIException {
-        List<Anime> seasonalAnime = JikanAPI.getSeason(Season.WINTER, 2024);
+        List<Anime> seasonalAnime = JikanAPI.getSeason(Season.FALL, 2024);
 
         // Sort by popularity
         seasonalAnime.sort(Comparator.comparingInt(AbstractMedium::getPopularity));
@@ -39,8 +39,7 @@ public class AnimeSeason {
                         Collectors.toList()
                 ));
 
-        System.out.println("Anime Releases Winter 2024");
-
+        System.out.println("Anime Releases Fall 2024");
         System.out.println(map.keySet().size() + " days");
 
         for (String key : map.keySet()) {
@@ -56,7 +55,7 @@ public class AnimeSeason {
 
     private static String getFormattedDateString(String date) {
         ZonedDateTime zonedDateTime = ZonedDateTime.parse(date);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("MMM dd", Locale.ENGLISH);
         return zonedDateTime.format(formatter);
     }
 }

@@ -75,6 +75,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
         addCommand(new DogCmd());
+        addCommand(new EmoteCmd());
         addCommand(new HttpCmd());
         addCommand(new InspiroCmd());
         addCommand(new PaletteCmd());
