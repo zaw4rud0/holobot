@@ -49,9 +49,7 @@ public class XkcdCmd extends AbstractCommand {
                 comics.put(comic.getIssueNr(), comic);
             }
         } catch (SQLException ex) {
-            if (logger.isErrorEnabled()) {
-                logger.error("Something went wrong while fetching the XKCD comics from the DB.", ex);
-            }
+            logger.error("Something went wrong while fetching the XKCD comics from the DB.", ex);
         }
     }
 
