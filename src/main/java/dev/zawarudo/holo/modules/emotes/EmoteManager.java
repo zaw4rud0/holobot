@@ -222,6 +222,72 @@ public class EmoteManager {
     }
 
     /**
+     * Renames a specified emote in the database. If the new name is already in use, then the two emotes change their names.
+     *
+     * @param emote   The emote to be renamed.
+     * @param newName The new name the emote should have.
+     */
+    public void renameEmote(String emote, String newName) throws SQLException {
+        String getEmoteQuery = "SELECT emote_id FROM Emotes WHERE LOWER(emote_name) = LOWER(?);";
+        String getConflictingEmoteQuery = "SELECT emote_id, emote_name FROM Emotes WHERE LOWER(emote_name) = LOWER(?);";
+        String updateEmoteQuery = "UPDATE Emotes SET emote_name = ? WHERE emote_id = ?;";
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement getEmoteStmt = conn.prepareStatement(getEmoteQuery);
+             PreparedStatement getConflictStmt = conn.prepareStatement(getConflictingEmoteQuery);
+             PreparedStatement updateStmt = conn.prepareStatement(updateEmoteQuery)) {
+
+            conn.setAutoCommit(false);
+
+            // Step 1: Check if the emote exists
+            getEmoteStmt.setString(1, emote);
+            ResultSet emoteResult = getEmoteStmt.executeQuery();
+
+            if (!emoteResult.next()) {
+                LOGGER.info("Emote '{}' does not exist. No changes made.", emote);
+                return;
+            }
+
+            long emoteId = emoteResult.getLong(EMOTE_ID_COL_NAME);
+
+            // Step 2: Check if newName is already in use
+            getConflictStmt.setString(1, newName);
+            ResultSet conflictResult = getConflictStmt.executeQuery();
+
+            if (conflictResult.next()) {
+                long conflictingEmoteId = conflictResult.getLong(EMOTE_ID_COL_NAME);
+                String conflictingEmoteName = conflictResult.getString(EMOTE_NAME_COL_NAME);
+
+                // Swap names between the two emotes
+                updateStmt.setString(1, conflictingEmoteName);
+                updateStmt.setLong(2, emoteId);
+                updateStmt.addBatch();
+
+                updateStmt.setString(1, newName);
+                updateStmt.setLong(2, conflictingEmoteId);
+                updateStmt.addBatch();
+
+                updateStmt.executeBatch();
+                conn.commit();
+
+                LOGGER.info("Swapped names: '{}' <-> '{}'.", emote, newName);
+            } else {
+                // Simply rename the emote
+                updateStmt.setString(1, newName);
+                updateStmt.setLong(2, emoteId);
+                updateStmt.executeUpdate();
+                conn.commit();
+
+                LOGGER.info("Renamed emote '{}' to '{}'.", emote, newName);
+            }
+
+        } catch (SQLException e) {
+            LOGGER.error("Failed to rename emote '{}' to '{}'. Rolling back changes.", emote, newName, e);
+            throw e;
+        }
+    }
+
+    /**
      * Checks if an emote ID exists in the database.
      */
     private boolean isEmoteIdInDatabase(long emoteId) throws SQLException {
