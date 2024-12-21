@@ -21,10 +21,13 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Command(name = "emote",
-        description = "Sends a specified emote in the channel.",
+        description = "Sends a specified emote in the channel as if you had nitro. It uses a fake profile (also called a webhook message) to show who sent the emote.",
+        usage = "<emote_name>",
+        example = "kekw",
         category = CommandCategory.IMAGE)
 public class EmoteCmd extends AbstractCommand {
 
@@ -59,17 +62,17 @@ public class EmoteCmd extends AbstractCommand {
                 return;
             }
 
-            deleteInvoke(event);
-            CustomEmoji emote = emojiOptional.get();
-
-            Webhook webhook = getWebhook(event.getChannel().asTextChannel(), caller);
-            webhook.sendMessage(emote.getImageUrl()).queue(m -> webhook.delete().queue());
-        } catch (SQLException | IOException e) {
+            sendEmoteMessage(event, emojiOptional.get());
+        } catch (SQLException e) {
             event.getChannel().sendMessage(e.getMessage()).queue();
         }
     }
 
     private void searchEmote(MessageReceivedEvent event) {
+        if (!isBotOwner(event.getAuthor())) {
+            return;
+        }
+
         String keyword = args[1];
 
         try {
@@ -85,7 +88,7 @@ public class EmoteCmd extends AbstractCommand {
             List<String> chunks = splitMessage(resultsMessage);
 
             for (String chunk : chunks) {
-                event.getMessage().reply(chunk).queue();
+                event.getMessage().reply(chunk).queue(m -> m.delete().queueAfter(5, TimeUnit.MINUTES));
             }
         } catch (SQLException e) {
             event.getChannel().sendMessage(e.getMessage()).queue();
@@ -93,8 +96,7 @@ public class EmoteCmd extends AbstractCommand {
     }
 
     private void renameEmote(MessageReceivedEvent event) {
-        // TODO: Better check
-        if (!event.getAuthor().getId().equals("466292292945313799")) {
+        if (!isBotOwner(event.getAuthor())) {
             return;
         }
 
@@ -125,6 +127,24 @@ public class EmoteCmd extends AbstractCommand {
         connection.setRequestMethod("GET");
         connection.connect();
         return Icon.from(connection.getInputStream());
+    }
+
+    /**
+     * Sends an emote as webhook message.
+     */
+    public void sendEmoteMessage(MessageReceivedEvent event, CustomEmoji emote) {
+        if (event.getMember() == null) {
+            return;
+        }
+
+        deleteInvoke(event);
+
+        try {
+            Webhook webhook = getWebhook(event.getChannel().asTextChannel(), event.getMember());
+            webhook.sendMessage(emote.getImageUrl()).queue(m -> webhook.delete().queue());
+        } catch (IOException e) {
+            event.getChannel().sendMessage(e.getMessage()).queue();
+        }
     }
 
     @Deprecated(forRemoval = true)
