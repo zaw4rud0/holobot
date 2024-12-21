@@ -1,10 +1,12 @@
 package dev.zawarudo.holo.commands;
 
+import dev.zawarudo.holo.commands.fun.EmoteCmd;
 import dev.zawarudo.holo.commands.image.ActionCmd;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.PermissionManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -12,9 +14,11 @@ import net.dv8tion.jda.internal.utils.PermissionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
@@ -70,6 +74,7 @@ public class CommandListener extends ListenerAdapter {
 
         // No valid command
         if (!cmdManager.isValidName(invoke)) {
+            checkEmoteInvoke(event, invoke);
             return;
         }
 
@@ -156,5 +161,19 @@ public class CommandListener extends ListenerAdapter {
         event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue(s -> {},
                 err -> LOGGER.warn("Can't send a private message because I have been blocked by {} (ID: {}).",
                 event.getAuthor().getName(), event.getAuthor().getId())));
+    }
+
+    private void checkEmoteInvoke(MessageReceivedEvent event, String invoke) {
+        try {
+            Optional<CustomEmoji> emoteOptional = Bootstrap.holo.getEmoteManager().getEmoteByName(invoke);
+            if (emoteOptional.isPresent()) {
+                CustomEmoji emote = emoteOptional.get();
+                LOGGER.info("{} has called emote ({})", event.getAuthor().getName(), invoke);
+                EmoteCmd cmd = (EmoteCmd) cmdManager.getCommand("emote");
+                cmd.sendEmoteMessage(event, emote);
+            }
+        } catch (SQLException e) {
+            event.getChannel().sendMessage(e.getMessage()).queue();
+        }
     }
 }

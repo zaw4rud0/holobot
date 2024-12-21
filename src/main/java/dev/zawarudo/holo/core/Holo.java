@@ -8,6 +8,7 @@ import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
 import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.modules.GitHubClient;
+import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -37,6 +38,7 @@ public class Holo extends ListenerAdapter {
 	private PokemonSpawnManager pokemonSpawnManager;
 	private SQLManager sqlManager;
 	private GitHubClient gitHubClient;
+	private EmoteManager emoteManager;
 
 	private final EventWaiter waiter;
 
@@ -70,8 +72,11 @@ public class Holo extends ListenerAdapter {
 			throw new IllegalStateException("Something went wrong while registering managers.", e);
 		}
 
+		emoteManager = new EmoteManager();
 		guildConfigManager = new GuildConfigManager();
 		pokemonSpawnManager = new PokemonSpawnManager(jda);
+
+		// Warning: Commands only get initialized here
 		commandManager = new CommandManager(waiter);
 		permissionManager = new PermissionManager();
 	}
@@ -114,6 +119,10 @@ public class Holo extends ListenerAdapter {
 
 	public GitHubClient getGitHubClient() {
 		return gitHubClient;
+	}
+
+	public EmoteManager getEmoteManager() {
+		return emoteManager;
 	}
 
 	@Override

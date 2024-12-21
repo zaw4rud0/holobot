@@ -7,8 +7,6 @@ import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -27,77 +25,6 @@ public final class DBOperations {
     private static final int BATCH_SIZE = 100;
 
     private DBOperations() {
-    }
-
-    /**
-     * Stores one or more emotes into the database.
-     */
-    public static void insertEmotes(CustomEmoji... emotes) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-emote");
-        List<Long> existing = getEmoteIds();
-
-        Connection conn = Database.getConnection();
-        conn.setAutoCommit(false);
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            int i = 0;
-
-            for (CustomEmoji emote : emotes) {
-                if (existing.contains(emote.getIdLong())) {
-                    continue;
-                }
-
-                ps.setLong(1, emote.getIdLong());
-                ps.setString(2, emote.getName());
-                ps.setBoolean(3, emote.isAnimated());
-                ps.setString(4, emote.getTimeCreated().toString());
-                ps.setString(5, emote.getImageUrl());
-                ps.addBatch();
-
-                if (++i % BATCH_SIZE == 0) {
-                    ps.executeBatch();
-                    conn.commit();
-                }
-            }
-            ps.executeBatch();
-            conn.commit();
-        }
-        conn.setAutoCommit(true);
-        conn.close();
-    }
-
-    /**
-     * Returns a list of ids of the emotes that are stored in the database.
-     */
-    public static List<Long> getEmoteIds() throws SQLException {
-        String sql = "SELECT emote_id FROM Emotes;";
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ResultSet rs = ps.executeQuery();
-            List<Long> ids = new ArrayList<>();
-            while (rs.next()) {
-                ids.add(rs.getLong(1));
-            }
-            conn.close();
-            return ids;
-        }
-    }
-
-    /**
-     * TODO: Implement
-     *
-     * @param name The name of the emote to search for.
-     * @return A list of emotes that fit the specified name.
-     */
-    public static List<CustomEmoji> getEmotesByName(@NotNull String name) {
-
-        // TODO:
-        //  - Use "select-emote-with-suffix.sql"
-        //  - Strip suffix and search with just name
-        //  - Pick from "display_name" the emote + suffix
-        //  - Send "image_url" in channel as webhook
-
-        throw new UnsupportedOperationException("Not implemented yet!");
     }
 
     /**
