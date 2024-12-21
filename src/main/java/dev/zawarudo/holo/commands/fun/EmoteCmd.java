@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Command(name = "emote",
-        description = "Sends a specified emote in the channel as if you had nitro. It uses a fake profile (also called a webhook message) to show who sent the emote.",
+        description = "Sends a specified emote in the channel as if you had nitro. It uses a fake profile (also called a webhook message) to show who sent the emote.\n\n You may also just use the emote name with the bot prefix.",
         usage = "<emote_name>",
         example = "kekw",
         category = CommandCategory.IMAGE)
