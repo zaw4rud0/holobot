@@ -288,6 +288,23 @@ public class EmoteManager {
     }
 
     /**
+     * Returns a list of ids of the emotes that are stored in the database.
+     */
+    public List<Long> getEmoteIds() throws SQLException {
+        String query = "SELECT emote_id FROM Emotes;";
+        Connection conn = Database.getConnection();
+        try (PreparedStatement ps = conn.prepareStatement(query)) {
+            ResultSet rs = ps.executeQuery();
+            List<Long> emoteIds = new ArrayList<>();
+            while (rs.next()) {
+                emoteIds.add(rs.getLong(1));
+            }
+            conn.close();
+            return emoteIds;
+        }
+    }
+
+    /**
      * Checks if an emote ID exists in the database.
      */
     private boolean isEmoteIdInDatabase(long emoteId) throws SQLException {

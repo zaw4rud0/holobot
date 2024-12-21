@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.core.misc;
 
+import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.GuildConfig;
 import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.DBOperations;
@@ -47,9 +48,11 @@ public class GuildListener extends ListenerAdapter {
 
             DBOperations.insertMembers(event.getGuild().getMembers());
             DBOperations.insertGuild(event.getGuild());
-            DBOperations.insertEmotes(event.getGuild().getEmojis().stream()
+
+            Bootstrap.holo.getEmoteManager().insertEmotes(event.getGuild().getEmojis().stream()
                     .map(e -> (CustomEmoji) e)
-                    .toArray(CustomEmoji[]::new));
+                    .toArray(CustomEmoji[]::new)
+            );
 
             // Create new guild configuration and save it in the DB
             GuildConfig config = manager.getGuildConfig(event.getGuild());
@@ -124,7 +127,7 @@ public class GuildListener extends ListenerAdapter {
     @Override
     public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         try {
-            DBOperations.insertEmotes(event.getEmoji());
+            Bootstrap.holo.getEmoteManager().insertEmotes(event.getEmoji());
         } catch (SQLException ex) {
             logError("Something went wrong while storing the new emoji in the DB.", ex);
         }
