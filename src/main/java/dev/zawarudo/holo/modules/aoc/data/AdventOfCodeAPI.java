@@ -20,6 +20,8 @@ import java.util.List;
 
 public final class AdventOfCodeAPI {
 
+    private static final String BASE_URL = "https://adventofcode.com";
+
     private static final Logger LOGGER = LoggerFactory.getLogger(AdventOfCodeAPI.class);
     private static int year;
 
@@ -40,7 +42,7 @@ public final class AdventOfCodeAPI {
     }
 
     private static JsonObject fetchJson(int year, int leaderboardId, String sessionKey) throws APIException {
-        String url = String.format("https://adventofcode.com/%d/leaderboard/private/view/%d.json", year, leaderboardId);
+        String url = String.format("%s/%d/leaderboard/private/view/%d.json", BASE_URL, year, leaderboardId);
 
         CookieHandler.setDefault(new CookieManager());
         HttpCookie cookie = new HttpCookie("session", sessionKey);
@@ -49,7 +51,7 @@ public final class AdventOfCodeAPI {
 
         String body;
         try {
-            ((CookieManager) CookieHandler.getDefault()).getCookieStore().add(new URI("https://adventofcode.com"), cookie);
+            ((CookieManager) CookieHandler.getDefault()).getCookieStore().add(new URI(BASE_URL), cookie);
             HttpClient client = HttpClient.newBuilder().cookieHandler(CookieHandler.getDefault()).connectTimeout(Duration.ofSeconds(10)).build();
             HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).GET().setHeader("Content-Type", "application/json").build();
             HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());

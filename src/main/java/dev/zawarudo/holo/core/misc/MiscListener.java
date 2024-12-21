@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.core.misc;
 
-import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -27,8 +28,9 @@ public class MiscListener extends ListenerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(MiscListener.class);
 
     public MiscListener() {
+        EmoteManager emoteManager = Bootstrap.holo.getEmoteManager();
         try {
-            existingEmotes = DBOperations.getEmoteIds();
+            existingEmotes = emoteManager.getEmoteIds();
         } catch (SQLException ex) {
             throw new IllegalStateException("Something went wrong while fetching the emote ids from the database.");
         }
@@ -73,16 +75,20 @@ public class MiscListener extends ListenerAdapter {
     }
 
     private void storeNewEmotesInDatabase(CustomEmoji... emotes) {
+        EmoteManager emoteManager = Bootstrap.holo.getEmoteManager();
+
+        List<CustomEmoji> newEmotes = Arrays.stream(emotes)
+                .filter(e -> !existingEmotes.contains(e.getIdLong()))
+                .toList();
+
+        if (newEmotes.isEmpty()) return;
+
         try {
-            DBOperations.insertEmotes(
-                    Arrays.stream(emotes)
-                            .filter(e -> !existingEmotes.contains(e.getIdLong()))
-                            .toArray(CustomEmoji[]::new)
-            );
+            emoteManager.insertEmotes(newEmotes.toArray(CustomEmoji[]::new));
+            existingEmotes.addAll(newEmotes.stream().map(ISnowflake::getIdLong).toList());
+            LOGGER.info("Successfully stored {} new emotes.", newEmotes.size());
         } catch (SQLException ex) {
             LOGGER.error("Something went wrong while storing new emotes.", ex);
         }
-
-        existingEmotes.addAll(Arrays.stream(emotes).map(ISnowflake::getIdLong).toList());
     }
 }
