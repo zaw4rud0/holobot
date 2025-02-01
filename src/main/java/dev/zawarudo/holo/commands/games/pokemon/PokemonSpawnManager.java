@@ -1,8 +1,8 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
 import dev.zawarudo.holo.core.Bootstrap;
-import dev.zawarudo.holo.modules.pokeapi.PokeAPI;
-import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
+import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.utils.ImageOperations;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import net.dv8tion.jda.api.EmbedBuilder;
