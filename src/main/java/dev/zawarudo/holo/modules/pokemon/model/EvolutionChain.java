@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.modules.pokeapi.model;
+package dev.zawarudo.holo.modules.pokemon.model;
 
 import com.google.gson.annotations.SerializedName;
 

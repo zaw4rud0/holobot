@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
-import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
+import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.utils.ImageOperations;
 import org.jetbrains.annotations.NotNull;
 

@@ -45,7 +45,7 @@ public final class Anime extends AbstractMedium<Anime> {
     }
 
     /**
-     * Whether this anime is currently airing.
+     * Checks whether this anime is currently airing.
      */
     public boolean isAiring() {
         return airing;
@@ -70,6 +70,11 @@ public final class Anime extends AbstractMedium<Anime> {
         return broadcast;
     }
 
+    /**
+     * Changes the time zone of the broadcast information to the specified one.
+     *
+     * @param timeZone The time zone to show broadcast information in.
+     */
     public void changeBroadcastTimeZone(String timeZone) {
         broadcast = broadcast.convertToTimeZone(timeZone);
     }

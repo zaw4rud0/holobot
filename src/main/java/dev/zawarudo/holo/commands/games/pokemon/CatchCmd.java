@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
-import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
-import dev.zawarudo.holo.modules.pokeapi.model.PokemonSpecies;
+import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
+import dev.zawarudo.holo.modules.pokemon.model.PokemonSpecies;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;

@@ -1,11 +1,11 @@
-package dev.zawarudo.holo.modules.pokeapi;
+package dev.zawarudo.holo.modules.pokemon;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.zawarudo.holo.modules.pokeapi.model.Pokemon;
-import dev.zawarudo.holo.modules.pokeapi.model.PokemonSpecies;
-import dev.zawarudo.holo.modules.pokeapi.model.PokemonType;
+import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
+import dev.zawarudo.holo.modules.pokemon.model.PokemonSpecies;
+import dev.zawarudo.holo.modules.pokemon.model.PokemonType;
 import dev.zawarudo.holo.utils.HttpResponse;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import dev.zawarudo.holo.utils.exceptions.NotFoundException;

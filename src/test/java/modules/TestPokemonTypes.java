@@ -1,7 +1,7 @@
 package modules;
 
-import dev.zawarudo.holo.modules.pokeapi.PokeAPI;
-import dev.zawarudo.holo.modules.pokeapi.model.PokemonType;
+import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.model.PokemonType;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
