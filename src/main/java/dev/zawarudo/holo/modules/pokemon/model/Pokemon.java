@@ -1,7 +1,7 @@
-package dev.zawarudo.holo.modules.pokeapi.model;
+package dev.zawarudo.holo.modules.pokemon.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.zawarudo.holo.modules.pokeapi.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeAPI;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import org.jetbrains.annotations.NotNull;
