@@ -194,7 +194,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
 
     private String extractLink(Element element) {
         Element titleElement = element.selectFirst("a.word");
-        return (titleElement != null) ? BASE_URL + titleElement.attr("href") : null;
+        return (titleElement != null) ? BASE_URL + titleElement.attr("href").replace(" ", "%20") : null;
     }
 
     /**
