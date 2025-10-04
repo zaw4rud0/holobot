@@ -184,10 +184,20 @@ public class CommandListener extends ListenerAdapter {
     }
 
     private void checkEmoteInvoke(MessageReceivedEvent event, String invoke) {
-
-        // TODO: Check if bot has webhook permission
-
         try {
+            // Only guild channels support webhooks
+            if (!event.isFromGuild()) {
+                return;
+            }
+
+            // Check MANAGE_WEBHOOKS permission
+            if (!PermissionUtil.checkPermission(
+                    event.getGuildChannel().getPermissionContainer(),
+                    event.getGuild().getSelfMember(),
+                    Permission.MANAGE_WEBHOOKS)) {
+                return;
+            }
+
             Optional<CustomEmoji> emoteOptional = Bootstrap.holo.getEmoteManager().getEmoteByName(invoke);
             if (emoteOptional.isPresent()) {
                 CustomEmoji emote = emoteOptional.get();
