@@ -49,6 +49,7 @@ public enum Emote {
     PISTOL("🔫"),
     SAW("🔪"),
     WRENCH("🔧"),
+    TRASH_BIN("🗑️"),
 
     // Arrows and traffic signs
     ARROW_UP("⬆"),
@@ -87,6 +88,7 @@ public enum Emote {
     HUNDRED("💯"),
 
     // Signs and warnings
+    CROSS("❌"),
     WARNING("⚠"),
     NO_ENTRY("⛔"),
     PROHIBITED("🚫"),
@@ -104,7 +106,7 @@ public enum Emote {
 
     // Akinator emotes
     TICK("<:tick:824297786102644757>"),
-    CROSS("<:cross:824297739377573910>"),
+    CROSS2("<:cross:824297739377573910>"),
     UNDO("<:undo:824289332688060416>"),
     CONTINUE("<:continue:824749379842998283>"),
 

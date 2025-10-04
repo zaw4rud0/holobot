@@ -8,12 +8,13 @@ import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.components.actionrow.ActionRow;
+import net.dv8tion.jda.api.components.buttons.Button;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.jetbrains.annotations.NotNull;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -69,18 +70,18 @@ public class UrbanDictionaryCmd extends AbstractCommand {
     }
 
     private void sendUrbanDictionaryEntries(MessageReceivedEvent event, List<UrbanEntry> entries) {
-        Button[] buttons = {
+        List<Button> buttons = new ArrayList<>(List.of(
                 Button.primary("prev", Emote.ARROW_LEFT.getAsEmoji()),
-                //Button.danger("exit", "❌"),
+                Button.danger("exit", Emote.TRASH_BIN.getAsEmoji()),
                 Button.primary("next", Emote.ARROW_RIGHT.getAsEmoji())
-        };
+        ));
         setButtonStates(buttons, 0, entries.size() - 1);
-        EmbedBuilder builder = createUrbanEmbed(entries.get(0), 0, entries.size());
-        Message msg = event.getMessage().replyEmbeds(builder.build()).setActionRow(buttons).complete();
+        EmbedBuilder builder = createUrbanEmbed(entries.getFirst(), 0, entries.size());
+        Message msg = event.getMessage().replyEmbeds(builder.build()).addComponents(ActionRow.of(buttons)).complete();
         awaitUserSelection(msg, event.getAuthor(), 0, entries, buttons);
     }
 
-    private void awaitUserSelection(Message msg, User caller, int index, List<UrbanEntry> entries, Button[] buttons) {
+    private void awaitUserSelection(Message msg, User caller, int index, List<UrbanEntry> entries, List<Button> buttons) {
         waiter.waitForEvent(
                 ButtonInteractionEvent.class,
                 evt -> isReactionValid(evt, msg, caller),
@@ -102,18 +103,44 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         return true;
     }
 
-    private void handleReaction(ButtonInteractionEvent buttonEvent, int index, List<UrbanEntry> entries, Button[] buttons, User caller) {
-        index = buttonEvent.getButton().getId().equals("prev") ? Math.max(0, index - 1) : Math.min(entries.size() - 1, index + 1);
+    private void handleReaction(ButtonInteractionEvent buttonEvent, int index, List<UrbanEntry> entries, List<Button> buttons, User caller) {
+        String id = buttonEvent.getButton().getCustomId();
+
+        // Immediate delete
+        if ("exit".equals(id)) {
+            buttonEvent.deferEdit().queue(
+                    s -> buttonEvent.getMessage().delete().queue(),
+                    e -> {}
+            );
+            return;
+        }
+
+        // Prev / next logic
+        if ("prev".equals(id)) {
+            index = Math.max(0, index - 1);
+        } else {
+            index = Math.min(entries.size() - 1, index + 1);
+        }
+
         setButtonStates(buttons, index, entries.size() - 1);
         EmbedBuilder builder = createUrbanEmbed(entries.get(index), index, entries.size());
+
         buttonEvent.deferEdit().queue(s -> {}, e -> {});
-        Message msg = buttonEvent.getMessage().editMessageEmbeds(builder.build()).setActionRow(buttons).complete();
+        Message msg = buttonEvent.getMessage().editMessageEmbeds(builder.build()).setComponents(ActionRow.of(buttons)).complete();
+
+        // Keep waiting for prev/next
         awaitUserSelection(msg, caller, index, entries, buttons);
     }
 
-    private void setButtonStates(Button[] buttons, int index, int maxIndex) {
-        buttons[0] = buttons[0].withDisabled(index == 0);
-        buttons[1] = buttons[1].withDisabled(index == maxIndex);
+    private void setButtonStates(List<Button> buttons, int index, int maxIndex) {
+        for (int i = 0; i < buttons.size(); i++) {
+            Button btn = buttons.get(i);
+            if ("prev".equals(btn.getCustomId())) {
+                buttons.set(i, btn.withDisabled(index == 0));
+            } else if ("next".equals(btn.getCustomId())) {
+                buttons.set(i, btn.withDisabled(index == maxIndex));
+            }
+        }
     }
 
     private EmbedBuilder createUrbanEmbed(UrbanEntry entry, int index, int total) {
