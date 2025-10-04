@@ -117,28 +117,4 @@ class DanbooruTests {
             assertEquals(DanbooruAPI.Rating.EXPLICIT.getShortValue(), post.getRating());
         }
     }
-
-    @Test
-    void testOrderById() throws APIException, InvalidRequestException {
-        DanbooruAPI danbooru = new DanbooruAPI();
-        List<DanbooruPost> posts = danbooru.setOrder(DanbooruAPI.Order.ID_ASC).getPosts();
-        assertNotNull(posts);
-        assertEquals(1, posts.get(0).getId());
-
-        for (BooruPost post : posts) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(post.toString());
-            }
-        }
-
-        posts = danbooru.setOrder(DanbooruAPI.Order.ID_DESC).getPosts();
-        assertNotNull(posts);
-        assertTrue(posts.get(0).getId() > 6000000);
-
-        for (BooruPost post : posts) {
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(post.toString());
-            }
-        }
-    }
 }

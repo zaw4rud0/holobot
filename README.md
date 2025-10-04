@@ -10,7 +10,7 @@ Coming soon!
 
 ### Prerequisites
 
-- Java JDK 17
+- Java JDK 21
 - Maven
 - Discord developer account and a Discord bot token
 
