@@ -82,7 +82,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.2.1</version>
+            <version>5.6.1</version>
         </dependency>
 
         <!-- Maintained version of JDA Utilities -->
@@ -154,7 +154,7 @@
         <dependency>
             <groupId>org.kohsuke</groupId>
             <artifactId>github-api</artifactId>
-            <version>1.327</version>
+            <version>1.330</version>
         </dependency>
 
         <!-- Logging stuff -->
@@ -217,7 +217,7 @@
         <dependency>
             <groupId>commons-validator</groupId>
             <artifactId>commons-validator</artifactId>
-            <version>1.9.0</version>
+            <version>1.10.0</version>
         </dependency>
 
         <!-- Used to get dominant color and representative color palette of an image -->
@@ -225,6 +225,13 @@
             <groupId>de.androidpit</groupId>
             <artifactId>color-thief</artifactId>
             <version>1.1.2</version>
+        </dependency>
+
+        <!-- Useful notations, such as @Nonnull -->
+        <dependency>
+            <groupId>com.google.code.findbugs</groupId>
+            <artifactId>jsr305</artifactId>
+            <version>3.0.2</version>
         </dependency>
     </dependencies>
 
