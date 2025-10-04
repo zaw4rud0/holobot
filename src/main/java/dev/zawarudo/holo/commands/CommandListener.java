@@ -13,16 +13,16 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.internal.utils.PermissionUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static dev.zawarudo.holo.utils.LoggingUtils.withMdc;
 
 /**
  * Class that listens to messages and checks if a bot command has been called. If that's
@@ -36,6 +36,7 @@ public class CommandListener extends ListenerAdapter {
     private final ExecutorService executorService;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListener.class);
+    private static final Logger AUDIT = LoggerFactory.getLogger("audit");
 
     public CommandListener(CommandManager cmdManager, PermissionManager permManager) {
         this.cmdManager = cmdManager;
@@ -51,25 +52,41 @@ public class CommandListener extends ListenerAdapter {
             return;
         }
 
+        final String prefix = getPrefix(event);
+        final String rawMsg = event.getMessage().getContentRaw();
+
         // Ignore messages without the bot prefix
-        if (!event.getMessage().getContentRaw().startsWith(getPrefix(event))
-                || event.getMessage().getContentRaw().equals(getPrefix(event))) {
+        if (!rawMsg.startsWith(prefix) || rawMsg.equals(prefix)) {
             return;
         }
 
-        String rawMessage = event.getMessage().getContentRaw()
-                .replaceFirst("(?i)" + Pattern.quote(getPrefix(event)), "");
-        List<String> split = parseArguments(rawMessage);
-
+        String withoutPrefix = rawMsg.replaceFirst("(?i)" + Pattern.quote(prefix), "");
+        List<String> split = parseArguments(withoutPrefix);
+        if (split.isEmpty()) {
+            return;
+        }
         String invoke = split.get(0).toLowerCase(Locale.UK);
+
+        // Build MDC context for logging
+        Map<String, String> mdc = new HashMap<>();
+        mdc.put("guildId", event.isFromGuild() ? event.getGuild().getId() : "DM");
+        mdc.put("channelId", event.getChannel().getId());
+        mdc.put("userId", event.getAuthor().getId());
+        mdc.put("command", invoke);
 
         // Action cmd has been called
         ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
         if (actionCmd.isAction(invoke)) {
-            LOGGER.info("{} has called action ({})", event.getAuthor(), invoke);
-
+            MDC.setContextMap(mdc);
+            try {
+                AUDIT.info("Action command invoked");
+                LOGGER.info("Action command invoked");
+            } finally {
+                MDC.clear();
+            }
             actionCmd.args = split.subList(1, split.size()).toArray(new String[0]);
             actionCmd.displayAction(event, actionCmd.getAction(invoke));
+            return;
         }
 
         // No valid command
@@ -85,15 +102,18 @@ public class CommandListener extends ListenerAdapter {
             return;
         }
 
-        LOGGER.info("{} has called {}", event.getAuthor(), cmd.getName());
-
-        if (split.size() > 1) {
-            cmd.args = split.subList(1, split.size()).toArray(new String[0]);
-        } else {
-            cmd.args = new String[0];
+        // Log the call with MDC
+        MDC.setContextMap(mdc);
+        try {
+            AUDIT.info("Command invoked");
+            LOGGER.info("Command invoked");
+        } finally {
+            MDC.clear();
         }
 
-        executorService.submit(() -> {
+        cmd.args = (split.size() > 1) ? split.subList(1, split.size()).toArray(new String[0]) : new String[0];
+
+        executorService.submit(withMdc(mdc, () -> {
             try {
                 cmd.onCommand(event);
             } catch (InsufficientPermissionException ex) {
@@ -101,7 +121,7 @@ public class CommandListener extends ListenerAdapter {
             } catch (Exception ex) {
                 LOGGER.error("An error occurred while executing a command.", ex);
             }
-        });
+        }));
     }
 
     private String getPrefix(MessageReceivedEvent e) {
@@ -164,6 +184,9 @@ public class CommandListener extends ListenerAdapter {
     }
 
     private void checkEmoteInvoke(MessageReceivedEvent event, String invoke) {
+
+        // TODO: Check if bot has webhook permission
+
         try {
             Optional<CustomEmoji> emoteOptional = Bootstrap.holo.getEmoteManager().getEmoteByName(invoke);
             if (emoteOptional.isPresent()) {
