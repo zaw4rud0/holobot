@@ -23,8 +23,4 @@ jobs:
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
       - name: Jib build to GHCR
-        run: |
-          mvn -B -DskipTests \
-            com.google.cloud.tools:jib-maven-plugin:3.4.6:build \
-            -Djib.to.image=ghcr.io/zaw4rud0/holobot \
-            -Djib.to.tags="${{ steps.ver.outputs.VERSION }},latest"
+        run: mvn -B -DskipTests com.google.cloud.tools:jib-maven-plugin:3.4.6:build
