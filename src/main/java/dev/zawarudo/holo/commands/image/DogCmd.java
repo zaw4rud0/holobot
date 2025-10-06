@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
         category = CommandCategory.IMAGE)
 public class DogCmd extends AbstractCommand {
 
-    private static final String PATH = "./resources/dog-breeds.json";
+    private static final String PATH = "./data/dog-breeds.json";
     private final String[] breeds;
     private final Map<String, String> formattedNames;
 

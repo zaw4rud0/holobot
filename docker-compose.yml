@@ -7,7 +7,6 @@ services:
       TZ: Europe/Zurich
     volumes:
       - ./data:/app/data  # persists DB on host
-      - ./resources:/app/resources
     restart: unless-stopped
     working_dir: /app
     command: ["java", "-jar", "holobot.jar"]
