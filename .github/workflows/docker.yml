@@ -19,10 +19,6 @@ jobs:
           java-version: '21'
           cache: maven
 
-      - name: Read version
-        id: ver
-        run: echo "VERSION=$(xmllint --xpath 'string(//project/version)' pom.xml)" >> $GITHUB_OUTPUT
-
       - name: Login to GHCR
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.repository_owner }} --password-stdin
 
