@@ -4,8 +4,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 /**
  * Simple script to be run after cloning to ensure all needed files are in place. If
@@ -17,39 +18,30 @@ public class Setup {
 
     public static void main(String[] args) throws IOException {
         logInfo("Running setup...");
-        createConfigIfMissing();
+        createEnvIfMissing();
         createDatabaseIfMissing();
     }
 
-    private static void createConfigIfMissing() throws IOException {
-        // TODO: Make copy of .env.example instead
+    private static void createEnvIfMissing() throws IOException {
+        File envFile = new File(".env");
+        File exampleFile = new File(".env.example");
 
-        File file = new File("config.json");
-        if (!file.exists()) {
-            logInfo("Config file is missing. Creating a new one with default settings...");
-            try (FileWriter writer = new FileWriter(file)) {
-                writer.write(getDefaultConfigString());
+        if (!envFile.exists()) {
+            if (!exampleFile.exists()) {
+                logError("Missing .env and .env.example — cannot create configuration automatically!");
+                return;
             }
-            logInfo("Created a new config file. Please open it and replace the placeholder values.");
+
+            logInfo(".env file is missing. Creating a new one from .env.example...");
+            Files.copy(exampleFile.toPath(), envFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            logInfo("Created new .env file. Please edit it and fill in your actual tokens and API keys.");
+        } else {
+            logInfo(".env file found. Using existing configuration.");
         }
     }
 
-    @Deprecated
-    private static String getDefaultConfigString() {
-        return """
-                {
-                    "token" : "BOT_TOKEN",
-                	"owner_id" : OWNER_ID,
-                    "default_prefix" : ",",
-                    "version" : "VERSION",
-                    "deepAI_token" : "DEEPAI_TOKEN",
-                    "aoc_token" : "AOC_TOKEN"
-                }
-                """;
-    }
-
     private static void createDatabaseIfMissing() {
-        File file = new File("src/main/resources/database/Holo.db");
+        File file = new File("src/main/resources/database/holobot.db");
         if (!file.exists()) {
             logInfo("Database is missing. Creating a new one...");
 
@@ -60,6 +52,12 @@ public class Setup {
     private static void logInfo(String infoString) {
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info(infoString);
+        }
+    }
+
+    private static void logError(String errorString) {
+        if (LOGGER.isErrorEnabled()) {
+            LOGGER.error(errorString);
         }
     }
 }

@@ -1,119 +1,238 @@
 package dev.zawarudo.holo.core;
 
-import com.google.gson.annotations.SerializedName;
-
 /**
- * Class that stores the configuration for the bot.
+ * Immutable configuration for the Holo bot.
+ * <p>
+ * Prefer building this from environment variables (e.g., Docker Compose)
+ * or a secure secret source. This class is deliberately immutable to
+ * prevent accidental runtime mutation of sensitive settings.
  */
-public class BotConfig {
-    @SerializedName("token")
-    private String botToken = "BOT_TOKEN";
-    @SerializedName("owner_id")
-    private long ownerId;
+public final class BotConfig {
 
-    // External settings and tokens
-    @SerializedName("deepAI_token")
-    private String deepAIKey = "DEEP_AI_KEY";
-    @SerializedName("aoc_token")
-    private String aocToken = "AOC_SESSION_KEY";
-    @SerializedName("saucenao_token")
-    private String saucenaoToken = "SAUCENAO_TOKEN";
-    @SerializedName("github_token")
-    private String githubToken = "GITHUB_TOKEN";
+    private final String botToken;
+    private final long ownerId;
 
-    // Minor bot properties
-    @SerializedName("default_prefix")
-    private String defaultPrefix = "<";
-    @SerializedName("version")
-    private String version = "1.0.0";
+    private final String deepAIKey;
+    private final String aocToken;
+    private final String saucenaoToken;
+    private final String githubToken;
+    private final String dictionaryKey;
+    private final String thesaurusKey;
 
-    /**
-     * Retrieves the Discord bot token. Each bot has a unique token which should
-     * never be shared with anyone.
-     *
-     * @return The bot token as a String.
-     */
+    private final String defaultPrefix;
+    private final String version;
+    private final String dbPath;
+
+    private BotConfig(
+            String botToken,
+            long ownerId,
+            String deepAIKey,
+            String aocToken,
+            String saucenaoToken,
+            String githubToken,
+            String dictionaryKey,
+            String thesaurusKey,
+            String defaultPrefix,
+            String version,
+            String dbPath
+    ) {
+        this.botToken = requireNonBlank(botToken, "botToken");
+        this.ownerId = ownerId;
+        this.deepAIKey = nullToEmpty(deepAIKey);
+        this.aocToken = nullToEmpty(aocToken);
+        this.saucenaoToken = nullToEmpty(saucenaoToken);
+        this.githubToken = nullToEmpty(githubToken);
+        this.dictionaryKey = dictionaryKey;
+        this.thesaurusKey = thesaurusKey;
+        this.defaultPrefix = defaultPrefix == null || defaultPrefix.isBlank() ? "<" : defaultPrefix;
+        this.version = version == null || version.isBlank() ? "1.0.0" : version;
+        this.dbPath = dbPath;
+    }
+
+    /** Discord bot token. */
     public String getBotToken() {
         return botToken;
     }
 
-    /**
-     * Retrieves the Discord user id of the bot owner. This is used to check if a
-     * user has permission to use certain commands of the bot.
-     *
-     * @return The Discord user id as a long.
-     */
+    /** Discord user ID of the bot owner. */
     public long getOwnerId() {
         return ownerId;
     }
 
-    /**
-     * Retrieves the DeepAI API key. The key is required to use the various endpoints
-     * of the DeepAI API.
-     *
-     * @return The DeepAI API key as a String.
-     */
-    public String getKeyDeepAI() {
+    /** DeepAI API key. */
+    public String getDeepAIKey() {
         return deepAIKey;
     }
 
-    /**
-     * Retrieves the API key of the Advent of Code (AoC) website. The key is required
-     * to get data from there, such as the leaderboard.
-     *
-     * @return The AoC API key as a String.
-     */
-    public String getAoCToken() {
+    /** Advent of Code session token. */
+    public String getAocToken() {
         return aocToken;
     }
 
-    /**
-     * Returns the token of SauceNAO.
-     */
+    /** SauceNAO token. */
     public String getSaucenaoToken() {
         return saucenaoToken;
     }
 
-    /**
-     * Returns the GitHub token needed to connect with the GitHub repository of the bot.
-     */
+    /** GitHub token. */
     public String getGitHubToken() {
         return githubToken;
     }
 
-    /**
-     * Returns the default prefix of the bot. The prefix is used to call commands.
-     *
-     * @return The default prefix as a String.
-     */
+    /** Dictionary key. */
+    public String getDictionaryKey() {
+        return dictionaryKey;
+    }
+
+    /** Thesaurus key. */
+    public String getThesaurusKey() {
+        return thesaurusKey;
+    }
+
+    /** Default command prefix (defaults to {@code "<"}). */
     public String getDefaultPrefix() {
         return defaultPrefix;
     }
 
-    /**
-     * Sets a new default prefix for the bot. The prefix is used to call commands.
-     *
-     * @param prefix The new default prefix as a String.
-     */
-    public void setDefaultPrefix(String prefix) {
-        this.defaultPrefix = prefix;
-    }
-
-    /**
-     * Returns the current version of the bot.
-     *
-     * @return The current bot version as a String.
-     */
+    /** Bot version string (defaults to {@code "1.0.0"}). */
     public String getVersion() {
         return version;
     }
 
     /**
-     * Sets a new version for the bot.
-     *
-     * @param version The new bot version as a String.
+     * Path to the database.
      */
-    public void setVersion(String version) {
-        this.version = version;
+    public String getDbPath() {
+        return dbPath;
+    }
+
+    /**
+     * Convenience builder for {@link BotConfig}.
+     */
+    public static final class Builder {
+        private String botToken;
+        private Long ownerId;
+        private String deepAIKey;
+        private String aocToken;
+        private String saucenaoToken;
+        private String githubToken;
+        private String dictionaryKey;
+        private String thesaurusKey;
+        private String defaultPrefix = "<";
+        private String version = "1.0.0";
+        private String dbPath;
+
+        public Builder botToken(String botToken) {
+            this.botToken = botToken;
+            return this;
+        }
+
+        public Builder ownerId(long ownerId) {
+            this.ownerId = ownerId;
+            return this;
+        }
+
+        public Builder deepAIKey(String deepAIKey) {
+            this.deepAIKey = deepAIKey;
+            return this;
+        }
+
+        public Builder aocToken(String aocToken) {
+            this.aocToken = aocToken;
+            return this;
+        }
+
+        public Builder saucenaoToken(String saucenaoToken) {
+            this.saucenaoToken = saucenaoToken;
+            return this;
+        }
+
+        public Builder githubToken(String githubToken) {
+            this.githubToken = githubToken;
+            return this;
+        }
+
+        public Builder dictionaryKey(String dictionaryKey) {
+            this.dictionaryKey = dictionaryKey;
+            return this;
+        }
+
+        public Builder thesaurusKey(String thesaurusKey) {
+            this.thesaurusKey = thesaurusKey;
+            return this;
+        }
+
+        public Builder defaultPrefix(String defaultPrefix) {
+            this.defaultPrefix = defaultPrefix;
+            return this;
+        }
+
+        public Builder version(String version) {
+            this.version = version;
+            return this;
+        }
+
+        public Builder dbPath(String dbPath) {
+            this.dbPath = dbPath;
+            return this;
+        }
+
+        public BotConfig build() {
+            if (ownerId == null) {
+                throw new IllegalStateException("ownerId is required");
+            }
+            return new BotConfig(
+                    botToken,
+                    ownerId,
+                    deepAIKey,
+                    aocToken,
+                    saucenaoToken,
+                    githubToken,
+                    dictionaryKey,
+                    thesaurusKey,
+                    defaultPrefix,
+                    version,
+                    dbPath
+            );
+        }
+    }
+
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    @Override
+    public String toString() {
+        // Mask secrets to avoid leaking them in logs
+        return "BotConfig{" +
+                "botToken=" + mask(botToken) +
+                ", ownerId=" + ownerId +
+                ", deepAIKey=" + mask(deepAIKey) +
+                ", aocToken=" + mask(aocToken) +
+                ", saucenaoToken=" + mask(saucenaoToken) +
+                ", githubToken=" + mask(githubToken) +
+                ", dictionaryKey=" + mask(dictionaryKey) +
+                ", thesaurusKey=" + mask(thesaurusKey) +
+                ", defaultPrefix='" + defaultPrefix + '\'' +
+                ", version='" + version + '\'' +
+                ", dbPath='" + dbPath + '\'' +
+                '}';
+    }
+
+    private static String requireNonBlank(String v, String name) {
+        if (v == null || v.isBlank()) {
+            throw new IllegalArgumentException(name + " must be provided and non-blank");
+        }
+        return v;
+    }
+
+    private static String nullToEmpty(String v) {
+        return v == null ? "" : v;
+    }
+
+    static String mask(String v) {
+        if (v == null || v.isBlank()) return "";
+        int keep = Math.min(4, v.length());
+        return "*".repeat(Math.max(0, v.length() - keep)) + v.substring(v.length() - keep);
     }
 }

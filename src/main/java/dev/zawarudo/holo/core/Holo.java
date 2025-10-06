@@ -64,9 +64,16 @@ public class Holo extends ListenerAdapter {
 		jda = builder.build();
 	}
 
+	public void registerEarlyManagers() {
+		try {
+			this.sqlManager = new SQLManager();
+		} catch (IOException e) {
+			throw new IllegalStateException("Failed to initialize early managers", e);
+		}
+	}
+
 	public void registerManagers() {
 		try {
-			sqlManager = new SQLManager();
 			gitHubClient = new GitHubClient(botConfig.getGitHubToken());
 		} catch (IOException e) {
 			throw new IllegalStateException("Something went wrong while registering managers.", e);

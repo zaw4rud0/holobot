@@ -662,11 +662,56 @@ public final class DBOperations {
     }
 
     public static void createNewDatabase() throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("create-database");
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.execute();
+        String script = Bootstrap.holo.getSQLManager().getStatement("create-database");
+        try (Connection conn = Database.getConnection()) {
+            runSqlScript(conn, script);
         }
-        conn.close();
+    }
+
+    private static void runSqlScript(Connection conn, String script) throws SQLException {
+        // Optional but recommended for SQLite
+        try (var pragma = conn.createStatement()) {
+            pragma.execute("PRAGMA foreign_keys = ON");
+        }
+
+        java.util.List<String> statements = new java.util.ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inSingle = false, inDouble = false;
+
+        for (int i = 0; i < script.length(); i++) {
+            char c = script.charAt(i);
+            if (c == '\'' && !inDouble) {
+                inSingle = !inSingle;
+            } else if (c == '"' && !inSingle) {
+                inDouble = !inDouble;
+            }
+
+            if (c == ';' && !inSingle && !inDouble) {
+                String stmt = current.toString().trim();
+                if (!stmt.isBlank()) statements.add(stmt);
+                current.setLength(0);
+            } else {
+                current.append(c);
+            }
+        }
+        String tail = current.toString().trim();
+        if (!tail.isBlank()) statements.add(tail);
+
+        // Execute all statements in a transaction
+        boolean origAuto = conn.getAutoCommit();
+        conn.setAutoCommit(false);
+        try (var st = conn.createStatement()) {
+            for (String sql : statements) {
+                // skip single-line comments (optional)
+                String trimmed = sql.replaceAll("(?m)^\\s*--.*$", "").trim();
+                if (!trimmed.isBlank()) st.execute(trimmed);
+            }
+            conn.commit();
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(origAuto);
+        }
     }
 }

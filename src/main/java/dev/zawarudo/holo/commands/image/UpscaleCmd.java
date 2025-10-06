@@ -64,7 +64,7 @@ public class UpscaleCmd extends AbstractCommand {
      * @return The URL of the upscaled image.
      */
     public static String process(String url) throws IOException {
-        String token = Bootstrap.holo.getConfig().getKeyDeepAI();
+        String token = Bootstrap.holo.getConfig().getDeepAIKey();
         ProcessBuilder processBuilder = new ProcessBuilder(
                 "curl",
                 "-F",

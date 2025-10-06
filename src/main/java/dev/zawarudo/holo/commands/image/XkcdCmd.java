@@ -41,10 +41,21 @@ public class XkcdCmd extends AbstractCommand {
 
     public XkcdCmd() {
         comics = new HashMap<>();
+
         try {
             List<XkcdComic> list = DBOperations.getXkcdComics();
+
+            if (list == null || list.isEmpty()) {
+                logger.warn("No XKCD comics found in DB.");
+                this.newestIssue = -1;
+                return;
+            }
+
             Collections.sort(list);
-            newestIssue = list.get(list.size() - 1).getIssueNr();
+
+            logger.info("Loaded {} XKCD comics from DB.", list.size());
+            this.newestIssue = list.getLast().getIssueNr();
+
             for (XkcdComic comic : list) {
                 comics.put(comic.getIssueNr(), comic);
             }

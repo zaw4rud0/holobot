@@ -6,6 +6,5 @@ services:
     environment:
       TZ: Europe/Zurich
     volumes:
-      - ./bot.db:/app/bot.db
-      - ./config.json:/app/config.json:ro
+      - ./data:/app/data  # persists DB on host
     restart: unless-stopped

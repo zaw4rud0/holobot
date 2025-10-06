@@ -151,7 +151,7 @@ public class CheckNSFWCmd extends AbstractCommand {
      */
     @NotNull
     public static JsonObject getEvaluation(String imageUrl) throws IOException {
-        String token = Bootstrap.holo.getConfig().getKeyDeepAI();
+        String token = Bootstrap.holo.getConfig().getDeepAIKey();
         Process pr = Runtime.getRuntime().exec("curl -F image=" + imageUrl + " -H api-key:" + token + " " + API_URL);
         String result = new BufferedReader(new InputStreamReader(pr.getInputStream())).lines().collect(Collectors.joining("\n"));
         return JsonParser.parseString(result).getAsJsonObject();
