@@ -66,6 +66,14 @@
                         </environment>
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
+                    <extraDirectories>
+                        <paths>
+                            <path>
+                                <from>${project.basedir}/src/main/resources</from>
+                                <into>/app/classes</into>
+                            </path>
+                        </paths>
+                    </extraDirectories>
                 </configuration>
                 <executions>
                     <execution>
