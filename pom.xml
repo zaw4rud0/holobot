@@ -64,6 +64,7 @@
                         <environment>
                             <TZ>Europe/Zurich</TZ>
                         </environment>
+                        <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
                 </configuration>
                 <executions>

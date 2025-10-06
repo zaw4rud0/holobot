@@ -1,0 +1,12 @@
+version: "3.9"
+
+services:
+  holobot:
+    image: ghcr.io/zaw4rud0/holobot:${IMAGE_TAG:-latest}
+    container_name: holobot
+    env_file: [.env]
+    environment:
+      TZ: Europe/Zurich
+    volumes:
+      - ./data:/app/bot.db
+    restart: unless-stopped
