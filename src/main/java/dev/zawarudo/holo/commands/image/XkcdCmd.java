@@ -47,7 +47,7 @@ public class XkcdCmd extends AbstractCommand {
 
             if (list == null || list.isEmpty()) {
                 logger.warn("No XKCD comics found in DB.");
-                this.newestIssue = -1;
+                this.newestIssue = 0;
                 return;
             }
 
@@ -153,9 +153,17 @@ public class XkcdCmd extends AbstractCommand {
 
         // Store all comics up to the newest issue
         for (int i = newestIssue + 1; i <= num; i++) {
+            // 404 is intentionally missing
+            if (i == 404) {
+                continue;
+            }
+
             XkcdComic newComic;
             try {
                 newComic = XkcdAPI.getComic(i);
+                if (logger.isInfoEnabled()) {
+                    logger.info("Storing comic: {} (#{})", newComic.getTitle(), newComic.getIssueNr());
+                }
             } catch (APIException | InvalidRequestException ex) {
                 if (logger.isErrorEnabled()) {
                     logger.error("Something went wrong while storing the XKCD comics in the DB.", ex);
