@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.image;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import dev.zawarudo.holo.utils.annotations.Command;
-import dev.zawarudo.holo.modules.DogAPI;
+import dev.zawarudo.holo.modules.DogCeoClient;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -68,7 +68,7 @@ public class DogCmd extends AbstractCommand {
     private void sendRandomDogEmbed(MessageReceivedEvent event) {
         String url;
         try {
-            url = DogAPI.getRandomImage();
+            url = DogCeoClient.getRandomImage();
         } catch (APIException ex) {
             sendErrorEmbed(event, "An error occurred while fetching the image from the API. Try again later!");
             if (logger.isErrorEnabled()) {
@@ -102,7 +102,7 @@ public class DogCmd extends AbstractCommand {
     private void sendDogImageEmbed(MessageReceivedEvent event, String breed) {
         String url;
         try {
-            url = DogAPI.getRandomBreedImage(breed);
+            url = DogCeoClient.getRandomBreedImage(breed);
         } catch (APIException | InvalidRequestException ex) {
             sendErrorEmbed(event, "An error occurred while fetching the image from the API. Try again later!");
             if (logger.isErrorEnabled()) {

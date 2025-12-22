@@ -21,9 +21,9 @@ import java.util.Map;
 /**
  * A wrapper class for the <a href="https://dog.ceo/dog-api/">Dog CEO API</a>.
  */
-public final class DogAPI {
+public final class DogCeoClient {
 
-    private DogAPI() {
+    private DogCeoClient() {
     }
 
     /**

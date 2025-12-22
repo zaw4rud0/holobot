@@ -6,12 +6,12 @@ import io.github.cdimascio.dotenv.Dotenv;
 
 import java.io.IOException;
 
-public final class DictionaryApi {
+public final class DictionaryClient {
 
     private static final String DICTIONARY_URL = "https://www.dictionaryapi.com/api/v3/references/collegiate/json/%s?key=%s";
     private static final String THESAURUS_URL = "https://www.dictionaryapi.com/api/v3/references/thesaurus/json/%s?key=%s";
 
-    private DictionaryApi() {
+    private DictionaryClient() {
         throw new UnsupportedOperationException();
     }
 

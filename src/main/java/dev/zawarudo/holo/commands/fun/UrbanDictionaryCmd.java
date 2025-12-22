@@ -2,6 +2,8 @@ package dev.zawarudo.holo.commands.fun;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.core.misc.Emote;
+import dev.zawarudo.holo.modules.urbandictionary.UrbanDictionaryEntry;
+import dev.zawarudo.holo.modules.urbandictionary.UrbanDictionaryScraper;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -16,14 +18,9 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -38,7 +35,7 @@ import java.util.concurrent.TimeUnit;
         category = CommandCategory.MISC)
 public class UrbanDictionaryCmd extends AbstractCommand {
 
-    private static final String BASE_URL = "https://www.urbandictionary.com";
+    private final UrbanDictionaryScraper scraper = new UrbanDictionaryScraper();
 
     private final EventWaiter waiter;
 
@@ -54,9 +51,9 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         }
 
         String searchTerm = getSearchTerm(event.getMessage());
-        List<UrbanEntry> entries;
+        List<UrbanDictionaryEntry> entries;
         try {
-            entries = fetchDefinitions(searchTerm);
+            entries = scraper.fetch(searchTerm);
             if (entries.isEmpty()) {
                 throw new FileNotFoundException();
             }
@@ -69,7 +66,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         }
     }
 
-    private void sendUrbanDictionaryEntries(MessageReceivedEvent event, List<UrbanEntry> entries) {
+    private void sendUrbanDictionaryEntries(MessageReceivedEvent event, List<UrbanDictionaryEntry> entries) {
         List<Button> buttons = new ArrayList<>(List.of(
                 Button.primary("prev", Emote.ARROW_LEFT.getAsEmoji()),
                 Button.danger("exit", Emote.TRASH_BIN.getAsEmoji()),
@@ -77,11 +74,15 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         ));
         setButtonStates(buttons, 0, entries.size() - 1);
         EmbedBuilder builder = createUrbanEmbed(entries.getFirst(), 0, entries.size());
-        Message msg = event.getMessage().replyEmbeds(builder.build()).addComponents(ActionRow.of(buttons)).complete();
-        awaitUserSelection(msg, event.getAuthor(), 0, entries, buttons);
+
+        event.getMessage()
+                .replyEmbeds(builder.build())
+                .addComponents(ActionRow.of(buttons))
+                .queue(msg -> awaitUserSelection(msg, event.getAuthor(), 0, entries, buttons),
+                        err -> sendErrorEmbed(event, "I couldn't send the Urban Dictionary result message."));
     }
 
-    private void awaitUserSelection(Message msg, User caller, int index, List<UrbanEntry> entries, List<Button> buttons) {
+    private void awaitUserSelection(Message msg, User caller, int index, List<UrbanDictionaryEntry> entries, List<Button> buttons) {
         waiter.waitForEvent(
                 ButtonInteractionEvent.class,
                 evt -> isReactionValid(evt, msg, caller),
@@ -103,7 +104,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         return true;
     }
 
-    private void handleReaction(ButtonInteractionEvent evt, int index, List<UrbanEntry> entries, List<Button> buttons, User caller) {
+    private void handleReaction(ButtonInteractionEvent evt, int index, List<UrbanDictionaryEntry> entries, List<Button> buttons, User caller) {
         String id = evt.getButton().getCustomId();
 
         // Immediate delete
@@ -150,20 +151,37 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         }
     }
 
-    private EmbedBuilder createUrbanEmbed(UrbanEntry entry, int index, int total) {
+    private EmbedBuilder createUrbanEmbed(UrbanDictionaryEntry entry, int index, int total) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setThumbnail(getThumbnail());
         embedBuilder.setTitle(entry.term(), entry.link());
         embedBuilder.setFooter(String.format("Page %d / %d", index + 1, total));
         embedBuilder.setColor(getEmbedColor());
+
+        boolean hasContent = false;
+
         if (entry.hasValidDefinition()) {
-            String description = Formatter.truncate(entry.definition, MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            String description = Formatter.truncate(
+                    entry.definition(),
+                    MessageEmbed.DESCRIPTION_MAX_LENGTH
+            );
             embedBuilder.setDescription(description);
+            hasContent = true;
         }
+
         if (entry.hasValidExample()) {
-            String example = Formatter.truncate(entry.example(), MessageEmbed.VALUE_MAX_LENGTH);
+            String example = Formatter.truncate(
+                    entry.example(),
+                    MessageEmbed.VALUE_MAX_LENGTH
+            );
             embedBuilder.addField("Example", example, false);
+            hasContent = true;
         }
+
+        if (!hasContent) {
+            embedBuilder.setDescription("No definition or example available.");
+        }
+
         return embedBuilder;
     }
 
@@ -171,87 +189,5 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         String content = message.getContentRaw();
         int firstSpaceIndex = content.indexOf(" ");
         return content.substring(firstSpaceIndex + 1);
-    }
-
-    private List<UrbanEntry> fetchDefinitions(@NotNull String searchTerm) throws IOException {
-        List<UrbanEntry> list = new ArrayList<>();
-
-        String url = String.format("%s/define.php?term=%s", BASE_URL, Formatter.encodeUrl(searchTerm));
-
-        Document doc = Jsoup.parse(URI.create(url).toURL().openStream(), "UTF-8", url);
-        Elements elements = doc.select("div.definition");
-
-        int max = Math.max(10, elements.size());
-        int counter = 0;
-
-        for (Element element : elements) {
-            if (counter == max) {
-                break;
-            }
-
-            String title = extractTitle(element);
-            String meaning = extractMeaning(element);
-            String example = extractExample(element);
-            String link = extractLink(element);
-
-            UrbanEntry entry = new UrbanEntry(title, meaning, example, link);
-            list.add(entry);
-
-            counter++;
-        }
-
-        return list;
-    }
-
-    private String extractTitle(Element element) {
-        Element titleElement = element.selectFirst("a.word");
-        return (titleElement != null) ? titleElement.wholeText() : null;
-    }
-
-    private String extractMeaning(Element element) {
-        Element meaningElement = element.selectFirst("div.meaning");
-        if (meaningElement != null) {
-            sanitizeLinks(meaningElement);
-            return meaningElement.wholeText();
-        }
-        return null;
-    }
-
-    private String extractExample(Element element) {
-        Element exampleElement = element.selectFirst("div.example");
-        if (exampleElement != null) {
-            sanitizeLinks(exampleElement);
-            return exampleElement.wholeText();
-        }
-        return null;
-    }
-
-    private String extractLink(Element element) {
-        Element titleElement = element.selectFirst("a.word");
-        return (titleElement != null) ? BASE_URL + titleElement.attr("href").replace(" ", "%20") : null;
-    }
-
-    /**
-     * Turns HTML links into Markdown links, so they can be displayed properly in a Discord embed.
-     */
-    private void sanitizeLinks(@NotNull Element element) {
-        for (Element child : element.children()) {
-            if (child.tagName().equals("a")) {
-                String href = BASE_URL + child.attr("href");
-                String linkText = child.text();
-                String markdownLink = "[" + linkText + "](" + href + ")";
-                child.replaceWith(Jsoup.parse(markdownLink));
-            }
-        }
-    }
-
-    private record UrbanEntry(String term, String definition, String example, String link) {
-        public boolean hasValidDefinition() {
-            return definition != null && !definition.trim().isEmpty();
-        }
-
-        public boolean hasValidExample() {
-            return example != null && !example.trim().isEmpty();
-        }
     }
 }
