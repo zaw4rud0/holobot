@@ -56,33 +56,23 @@
                         </tags>
                     </to>
                     <container>
+                        <appRoot>/app</appRoot>
+                        <workingDirectory>/app</workingDirectory>
+
                         <mainClass>dev.zawarudo.holo.core.Bootstrap</mainClass>
+
                         <jvmFlags>
                             <jvmFlag>-XX:+ExitOnOutOfMemoryError</jvmFlag>
                             <jvmFlag>-XX:MaxRAMPercentage=75.0</jvmFlag>
                         </jvmFlags>
+
                         <environment>
                             <TZ>Europe/Zurich</TZ>
                         </environment>
+
                         <creationTime>USE_CURRENT_TIMESTAMP</creationTime>
                     </container>
-                    <extraDirectories>
-                        <paths>
-                            <path>
-                                <from>${project.basedir}/src/main/resources</from>
-                                <into>/app/classes</into>
-                            </path>
-                        </paths>
-                    </extraDirectories>
                 </configuration>
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -92,7 +82,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>6.0.0</version>
+            <version>6.2.0</version>
         </dependency>
 
         <!-- Maintained version of JDA Utilities -->

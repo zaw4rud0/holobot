@@ -1,12 +1,12 @@
 services:
   holobot:
-    image: ghcr.io/zaw4rud0/holobot:${IMAGE_TAG:-latest}
+    image: ghcr.io/zaw4rud0/holobot:latest
     container_name: holobot
-    env_file: [.env]
+    env_file:
+      - .env
     environment:
       TZ: Europe/Zurich
     volumes:
-      - ./data:/app/data  # persists DB on host
+      - ./data:/app/data
+      - ./logs:/app/logs
     restart: unless-stopped
-    working_dir: /app
-    command: ["java", "-jar", "holobot.jar"]
