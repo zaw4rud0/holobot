@@ -20,7 +20,6 @@ public final class BotConfig {
     private final String thesaurusKey;
 
     private final String defaultPrefix;
-    private final String version;
     private final String dbPath;
 
     private BotConfig(
@@ -33,7 +32,6 @@ public final class BotConfig {
             String dictionaryKey,
             String thesaurusKey,
             String defaultPrefix,
-            String version,
             String dbPath
     ) {
         this.botToken = requireNonBlank(botToken, "botToken");
@@ -45,7 +43,6 @@ public final class BotConfig {
         this.dictionaryKey = dictionaryKey;
         this.thesaurusKey = thesaurusKey;
         this.defaultPrefix = defaultPrefix == null || defaultPrefix.isBlank() ? "<" : defaultPrefix;
-        this.version = version == null || version.isBlank() ? "1.0.0" : version;
         this.dbPath = dbPath;
     }
 
@@ -94,11 +91,6 @@ public final class BotConfig {
         return defaultPrefix;
     }
 
-    /** Bot version string (defaults to {@code "1.0.0"}). */
-    public String getVersion() {
-        return version;
-    }
-
     /**
      * Path to the database.
      */
@@ -119,7 +111,6 @@ public final class BotConfig {
         private String dictionaryKey;
         private String thesaurusKey;
         private String defaultPrefix = "<";
-        private String version = "1.0.0";
         private String dbPath;
 
         public Builder botToken(String botToken) {
@@ -167,11 +158,6 @@ public final class BotConfig {
             return this;
         }
 
-        public Builder version(String version) {
-            this.version = version;
-            return this;
-        }
-
         public Builder dbPath(String dbPath) {
             this.dbPath = dbPath;
             return this;
@@ -191,7 +177,6 @@ public final class BotConfig {
                     dictionaryKey,
                     thesaurusKey,
                     defaultPrefix,
-                    version,
                     dbPath
             );
         }
@@ -214,7 +199,6 @@ public final class BotConfig {
                 ", dictionaryKey=" + mask(dictionaryKey) +
                 ", thesaurusKey=" + mask(thesaurusKey) +
                 ", defaultPrefix='" + defaultPrefix + '\'' +
-                ", version='" + version + '\'' +
                 ", dbPath='" + dbPath + '\'' +
                 '}';
     }

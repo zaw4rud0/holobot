@@ -2,7 +2,8 @@ name: Release holobot
 
 on:
   push:
-    branches: ["main"]
+    tags:
+      - "v*"
   workflow_dispatch:
 
 jobs:
@@ -24,6 +25,15 @@ jobs:
           distribution: temurin
           java-version: '21'
           cache: maven
+
+      - name: Verify tag matches pom.xml version
+        run: |
+          TAG="${GITHUB_REF_NAME#v}"
+          POM_VER=$(mvn -q -DforceStdout help:evaluate -Dexpression=project.version)
+          echo "Tag: $TAG | POM: $POM_VER"
+          if [ "$TAG" != "$POM_VER" ]; then
+            echo "Error: Tag ($TAG) must match pom.xml version ($POM_VER)"; exit 1;
+          fi
 
       - name: Build & Push image (Jib -> GHCR)
         env:
@@ -48,6 +58,7 @@ jobs:
           script: |
             set -e
             cd /home/ubuntu/holo
+            export IMAGE_TAG="${GITHUB_REF_NAME#v}"
             docker compose pull
-            docker compose up -d
+            docker compose up -d --remove-orphans
             docker image prune -f

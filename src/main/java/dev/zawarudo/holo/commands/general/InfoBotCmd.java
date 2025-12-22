@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
+import dev.zawarudo.holo.utils.VersionInfo;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
@@ -66,7 +67,7 @@ public class InfoBotCmd extends AbstractCommand {
 		builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"));
 		builder.setDescription(description);
 		builder.addField("Creator", "<@" + Bootstrap.holo.getConfig().getOwnerId() + ">", false);
-		builder.addField("Bot Version", "`" + Bootstrap.holo.getConfig().getVersion() + "`", false);
+		builder.addField("Bot Version", "`" + VersionInfo.getVersion() + "`", false);
 		builder.addField("JDA Version", "`" + JDAInfo.VERSION.replace("_" + JDAInfo.COMMIT_HASH, "") + "`", false);
 		builder.addField("System Information", systemInfo, false);
 		builder.addField("Database Size", "`" + new File(Database.getDbPath()).length() / 1024 / 1024 + "MB`", false);

@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>dev.zawarudo</groupId>
     <artifactId>holobot</artifactId>
-    <version>3.3.6</version>
+    <version>3.3.7</version>
     <name>HoloBot</name>
     <description>Java Discord Bot</description>
     <packaging>jar</packaging>
@@ -28,6 +28,17 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.5.0</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
             </plugin>
 
             <plugin>

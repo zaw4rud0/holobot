@@ -1,6 +1,6 @@
 services:
   holobot:
-    image: ghcr.io/zaw4rud0/holobot:latest
+    image: ghcr.io/zaw4rud0/holobot:${IMAGE_TAG:-latest}
     container_name: holobot
     env_file:
       - .env

@@ -2,6 +2,7 @@ package dev.zawarudo.holo.core;
 
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.database.Database;
+import dev.zawarudo.holo.utils.VersionInfo;
 import io.github.cdimascio.dotenv.Dotenv;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +48,9 @@ public final class Bootstrap {
         LOGGER.info(".env loaded ({} entries)", dotenv.entries().spliterator().getExactSizeIfKnown());
         LOGGER.info("BOT_TOKEN: {}", mask(dotenv.get("BOT_TOKEN")));
         LOGGER.info("OWNER_ID: {}", dotenv.get("OWNER_ID"));
-        LOGGER.info("Version: {}", dotenv.get("BOT_VERSION"));
+
+        String version = VersionInfo.getVersion();
+        LOGGER.info("Version: {}", version);
 
         BotConfig config = buildConfig(dotenv);
 
@@ -72,7 +75,6 @@ public final class Bootstrap {
                 .botToken(require(env, "BOT_TOKEN"))
                 .ownerId(requireLong(env, "OWNER_ID"))
                 .defaultPrefix(env.get("DEFAULT_PREFIX", "<"))
-                .version(env.get("BOT_VERSION", "1.0.0"))
                 .deepAIKey(env.get("DEEP_AI_TOKEN", ""))
                 .aocToken(env.get("AOC_TOKEN", ""))
                 .saucenaoToken(env.get("SAUCE_NAO_TOKEN", ""))
