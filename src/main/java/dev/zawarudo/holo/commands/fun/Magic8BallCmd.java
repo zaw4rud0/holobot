@@ -9,11 +9,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Random;
 
@@ -26,10 +23,17 @@ import java.util.Random;
 public class Magic8BallCmd extends AbstractCommand {
 
     private static final Random RANDOM = new Random();
-    private final List<File> responses;
+    private final List<String> responses;
 
     public Magic8BallCmd() {
-        responses = FileUtils.getAllFiles("src/main/resources/image/8ball");
+        try {
+            responses = FileUtils.getAllResourcePaths("image/8ball", "png", "jpg", "jpeg", "webp");
+            if (responses.isEmpty()) {
+                throw new IllegalStateException("No 8ball images found under classpath: image/8ball");
+            }
+        } catch (IOException e) {
+            throw new IllegalStateException("Failed to load 8ball images from resources", e);
+        }
     }
 
     @Override
@@ -39,24 +43,18 @@ public class Magic8BallCmd extends AbstractCommand {
             return;
         }
 
-        int index = RANDOM.nextInt(responses.size());
-        File response = responses.get(index);
+        String resourcePath = responses.get(RANDOM.nextInt(responses.size()));
 
-        InputStream input;
-
-        try {
-            input = Files.newInputStream(Paths.get(response.getPath()));
-        } catch (IOException ex) {
+        InputStream input = getClass().getClassLoader().getResourceAsStream(resourcePath);
+        if (input == null) {
             sendErrorEmbed(event, "An error occurred while fetching an answer. Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("Something went wrong while getting an answer.", ex);
-            }
             return;
         }
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Magic 8-Ball");
         builder.setImage("attachment://8ball.png");
+
         FileUpload upload = FileUpload.fromData(input, "8ball.png");
         event.getMessage().replyFiles(upload).setEmbeds(builder.build()).queue();
     }
