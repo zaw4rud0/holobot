@@ -136,6 +136,7 @@
         </dependency>
 
         <!-- LavaPlayer -->
+        <!-- TODO: Borked, remove -->
         <dependency>
             <groupId>com.github.walkyst</groupId>
             <artifactId>lavaplayer-fork</artifactId>
@@ -263,10 +264,17 @@
     </distributionManagement>
 
     <repositories>
+        <!-- Repo for JDA -->
         <repository>
             <id>dv8tion</id>
             <name>m2-dv8tion</name>
             <url>https://m2.dv8tion.net/releases</url>
+        </repository>
+        <!-- Repo for jda-chewtils -->
+        <repository>
+            <id>chew</id>
+            <name>m2-chew</name>
+            <url>https://m2.chew.pro/releases</url>
         </repository>
         <repository>
             <id>jitpack</id>
@@ -276,10 +284,6 @@
             <id>jcenter</id>
             <name>jcenter-bintray</name>
             <url>https://jcenter.bintray.com</url>
-        </repository>
-        <repository>
-            <id>chew-m2-snapshots</id>
-            <url>https://m2.chew.pro/snapshots/</url>
         </repository>
         <repository>
             <id>github</id>
