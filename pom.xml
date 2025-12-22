@@ -66,10 +66,12 @@
                             <tag>latest</tag>
                         </tags>
                     </to>
+
+                    <containerizingMode>packaged</containerizingMode>
+
                     <container>
                         <appRoot>/app</appRoot>
                         <workingDirectory>/app</workingDirectory>
-
                         <mainClass>dev.zawarudo.holo.core.Bootstrap</mainClass>
 
                         <jvmFlags>
