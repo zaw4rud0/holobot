@@ -93,7 +93,7 @@ public class UrbanDictionaryCmd extends AbstractCommand {
 
     private boolean isReactionValid(ButtonInteractionEvent buttonEvent, Message msg, User caller) {
         // Ignore interactions on other messages
-        if (!buttonEvent.getMessage().equals(msg)) {
+        if (buttonEvent.getMessageIdLong() != msg.getIdLong()) {
             return false;
         }
         if (!buttonEvent.getUser().equals(caller)) {
@@ -103,13 +103,13 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         return true;
     }
 
-    private void handleReaction(ButtonInteractionEvent buttonEvent, int index, List<UrbanEntry> entries, List<Button> buttons, User caller) {
-        String id = buttonEvent.getButton().getCustomId();
+    private void handleReaction(ButtonInteractionEvent evt, int index, List<UrbanEntry> entries, List<Button> buttons, User caller) {
+        String id = evt.getButton().getCustomId();
 
         // Immediate delete
         if ("exit".equals(id)) {
-            buttonEvent.deferEdit().queue(
-                    s -> buttonEvent.getMessage().delete().queue(),
+            evt.deferEdit().queue(
+                    hook -> evt.getMessage().delete().queue(),
                     e -> {}
             );
             return;
@@ -118,18 +118,25 @@ public class UrbanDictionaryCmd extends AbstractCommand {
         // Prev / next logic
         if ("prev".equals(id)) {
             index = Math.max(0, index - 1);
-        } else {
+        } else if ("next".equals(id)) {
             index = Math.min(entries.size() - 1, index + 1);
+        } else {
+            // Unknown button id
+            evt.deferEdit().queue();
+            return;
         }
 
         setButtonStates(buttons, index, entries.size() - 1);
         EmbedBuilder builder = createUrbanEmbed(entries.get(index), index, entries.size());
 
-        buttonEvent.deferEdit().queue(s -> {}, e -> {});
-        Message msg = buttonEvent.getMessage().editMessageEmbeds(builder.build()).setComponents(ActionRow.of(buttons)).complete();
+        final int newIndex = index;
 
-        // Keep waiting for prev/next
-        awaitUserSelection(msg, caller, index, entries, buttons);
+        // Acknowledge and edit
+        evt.deferEdit().queue(hook -> hook.editOriginalEmbeds(builder.build())
+                .setComponents(ActionRow.of(buttons))
+                .queue(success -> awaitUserSelection(evt.getMessage(), caller, newIndex, entries, buttons), failure -> {}),
+                failure -> {
+        });
     }
 
     private void setButtonStates(List<Button> buttons, int index, int maxIndex) {
