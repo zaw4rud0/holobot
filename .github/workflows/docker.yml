@@ -34,7 +34,7 @@ jobs:
             -Djib.to.auth.password=${GITHUB_TOKEN}
 
   deploy:
-    needs: build-and-push
+    needs: jib
     runs-on: ubuntu-latest
 
     steps:
