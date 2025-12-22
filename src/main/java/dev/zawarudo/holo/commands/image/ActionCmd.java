@@ -36,7 +36,8 @@ import java.util.concurrent.TimeUnit;
         category = CommandCategory.IMAGE)
 public class ActionCmd extends AbstractCommand {
 
-    private static final String FILE_PATH = "./data/actions.json";
+    private static final String PERSISTED_PATH = "./data/actions.json";
+    private static final String RESOURCE_PATH = "data/actions.json";
 
     private final Map<String, Action> actions;
     private static final Random RANDOM = new Random();
@@ -188,7 +189,7 @@ public class ActionCmd extends AbstractCommand {
         } else if (args.length != 0) {
             return event.getMessage().getMentions().getMembers().isEmpty() ?
                     String.join(" ", args) :
-                    event.getMessage().getMentions().getMembers().get(0).getEffectiveName();
+                    event.getMessage().getMentions().getMembers().getFirst().getEffectiveName();
         } else {
             return "nothing";
         }
@@ -224,7 +225,16 @@ public class ActionCmd extends AbstractCommand {
      * Initializes all actions using a Json file containing information for each action.
      */
     private void initializeActions() throws IOException {
-        JsonArray array = Reader.readJsonArray(FILE_PATH);
+        JsonArray array;
+
+        if (Reader.exists(PERSISTED_PATH)) {
+            array = Reader.readJsonArray((PERSISTED_PATH));
+        } else {
+            array = Reader.readJsonArrayResource(RESOURCE_PATH);
+            // Write to persisted path so new actions can be written into it
+            Writer.writeToFile(array.toString(), PERSISTED_PATH);
+        }
+
         Type listType = TypeTokenUtils.getListTypeToken(Action.class);
         List<Action> actionList = new Gson().fromJson(array, listType);
         actionList.forEach(action -> actions.put(action.getName(), action));
@@ -237,7 +247,7 @@ public class ActionCmd extends AbstractCommand {
         List<Action> actionList = new ArrayList<>(actions.values());
         Collections.sort(actionList);
         String jsonString = new GsonBuilder().setPrettyPrinting().create().toJson(actionList);
-        Writer.writeToFile(jsonString, FILE_PATH);
+        Writer.writeToFile(jsonString, PERSISTED_PATH);
     }
 
     private String getActionsAsString() {

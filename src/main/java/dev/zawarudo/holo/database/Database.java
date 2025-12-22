@@ -18,7 +18,7 @@ import java.util.List;
 public final class Database {
 
 	// Default if nothing is provided
-	private static volatile String dbPath = "./data/holobot.db";
+	private static volatile String dbPath = "./data/Holo.db";
 
 	private Database() {
 		throw new UnsupportedOperationException();

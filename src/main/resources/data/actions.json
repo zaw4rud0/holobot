@@ -1,0 +1,347 @@
+[
+  {
+    "name": "baka",
+    "sentence": "{s} calls {u} a baka",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/baka"
+    ]
+  },
+  {
+    "name": "bite",
+    "sentence": "{s} bites {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/bite"
+    ]
+  },
+  {
+    "name": "blush",
+    "sentence": "{s} blushes",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/blush"
+    ]
+  },
+  {
+    "name": "bonk",
+    "sentence": "{s} bonks {u}",
+    "api": false,
+    "urls": [
+      "https://media.tenor.com/mXwNLMSQRN8AAAAC/yuru-yuri-chinatsu-yoshikawa.gif",
+      "https://media.tenor.com/D6Ln3UPAdKcAAAAd/bonk-anime.gif",
+      "https://media.tenor.com/FJsjk_9b_XgAAAAC/anime-hit.gif",
+      "https://media.tenor.com/JS0ZB_b3kjoAAAAC/sugiura-ayano-funami-yui.gif",
+      "https://media.tenor.com/DiGHoKx3x8kAAAAC/atonnic-bonk.gif",
+      "https://media.tenor.com/lqVMTRILn8QAAAAd/anime-bonk-anime.gif",
+      "https://media.tenor.com/E6njrpISBV4AAAAC/bonk-hit.gif",
+      "https://media.tenor.com/1lOnmugPJLUAAAAC/bonk.gif",
+      "https://media.tenor.com/DDHCBZcDOcIAAAAd/horny-bonk-anime-horny-bonk.gif",
+      "https://media.tenor.com/1T5bgBYtMgUAAAAC/head-hit-anime.gif"
+    ]
+  },
+  {
+    "name": "bored",
+    "sentence": "{s} is bored",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/bored"
+    ]
+  },
+  {
+    "name": "cry",
+    "sentence": "{s} cries",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/cry"
+    ]
+  },
+  {
+    "name": "cuddle",
+    "sentence": "{s} cuddles {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/cuddle"
+    ]
+  },
+  {
+    "name": "dance",
+    "sentence": "{s} dances",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/dance"
+    ]
+  },
+  {
+    "name": "die",
+    "sentence": "{s} dies",
+    "api": false,
+    "urls": [
+      "https://media.tenor.com/iU20sXcBKOAAAAAC/anime-die.gif",
+      "https://media.tenor.com/k6AtJ49Nm5AAAAAC/aharen-san-anime-dead.gif",
+      "https://media.tenor.com/9Ql_VyYvMZkAAAAC/anime-sleeping.gif",
+      "https://media.tenor.com/hjnUROOP0WkAAAAd/falling-over.gif",
+      "https://media.tenor.com/tfWDvMqBFb4AAAAC/anime-fall.gif",
+      "https://media.tenor.com/MKaKRG9739AAAAAC/no-game-no-life-faint.gif",
+      "https://media.tenor.com/PET77kMx7XQAAAAd/dizzy-fall.gif",
+      "https://media.tenor.com/GyFbT8ZoyqAAAAAC/kanokari-anime-fall.gif",
+      "https://media.tenor.com/XqaU6agJocEAAAAd/anime-death.gif",
+      "https://media.tenor.com/cialBiHBraQAAAAd/anime-engaged-to-a-stranger.gif"
+    ]
+  },
+  {
+    "name": "eat",
+    "sentence": "{s} is eating",
+    "api": false,
+    "urls": [
+      "https://media1.tenor.com/m/ZBO4pyuseVcAAAAC/engage-kiss-kanna.gif",
+      "https://media1.tenor.com/m/ZJltjT6QMBwAAAAC/eating-anime.gif",
+      "https://media1.tenor.com/m/K3XUYZG1cUEAAAAd/sweetdreams-eat.gif",
+      "https://media1.tenor.com/m/rL9bf5nEuFUAAAAC/dragon-ball-eating.gif",
+      "https://media1.tenor.com/m/A1Ts3Jlj4zYAAAAd/kobayashi-dragon-maid-kanna.gif"
+    ]
+  },
+  {
+    "name": "facepalm",
+    "sentence": "{s} face-palms",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/facepalm"
+    ]
+  },
+  {
+    "name": "feed",
+    "sentence": "{s} feeds {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/feed"
+    ]
+  },
+  {
+    "name": "handhold",
+    "sentence": "{s} holds the hand of {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/handhold"
+    ]
+  },
+  {
+    "name": "happy",
+    "sentence": "{s} is happy",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/happy"
+    ]
+  },
+  {
+    "name": "highfive",
+    "sentence": "{s} highfives {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/highfive"
+    ]
+  },
+  {
+    "name": "hug",
+    "sentence": "{s} hugs {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/hug"
+    ]
+  },
+  {
+    "name": "hungry",
+    "sentence": "{s} is hungry",
+    "api": false,
+    "urls": [
+      "https://media1.tenor.com/m/8e0zlax0OTgAAAAC/anime-hungry.gif",
+      "https://media1.tenor.com/m/dHXNX37Muj0AAAAC/hungry-starving.gif",
+      "https://media1.tenor.com/m/16ap6EGxXtQAAAAC/food-pokemon.gif"
+    ]
+  },
+  {
+    "name": "kick",
+    "sentence": "{s} kicks {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/kick"
+    ]
+  },
+  {
+    "name": "kiss",
+    "sentence": "{s} kisses {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/kiss"
+    ]
+  },
+  {
+    "name": "laugh",
+    "sentence": "{s} laughs",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/laugh"
+    ]
+  },
+  {
+    "name": "pat",
+    "sentence": "{s} pats {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/pat"
+    ]
+  },
+  {
+    "name": "poke",
+    "sentence": "{s} pokes {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/poke"
+    ]
+  },
+  {
+    "name": "pout",
+    "sentence": "{s} pouts",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/pout"
+    ]
+  },
+  {
+    "name": "punch",
+    "sentence": "{s} punches {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/punch"
+    ]
+  },
+  {
+    "name": "shoot",
+    "sentence": "{s} shoots {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/shoot"
+    ]
+  },
+  {
+    "name": "shrug",
+    "sentence": "{s} shrugs",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/shrug"
+    ]
+  },
+  {
+    "name": "slap",
+    "sentence": "{s} slaps {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/slap"
+    ]
+  },
+  {
+    "name": "sleep",
+    "sentence": "{s} sleeps",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/sleep"
+    ]
+  },
+  {
+    "name": "smile",
+    "sentence": "{s} smiles",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/smile"
+    ]
+  },
+  {
+    "name": "smug",
+    "sentence": "{s} is smug",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/smug"
+    ]
+  },
+  {
+    "name": "stare",
+    "sentence": "{s} stares at {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/stare"
+    ]
+  },
+  {
+    "name": "study",
+    "sentence": "{s} is studying",
+    "api": false,
+    "urls": [
+      "https://media.tenor.com/0IudfCinoWgAAAAC/study-anime.gif",
+      "https://media.tenor.com/_h_1fcwEkHYAAAAC/studying-windy.gif",
+      "https://media.tenor.com/zk6OuE-RGngAAAAC/midoriya-izuku-anime-stud.gif",
+      "https://media.tenor.com/HwMm88Olb14AAAAC/k-on-yui.gif",
+      "https://media.tenor.com/D48L_xXEcDoAAAAd/stress-study.gif",
+      "https://media.tenor.com/Ucz3oKrJNdsAAAAC/spy-x-family-study.gif",
+      "https://media.tenor.com/ycBSGu7GEQAAAAAC/crying-kill-la-kill.gif",
+      "https://media.tenor.com/UH2l27eLWBUAAAAC/papi-monster-musume.gif",
+      "https://media.tenor.com/LdflfYxrPLkAAAAC/anime-study.gif",
+      "https://media.tenor.com/UHYgSGkjpusAAAAC/anime-read-book.gif",
+      "https://media.tenor.com/hWWn-MsXY0kAAAAC/anime-bookworm.gif",
+      "https://media.tenor.com/eVegEHxt9goAAAAC/study-work.gif",
+      "https://media.tenor.com/2vHjW5QbFckAAAAC/yorimoi-sora-yori.gif",
+      "https://media.tenor.com/Txr7RYfzW-EAAAAC/anime-boy.gif",
+      "https://media.tenor.com/E_e1-lp25LMAAAAC/anime-notes.gif",
+      "https://media.tenor.com/eIDOCgLRMNQAAAAd/hachioji-naoto-naoto-waiting-for-a-chat.gif",
+      "https://media.tenor.com/t7pxbAbPSWsAAAAC/anime.gif",
+      "https://media.tenor.com/0AEB38Hz1PMAAAAC/death-note-light.gif"
+    ]
+  },
+  {
+    "name": "think",
+    "sentence": "{s} thinks",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/think"
+    ]
+  },
+  {
+    "name": "thumbsup",
+    "sentence": "{s} gives a thumbs-up",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/thumbsup"
+    ]
+  },
+  {
+    "name": "tickle",
+    "sentence": "{s} tickles {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/tickle"
+    ]
+  },
+  {
+    "name": "wave",
+    "sentence": "{s} waves",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/wave"
+    ]
+  },
+  {
+    "name": "wink",
+    "sentence": "{s} winks",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/wink"
+    ]
+  },
+  {
+    "name": "yeet",
+    "sentence": "{s} yeets {u}",
+    "api": true,
+    "urls": [
+      "https://nekos.best/api/v2/yeet"
+    ]
+  }
+]

@@ -26,7 +26,7 @@ import java.util.concurrent.TimeUnit;
         category = CommandCategory.IMAGE)
 public class DogCmd extends AbstractCommand {
 
-    private static final String PATH = "./data/dog-breeds.json";
+    private static final String RESOURCE_PATH = "data/dog-breeds.json";
     private final String[] breeds;
     private final Map<String, String> formattedNames;
 
@@ -34,7 +34,7 @@ public class DogCmd extends AbstractCommand {
         formattedNames = new HashMap<>();
 
         try {
-            JsonObject obj = Reader.readJsonObject(PATH);
+            JsonObject obj = Reader.readJsonObjectResource(RESOURCE_PATH);
             breeds = new Gson().fromJson(obj.getAsJsonArray("breeds"), String[].class);
 
             obj.getAsJsonArray("breeds-formatted").forEach(breed -> {

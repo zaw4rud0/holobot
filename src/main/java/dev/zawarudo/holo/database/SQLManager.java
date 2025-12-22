@@ -15,7 +15,7 @@ import java.util.jar.JarFile;
 public class SQLManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(SQLManager.class);
-    private static final String SQL_DIRECTORY_PATH = "dev/zawarudo/holo/database";
+    private static final String SQL_DIRECTORY_PATH = "database";
     private final Map<String, String> sqlStatements;
 
     /**
