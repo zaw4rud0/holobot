@@ -29,9 +29,9 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          mvn -B -DskipTests jib:build \
-            -Djib.to.auth.username=${{ github.actor }} \
-            -Djib.to.auth.password=${GITHUB_TOKEN}
+          mvn -B -DskipTests package jib:build \
+          -Djib.to.auth.username=${{ github.actor }} \
+          -Djib.to.auth.password=${GITHUB_TOKEN}
 
   deploy:
     needs: jib
