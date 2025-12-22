@@ -214,7 +214,7 @@ public abstract class AdventOfCodeGraph {
         startX = OFFSET_X1 / 3 - metrics.getHeight() / 2 + metrics.getAscent();
         startY = graphHeight / 2 + OFFSET_Y1 + metrics.stringWidth(text) / 2;
 
-        g2d.setFont(FontUtils.rotateFont(font, -90));
+        g2d.setFont(FontUtils.rotate(font, -90));
         g2d.drawString(text, startX, startY);
 
         g2d.setFont(font);

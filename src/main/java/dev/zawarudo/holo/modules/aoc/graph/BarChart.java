@@ -18,7 +18,7 @@ public class BarChart extends AdventOfCodeGraph {
         BufferedImage chart = new BufferedImage(IMAGE_WIDTH, IMAGE_HEIGHT, BufferedImage.TYPE_INT_ARGB_PRE);
         Graphics2D g2d = chart.createGraphics();
 
-        FontUtils.setSmoothFont(g2d);
+        FontUtils.enableHighQuality(g2d);
 
         int graphWidth = IMAGE_WIDTH - OFFSET_X1 - OFFSET_X2;
         int graphHeight = (IMAGE_HEIGHT - OFFSET_Y1 - OFFSET_Y2) / rows * rows;

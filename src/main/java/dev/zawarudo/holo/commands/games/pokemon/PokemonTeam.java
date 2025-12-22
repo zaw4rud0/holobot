@@ -59,7 +59,7 @@ public class PokemonTeam {
             List<String> types = pokemon.getTypes();
             PokemonType type1 = PokemonUtils.getType(types.get(0));
             PokemonType type2 = types.size() == 2 ? PokemonUtils.getType(types.get(1)) : null;
-            String string = String.format("#%03d %s", pokemon.getPokedexId(), Formatter.capitalize(pokemon.getName()));
+            String string = String.format("#%03d %s", pokemon.getPokedexId(), Formatter.capitalize(pokemon.getSpecies().getName()));
 
             BufferedImage img = draw(artwork, type1.getColor(), type2 != null ? type2.getColor() : null, string);
             images.add(img);
@@ -83,7 +83,7 @@ public class PokemonTeam {
         BufferedImage res = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = res.createGraphics();
 
-        FontUtils.setSmoothFont(g2d);
+        FontUtils.enableHighQuality(g2d);
 
         Color oldColor = g2d.getColor();
 

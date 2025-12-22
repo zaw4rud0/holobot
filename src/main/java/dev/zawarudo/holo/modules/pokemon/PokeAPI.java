@@ -30,7 +30,7 @@ public final class PokeAPI {
     /**
      * The number of Pokémon that exist.
      */
-    public static final int POKEMON_COUNT = 905;
+    public static final int POKEMON_COUNT = 1025;
 
     private PokeAPI() {
     }
