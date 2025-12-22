@@ -17,24 +17,29 @@ Coming soon!
 ### Installation
 
 1. Clone this repository:
-```
+```bash
 git clone https://github.com/zaw4rud0/holobot.git
 ```
 2. Navigate to the project directory: 
-```
+```bash
 cd holobot
 ```
-3. Build the project:
+3. Create your local environment file from the example:
+```bash
+cp .env.example .env 
 ```
+4. Open `.env` and replace the placeholder values with your own, such as the bot token and any other required keys.
+5. Build the project:
+```bash
 mvn clean install
 ```
-4. Run `Setup` inside `src\main\java\dev.zawarudo.holo\scripts` in your favorite IDE to create the necessary files and configure the project.
-5. In the newly created `config.json` file, set the value of `token` with your bot token.
-6. Now you can either run `Bootstrap` in your IDE or execute
-```
+6. Run the bot:
+- Either run `Bootstrap` from your IDE, or
+- Run the built JAR:
+```bash
 java -jar holobot-VERSION.jar
 ```
-where `VERSION` is the current version of the bot which is defined inside `pom.xml`.
+where `VERSION` is the current version defined in `pom.xml`.
 
 ## Usage
 
@@ -43,7 +48,10 @@ You can add a Discord bot to your server using the following invitation link whe
 https://discord.com/oauth2/authorize?client_id=YOUR_BOT&scope=bot
 ```
 
-The default prefix of this bot is `<`, and you can see all the commands using `<help`.
+The default prefix of this bot is `<`. You can see all the commands with:
+```
+<help
+```
 
 ## Contributing
 
