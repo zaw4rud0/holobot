@@ -1,7 +1,6 @@
 package dev.zawarudo.holo.commands.fun;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.core.misc.Emote;
 import dev.zawarudo.holo.modules.urbandictionary.UrbanDictionaryEntry;
 import dev.zawarudo.holo.modules.urbandictionary.UrbanDictionaryScraper;
 import dev.zawarudo.holo.utils.annotations.Command;
@@ -9,19 +8,13 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.Formatter;
+import dev.zawarudo.holo.utils.interact.ButtonPaginator;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.components.actionrow.ActionRow;
-import net.dv8tion.jda.api.components.buttons.Button;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -37,10 +30,15 @@ public class UrbanDictionaryCmd extends AbstractCommand {
 
     private final UrbanDictionaryScraper scraper = new UrbanDictionaryScraper();
 
-    private final EventWaiter waiter;
+    private final ButtonPaginator<UrbanDictionaryEntry> paginator;
 
     public UrbanDictionaryCmd(EventWaiter waiter) {
-        this.waiter = waiter;
+        this.paginator = new ButtonPaginator<>(
+                waiter,
+                this::createUrbanEmbed,
+                "urban",
+                5, TimeUnit.MINUTES
+        );
     }
 
     @Override
@@ -50,112 +48,27 @@ public class UrbanDictionaryCmd extends AbstractCommand {
             return;
         }
 
-        String searchTerm = getSearchTerm(event.getMessage());
+        String searchTerm = String.join(" ", args).trim();
         List<UrbanDictionaryEntry> entries;
         try {
             entries = scraper.fetch(searchTerm);
+
             if (entries.isEmpty()) {
-                throw new FileNotFoundException();
+                sendErrorEmbed(event, "Couldn't find any Urban Dictionary entries with the given search terms.");
+                return;
             }
 
-            sendUrbanDictionaryEntries(event, entries);
-        } catch (FileNotFoundException e) {
-            sendErrorEmbed(event, "Couldn't find any Urban Dictionary entries with the given search terms.");
+            paginator.start(event.getMessage(), event.getAuthor(), entries);
+
         } catch (IOException e) {
             sendErrorEmbed(event, "Something went wrong while searching your term. Please try again at a later time.");
         }
     }
 
-    private void sendUrbanDictionaryEntries(MessageReceivedEvent event, List<UrbanDictionaryEntry> entries) {
-        List<Button> buttons = new ArrayList<>(List.of(
-                Button.primary("prev", Emote.ARROW_LEFT.getAsEmoji()),
-                Button.danger("exit", Emote.TRASH_BIN.getAsEmoji()),
-                Button.primary("next", Emote.ARROW_RIGHT.getAsEmoji())
-        ));
-        setButtonStates(buttons, 0, entries.size() - 1);
-        EmbedBuilder builder = createUrbanEmbed(entries.getFirst(), 0, entries.size());
-
-        event.getMessage()
-                .replyEmbeds(builder.build())
-                .addComponents(ActionRow.of(buttons))
-                .queue(msg -> awaitUserSelection(msg, event.getAuthor(), 0, entries, buttons),
-                        err -> sendErrorEmbed(event, "I couldn't send the Urban Dictionary result message."));
-    }
-
-    private void awaitUserSelection(Message msg, User caller, int index, List<UrbanDictionaryEntry> entries, List<Button> buttons) {
-        waiter.waitForEvent(
-                ButtonInteractionEvent.class,
-                evt -> isReactionValid(evt, msg, caller),
-                evt -> handleReaction(evt, index, entries, buttons, caller),
-                5, TimeUnit.MINUTES,
-                () -> msg.delete().queue()
-        );
-    }
-
-    private boolean isReactionValid(ButtonInteractionEvent buttonEvent, Message msg, User caller) {
-        // Ignore interactions on other messages
-        if (buttonEvent.getMessageIdLong() != msg.getIdLong()) {
-            return false;
-        }
-        if (!buttonEvent.getUser().equals(caller)) {
-            buttonEvent.reply("This command was not called by you!").setEphemeral(true).queue();
-            return false;
-        }
-        return true;
-    }
-
-    private void handleReaction(ButtonInteractionEvent evt, int index, List<UrbanDictionaryEntry> entries, List<Button> buttons, User caller) {
-        String id = evt.getButton().getCustomId();
-
-        // Immediate delete
-        if ("exit".equals(id)) {
-            evt.deferEdit().queue(
-                    hook -> evt.getMessage().delete().queue(),
-                    e -> {}
-            );
-            return;
-        }
-
-        // Prev / next logic
-        if ("prev".equals(id)) {
-            index = Math.max(0, index - 1);
-        } else if ("next".equals(id)) {
-            index = Math.min(entries.size() - 1, index + 1);
-        } else {
-            // Unknown button id
-            evt.deferEdit().queue();
-            return;
-        }
-
-        setButtonStates(buttons, index, entries.size() - 1);
-        EmbedBuilder builder = createUrbanEmbed(entries.get(index), index, entries.size());
-
-        final int newIndex = index;
-
-        // Acknowledge and edit
-        evt.deferEdit().queue(hook -> hook.editOriginalEmbeds(builder.build())
-                .setComponents(ActionRow.of(buttons))
-                .queue(success -> awaitUserSelection(evt.getMessage(), caller, newIndex, entries, buttons), failure -> {}),
-                failure -> {
-        });
-    }
-
-    private void setButtonStates(List<Button> buttons, int index, int maxIndex) {
-        for (int i = 0; i < buttons.size(); i++) {
-            Button btn = buttons.get(i);
-            if ("prev".equals(btn.getCustomId())) {
-                buttons.set(i, btn.withDisabled(index == 0));
-            } else if ("next".equals(btn.getCustomId())) {
-                buttons.set(i, btn.withDisabled(index == maxIndex));
-            }
-        }
-    }
-
-    private EmbedBuilder createUrbanEmbed(UrbanDictionaryEntry entry, int index, int total) {
+    private MessageEmbed createUrbanEmbed(UrbanDictionaryEntry entry, int index, int total) {
         EmbedBuilder embedBuilder = new EmbedBuilder();
         embedBuilder.setThumbnail(getThumbnail());
         embedBuilder.setTitle(entry.term(), entry.link());
-        embedBuilder.setFooter(String.format("Page %d / %d", index + 1, total));
         embedBuilder.setColor(getEmbedColor());
 
         boolean hasContent = false;
@@ -182,12 +95,6 @@ public class UrbanDictionaryCmd extends AbstractCommand {
             embedBuilder.setDescription("No definition or example available.");
         }
 
-        return embedBuilder;
-    }
-
-    private String getSearchTerm(Message message) {
-        String content = message.getContentRaw();
-        int firstSpaceIndex = content.indexOf(" ");
-        return content.substring(firstSpaceIndex + 1);
+        return ButtonPaginator.withPageFooter(embedBuilder, index, total);
     }
 }
