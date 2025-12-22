@@ -41,7 +41,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new PermCmd());
         addCommand(new PingCmd());
         addCommand(new RoleInfoCmd());
-        addCommand(new ServerEmotesCmd());
         addCommand(new ServerInfoCmd());
         addCommand(new ServerRolesCmd());
         addCommand(new SuggestionCmd(Bootstrap.holo.getGitHubClient()));

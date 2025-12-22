@@ -4,7 +4,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.sql.Connection;
-import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -62,19 +61,17 @@ public final class Database {
 		return DriverManager.getConnection(url);
 	}
 
-	private static DatabaseMetaData getDBMetaData() throws SQLException {
-		return getConnection().getMetaData();
-	}
-
 	public static boolean tableExists(String tableName) throws SQLException {
-		try (ResultSet rs = getDBMetaData().getTables(null, null, tableName, null)) {
+		try (Connection conn = getConnection();
+			 ResultSet rs = conn.getMetaData().getTables(null, null, tableName, null)) {
 			return rs.next();
 		}
 	}
 
 	public static List<String> getColumnNames(String tableName) throws SQLException {
 		List<String> columns = new ArrayList<>();
-		try (ResultSet rs = getDBMetaData().getColumns(null, null, tableName, null)) {
+		try (Connection conn = getConnection();
+			 ResultSet rs = conn.getMetaData().getColumns(null, null, tableName, null)) {
 			while (rs.next()) {
 				columns.add(rs.getString("COLUMN_NAME"));
 			}

@@ -45,7 +45,8 @@ public final class Bootstrap {
                 .ignoreIfMalformed()
                 .load();
 
-        LOGGER.info(".env loaded ({} entries)", dotenv.entries().spliterator().getExactSizeIfKnown());
+        LOGGER.info(".env loaded ({} entries)", dotenv.entries().size());
+
         LOGGER.info("BOT_TOKEN: {}", mask(dotenv.get("BOT_TOKEN")));
         LOGGER.info("OWNER_ID: {}", dotenv.get("OWNER_ID"));
 
@@ -85,10 +86,15 @@ public final class Bootstrap {
     }
 
     private static void checkDatabase() {
-        String dbPath = dotenv.get("DB_PATH", "./data/holobot.db");
+        String dbPath = dotenv.get("DB_PATH", "./data/Holo.db");
         Database.setDbPath((dbPath));
 
         File dbFile = new File(dbPath);
+        File parent = dbFile.getParentFile();
+
+        if (parent != null && !parent.exists() && !parent.mkdirs()) {
+            throw new IllegalStateException("Failed to create DB directory: " + parent.getAbsolutePath());
+        }
 
         if (!dbFile.exists()) {
             try {
@@ -127,8 +133,7 @@ public final class Bootstrap {
     private static String require(Dotenv env, String name) {
         String val = env.get(name);
         if (val == null || val.isBlank()) {
-            LOGGER.error("Missing required environment variable: {}", name);
-            System.exit(1);
+            throw new IllegalStateException("Missing required environment variable: " + name);
         }
         return val;
     }
@@ -136,11 +141,9 @@ public final class Bootstrap {
     private static long requireLong(Dotenv env, String name) {
         String val = require(env, name);
         try {
-            return Long.parseLong(val.trim());
+            return Long.parseLong(val);
         } catch (NumberFormatException e) {
-            LOGGER.error("{} must be a valid long, but got '{}'", name, val);
-            System.exit(1);
-            throw e;
+            throw new IllegalStateException("Environment variable '" + name + "' must be a valid long, but was: '" + val + "'", e);
         }
     }
 }
