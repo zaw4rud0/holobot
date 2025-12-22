@@ -272,9 +272,8 @@
         </repository>
         <!-- Repo for jda-chewtils -->
         <repository>
-            <id>chew</id>
-            <name>m2-chew</name>
-            <url>https://m2.chew.pro/releases</url>
+            <id>chew-m2-snapshots</id>
+            <url>https://m2.chew.pro/snapshots/</url>
         </repository>
         <repository>
             <id>jitpack</id>
