@@ -3,7 +3,9 @@ package dev.zawarudo.holo.utils;
 import dev.zawarudo.holo.core.Bootstrap;
 
 public final class VersionInfo {
-    private VersionInfo() {}
+    private VersionInfo() {
+        throw new UnsupportedOperationException();
+    }
 
     public static String getVersion() {
         Package p = Bootstrap.class.getPackage();

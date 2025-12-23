@@ -53,16 +53,17 @@ public final class HoloHttp {
         return i < 0 ? body : body.substring(0, i);
     }
 
-    public static @NotNull JsonElement getJson(@NotNull String url) throws HttpStatusException, HttpTransportException {
-        return JsonParser.parseString(getString(url));
+    public static @NotNull JsonObject getJsonObject(@NotNull String url) throws HttpStatusException, HttpTransportException {
+        return JsonParser.parseString(getString(url)).getAsJsonObject();
     }
 
-    public static @NotNull JsonObject getJsonObject(@NotNull String url) throws HttpStatusException, HttpTransportException {
-        return getJson(url).getAsJsonObject();
+    public static @NotNull JsonObject getJsonObject(@NotNull String url, @Nullable Map<String, String> headers)
+            throws HttpStatusException, HttpTransportException {
+        return JsonParser.parseString(getString(url, headers)).getAsJsonObject();
     }
 
     public static @NotNull JsonArray getJsonArray(@NotNull String url) throws HttpStatusException, HttpTransportException {
-        return getJson(url).getAsJsonArray();
+        return JsonParser.parseString(getString(url)).getAsJsonArray();
     }
 
     public static <T> @NotNull T getJson(@NotNull String url, @NotNull Class<T> clazz) throws HttpStatusException, HttpTransportException {

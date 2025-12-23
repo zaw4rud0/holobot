@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.modules.aoc.graph;
 
 import dev.zawarudo.holo.modules.aoc.data.AdventDay;
-import dev.zawarudo.holo.modules.aoc.data.AdventOfCodeAPI;
+import dev.zawarudo.holo.modules.aoc.data.AdventOfCodeClient;
 import dev.zawarudo.holo.utils.FontUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 
@@ -88,7 +88,7 @@ public abstract class AdventOfCodeGraph {
 
         drawBackground(g2d, result);
 
-        List<AdventDay> days = AdventOfCodeAPI.getAdventDays(year, leaderboardId, sessionKey);
+        List<AdventDay> days = AdventOfCodeClient.getAdventDays(year, leaderboardId, sessionKey);
 
         participants = getParticipantCount(days);
         maxCount = roundUp(participants);

@@ -1,35 +1,29 @@
 package dev.zawarudo.holo.modules.aoc.data;
 
 import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.exceptions.APIException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import dev.zawarudo.holo.utils.exceptions.HttpStatusException;
+import dev.zawarudo.holo.utils.exceptions.HttpTransportException;
 
-import java.io.IOException;
-import java.net.*;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
-public final class AdventOfCodeAPI {
+public final class AdventOfCodeClient {
 
     private static final String BASE_URL = "https://adventofcode.com";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(AdventOfCodeAPI.class);
     private static int year;
 
-    private AdventOfCodeAPI() {
+    private AdventOfCodeClient() {
     }
 
     public static List<AdventDay> getAdventDays(int year, int leaderboardId, String sessionKey) throws APIException {
-        AdventOfCodeAPI.year = year;
+        AdventOfCodeClient.year = year;
 
         JsonObject members = fetchJson(year, leaderboardId, sessionKey).get("members").getAsJsonObject();
         List<JsonObject> completionRates = new ArrayList<>();
@@ -39,29 +33,6 @@ public final class AdventOfCodeAPI {
             completionRates.add(completion);
         }
         return parseData(completionRates);
-    }
-
-    private static JsonObject fetchJson(int year, int leaderboardId, String sessionKey) throws APIException {
-        String url = String.format("%s/%d/leaderboard/private/view/%d.json", BASE_URL, year, leaderboardId);
-
-        CookieHandler.setDefault(new CookieManager());
-        HttpCookie cookie = new HttpCookie("session", sessionKey);
-        cookie.setPath("/");
-        cookie.setVersion(0);
-
-        String body;
-        try {
-            ((CookieManager) CookieHandler.getDefault()).getCookieStore().add(new URI(BASE_URL), cookie);
-            HttpClient client = HttpClient.newBuilder().cookieHandler(CookieHandler.getDefault()).connectTimeout(Duration.ofSeconds(10)).build();
-            HttpRequest req = HttpRequest.newBuilder().uri(URI.create(url)).GET().setHeader("Content-Type", "application/json").build();
-            HttpResponse<String> response = client.send(req, HttpResponse.BodyHandlers.ofString());
-            body = response.body();
-        } catch (URISyntaxException | IOException | InterruptedException e) {
-            LOGGER.error("An error occurred while fetching the AOC data.", e);
-            throw new APIException(e);
-        }
-
-        return JsonParser.parseString(body).getAsJsonObject();
     }
 
     private static List<AdventDay> parseData(List<JsonObject> dataList) {
@@ -94,5 +65,21 @@ public final class AdventOfCodeAPI {
             return Math.min(25, currentDateTime.getDayOfMonth());
         }
         return 25;
+    }
+
+    private static JsonObject fetchJson(int year, int leaderboardId, String sessionKey) throws APIException {
+        String url = String.format("%s/%d/leaderboard/private/view/%d.json", BASE_URL, year, leaderboardId);
+
+        Map<String, String> headers = Map.of(
+                "Cookie", "session=" + sessionKey,
+                "Accept", "application/json"
+        );
+
+        try {
+            return HoloHttp.getJsonObject(url, headers);
+        } catch (HttpStatusException ex) {
+            throw new APIException("AoC request failed (HTTP " + ex.getStatusCode() + "): " + ex.getMessage(), ex);
+        } catch (HttpTransportException ex) {
+            throw new APIException("I/O error while contacting the AOC website.", ex);        }
     }
 }
