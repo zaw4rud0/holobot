@@ -7,6 +7,7 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
@@ -52,7 +53,7 @@ public class CatchCmd extends AbstractCommand {
 		
 		try {
 			species = pokemon.getPokemonSpecies();
-		} catch (IOException ex) {
+		} catch (IOException | APIException ex) {
 			sendErrorEmbed(event, "API error. Please try again later");
 			if (logger.isErrorEnabled()) {
 				logger.error("There has been an API error.", ex);

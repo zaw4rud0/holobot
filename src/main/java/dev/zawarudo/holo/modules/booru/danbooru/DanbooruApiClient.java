@@ -3,26 +3,28 @@ package dev.zawarudo.holo.modules.booru.danbooru;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
-import dev.zawarudo.holo.modules.booru.BooruAPI;
+import dev.zawarudo.holo.modules.booru.BooruApiClient;
+import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.HttpStatusException;
+import dev.zawarudo.holo.utils.exceptions.HttpTransportException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
-import okhttp3.Request;
-import okhttp3.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DanbooruAPI extends BooruAPI<DanbooruPost> {
+// TODO: Set rate limit of 3 requests / sec
+public class DanbooruApiClient extends BooruApiClient<DanbooruPost> {
 
     public static final int MAX_LIMIT = 200;
     public static final String BASE_URL = "https://danbooru.donmai.us";
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DanbooruAPI.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DanbooruApiClient.class);
 
     /**
      * Returns the number of posts that have the given set of tags.
@@ -35,21 +37,22 @@ public class DanbooruAPI extends BooruAPI<DanbooruPost> {
         if (tags.length > 0) {
             url += "?tags=" + String.join("+", tags);
         }
-        String json = getJsonString(url);
+        String json = fetchJsonOrThrow(url);
         JsonObject object = new Gson().fromJson(json, JsonObject.class);
         return object.getAsJsonObject("counts").get("posts").getAsInt();
     }
 
     @Override
-    public List<DanbooruPost> getPosts() throws InvalidRequestException, APIException {
+    public List<DanbooruPost> getPosts() throws APIException, InvalidRequestException {
         String url = prepareUrl();
-        String json = getJsonString(url);
-        Type type = new TypeToken<List<DanbooruPost>>() {}.getType();
+        String json = fetchJsonOrThrow(url);
+        Type type = new TypeToken<List<DanbooruPost>>() {
+        }.getType();
         return Collections.unmodifiableList(new Gson().fromJson(json, type));
     }
 
     @Override
-    public List<DanbooruPost> getAllPosts() throws APIException, InvalidRequestException {
+    public List<DanbooruPost> getAllPosts() throws InvalidRequestException {
         if (tags.isEmpty()) {
             throw new IllegalArgumentException("No tags given! Requires at least one tag!");
         }
@@ -59,7 +62,7 @@ public class DanbooruAPI extends BooruAPI<DanbooruPost> {
         List<DanbooruPost> posts;
         do {
             try {
-                String json = getJsonString(url + "&page=" + page);
+                String json = fetchJsonOrThrow(url + "&page=" + page);
                 Type type = new TypeToken<List<DanbooruPost>>() {
                 }.getType();
                 posts = new Gson().fromJson(json, type);
@@ -73,7 +76,6 @@ public class DanbooruAPI extends BooruAPI<DanbooruPost> {
     }
 
     @Override
-    @Deprecated
     public List<DanbooruPost> getAllPosts(int page) throws APIException, InvalidRequestException {
         String url;
         if (tags.isEmpty()) {
@@ -81,7 +83,7 @@ public class DanbooruAPI extends BooruAPI<DanbooruPost> {
         } else {
             url = String.format("%s&page=%d", prepareUrlPagination(), page);
         }
-        String json = getJsonString(url);
+        String json = fetchJsonOrThrow(url);
         Type type = new TypeToken<List<DanbooruPost>>() {}.getType();
         return new Gson().fromJson(json, type);
     }
@@ -101,24 +103,31 @@ public class DanbooruAPI extends BooruAPI<DanbooruPost> {
 
     public static DanbooruPost getPost(int id) throws APIException, InvalidRequestException {
         String url = String.format("%s/posts/%d.json", BASE_URL, id);
-        String json = getJsonString(url);
+        String json = fetchJsonOrThrow(url);
         return new Gson().fromJson(json, DanbooruPost.class);
     }
 
-    private static String getJsonString(String url) throws APIException, InvalidRequestException {
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Sending a request to {}...", url);
-        }
-        Request request = new Request.Builder().url(url).build();
+    private static String fetchJsonOrThrow(String url) throws APIException, InvalidRequestException {
         try {
-            Response response = sendRequest(request);
-            checkResponseCode(response);
-            return getBody(response);
-        } catch (IOException e) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("An error occurred while sending a request and fetching the response:", e);
+            return HoloHttp.getString(url);
+        } catch (HttpStatusException ex) {
+            int code = ex.getStatusCode();
+
+            if (code == 429) {
+                throw new APIException("429 Too Many Requests (Danbooru rate limit).", ex);
             }
-            throw new APIException("Something unexpected happened! (" + e.getCause() + ")");
+
+            // Bad request
+            if (code >= 400 && code < 500) {
+                throw new InvalidRequestException(code + " Client error from Danbooru.", ex);
+            }
+
+            // Server-side errors
+            throw new APIException(code + " Server error from Danbooru.", ex);
+
+        } catch (HttpTransportException ex) {
+            // Network/timeout/interrupted
+            throw new APIException("Transport error while contacting Danbooru.", ex);
         }
     }
 }

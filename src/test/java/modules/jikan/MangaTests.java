@@ -1,6 +1,6 @@
 package modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Manga;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
@@ -15,7 +15,7 @@ class MangaTests {
 
     @Test
     void testMangaById1() throws APIException, InvalidIdException {
-        Manga onePiece = JikanAPI.getManga(13);
+        Manga onePiece = JikanApiClient.getManga(13);
 
         assertNotNull(onePiece);
         assertNotNull(onePiece.getTitle());
@@ -32,7 +32,7 @@ class MangaTests {
 
     @Test
     void testMangaById2() throws APIException, InvalidIdException {
-        Manga naruto = JikanAPI.getManga(11);
+        Manga naruto = JikanApiClient.getManga(11);
 
         assertNotNull(naruto);
         assertEquals(11, naruto.getId());
@@ -41,7 +41,7 @@ class MangaTests {
 
     @Test
     void testMangaSearch() throws APIException, InvalidRequestException {
-        List<Manga> results = JikanAPI.searchManga("one piece");
+        List<Manga> results = JikanApiClient.searchManga("one piece");
 
         assertNotNull(results);
         assertFalse(results.isEmpty());
@@ -58,7 +58,7 @@ class MangaTests {
 
     @Test
     void testRandomManga() throws APIException {
-        Manga randomManga = JikanAPI.getRandomManga();
+        Manga randomManga = JikanApiClient.getRandomManga();
 
         assertNotNull(randomManga);
         assertTrue(randomManga.getId() != 0);

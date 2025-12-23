@@ -5,14 +5,16 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.TypeTokenUtils;
 import dev.zawarudo.holo.utils.Writer;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
-import dev.zawarudo.holo.utils.HttpResponse;
 import dev.zawarudo.holo.utils.Reader;
+import dev.zawarudo.holo.utils.exceptions.HttpStatusException;
+import dev.zawarudo.holo.utils.exceptions.HttpTransportException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -174,10 +176,14 @@ public class ActionCmd extends AbstractCommand {
 
     private Optional<String> fetchUrlFromApi(String url) {
         try {
-            JsonObject obj = HttpResponse.getJsonObject(url);
+            JsonObject obj = HoloHttp.getJsonObject(url);
             String imageUrl = obj.getAsJsonArray("results").get(0).getAsJsonObject().get("url").getAsString();
-            return Optional.ofNullable(imageUrl);
-        } catch (IOException ex) {
+            return (imageUrl == null || imageUrl.isBlank()) ? Optional.empty() : Optional.of(imageUrl);
+        } catch (HttpStatusException ex) {
+            logger.warn("Action API HTTP error: status={} url={}", ex.getStatusCode(), url);
+            return Optional.empty();
+        } catch (HttpTransportException ex) {
+            logger.warn("Action API transport error: url={}", url, ex);
             return Optional.empty();
         }
     }

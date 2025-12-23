@@ -1,7 +1,8 @@
 package modules;
 
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.PokemonType;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -14,8 +15,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class TestPokemonTypes {
 
     @Test
-    void testTypeNormal() throws IOException {
-        PokemonType normal = PokeAPI.getType("normal");
+    void testTypeNormal() throws APIException {
+        PokemonType normal = PokeApiClient.getType("normal");
 
         assertEquals(1, normal.getId());
         assertEquals("normal", normal.getName());
@@ -42,8 +43,8 @@ class TestPokemonTypes {
     }
 
     @Test
-    void testTypeGround() throws IOException {
-        PokemonType ground = PokeAPI.getType("ground");
+    void testTypeGround() throws APIException {
+        PokemonType ground = PokeApiClient.getType("ground");
 
         assertEquals(5, ground.getId());
         assertEquals("ground", ground.getName());
@@ -67,9 +68,9 @@ class TestPokemonTypes {
     }
 
     @Test
-    void testTypeMoves() throws IOException {
-        PokemonType poison = PokeAPI.getType("poison");
-        PokemonType fairy = PokeAPI.getType("fairy");
+    void testTypeMoves() throws APIException {
+        PokemonType poison = PokeApiClient.getType("poison");
+        PokemonType fairy = PokeApiClient.getType("fairy");
 
         List<String> poisonMoves = poison.getMoves();
         assertTrue(poisonMoves.contains("acid"));
@@ -85,9 +86,9 @@ class TestPokemonTypes {
     }
 
     @Test
-    void testTypeMoves2() throws IOException {
-        PokemonType fighting = PokeAPI.getType("fighting");
-        PokemonType water = PokeAPI.getType("water");
+    void testTypeMoves2() throws APIException {
+        PokemonType fighting = PokeApiClient.getType("fighting");
+        PokemonType water = PokeApiClient.getType("water");
 
         List<String> fightingMoves = fighting.getMovesFormatted();
         assertTrue(fightingMoves.contains("Arm Thrust"));

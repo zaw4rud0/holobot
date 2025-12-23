@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Manga;
 import dev.zawarudo.holo.modules.jikan.model.Nameable;
 import dev.zawarudo.holo.utils.annotations.Command;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 /**
  * A command for searching and displaying manga information from the MyAnimeList
  * database. It uses JikanAPI since the official MyAnimeList API doesn't provide
- * all needed functionalities. See {@link JikanAPI} for more info.
+ * all needed functionalities. See {@link JikanApiClient} for more info.
  */
 @Command(name = "mangasearch",
         description = "Use this command to search for a manga in the database of MyAnimeList.",
@@ -63,7 +63,7 @@ public class MangaSearchCmd extends BaseSearchCmd<Manga> {
     @Override
     protected List<Manga> performSearch(MessageReceivedEvent event, String search) {
         try {
-            return JikanAPI.searchManga(search);
+            return JikanApiClient.searchManga(search);
         } catch (InvalidRequestException ex) {
             sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
             if (logger.isErrorEnabled()) {

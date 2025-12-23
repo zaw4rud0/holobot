@@ -1,6 +1,6 @@
 package modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.modules.jikan.model.Related;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -18,12 +18,12 @@ class OtherTests {
 
     @BeforeAll
     static void setup() {
-        JikanAPI.setLimit(50);
+        JikanApiClient.setLimit(50);
     }
 
     @Test
     void testRelated() throws APIException, InvalidRequestException, InvalidIdException {
-        Anime onePiece = JikanAPI.getAnime(21);
+        Anime onePiece = JikanApiClient.getAnime(21);
 
         assertNotNull(onePiece);
 

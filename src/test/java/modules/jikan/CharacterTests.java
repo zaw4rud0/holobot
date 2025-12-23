@@ -1,6 +1,6 @@
 package modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Appearance;
 import dev.zawarudo.holo.modules.jikan.model.Character;
 import dev.zawarudo.holo.modules.jikan.model.MediaType;
@@ -17,7 +17,7 @@ class CharacterTests {
 
     @Test
     void testCharacterById() throws APIException, InvalidIdException {
-        Character luffy = JikanAPI.getCharacter(40);
+        Character luffy = JikanApiClient.getCharacter(40);
 
         assertNotNull(luffy);
 
@@ -32,7 +32,7 @@ class CharacterTests {
 
     @Test
     void testCharacterAppearance1() throws APIException, InvalidIdException {
-        List<Appearance> luffy = JikanAPI.getCharacter(40, MediaType.ANIME);
+        List<Appearance> luffy = JikanApiClient.getCharacter(40, MediaType.ANIME);
         assertNotNull(luffy);
         assertFalse(luffy.isEmpty());
         assertEquals("Main", luffy.get(0).getRole());
@@ -40,7 +40,7 @@ class CharacterTests {
 
     @Test
     void testCharacterAppearance2() throws APIException, InvalidIdException {
-        List<Appearance> kaidou = JikanAPI.getCharacter(46109, MediaType.ANIME);
+        List<Appearance> kaidou = JikanApiClient.getCharacter(46109, MediaType.ANIME);
 
         assertNotNull(kaidou);
         assertFalse(kaidou.isEmpty());
@@ -49,7 +49,7 @@ class CharacterTests {
 
     @Test
     void testCharacterSearch() throws APIException, InvalidRequestException {
-        List<Character> luffy = JikanAPI.searchCharacter("Luffy");
+        List<Character> luffy = JikanApiClient.searchCharacter("Luffy");
 
         assertNotNull(luffy);
         assertFalse(luffy.isEmpty());

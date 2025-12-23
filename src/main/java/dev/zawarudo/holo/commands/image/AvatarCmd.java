@@ -40,7 +40,7 @@ public class AvatarCmd extends AbstractCommand {
         String userAvatar = user.getEffectiveAvatarUrl() + "?size=1024";
         String serverAvatar = member.map(value -> value.getEffectiveAvatarUrl() + "?size=1024").orElse(null);
 
-        Color embedColor = member.map(Member::getColor).orElse(null);
+        Color embedColor = member.map(m -> m.getColors().getPrimary()).orElse(null);
 
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Avatar of " + name, userAvatar);

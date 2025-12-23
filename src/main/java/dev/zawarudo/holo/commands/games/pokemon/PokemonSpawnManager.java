@@ -1,10 +1,10 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
 import dev.zawarudo.holo.core.Bootstrap;
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Guild;
@@ -63,13 +63,14 @@ public class PokemonSpawnManager {
             Pokemon pokemon;
             FileUpload upload;
             try {
-                pokemon = PokeAPI.getRandomPokemon();
+                pokemon = PokeApiClient.getRandomPokemon();
                 BufferedImage image = PokemonUtils.drawHiddenPokemon(pokemon);
                 upload = FileUpload.fromData(ImageOperations.toInputStream(image), "pokemon.png");
-            } catch (IOException | InvalidIdException ex) {
-                if (LOGGER.isErrorEnabled()) {
-                    LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", id, ex);
-                }
+            } catch (APIException ex) {
+                LOGGER.error("Failed to fetch random Pokémon for channel id={}", id, ex);
+                continue;
+            } catch (IOException ex) {
+                LOGGER.error("Failed to render Pokémon image for channel id={}", id, ex);
                 continue;
             }
 
@@ -86,14 +87,13 @@ public class PokemonSpawnManager {
     public void spawnNewPokemon(long channelId) {
         Pokemon pokemon;
         try {
-            pokemon = PokeAPI.getRandomPokemon();
-        } catch (IOException | InvalidIdException ex) {
+            pokemon = PokeApiClient.getRandomPokemon();
+            spawnNewPokemon(channelId, pokemon);
+        } catch (APIException ex) {
             if (LOGGER.isErrorEnabled()) {
                 LOGGER.error("Something went wrong while spawning a new Pokémon in the channel with id={}", channelId, ex);
             }
-            return;
         }
-        spawnNewPokemon(channelId, pokemon);
     }
 
     public void spawnNewPokemon(long channelId, Pokemon pokemon) {

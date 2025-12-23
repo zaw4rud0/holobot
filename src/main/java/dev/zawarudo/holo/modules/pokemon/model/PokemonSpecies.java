@@ -1,16 +1,14 @@
 package dev.zawarudo.holo.modules.pokemon.model;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
+import dev.zawarudo.holo.modules.pokemon.utils.EvolutionChainFormatter;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.HttpResponse;
-import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -373,67 +371,40 @@ public class PokemonSpecies implements Comparable<PokemonSpecies> {
 	}
 
 	/**
-	 * Returns the evolution tree as a formatted String
+	 * Returns the evolution tree as a formatted String.
 	 */
 	@Nullable
-	public String getEvolutionChainString() {
-		EvolutionChain evolution;
-
-		try {
-			JsonObject obj = HttpResponse.getJsonObject(evolutionChain.getUrl());
-			evolution = new Gson().fromJson(obj, EvolutionChain.class);
-		} catch (IOException e) {
-			return null;
-		}
-
-		StringBuilder sb = new StringBuilder();
-
-		// No evolutions
-		if (evolution.chain.evolvesTo.isEmpty()) {
-			sb.append(Formatter.formatPokemonName(name));
-		}
-
-		// One evolution
-		else if (evolution.chain.evolvesTo.get(0).evolvesTo.isEmpty()) {
-			String stage1 = Formatter.formatPokemonName(evolution.chain.species.getName());
-			sb.append(stage1).append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(0).species.getName()));
-
-			for (int i = 1; i < evolution.chain.evolvesTo.size(); i++) {
-				sb.append("\n").append(stage1).append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(i).species.getName()));
-			}
-		}
-
-		// Two evolutions
-		else {
-			String stage1 = Formatter.formatPokemonName(evolution.chain.species.getName());
-			// Multiple stage 2 evolution
-			if (evolution.chain.evolvesTo.size() > 1) {
-				sb.append(stage1).append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(0).species.getName()))
-								 .append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(0).evolvesTo.get(0).species.getName()));
-
-				for (int i = 1; i < evolution.chain.evolvesTo.size(); i++) {
-					sb.append("\n").append(stage1).append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(i).species.getName()))
-												  .append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(i).evolvesTo.get(0).species.getName()));
-				}
-			}
-			// Only one stage 2 evolution
-			else {
-				String stage2 = Formatter.formatPokemonName(evolution.chain.evolvesTo.get(0).species.getName());
-				sb.append(stage1).append(" → ").append(stage2).append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(0).evolvesTo.get(0).species.getName()));
-
-				for (int i = 1; i < evolution.chain.evolvesTo.get(0).evolvesTo.size(); i++) {
-					sb.append("\n").append(stage1).append(" → ").append(stage2).append(" → ").append(Formatter.formatPokemonName(evolution.chain.evolvesTo.get(0).evolvesTo.get(i).species.getName()));
-				}
-			}
-		}
-		return sb.toString();
+	public String getEvolutionChainString() throws APIException {
+		EvolutionChain chain = PokeApiClient.getEvolutionChainByUrl(getEvolutionChainUrl());
+		return EvolutionChainFormatter.format(chain, name);
 	}
 
 	/**
 	 * Returns an individual Pokémon. In this case, it's the default variant.
 	 */
-	public Pokemon getPokemon() throws IOException, InvalidIdException {
-		return PokeAPI.getPokemon(pokedexId);
+	public Pokemon getPokemon() throws APIException, NotFoundException {
+		String pokemonName = getDefaultVarietyName();
+		if (pokemonName == null) {
+			// This is “should never happen” unless the API changed / data is weird
+			throw new APIException("Species " + pokedexId + " has no default variety");
+		}
+
+		// Prefer name-based lookup; it’s stable and matches what species gives you
+		return PokeApiClient.getPokemon(pokemonName);
+	}
+
+	private @Nullable String getDefaultVarietyName() {
+		if (varieties == null || varieties.isEmpty()) return null;
+
+		for (Variety v : varieties) {
+			if (v != null && v.isDefault() && v.getPokemon() != null) {
+				return v.getPokemon().getName();
+			}
+		}
+
+		// Fallback: first variety
+		Variety first = varieties.getFirst();
+		return first != null && first.getPokemon() != null ? first.getPokemon().getName() : null;
 	}
 
 	@Override

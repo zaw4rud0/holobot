@@ -1,6 +1,6 @@
 package modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.modules.jikan.model.Season;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -14,7 +14,7 @@ class SeasonTests {
 
     @Test
     void testSeasonNow() throws APIException {
-        List<Anime> now = JikanAPI.getSeason();
+        List<Anime> now = JikanApiClient.getSeason();
 
         assertNotNull(now);
         assertFalse(now.isEmpty());
@@ -22,7 +22,7 @@ class SeasonTests {
 
     @Test
     void testSeasonSpring2022() throws APIException {
-        List<Anime> spring2022 = JikanAPI.getSeason(Season.SPRING, 2022);
+        List<Anime> spring2022 = JikanApiClient.getSeason(Season.SPRING, 2022);
 
         assertNotNull(spring2022);
         assertFalse(spring2022.isEmpty());
@@ -34,7 +34,7 @@ class SeasonTests {
 
     @Test
     void testSeasonFuture() throws APIException {
-        List<Anime> spring2069 = JikanAPI.getSeason(Season.SPRING, 2069);
+        List<Anime> spring2069 = JikanApiClient.getSeason(Season.SPRING, 2069);
 
         assertNotNull(spring2069);
         assertTrue(spring2069.isEmpty());

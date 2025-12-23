@@ -1,19 +1,15 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
-import dev.zawarudo.holo.modules.pokemon.model.PokemonSpecies;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
-import dev.zawarudo.holo.utils.exceptions.NotFoundException;
+import dev.zawarudo.holo.utils.exceptions.*;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
-
-import java.io.IOException;
 
 @Command(name = "spawn",
 		description = "Spawns a Pokémon",
@@ -29,41 +25,53 @@ public class SpawnCmd extends AbstractCommand {
 	}
 
 	@Override
-	public void onCommand(@NotNull MessageReceivedEvent e) {
-		deleteInvoke(e);
+	public void onCommand(@NotNull MessageReceivedEvent event) {
+		deleteInvoke(event);
 
-		EmbedBuilder builder = new EmbedBuilder();
-
-		PokemonSpecies species;
-		Pokemon pokemon;
+		long channelId = event.getChannel().getIdLong();
 
 		try {
-			// Spawn random Pokémon
-			if (args.length == 0 || args.length == 1 && "random".equals(args[0])) {
-				species = PokeAPI.getRandomPokemonSpecies();
-				manager.deleteMessage(e.getChannel().getIdLong());
+			if (args.length == 0 || args.length == 1 && "random".equalsIgnoreCase(args[0])) {
+				// Random spawn
+				Pokemon pokemon = PokeApiClient.getRandomPokemonSpecies().getPokemon();
+				manager.deleteMessage(channelId);
+				manager.spawnNewPokemon(channelId, pokemon);
+				return;
 			}
-			// Make Pokémon spawn in a new text channel
-			else if ("add".equals(args[0])) {
-				species = PokeAPI.getRandomPokemonSpecies();
+
+			else if ("add".equalsIgnoreCase(args[0])) {
+				// Make Pokémon spawn in a new text channel
+				manager.addChannel(channelId);
+
+				Pokemon pokemon = PokeApiClient.getRandomPokemonSpecies().getPokemon();
+				manager.spawnNewPokemon(channelId, pokemon);
+				return;
 			}
 			// Spawn specific Pokémon
-			else {
-				species = PokeAPI.getPokemonSpecies(args[0]);
-				manager.deleteMessage(e.getChannel().getIdLong());
-			}
-			pokemon = species.getPokemon();
-		} catch (IOException ex) {
-			builder.setTitle("Error");
-			builder.setDescription("API error. Please try again later.");
-			sendToOwner(builder);
-			return;
-		} catch (InvalidIdException | NotFoundException ex) {
-			builder.setTitle("Error");
-			builder.setDescription("Pokémon not found. Please check for typos.");
-			sendToOwner(builder);
-			return;
+			Pokemon pokemon = isNumeric(args[0])
+					? PokeApiClient.getPokemon(Integer.parseInt(args[0]))
+					: PokeApiClient.getPokemon(args[0]);
+
+			manager.deleteMessage(channelId);
+			manager.spawnNewPokemon(channelId, pokemon);
+		} catch (APIException ex) {
+			sendOwnerError("PokéAPI error right now. Try again later.");
+		} catch (NotFoundException | InvalidIdException ex) {
+			sendOwnerError("Pokémon not found. Check typos / ID.");
 		}
-		manager.spawnNewPokemon(e.getChannel().getIdLong(), pokemon);
+	}
+
+	private static boolean isNumeric(String s) {
+		for (int i = 0; i < s.length(); i++) {
+			if (!Character.isDigit(s.charAt(i))) return false;
+		}
+		return !s.isBlank();
+	}
+
+	private void sendOwnerError(String msg) {
+		EmbedBuilder b = new EmbedBuilder();
+		b.setTitle("Spawn error");
+		b.setDescription(msg);
+		sendToOwner(b);
 	}
 }

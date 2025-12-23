@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.modules.jikan.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 
@@ -184,6 +184,6 @@ public abstract class AbstractMedium<T extends AbstractMedium<T>> implements Com
     }
 
     public List<Related> getRelated() throws APIException, InvalidRequestException {
-        return JikanAPI.getRelated(id, MediaType.ANIME);
+        return JikanApiClient.getRelated(id, MediaType.ANIME);
     }
 }

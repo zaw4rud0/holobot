@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
@@ -49,10 +49,10 @@ public class PokemonTeamCmd extends AbstractCommand {
 				// Generate 6 random Pokémon ids
 				List<Integer> ids = new ArrayList<>();
 				for (int i = 0; i < 6; i++) {
-					ids.add(new Random().nextInt(PokeAPI.POKEMON_COUNT) + 1);
+					ids.add(new Random().nextInt(PokeApiClient.POKEMON_COUNT) + 1);
 				}
 
-                List<Pokemon> pokemon = PokeAPI.getPokemon(ids.stream().mapToInt(k -> k).toArray());
+                List<Pokemon> pokemon = PokeApiClient.getPokemon(ids.stream().mapToInt(k -> k).toArray());
                 PokemonTeam team = new PokemonTeam(pokemon.toArray(new Pokemon[0]));
 
 				BufferedImage img = team.generateTeamImage();

@@ -1,12 +1,13 @@
 package dev.zawarudo.holo.commands.games.pokemon;
 
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.modules.pokemon.model.PokemonSpecies;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -46,21 +47,21 @@ public class PokedexCmd extends AbstractCommand {
 		Pokemon pokemon;
 
 		try {
-			species = PokeAPI.getPokemonSpecies(search);
+			species = PokeApiClient.getPokemonSpecies(search);
 			pokemon = species.getPokemon();
-		} catch (IOException ex) {
+		} catch (APIException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Something went wrong. Please try again in a few minutes!");
 			sendEmbed(event, builder, false, 30, TimeUnit.SECONDS);
 			return;
-		} catch (NotFoundException | InvalidIdException ex) {
+		} catch (NotFoundException ex) {
 			builder.setTitle("Error");
 			builder.setDescription("Pokémon not found. Please check for typos or that you used the right Pokédex id!");
 			sendEmbed(event, builder, false, 30, TimeUnit.SECONDS);
 			return;	
 		}
 
-		// Prepare embed fields
+        // Prepare embed fields
 		String name = species.getName("en");
 		String gen = species.getGeneration().getName().toUpperCase(Locale.UK).replace("GENERATION-", "Gen ");
 		String type;
@@ -72,9 +73,18 @@ public class PokedexCmd extends AbstractCommand {
 		}
 		String genderRatio = species.getGenderRate() == -1.0 ? "Genderless" : 100 - species.getGenderRate() / 8.0 * 100 + "% \\\u2642 | " + species.getGenderRate() / 8.0 * 100 + "% \\\u2640";
 		String entry = species.getPokedexEntry("en");
-		String evolutionChain = species.getEvolutionChainString().equals(name) ? null : species.getEvolutionChainString().replace(name, "*" + name + "*");
 
-		// Set embed
+		String evolutionChain;
+        try {
+            evolutionChain = species.getEvolutionChainString().equals(name) ? null : species.getEvolutionChainString().replace(name, "*" + name + "*");
+        } catch (APIException e) {
+			builder.setTitle("Error");
+			builder.setDescription("Something went wrong. Please try again in a few minutes!");
+			sendEmbed(event, builder, false, 30, TimeUnit.SECONDS);
+			return;
+        }
+
+        // Set embed
 		builder.setTitle(name + " | " + "#" + species.getPokedexId() + " | " + gen);
 		builder.setThumbnail(pokemon.getSprites().getOther().getArtwork().getFrontDefault());
 		builder.setDescription(species.getGenus("en"));

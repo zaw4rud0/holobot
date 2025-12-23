@@ -4,14 +4,11 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
-import dev.zawarudo.holo.utils.exceptions.APIException;
-import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
-import dev.zawarudo.holo.utils.HttpResponse;
+import dev.zawarudo.holo.utils.HoloHttp;
+import dev.zawarudo.holo.utils.exceptions.*;
 import dev.zawarudo.holo.utils.TypeTokenUtils;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -22,6 +19,8 @@ import java.util.Map;
  * A wrapper class for the <a href="https://dog.ceo/dog-api/">Dog CEO API</a>.
  */
 public final class DogCeoClient {
+
+    private static final Gson GSON = new Gson();
 
     private DogCeoClient() {
     }
@@ -34,13 +33,14 @@ public final class DogCeoClient {
      */
     @NotNull
     public static String getRandomImage() throws APIException {
-        JsonObject obj;
+        String url = ENDPOINT.RANDOM.getUrl();
         try {
-            obj = HttpResponse.getJsonObject(ENDPOINT.RANDOM.getUrl());
-        } catch (IOException e) {
-            throw new APIException(e);
+            JsonObject obj = fetchJsonOrThrow(ENDPOINT.RANDOM.getUrl());
+            return obj.get("message").getAsString();
+        } catch (InvalidRequestException ex) {
+            // This should not happen
+            throw new APIException("Unexpected error response for endpoint with no input: " + url, ex);
         }
-        return obj.get("message").getAsString();
     }
 
     /**
@@ -53,14 +53,8 @@ public final class DogCeoClient {
      */
     @NotNull
     public static String getRandomBreedImage(@NotNull String breed) throws APIException, InvalidRequestException {
-        JsonObject obj;
-        try {
-            obj = HttpResponse.getJsonObject(String.format(ENDPOINT.RANDOM_BREED.getUrl(), breed));
-        } catch (FileNotFoundException e) {
-            throw new InvalidRequestException("Invalid breed: " + breed, e);
-        } catch (IOException e) {
-            throw new APIException(e);
-        }
+        String url = String.format(ENDPOINT.RANDOM_BREED.getUrl(), breed);
+        JsonObject obj = fetchJsonOrThrow(url);
         return obj.get("message").getAsString();
     }
 
@@ -74,17 +68,9 @@ public final class DogCeoClient {
      */
     @NotNull
     public static List<String> getBreedImages(@NotNull String breed) throws APIException, InvalidRequestException {
-        JsonObject jsonObj;
-        try {
-            jsonObj = HttpResponse.getJsonObject(String.format(ENDPOINT.BY_BREED.getUrl(), breed));
-        } catch (FileNotFoundException e) {
-            throw new InvalidRequestException("Invalid breed: " + breed, e);
-        } catch (IOException e) {
-            throw new APIException(e);
-        }
-        JsonArray array = jsonObj.getAsJsonArray("message");
-        Type listType = TypeTokenUtils.getListTypeToken(String.class);
-        return new Gson().fromJson(array, listType);
+        String url = String.format(ENDPOINT.BY_BREED.getUrl(), breed);
+        JsonObject obj = fetchJsonOrThrow(url);
+        return parseMessageAsStringList(obj);
     }
 
     /**
@@ -98,14 +84,8 @@ public final class DogCeoClient {
      */
     @NotNull
     public static String getRandomSubBreedImage(@NotNull String breed, @NotNull String subBreed) throws APIException, InvalidRequestException {
-        JsonObject obj;
-        try {
-            obj = HttpResponse.getJsonObject(String.format(ENDPOINT.RANDOM_SUB_BREED.getUrl(), breed, subBreed));
-        } catch (FileNotFoundException e) {
-            throw new InvalidRequestException("Invalid breed or sub-breed: " + breed + ", " + subBreed, e);
-        } catch (IOException e) {
-            throw new APIException(e);
-        }
+        String url = String.format(ENDPOINT.RANDOM_SUB_BREED.getUrl(), breed, subBreed);
+        JsonObject obj = fetchJsonOrThrow(url);
         return obj.get("message").getAsString();
     }
 
@@ -120,17 +100,9 @@ public final class DogCeoClient {
      */
     @NotNull
     public static List<String> getSubBreedImages(@NotNull String breed, @NotNull String subBreed) throws APIException, InvalidRequestException {
-        JsonObject jsonObj;
-        try {
-            jsonObj = HttpResponse.getJsonObject(String.format(ENDPOINT.BY_SUB_BREED.getUrl(), breed, subBreed));
-        } catch (FileNotFoundException e) {
-            throw new InvalidRequestException("Invalid breed or sub-breed: " + breed + ", " + subBreed, e);
-        } catch (IOException e) {
-            throw new APIException(e);
-        }
-        JsonArray array = jsonObj.getAsJsonArray("message");
-        Type listType = TypeTokenUtils.getListTypeToken(String.class);
-        return new Gson().fromJson(array, listType);
+        String url = String.format(ENDPOINT.BY_SUB_BREED.getUrl(), breed, subBreed);
+        JsonObject obj = fetchJsonOrThrow(url);
+        return parseMessageAsStringList(obj);
     }
 
     /**
@@ -141,18 +113,22 @@ public final class DogCeoClient {
      */
     @NotNull
     public static List<Breed> getBreedList() throws APIException {
-        JsonObject jsonObj;
+        String url = ENDPOINT.ALL_BREEDS.getUrl();
+
+        JsonObject obj;
         try {
-            jsonObj = HttpResponse.getJsonObject(ENDPOINT.ALL_BREEDS.getUrl());
-        } catch (IOException e) {
-            throw new APIException(e);
+            obj = fetchJsonOrThrow(url);
+        } catch (InvalidRequestException ex) {
+            // This should not happen
+            throw new APIException("Unexpected error response for endpoint with no input: " + url, ex);
         }
-        JsonObject breeds = jsonObj.getAsJsonObject("message");
+
+        JsonObject breeds = obj.getAsJsonObject("message");
+
         List<Breed> breedList = new ArrayList<>();
         for (Map.Entry<String, JsonElement> entry : breeds.entrySet()) {
-            String[] subBreeds = new Gson().fromJson(entry.getValue().getAsJsonArray(), String[].class);
-            Breed breed = new Breed(entry.getKey(), subBreeds);
-            breedList.add(breed);
+            String[] subBreeds = GSON.fromJson(entry.getValue().getAsJsonArray(), String[].class);
+            breedList.add(new Breed(entry.getKey(), subBreeds));
         }
         return breedList;
     }
@@ -166,26 +142,38 @@ public final class DogCeoClient {
      * @throws InvalidRequestException If the given breed is invalid.
      */
     @NotNull
-    public static List<String> getSubBreeds(@NotNull String breed) throws InvalidRequestException, APIException {
+    public static List<String> getSubBreeds(@NotNull String breed) throws APIException, InvalidRequestException {
         String url = String.format(ENDPOINT.ALL_SUB_BREEDS.getUrl(), breed);
+        JsonObject obj = fetchJsonOrThrow(url);
+        return parseMessageAsStringList(obj);
+    }
 
-        JsonObject jsonObj;
-        try {
-            jsonObj = HttpResponse.getJsonObject(url);
-        } catch (FileNotFoundException e) {
-            throw new InvalidRequestException("Invalid breed: " + breed, e);
-        } catch (IOException e) {
-            throw new APIException(e);
-        }
-
-        // Check if request was successful
-        if (!"success".equals(jsonObj.get("status").getAsString())) {
-            throw new InvalidRequestException("Invalid breed: " + breed);
-        }
-
-        JsonArray array = jsonObj.getAsJsonArray("message");
+    private static List<String> parseMessageAsStringList(JsonObject obj) {
+        JsonArray array = obj.getAsJsonArray("message");
         Type listType = TypeTokenUtils.getListTypeToken(String.class);
-        return new Gson().fromJson(array, listType);
+        return GSON.fromJson(array, listType);
+    }
+
+    private static JsonObject fetchJsonOrThrow(String url) throws APIException, InvalidRequestException {
+        try {
+            JsonObject obj = HoloHttp.getJsonObject(url);
+            if (obj.has("status") && !"success".equalsIgnoreCase(obj.get("status").getAsString())) {
+                String msg = obj.has("message") ? obj.get("message").getAsString() : "Invalid request";
+                throw new InvalidRequestException(msg);
+            }
+            return obj;
+        } catch (HttpStatusException e) {
+            int code = e.getStatusCode();
+            if (code == 404) {
+                throw new InvalidRequestException("Not found: " + url, e);
+            }
+            if (code >= 400 && code < 500) {
+                throw new InvalidRequestException("Invalid request (" + code + "): " + url, e);
+            }
+            throw new APIException("API error (" + code + "): " + url, e);
+        } catch (HttpTransportException e) {
+            throw new APIException("I/O error while contacting DogCEO: " + url, e);
+        }
     }
 
     /**

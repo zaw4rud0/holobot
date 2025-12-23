@@ -1,8 +1,9 @@
 package dev.zawarudo.holo.modules.pokemon.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.zawarudo.holo.modules.pokemon.PokeAPI;
+import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.utils.Formatter;
+import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import org.jetbrains.annotations.NotNull;
 
@@ -454,8 +455,8 @@ public class Pokemon implements Comparable<Pokemon> {
     /**
      * Returns the {@link PokemonSpecies} of this Pokémon.
      */
-    public PokemonSpecies getPokemonSpecies() throws IOException, NotFoundException {
-        return PokeAPI.getPokemonSpecies(species.getName());
+    public PokemonSpecies getPokemonSpecies() throws IOException, NotFoundException, APIException {
+        return PokeApiClient.getPokemonSpecies(species.getName());
     }
 
     @Override

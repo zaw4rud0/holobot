@@ -22,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.annotation.Nonnull;
 import java.sql.SQLException;
 
 /**
@@ -137,7 +136,7 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a guild chances its name.
      */
     @Override
-    public void onGuildUpdateName(@Nonnull GuildUpdateNameEvent event) {
+    public void onGuildUpdateName(@NotNull GuildUpdateNameEvent event) {
         try {
             DBOperations.updateGuild(event.getGuild());
         } catch (SQLException ex) {
@@ -179,7 +178,7 @@ public class GuildListener extends ListenerAdapter {
      * Event that is fired when a user changes their username.
      */
     @Override
-    public void onUserUpdateName(@Nonnull UserUpdateNameEvent event) {
+    public void onUserUpdateName(@NotNull UserUpdateNameEvent event) {
         try {
             DBOperations.updateUser(event.getUser());
         } catch (SQLException ex) {

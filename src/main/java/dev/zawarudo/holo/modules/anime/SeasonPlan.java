@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.modules.anime;
 
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.modules.jikan.model.Season;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -21,7 +21,7 @@ public final class SeasonPlan {
      * Creates an image displaying the anime that air on the respective week day.
      */
     public static BufferedImage createWeekPlan(Season season, int year) throws APIException {
-        List<Anime> seasonalAnime = JikanAPI.getSeason(season, year);
+        List<Anime> seasonalAnime = JikanApiClient.getSeason(season, year);
 
         for (Anime anime : seasonalAnime) {
             anime.changeBroadcastTimeZone("Europe/Zurich");

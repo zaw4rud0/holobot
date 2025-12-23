@@ -1,7 +1,7 @@
 package modules.booru;
 
 import dev.zawarudo.holo.modules.booru.BooruPost;
-import dev.zawarudo.holo.modules.booru.danbooru.DanbooruAPI;
+import dev.zawarudo.holo.modules.booru.danbooru.DanbooruApiClient;
 import dev.zawarudo.holo.modules.booru.danbooru.DanbooruPost;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
@@ -20,9 +20,9 @@ class DanbooruTests {
 
     @Test
     void testPostCount() throws APIException, InvalidRequestException {
-        assertTrue(DanbooruAPI.getPostCount("holo") > 2500);
-        assertTrue(DanbooruAPI.getPostCount() > 5000000);
-        assertEquals(0, DanbooruAPI.getPostCount("holo", "yae_miko"));
+        assertTrue(DanbooruApiClient.getPostCount("holo") > 2500);
+        assertTrue(DanbooruApiClient.getPostCount() > 5000000);
+        assertEquals(0, DanbooruApiClient.getPostCount("holo", "yae_miko"));
     }
 
     /**
@@ -30,11 +30,11 @@ class DanbooruTests {
      */
     @Test
     void testBasic() {
-        DanbooruAPI danbooru = new DanbooruAPI();
+        DanbooruApiClient danbooru = new DanbooruApiClient();
 
         assertEquals(10, danbooru.getLimit());
-        assertEquals(DanbooruAPI.Order.DEFAULT, danbooru.getOrder());
-        assertEquals(DanbooruAPI.Rating.ALL, danbooru.getRating());
+        assertEquals(DanbooruApiClient.Order.DEFAULT, danbooru.getOrder());
+        assertEquals(DanbooruApiClient.Rating.ALL, danbooru.getRating());
         assertEquals(new ArrayList<String>(), danbooru.getTags());
         assertEquals(new ArrayList<String>(), danbooru.setTags("holo").clearTags().getTags());
         assertEquals(new ArrayList<String>(), danbooru.getBlacklistedTags());
@@ -60,7 +60,7 @@ class DanbooruTests {
 
     @Test
     void testLimit() throws APIException, InvalidRequestException {
-        DanbooruAPI danbooru = new DanbooruAPI();
+        DanbooruApiClient danbooru = new DanbooruApiClient();
 
         List<DanbooruPost> posts = danbooru.getPosts();
         assertNotNull(posts);
@@ -81,40 +81,40 @@ class DanbooruTests {
 
     @Test
     void testRatingSafe() throws APIException, InvalidRequestException {
-        DanbooruAPI danbooru = new DanbooruAPI();
-        List<DanbooruPost> posts = danbooru.setRating(DanbooruAPI.Rating.SAFE).getPosts();
+        DanbooruApiClient danbooru = new DanbooruApiClient();
+        List<DanbooruPost> posts = danbooru.setRating(DanbooruApiClient.Rating.SAFE).getPosts();
 
         for (BooruPost post : posts) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(post.toString());
             }
-            assertEquals(DanbooruAPI.Rating.SAFE.getShortValue(), post.getRating());
+            assertEquals(DanbooruApiClient.Rating.SAFE.getShortValue(), post.getRating());
         }
     }
 
     @Test
     void testRatingQuestionable() throws APIException, InvalidRequestException {
-        DanbooruAPI danbooru = new DanbooruAPI();
-        List<DanbooruPost> posts = danbooru.setRating(DanbooruAPI.Rating.QUESTIONABLE).getPosts();
+        DanbooruApiClient danbooru = new DanbooruApiClient();
+        List<DanbooruPost> posts = danbooru.setRating(DanbooruApiClient.Rating.QUESTIONABLE).getPosts();
 
         for (BooruPost post : posts) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(post.toString());
             }
-            assertEquals(DanbooruAPI.Rating.QUESTIONABLE.getShortValue(), post.getRating());
+            assertEquals(DanbooruApiClient.Rating.QUESTIONABLE.getShortValue(), post.getRating());
         }
     }
 
     @Test
     void testRatingExplicit() throws APIException, InvalidRequestException {
-        DanbooruAPI danbooru = new DanbooruAPI();
-        List<DanbooruPost> posts = danbooru.setRating(DanbooruAPI.Rating.EXPLICIT).getPosts();
+        DanbooruApiClient danbooru = new DanbooruApiClient();
+        List<DanbooruPost> posts = danbooru.setRating(DanbooruApiClient.Rating.EXPLICIT).getPosts();
 
         for (BooruPost post : posts) {
             if (LOGGER.isDebugEnabled()) {
                 LOGGER.debug(post.toString());
             }
-            assertEquals(DanbooruAPI.Rating.EXPLICIT.getShortValue(), post.getRating());
+            assertEquals(DanbooruApiClient.Rating.EXPLICIT.getShortValue(), post.getRating());
         }
     }
 }

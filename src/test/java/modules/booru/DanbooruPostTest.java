@@ -1,6 +1,6 @@
 package modules.booru;
 
-import dev.zawarudo.holo.modules.booru.danbooru.DanbooruAPI;
+import dev.zawarudo.holo.modules.booru.danbooru.DanbooruApiClient;
 import dev.zawarudo.holo.modules.booru.danbooru.DanbooruPost;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
@@ -12,7 +12,7 @@ class DanbooruPostTest {
 
     @Test
     void testPost() throws APIException, InvalidRequestException {
-        DanbooruPost post = DanbooruAPI.getPost(1);
+        DanbooruPost post = DanbooruApiClient.getPost(1);
 
         // Basic data
         assertEquals(1, post.getId());

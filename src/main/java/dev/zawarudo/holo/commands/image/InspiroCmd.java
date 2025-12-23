@@ -1,22 +1,23 @@
 package dev.zawarudo.holo.commands.image;
 
+import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
-import dev.zawarudo.holo.utils.HttpResponse;
+import dev.zawarudo.holo.utils.exceptions.HttpStatusException;
+import dev.zawarudo.holo.utils.exceptions.HttpTransportException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
 /**
  * Command to fetch a quote from inspirobot.me and display it in an embed.
  */
 @Command(name = "inspiro",
-		description = "Fetch a random quote from [Inspirobot](https://inspirobot.me).",
+		description = "Fetch a random quote from [InspiroBot](https://inspirobot.me).",
 		thumbnail = "https://inspirobot.me/website/images/inspirobot-dark-green.png",
 		embedColor = EmbedColor.INSPIRO,
 		guildOnly = false,
@@ -29,17 +30,26 @@ public class InspiroCmd extends AbstractCommand {
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
 
-		String url;
+		String imageUrl;
 		try {
-			url = HttpResponse.readLine(API_URL);
-		} catch (IOException ex) {
-			sendErrorEmbed(event, "Something went wrong while communicating with the API! Please try again in a few minutes.");
+			imageUrl = HoloHttp.readLine(API_URL);
+		} catch (HttpStatusException ex) {
+			sendErrorEmbed(event, "InspiroBot returned an error (HTTP " + ex.getStatusCode() + "). Please try again later.");
+			return;
+		} catch (HttpTransportException ex) {
+			sendErrorEmbed(event, "I couldn't reach InspiroBot. Please try again in a few minutes.");
 			return;
 		}
 
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("InspiroBot Quote");
-		builder.setImage(url);
+		if (imageUrl.isBlank()) {
+			sendErrorEmbed(event, "InspiroBot returned an empty response. Please try again.");
+			return;
+		}
+
+        EmbedBuilder builder = new EmbedBuilder()
+				.setTitle("InspiroBot Quote")
+				.setImage(imageUrl);
+
 		sendEmbed(event, builder, true, 5, TimeUnit.MINUTES, getEmbedColor());
 	}
 }

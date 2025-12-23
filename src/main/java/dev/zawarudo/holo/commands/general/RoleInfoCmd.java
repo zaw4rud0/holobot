@@ -44,7 +44,7 @@ public class RoleInfoCmd extends AbstractCommand {
         Role role = null;
 
         if (!e.getMessage().getMentions().getRoles().isEmpty()) {
-            role = e.getMessage().getMentions().getRoles().get(0);
+            role = e.getMessage().getMentions().getRoles().getFirst();
         } else if (isLong(args[0])) {
             role = e.getGuild().getRoleById(args[0]);
         } else {
@@ -80,7 +80,7 @@ public class RoleInfoCmd extends AbstractCommand {
         builder.addField("Members", "`" + count + "`", false);
 
         // Other info
-        Color roleColor = role.getColor();
+        Color roleColor = role.getColors().getPrimary();
         String color = "None";
         if (roleColor != null) {
             color = String.format("#%02x%02x%02x", roleColor.getRed(), roleColor.getGreen(), roleColor.getBlue());
@@ -91,11 +91,11 @@ public class RoleInfoCmd extends AbstractCommand {
 
         // Permissions
         String perms = "None";
-        if (role.getPermissions().size() > 0) {
+        if (!role.getPermissions().isEmpty()) {
             perms = role.getPermissions().stream().map(Permission::getName).collect(Collectors.joining(", "));
         }
         builder.addField("Permissions", "```" + perms + "```", false);
 
-        sendEmbed(e, builder, true, 2, TimeUnit.MINUTES, role.getColor());
+        sendEmbed(e, builder, true, 2, TimeUnit.MINUTES, roleColor);
     }
 }

@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -21,7 +21,7 @@ import java.util.List;
 /**
  * A command for searching and displaying anime information from the MyAnimeList
  * database. It uses JikanAPI since the official MyAnimeList API doesn't provide
- * all the needed functionalities. See {@link JikanAPI} for more info.
+ * all the needed functionalities. See {@link JikanApiClient} for more info.
  */
 @Command(name = "animesearch",
         description = "Use this command to search for an anime in the database of MyAnimeList.",
@@ -61,7 +61,7 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
     @Override
     protected List<Anime> performSearch(MessageReceivedEvent event, String search) {
         try {
-            return JikanAPI.searchAnime(search);
+            return JikanApiClient.searchAnime(search);
         } catch (InvalidRequestException ex) {
             sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
             if (logger.isErrorEnabled()) {

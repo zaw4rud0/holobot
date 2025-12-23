@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Evolution chains are essentially family trees. They start with the lowest stage within a family and detail evolution conditions for each as well as Pokémon they can evolve into up through the hierarchy.
  */
-class EvolutionChain {
+public class EvolutionChain {
     /**
      * The id of the evolution chain.
      */

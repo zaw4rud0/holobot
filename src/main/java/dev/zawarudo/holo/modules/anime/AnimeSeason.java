@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.modules.anime;
 
-import dev.zawarudo.holo.modules.jikan.JikanAPI;
+import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.AbstractMedium;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.modules.jikan.model.Broadcast;
@@ -18,7 +18,7 @@ public class AnimeSeason {
     private static final String TARGET_TIME_ZONE = "Europe/Zurich";
 
     public static void main(String[] args) throws APIException {
-        List<Anime> seasonalAnime = JikanAPI.getSeason(Season.FALL, 2024);
+        List<Anime> seasonalAnime = JikanApiClient.getSeason(Season.FALL, 2024);
 
         // Sort by popularity
         seasonalAnime.sort(Comparator.comparingInt(AbstractMedium::getPopularity));
