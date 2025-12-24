@@ -2,7 +2,6 @@ package dev.zawarudo.holo.database;
 
 import dev.zawarudo.holo.commands.general.CountdownCmd;
 import dev.zawarudo.holo.core.GuildConfig;
-import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -400,58 +399,6 @@ public final class DBOperations {
             ps.setString(4, reason);
             ps.execute();
         }
-        conn.close();
-    }
-
-    /**
-     * Returns a list of xkcd comics from the DB.
-     */
-    public static List<XkcdComic> getXkcdComics() throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("select-all-xkcd-comics");
-
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            List<XkcdComic> result = new ArrayList<>();
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                XkcdComic comic = new XkcdComic();
-                comic.setIssueNr(rs.getInt("id"));
-                comic.setTitle(rs.getString("title"));
-                comic.setImg(rs.getString("img"));
-                comic.setAlt(rs.getString("alt"));
-                comic.setDate(rs.getInt("day"), rs.getInt("month"), rs.getInt("year"));
-                result.add(comic);
-            }
-            conn.close();
-            return result;
-        }
-    }
-
-    /**
-     * Inserts a list of xkcd comics into the DB.
-     */
-    public static void insertXkcdComics(List<XkcdComic> comics) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-xkcd-comic");
-
-        Connection conn = Database.getConnection();
-        conn.setAutoCommit(false);
-
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            for (XkcdComic comic : comics) {
-                ps.setInt(1, comic.getIssueNr());
-                ps.setString(2, comic.getTitle());
-                ps.setString(3, comic.getAlt());
-                ps.setString(4, comic.getImg());
-                ps.setInt(5, comic.getDay());
-                ps.setInt(6, comic.getMonth());
-                ps.setInt(7, comic.getYear());
-                ps.addBatch();
-            }
-            ps.executeBatch();
-            conn.commit();
-        }
-
-        conn.setAutoCommit(true);
         conn.close();
     }
 

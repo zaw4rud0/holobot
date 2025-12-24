@@ -1,11 +1,12 @@
 package dev.zawarudo.holo.commands.image;
 
+import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.core.misc.EmbedColor;
@@ -36,16 +37,18 @@ public class XkcdCmd extends AbstractCommand {
     private static final String ERROR_RETRIEVING = "Something went wrong while retrieving the comic. Please try again later.";
     private static final String ERROR_DOES_NOT_EXIST = "This comic does not exist! If you think it should exist, consider using `%sxkcd new` to refresh my database.";
 
-    private final Map<Integer, XkcdComic> comics;
+    private final XkcdDao dao;
+
+    private final Map<Integer, XkcdComic> comics = new HashMap<>();
     private int newestIssue;
 
     public XkcdCmd() {
-        comics = new HashMap<>();
+        this.dao = new XkcdDao(Bootstrap.holo.getSQLManager());
 
         try {
-            List<XkcdComic> list = DBOperations.getXkcdComics();
+            List<XkcdComic> list = dao.findAll();
 
-            if (list == null || list.isEmpty()) {
+            if (list.isEmpty()) {
                 logger.warn("No XKCD comics found in DB.");
                 this.newestIssue = 0;
                 return;
@@ -61,6 +64,7 @@ public class XkcdCmd extends AbstractCommand {
             }
         } catch (SQLException ex) {
             logger.error("Something went wrong while fetching the XKCD comics from the DB.", ex);
+            newestIssue = 0;
         }
     }
 
@@ -173,8 +177,8 @@ public class XkcdCmd extends AbstractCommand {
             comics.put(newComic.getIssueNr(), newComic);
             newComics.add(newComic);
         }
-        newestIssue = num;
 
-        DBOperations.insertXkcdComics(newComics);
+        newestIssue = num;
+        dao.insertAll(newComics);
     }
 }
