@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.AbstractCommand;
@@ -23,13 +24,14 @@ public class PermCmd extends AbstractCommand {
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
-		
-		EmbedBuilder builder = new EmbedBuilder();		
-		builder.setTitle("My Permissions");
-		String s = e.getGuild().getSelfMember().getPermissions().stream()
+
+		String permissionString = e.getGuild().getSelfMember().getPermissions().stream()
 				.map(Permission::getName)
 				.collect(Collectors.joining("\n"));
-		builder.setDescription("```" + s + "```");
+
+		EmbedBuilder builder = new EmbedBuilder();		
+		builder.setTitle("My Permissions");
+		builder.setDescription(Formatter.asCodeBlock(permissionString));
 		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
 	}
 }

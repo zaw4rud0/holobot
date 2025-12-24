@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.AbstractCommand;
@@ -94,7 +95,7 @@ public class RoleInfoCmd extends AbstractCommand {
         if (!role.getPermissions().isEmpty()) {
             perms = role.getPermissions().stream().map(Permission::getName).collect(Collectors.joining(", "));
         }
-        builder.addField("Permissions", "```" + perms + "```", false);
+        builder.addField("Permissions", Formatter.asCodeBlock(perms), false);
 
         sendEmbed(e, builder, true, 2, TimeUnit.MINUTES, roleColor);
     }

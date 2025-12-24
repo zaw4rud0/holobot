@@ -175,4 +175,8 @@ public final class Formatter {
 
         return Formatter.capitalize(sb.toString());
     }
+
+    public static String asCodeBlock(String text) {
+        return String.format("```%n%s%n```", text);
+    }
 }

@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -8,9 +9,10 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Command(name = "help",
         description = "Shows a list of commands or their respective usage",
@@ -33,98 +35,129 @@ public class HelpCmd extends AbstractCommand {
     }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent e) {
-        deleteInvoke(e);
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        deleteInvoke(event);
 
         // Send the full help page
         if (args.length == 0) {
-            sendHelpPage(e);
+            sendHelpPage(event);
             return;
         }
 
-        EmbedBuilder builder = new EmbedBuilder();
+        String query = args[0].toLowerCase(Locale.ROOT);
 
         // Given command doesn't exist
-        if (!manager.isValidName(args[0])) {
-            builder.setTitle("Command not found");
-            builder.setDescription("Please check for typos and try again!");
-            sendEmbed(e, builder, true, 15, TimeUnit.SECONDS);
+        if (!manager.isValidName(query)) {
+            sendCommandNotFound(event, query);
             return;
         }
 
         // Help page for given command
-        sendHelpPageForCommand(e, manager.getCommand(args[0]));
+        sendHelpPageForCommand(event, manager.getCommand(args[0]));
     }
 
-    /**
-     * Sends the full help page of the bot.
-     */
-    private void sendHelpPage(MessageReceivedEvent event) {
-        EmbedBuilder builder = new EmbedBuilder();
+    private void sendCommandNotFound(MessageReceivedEvent event, String query) {
+        EmbedBuilder builder = new EmbedBuilder()
+                .setTitle("Command not found")
+                .setDescription("Please check for typos and try again!")
+                .addField("Tried", Formatter.asCodeBlock(query), false);
 
-        builder.setTitle("Help Page");
-        builder.setThumbnail(event.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"));
-        builder.setDescription("I currently use `" + getPrefix(event) + "` as prefix for all commands\n"
-                + "For more information on a certain command, use ```" + getPrefix(event) + "help <command>```");
+        sendEmbed(event, builder, true, 15, TimeUnit.SECONDS);
+    }
+
+    private void sendHelpPage(MessageReceivedEvent event) {
+        String prefix = getPrefix(event);
+
+        EmbedBuilder builder = new EmbedBuilder()
+                .setTitle("Help Page")
+                .setThumbnail(event.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"))
+                .setDescription(
+                        "I currently use `" + prefix + "` as prefix for all commands.\n" +
+                                "For more information on a certain command, use " +
+                                Formatter.asCodeBlock(prefix + "help <command>")
+                );
 
         for (CommandCategory category : CommandCategory.values()) {
-            List<AbstractCommand> cmds = getCommandsForCategory(category, event);
+            List<AbstractCommand> visible = getVisibleCommands(category, event);
 
-            // Hide guild only commands from DMs
-            if (!event.isFromGuild()) {
-                cmds.removeIf(AbstractCommand::isGuildOnly);
-            }
-            if (cmds.isEmpty()) {
+            if (visible.isEmpty()) {
                 continue;
             }
 
-            List<String> names = cmds.stream().map(AbstractCommand::getName).toList();
-            String text = String.format("```%s```", String.join(", ", names));
-            builder.addField(category.getName(), text, false);
+            String names = visible.stream()
+                    .map(AbstractCommand::getName)
+                    .sorted(String::compareToIgnoreCase)
+                    .collect(Collectors.joining(", "));
+
+            builder.addField(category.getName(), Formatter.asCodeBlock(names), false);
         }
         sendEmbed(event, builder, true, 2, TimeUnit.MINUTES);
     }
 
-    /**
-     * Gets the commands of a given category. Returns an empty list if the user is
-     * missing the required permissions.
-     */
-    private List<AbstractCommand> getCommandsForCategory(CommandCategory category, MessageReceivedEvent event) {
-        if (category == CommandCategory.OWNER && !isBotOwner(event.getAuthor())) {
-            return new ArrayList<>();
+    private List<AbstractCommand> getVisibleCommands(CommandCategory category, MessageReceivedEvent event) {
+        if (!canSeeCategory(category, event)) {
+            return List.of();
         }
-        if (category == CommandCategory.ADMIN &&
-                !(isGuildAdmin(event) || isBotOwner(event.getAuthor()))) {
-            return new ArrayList<>();
-        }
-        return manager.getCommands(category);
+
+        boolean isGuild = event.isFromGuild();
+        boolean isOwner = isBotOwner(event.getAuthor());
+        boolean isAdmin = isGuild && isGuildAdmin(event);
+
+        return manager.getCommands(category).stream()
+                // Hide guild-only commands in DMs
+                .filter(cmd -> isGuild || !cmd.isGuildOnly())
+
+                // Hide owner-only commands
+                .filter(cmd -> !cmd.isOwnerOnly() || isOwner)
+
+                // Hide admin-only commands
+                .filter(cmd -> !cmd.isAdminOnly() || isAdmin || isOwner)
+
+                .toList();
+    }
+
+    private boolean canSeeCategory(CommandCategory category, MessageReceivedEvent event) {
+        return switch (category) {
+            case OWNER -> isBotOwner(event.getAuthor());
+            case ADMIN -> isBotOwner(event.getAuthor()) || isGuildAdmin(event);
+            default -> true;
+        };
     }
 
     /**
      * Sends the help page for a given command.
      */
     private void sendHelpPageForCommand(MessageReceivedEvent event, AbstractCommand cmd) {
-        EmbedBuilder builder = new EmbedBuilder();
+        String prefix = getPrefix(event);
 
-        builder.setTitle("Command Help");
-        builder.addField("Name", cmd.getName(), false);
-        builder.addField("Description", cmd.getDescription(), false);
+        EmbedBuilder builder = new EmbedBuilder()
+                .setTitle("Command Help")
+                .addField("Name", Formatter.asCodeBlock(cmd.getName()), false)
+                .addField("Description", cmd.getDescription(), false);
 
         if (cmd.hasUsage()) {
-            String s = String.format("```%s%s %s```", getPrefix(event), cmd.getName(), cmd.getUsage());
-            builder.addField("Usage", s, false);
+            builder.addField(
+                    "Usage",
+                    Formatter.asCodeBlock(prefix + cmd.getName() + " " + cmd.getUsage()),
+                    false);
         }
+
         if (cmd.hasExample()) {
-            String s = String.format("```%s%s %s```", getPrefix(event), cmd.getName(), cmd.getExample());
-            builder.addField("Example", s, false);
+            builder.addField(
+                    "Example",
+                    Formatter.asCodeBlock(prefix + cmd.getName() + " " + cmd.getExample()),
+                    false);
         }
+
+        if (cmd.hasAlias()) {
+            String aliases = String.join(", ", cmd.getAlias());
+            builder.addField("Aliases", Formatter.asCodeBlock(aliases), false);
+        }
+
         if (cmd.hasThumbnail()) {
             builder.setThumbnail(cmd.getThumbnail());
         }
-        if (cmd.hasAlias()) {
-            String aliases = String.join(", ", cmd.getAlias());
-            builder.addField("Alias", String.format("```%s```", aliases), false);
-        }
+
         sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, cmd.getEmbedColor());
     }
 }

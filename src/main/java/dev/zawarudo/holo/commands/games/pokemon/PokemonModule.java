@@ -17,20 +17,17 @@ public class PokemonModule implements CommandModule {
     }
 
     @Override
-    public String name() {
-        return "pokemon";
-    }
-
-    @Override
     public String description() {
-        return "Commands related to Pokémon, such catching Pokémon, managing teams, and viewing Pokédex entries.";
+        return "Commands related to Pokémon, such as catching Pokémon, managing teams, and viewing Pokédex entries.";
     }
 
     @Override
     public void register(CommandManager registry) {
-        registry.addCommand(new CatchCmd(pokemonSpawnManager));
-        registry.addCommand(new PokedexCmd());
-        registry.addCommand(new PokemonTeamCmd());
-        registry.addCommand(new SpawnCmd(pokemonSpawnManager));
+        ModuleId moduleId = id();
+
+        registry.addCommand(new CatchCmd(pokemonSpawnManager), moduleId);
+        registry.addCommand(new PokedexCmd(), moduleId);
+        registry.addCommand(new PokemonTeamCmd(), moduleId);
+        registry.addCommand(new SpawnCmd(pokemonSpawnManager), moduleId);
     }
 }

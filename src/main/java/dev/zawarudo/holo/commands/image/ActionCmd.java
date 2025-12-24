@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.annotations.SerializedName;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.TypeTokenUtils;
 import dev.zawarudo.holo.utils.Writer;
@@ -24,6 +25,7 @@ import java.io.IOException;
 import java.lang.reflect.Type;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
  * Class of the Action command. By calling this command, the user can get a random
@@ -257,11 +259,11 @@ public class ActionCmd extends AbstractCommand {
     }
 
     private String getActionsAsString() {
-        return "```" + actions.keySet().stream().sorted().toList().toString()
-                .replace("]", "")
-                .replace("[", "")
-                .replace(",", "")
-                .replace(" ", ", ") + "```";
+        String actionsList = actions.keySet().stream()
+                .sorted()
+                .collect(Collectors.joining(", "));
+
+        return Formatter.asCodeBlock(actionsList);
     }
 
     /**

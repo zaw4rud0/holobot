@@ -2,6 +2,7 @@ package dev.zawarudo.holo.core;
 
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.User;
@@ -55,17 +56,31 @@ public class PermissionManager {
             return true;
         }
 
+        if (!cmd.isNSFW()) {
+            return true;
+        }
+
         GuildConfig config = getGuildConfig(event.getGuild());
 
-        if (cmd.isNSFW() && !isNSFWConfigEnabled(event.getGuild())) {
-            sendErrorEmbed(event, String.format("NSFW commands are disabled in this server. You can change it via ```%sconfig nsfw true```", config.getPrefix()));
+        if (!isNSFWConfigEnabled(event.getGuild())) {
+            sendErrorEmbed(
+                    event,
+                    "NSFW commands are disabled in this server.\n" +
+                            "You can enable them via " +
+                            Formatter.asCodeBlock(config.getPrefix() + "config nsfw true")
+            );
             return false;
         }
 
-        if (cmd.isNSFW() && !isChannelNSFW(event.getChannel())) {
-            sendErrorEmbed(event, "You can't use NSFW commands outside NSFW channels. If you want to use this command, move to a NSFW channel.");
+        if (!isChannelNSFW(event.getChannel())) {
+            sendErrorEmbed(
+                    event,
+                    "You can't use NSFW commands outside NSFW channels.\n" +
+                            "Please move to a NSFW channel to use this command."
+            );
             return false;
         }
+
         return true;
     }
 

@@ -18,27 +18,24 @@ public class MusicModule implements CommandModule {
     }
 
     @Override
-    public String name() {
-        return "music";
-    }
-
-    @Override
     public String description() {
         return "Commands related to music and the music player.";
     }
 
     @Override
     public void register(CommandManager registry) {
-        registry.addCommand(new ClearCmd(eventWaiter));
-        registry.addCommand(new CloneCmd());
-        registry.addCommand(new JoinCmd());
-        registry.addCommand(new LeaveCmd());
-        registry.addCommand(new LoopCmd());
-        registry.addCommand(new NowPlayingCmd());
-        registry.addCommand(new PlayCmd());
-        registry.addCommand(new QueueCmd());
-        registry.addCommand(new ShuffleCmd());
-        registry.addCommand(new SkipCmd(eventWaiter));
-        registry.addCommand(new StopCmd());
+        ModuleId moduleId = id();
+
+        registry.addCommand(new ClearCmd(eventWaiter), moduleId);
+        registry.addCommand(new CloneCmd(), moduleId);
+        registry.addCommand(new JoinCmd(), moduleId);
+        registry.addCommand(new LeaveCmd(), moduleId);
+        registry.addCommand(new LoopCmd(), moduleId);
+        registry.addCommand(new NowPlayingCmd(), moduleId);
+        registry.addCommand(new PlayCmd(), moduleId);
+        registry.addCommand(new QueueCmd(), moduleId);
+        registry.addCommand(new ShuffleCmd(), moduleId);
+        registry.addCommand(new SkipCmd(eventWaiter), moduleId);
+        registry.addCommand(new StopCmd(), moduleId);
     }
 }

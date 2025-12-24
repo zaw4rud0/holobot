@@ -89,7 +89,7 @@ public class DogCmd extends AbstractCommand {
      * Sends an embed with a list of available breeds.
      */
     private void sendBreedListEmbed(MessageReceivedEvent event) {
-        String s = String.format("```%s```", String.join(", ", breeds));
+        String s = Formatter.asCodeBlock(String.join(", ", breeds));
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Available dog breeds");
         builder.setDescription(s);

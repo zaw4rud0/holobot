@@ -14,6 +14,8 @@ import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,21 +28,20 @@ public class CommandManager extends ListenerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandManager.class);
 
-    private final Map<String, AbstractCommand> commands;
+    private final Map<String, AbstractCommand> commands = new LinkedHashMap<>();
+    private final Map<AbstractCommand, CommandModule.ModuleId> ownerModule = new IdentityHashMap<>();
 
     public CommandManager(
             EventWaiter waiter,
-            List<CommandModule> modules,
+            ModuleRegistry moduleRegistry,
             GitHubClient gitHubClient,
             GuildConfigManager guildConfigManager,
             EmoteManager emoteManager,
             XkcdDao xkcdDao
     ) {
-        commands = new LinkedHashMap<>();
-
         // General Cmds
         addCommand(new BugCmd(gitHubClient));
-        addCommand(new ConfigCmd(guildConfigManager));
+        addCommand(new ConfigCmd(guildConfigManager, moduleRegistry));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -91,7 +92,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new StatusCmd());
 
         // Register module commands
-        for (CommandModule m : modules) {
+        for (CommandModule m : moduleRegistry.all()) {
             m.register(this);
         }
 
@@ -105,7 +106,11 @@ public class CommandManager extends ListenerAdapter {
      *
      * @param cmd The command to register.
      */
-    public void addCommand(AbstractCommand cmd) {
+    public void addCommand(@NotNull AbstractCommand cmd) {
+        addCommand(cmd, null);
+    }
+
+    public void addCommand(@NotNull AbstractCommand cmd, @Nullable CommandModule.ModuleId moduleId) {
         // Ignore deactivated commands
         if (cmd.getClass().isAnnotationPresent(Deactivated.class)) {
             if (LOGGER.isInfoEnabled()) {
@@ -114,10 +119,29 @@ public class CommandManager extends ListenerAdapter {
             return;
         }
 
-        commands.put(cmd.getName(), cmd);
+        putKey(cmd.getName(), cmd);
         for (String alias : cmd.getAlias()) {
-            commands.put(alias, cmd);
+            putKey(alias, cmd);
         }
+
+        if (moduleId != null) {
+            CommandModule.ModuleId existing = ownerModule.putIfAbsent(cmd, moduleId);
+            if (existing != null && existing != moduleId) {
+                LOGGER.warn("Command {} already assigned to module {} (new: {})", cmd.getName(), existing, moduleId);
+            }
+        }
+    }
+
+    private void putKey(String key, AbstractCommand cmd) {
+        AbstractCommand existing = commands.putIfAbsent(key, cmd);
+        if (existing != null && existing != cmd) {
+            LOGGER.warn("Command key '{}' already registered by {}. Ignoring {}",
+                    key, existing.getClass().getSimpleName(), cmd.getClass().getSimpleName());
+        }
+    }
+
+    public Optional<CommandModule.ModuleId> getModuleOf(@NotNull AbstractCommand cmd) {
+        return Optional.ofNullable(ownerModule.get(cmd));
     }
 
     /**

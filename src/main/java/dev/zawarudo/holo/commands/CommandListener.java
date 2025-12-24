@@ -4,6 +4,7 @@ import dev.zawarudo.holo.commands.fun.EmoteCmd;
 import dev.zawarudo.holo.commands.image.ActionCmd;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.PermissionManager;
+import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
@@ -65,7 +66,7 @@ public class CommandListener extends ListenerAdapter {
         if (split.isEmpty()) {
             return;
         }
-        String invoke = split.get(0).toLowerCase(Locale.UK);
+        String invoke = split.getFirst().toLowerCase(Locale.ROOT);
 
         // Build MDC context for logging
         Map<String, String> mdc = new HashMap<>();
@@ -96,6 +97,25 @@ public class CommandListener extends ListenerAdapter {
         }
 
         AbstractCommand cmd = cmdManager.getCommand(invoke);
+
+        // TODO: Refactor to permission manager maybe?
+        if (event.isFromGuild()) {
+            Optional<CommandModule.ModuleId> moduleIdOpt = cmdManager.getModuleOf(cmd);
+
+            if (moduleIdOpt.isPresent()) {
+                CommandModule.ModuleId moduleId = moduleIdOpt.get();
+                var cfg = Bootstrap.holo.getGuildConfigManager().getGuildConfig(event.getGuild());
+
+                if (!cfg.isModuleEnabled(moduleId)) {
+                    executorService.submit(withMdc(mdc, () ->
+                            event.getChannel()
+                                    .sendMessage("This command module is disabled on this server: `" + moduleId.id() + "`")
+                                    .queue()
+                    ));
+                    return;
+                }
+            }
+        }
 
         // Check if user can do anything
         if (!permManager.hasUserPermission(event, cmd) || !permManager.hasChannelPermission(event, cmd)) {
@@ -152,11 +172,13 @@ public class CommandListener extends ListenerAdapter {
     }
 
     private void handlePermissionError(MessageReceivedEvent event, InsufficientPermissionException ex) {
+        String permissionName = ex.getPermission().getName();
+
         EmbedBuilder builder = new EmbedBuilder();
         builder.setTitle("Missing Permission");
         builder.setDescription("Cannot perform action due to a lack of permission. Please update my permissions " +
                 "so I can run the called command.");
-        builder.addField("Permission", String.format("```%s```", ex.getPermission().getName()), false);
+        builder.addField("Permission", Formatter.asCodeBlock(permissionName), false);
 
         boolean hasWritePermission = PermissionUtil.checkPermission(
                 event.getGuildChannel().getPermissionContainer(),

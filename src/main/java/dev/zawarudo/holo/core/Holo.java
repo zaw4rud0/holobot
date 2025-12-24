@@ -3,7 +3,7 @@ package dev.zawarudo.holo.core;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.CommandListener;
 import dev.zawarudo.holo.commands.CommandManager;
-import dev.zawarudo.holo.commands.CommandModule;
+import dev.zawarudo.holo.commands.ModuleRegistry;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonModule;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.commands.music.MusicModule;
@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.EnumSet;
-import java.util.List;
 
 /**
  * Represents an instance of the bot.
@@ -46,6 +45,8 @@ public class Holo extends ListenerAdapter {
     private SQLManager sqlManager;
     private GitHubClient gitHubClient;
     private EmoteManager emoteManager;
+
+    private ModuleRegistry moduleRegistry;
 
     private final EventWaiter waiter;
 
@@ -96,16 +97,15 @@ public class Holo extends ListenerAdapter {
         pokemonSpawnManager = new PokemonSpawnManager(jda);
         permissionManager = new PermissionManager();
 
-        // Initialize modules
-        List<CommandModule> modules = List.of(
-                new MusicModule(waiter),
-                new PokemonModule(pokemonSpawnManager)
-        );
+        // Initialize command modules
+        moduleRegistry = new ModuleRegistry();
+        moduleRegistry.register(new MusicModule(waiter));
+        moduleRegistry.register(new PokemonModule(pokemonSpawnManager));
 
         // Warning: Commands only get initialized here
         commandManager = new CommandManager(
                 waiter,
-                modules,
+                moduleRegistry,
                 gitHubClient,
                 guildConfigManager,
                 emoteManager,
@@ -155,6 +155,10 @@ public class Holo extends ListenerAdapter {
 
     public EmoteManager getEmoteManager() {
         return emoteManager;
+    }
+
+    public ModuleRegistry getModuleRegistry() {
+        return moduleRegistry;
     }
 
     @Override

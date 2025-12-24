@@ -45,9 +45,10 @@ CREATE TABLE DiscordGuilds
 
 CREATE TABLE DiscordGuildConfigs
 (
-    guild_id INTEGER PRIMARY KEY,
-    prefix TEXT,
-    nsfw TEXT,
+    guild_id         INTEGER PRIMARY KEY,
+    prefix           TEXT,
+    nsfw             TEXT,
+    disabled_modules TEXT,
     FOREIGN KEY (guild_id) REFERENCES DiscordGuilds
 );
 

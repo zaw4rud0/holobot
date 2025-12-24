@@ -4,6 +4,7 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.modules.image.FilterRegistry;
 import dev.zawarudo.holo.modules.image.ImageFilter;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.ImageOperations;
 import dev.zawarudo.holo.utils.annotations.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -130,6 +131,6 @@ public class FilterCmd extends AbstractCommand {
                 .sorted(String.CASE_INSENSITIVE_ORDER)
                 .collect(Collectors.joining("\n"));
 
-        return "```\n" + joined + "\n```";
+        return Formatter.asCodeBlock(joined);
     }
 }
