@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
-import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.GuildConfig;
@@ -24,22 +24,23 @@ import java.util.concurrent.TimeUnit;
 public class ConfigCmd extends AbstractCommand {
 
 	private final GuildConfigManager manager;
+	private final GuildConfigDao guildConfigDao;
 
-	public ConfigCmd(GuildConfigManager manager) {
+	public ConfigCmd(GuildConfigManager manager, GuildConfigDao guildConfigDao) {
 		this.manager = manager;
+		this.guildConfigDao = guildConfigDao;
 	}
 
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
-		Locale locale = Locale.UK; // TODO: Store locale somewhere to reuse for consistency across the codebase.
 
 		if (args.length == 0) {
 			showCurrentConfig(event);
 			return;
 		}
 
-		String module = args[0].toLowerCase(locale);
+		String module = args[0].toLowerCase(Locale.ROOT);
 
 		switch (module) {
 			case "prefix" -> {
@@ -154,7 +155,7 @@ public class ConfigCmd extends AbstractCommand {
 	 */
 	private void saveChanges(MessageReceivedEvent event, GuildConfig config) {
 		try {
-			DBOperations.updateGuildConfig(config);
+			guildConfigDao.update(config);
 		} catch (SQLException ex) {
 			sendErrorEmbed(event, "Something went wrong while updating your configuration in the " +
 					"database. We will try to fix this ASAP.");

@@ -35,7 +35,7 @@ public class CommandManager extends ListenerAdapter {
 
         // General Cmds
         addCommand(new BugCmd(Bootstrap.holo.getGitHubClient()));
-        addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
+        addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager(), Bootstrap.holo.getGuildConfigDao()));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -78,7 +78,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new PaletteCmd());
         addCommand(new PixelateCmd());
         addCommand(new UpscaleCmd());
-        addCommand(new XkcdCmd());
+        addCommand(new XkcdCmd(Bootstrap.holo.getXkcdDao()));
 
         // Game Cmds
         addCommand(new CatchCmd());

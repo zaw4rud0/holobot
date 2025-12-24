@@ -1,6 +1,5 @@
 package dev.zawarudo.holo.commands.image;
 
-import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
@@ -37,16 +36,16 @@ public class XkcdCmd extends AbstractCommand {
     private static final String ERROR_RETRIEVING = "Something went wrong while retrieving the comic. Please try again later.";
     private static final String ERROR_DOES_NOT_EXIST = "This comic does not exist! If you think it should exist, consider using `%sxkcd new` to refresh my database.";
 
-    private final XkcdDao dao;
+    private final XkcdDao xkcdDao;
 
     private final Map<Integer, XkcdComic> comics = new HashMap<>();
     private int newestIssue;
 
-    public XkcdCmd() {
-        this.dao = new XkcdDao(Bootstrap.holo.getSQLManager());
+    public XkcdCmd(XkcdDao xkcdDao) {
+        this.xkcdDao = xkcdDao;
 
         try {
-            List<XkcdComic> list = dao.findAll();
+            List<XkcdComic> list = xkcdDao.findAll();
 
             if (list.isEmpty()) {
                 logger.warn("No XKCD comics found in DB.");
@@ -179,6 +178,6 @@ public class XkcdCmd extends AbstractCommand {
         }
 
         newestIssue = num;
-        dao.insertAll(newComics);
+        xkcdDao.insertAll(newComics);
     }
 }

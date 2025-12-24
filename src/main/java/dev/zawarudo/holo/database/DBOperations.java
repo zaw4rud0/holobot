@@ -1,7 +1,6 @@
 package dev.zawarudo.holo.database;
 
 import dev.zawarudo.holo.commands.general.CountdownCmd;
-import dev.zawarudo.holo.core.GuildConfig;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -14,9 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class that handles all the operations on the database. Note that the connection to the database is automatically established.
@@ -554,58 +551,6 @@ public final class DBOperations {
             conn.close();
             return countdowns;
         }
-    }
-
-    public static void insertGuildConfig(GuildConfig config) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-guild-config.sql");
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, config.getGuildId());
-            ps.setString(2, config.getPrefix());
-            ps.setBoolean(3, config.isNSFWEnabled());
-            ps.execute();
-        }
-    }
-
-    public static Map<Long, GuildConfig> selectGuildConfigs() throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("select-all-guild-configs");
-
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            Map<Long, GuildConfig> map = new HashMap<>();
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                long guildId = rs.getLong("guild_id");
-                GuildConfig config = new GuildConfig(guildId);
-                config.setAllowNSFW(rs.getBoolean("nsfw"));
-                config.setPrefix(rs.getString("prefix"));
-                map.put(guildId, config);
-            }
-            conn.close();
-            return map;
-        }
-    }
-
-    public static void updateGuildConfig(GuildConfig config) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("update-guild-config.sql");
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, config.getPrefix());
-            ps.setBoolean(2, config.isNSFWEnabled());
-            ps.setLong(3, config.getGuildId());
-            ps.executeUpdate();
-            conn.close();
-        }
-    }
-
-    public static void deleteGuildConfig(GuildConfig config) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("delete-guild-config.sql");
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setLong(1, config.getGuildId());
-            ps.execute();
-        }
-        conn.close();
     }
 
     public static void createNewDatabase() throws SQLException {

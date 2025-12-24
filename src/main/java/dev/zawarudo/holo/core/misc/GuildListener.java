@@ -6,6 +6,7 @@ import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.commands.music.GuildMusicManager;
 import dev.zawarudo.holo.commands.music.PlayerManager;
+import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
@@ -32,9 +33,11 @@ public class GuildListener extends ListenerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(GuildListener.class);
 
     private final GuildConfigManager manager;
+    private final GuildConfigDao guildConfigDao;
 
-    public GuildListener(GuildConfigManager manager) {
+    public GuildListener(GuildConfigManager manager, GuildConfigDao guildConfigDao) {
         this.manager = manager;
+        this.guildConfigDao = guildConfigDao;
     }
 
     /**
@@ -55,7 +58,7 @@ public class GuildListener extends ListenerAdapter {
 
             // Create new guild configuration and save it in the DB
             GuildConfig config = manager.getGuildConfig(event.getGuild());
-            DBOperations.insertGuildConfig(config);
+            guildConfigDao.insert(config);
 
             logInfo("Saving successful for guild ({})", event.getGuild());
         } catch (SQLException ex) {
@@ -74,7 +77,7 @@ public class GuildListener extends ListenerAdapter {
             DBOperations.deleteMembers(event.getGuild().getMembers());
             DBOperations.deleteGuild(event.getGuild());
 
-            DBOperations.deleteGuildConfig(manager.getGuildConfig(event.getGuild()));
+            guildConfigDao.deleteByGuildId(event.getGuild().getIdLong());
 
             logInfo("Successful removed guild ({}) from the database.", event.getGuild());
         } catch (SQLException ex) {

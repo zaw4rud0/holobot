@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.core;
 
-import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import net.dv8tion.jda.api.entities.Guild;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,9 +18,13 @@ public class GuildConfigManager {
 
     private Map<Long, GuildConfig> guildConfigs;
 
-    public GuildConfigManager() {
+    private final GuildConfigDao guildConfigDao;
+
+    public GuildConfigManager(GuildConfigDao guildConfigDao) {
+        this.guildConfigDao = guildConfigDao;
+
         try {
-            guildConfigs = DBOperations.selectGuildConfigs();
+            guildConfigs = guildConfigDao.findAll();
             Bootstrap.holo.getJDA().getGuilds().stream()
                     .map(Guild::getIdLong)
                     .filter(g -> !guildConfigs.containsKey(g))
@@ -35,7 +39,7 @@ public class GuildConfigManager {
         GuildConfig config = new GuildConfig(guildId);
         guildConfigs.put(guildId, config);
         try {
-            DBOperations.insertGuildConfig(config);
+            guildConfigDao.insert(config);
         } catch (SQLException e) {
             throw new IllegalStateException("Error initializing config for guild (" + guildId + ").", e);
         }
