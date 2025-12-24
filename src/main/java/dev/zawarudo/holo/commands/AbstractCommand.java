@@ -133,7 +133,16 @@ public abstract class AbstractCommand {
             addFooter(event, embedBuilder);
         }
         embedBuilder.setColor(embedColor);
-        event.getChannel().sendMessageEmbeds(embedBuilder.build()).queue(msg -> msg.delete().queueAfter(delay, unit));
+        event.getChannel()
+                .sendMessageEmbeds(embedBuilder.build())
+                .queue(msg -> msg.delete()
+                        .queueAfter(delay, unit,
+                                null,
+                                error -> {
+                                    // Ignore if message is already deleted
+                                }
+                        )
+                );
     }
 
     /**
