@@ -67,13 +67,16 @@ public class EmoteManager {
 
         List<EmoteDao.EmoteRow> toInsert = new ArrayList<>(emotes.length);
 
+        // Track names for emotes of this batch
+        Set<String> reservedLower = new HashSet<>();
+
         for (CustomEmoji emote : emotes) {
             // Emote already stored in the database
             if (emote == null || emoteDao.existsById(emote.getIdLong())) {
                 continue;
             }
 
-            String uniqueName = generateUniqueName(emote.getName());
+            String uniqueName = generateUniqueName(emote.getName(), reservedLower);
 
             toInsert.add(new EmoteDao.EmoteRow(
                     emote.getIdLong(),
@@ -169,14 +172,14 @@ public class EmoteManager {
     /**
      * Generates a unique name for the emote, ensuring no duplicates in the database.
      */
-    private String generateUniqueName(String baseName) throws SQLException {
+    private String generateUniqueName(String baseName, Set<String> reservedLower) throws SQLException {
         String strippedName = stripSuffix(baseName).trim();
         if (strippedName.isEmpty()) strippedName = "emote";
 
         Set<String> existingNames = emoteDao.findNamesStartingWithIgnoreCase(strippedName);
 
         // Compare case-insensitively
-        Set<String> lower = HashSet.newHashSet(existingNames.size());
+        Set<String> lower = new HashSet<>(reservedLower);
         for (String s : existingNames) {
             if (s != null) lower.add(s.toLowerCase(Locale.ROOT));
         }
@@ -188,6 +191,7 @@ public class EmoteManager {
             unique = strippedName + "-" + suffix++;
         }
 
+        reservedLower.add(unique.toLowerCase(Locale.ROOT));
         return unique;
     }
 
