@@ -7,6 +7,7 @@ import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
 import dev.zawarudo.holo.database.SQLManager;
+import dev.zawarudo.holo.database.dao.EmoteDao;
 import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
@@ -44,6 +45,7 @@ public class Holo extends ListenerAdapter {
 
     private GuildConfigDao guildConfigDao;
     private XkcdDao xkcdDao;
+    private EmoteDao emoteDao;
 
     private final EventWaiter waiter;
 
@@ -81,6 +83,7 @@ public class Holo extends ListenerAdapter {
         // Register DAOs
         this.guildConfigDao = new GuildConfigDao(sqlManager);
         this.xkcdDao = new XkcdDao(sqlManager);
+        this.emoteDao = new EmoteDao(sqlManager);
 
         try {
             gitHubClient = new GitHubClient(botConfig.getGitHubToken());
@@ -88,7 +91,7 @@ public class Holo extends ListenerAdapter {
             throw new IllegalStateException("Something went wrong while registering managers.", e);
         }
 
-        emoteManager = new EmoteManager();
+        emoteManager = new EmoteManager(emoteDao);
         guildConfigManager = new GuildConfigManager(guildConfigDao);
         pokemonSpawnManager = new PokemonSpawnManager(jda);
 
@@ -100,8 +103,8 @@ public class Holo extends ListenerAdapter {
     public void registerListeners() {
         jda.addEventListener(
                 new CommandListener(commandManager, permissionManager),
-                new MiscListener(),
-                new GuildListener(guildConfigManager, guildConfigDao)
+                new MiscListener(emoteManager),
+                new GuildListener(guildConfigManager, emoteManager)
         );
     }
 
@@ -147,6 +150,10 @@ public class Holo extends ListenerAdapter {
 
     public XkcdDao getXkcdDao() {
         return xkcdDao;
+    }
+
+    public EmoteDao getEmoteDao() {
+        return emoteDao;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package dev.zawarudo.holo.commands.general;
 
-import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.GuildConfig;
@@ -23,12 +22,10 @@ import java.util.concurrent.TimeUnit;
 		category = CommandCategory.GENERAL)
 public class ConfigCmd extends AbstractCommand {
 
-	private final GuildConfigManager manager;
-	private final GuildConfigDao guildConfigDao;
+	private final GuildConfigManager configManager;
 
-	public ConfigCmd(GuildConfigManager manager, GuildConfigDao guildConfigDao) {
-		this.manager = manager;
-		this.guildConfigDao = guildConfigDao;
+	public ConfigCmd(GuildConfigManager configManager) {
+		this.configManager = configManager;
 	}
 
 	@Override
@@ -57,7 +54,7 @@ public class ConfigCmd extends AbstractCommand {
 	}
 
 	private void showCurrentConfig(MessageReceivedEvent event) {
-		GuildConfig config = manager.getGuildConfig(event.getGuild());
+		GuildConfig config = configManager.getGuildConfig(event.getGuild());
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle(String.format("Bot Configuration for %s", event.getGuild().getName()))
@@ -83,7 +80,7 @@ public class ConfigCmd extends AbstractCommand {
 	}
 
 	private void changePrefix(MessageReceivedEvent event) {
-		GuildConfig config = manager.getGuildConfig(event.getGuild());
+		GuildConfig config = configManager.getGuildConfig(event.getGuild());
 
 		String newPrefix = args[1];
 		config.setPrefix(newPrefix);
@@ -98,7 +95,7 @@ public class ConfigCmd extends AbstractCommand {
 	}
 
 	private void showNSFWInfo(MessageReceivedEvent event) {
-		GuildConfig config = manager.getGuildConfig(event.getGuild());
+		GuildConfig config = configManager.getGuildConfig(event.getGuild());
 
 		EmbedBuilder builder = new EmbedBuilder();
 
@@ -114,7 +111,7 @@ public class ConfigCmd extends AbstractCommand {
 	}
 
 	private void changeNSFW(MessageReceivedEvent event) {
-		GuildConfig config = manager.getGuildConfig(event.getGuild());
+		GuildConfig config = configManager.getGuildConfig(event.getGuild());
 
 		boolean nsfw = Boolean.parseBoolean(args[1]);
 		config.setAllowNSFW(nsfw);
@@ -129,8 +126,8 @@ public class ConfigCmd extends AbstractCommand {
 	}
 
 	private void resetConfiguration(MessageReceivedEvent event) {
-		manager.resetConfigurationForGuild(event.getGuild());
-		GuildConfig config = manager.getGuildConfig(event.getGuild());
+		configManager.resetConfigurationForGuild(event.getGuild());
+		GuildConfig config = configManager.getGuildConfig(event.getGuild());
 
 		EmbedBuilder builder = new EmbedBuilder()
 				.setTitle("Reset Bot Configuration")
@@ -155,7 +152,7 @@ public class ConfigCmd extends AbstractCommand {
 	 */
 	private void saveChanges(MessageReceivedEvent event, GuildConfig config) {
 		try {
-			guildConfigDao.update(config);
+			configManager.persist(config);
 		} catch (SQLException ex) {
 			sendErrorEmbed(event, "Something went wrong while updating your configuration in the " +
 					"database. We will try to fix this ASAP.");

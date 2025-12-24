@@ -30,7 +30,7 @@ public class GuildConfigManager {
                     .filter(g -> !guildConfigs.containsKey(g))
                     .forEach(this::addNewGuildConfig);
         } catch (SQLException ex) {
-			LOGGER.error("Something went wrong while loading the guild configs from the DB.", ex);
+            LOGGER.error("Something went wrong while loading the guild configs from the DB.", ex);
             guildConfigs = new HashMap<>();
         }
     }
@@ -53,6 +53,34 @@ public class GuildConfigManager {
      */
     public GuildConfig getGuildConfig(Guild guild) {
         return guildConfigs.get(guild.getIdLong());
+    }
+
+    /**
+     * Inserts a new config when joining a new guild.
+     */
+    public void ensureConfigExists(Guild guild) throws SQLException {
+        long id = guild.getIdLong();
+        if (guildConfigs.containsKey(id)) return;
+
+        GuildConfig cfg = new GuildConfig(id);
+        guildConfigs.put(id, cfg);
+        guildConfigDao.insert(cfg);
+    }
+
+    /**
+     * Removes the configuration when leaving a guild.
+     */
+    public void removeConfig(Guild guild) throws SQLException {
+        long id = guild.getIdLong();
+        guildConfigs.remove(id);
+        guildConfigDao.deleteByGuildId(id);
+    }
+
+    /**
+     * Save configuration after changes.
+     */
+    public void persist(GuildConfig config) throws SQLException {
+        guildConfigDao.update(config);
     }
 
     /**

@@ -1,0 +1,1 @@
+SELECT emote_id, emote_name, is_animated FROM Emotes WHERE emote_name LIKE ?;

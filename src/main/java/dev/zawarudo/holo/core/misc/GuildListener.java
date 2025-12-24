@@ -1,12 +1,10 @@
 package dev.zawarudo.holo.core.misc;
 
-import dev.zawarudo.holo.core.Bootstrap;
-import dev.zawarudo.holo.core.GuildConfig;
 import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.commands.music.GuildMusicManager;
 import dev.zawarudo.holo.commands.music.PlayerManager;
-import dev.zawarudo.holo.database.dao.GuildConfigDao;
+import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
 import net.dv8tion.jda.api.events.emoji.EmojiAddedEvent;
@@ -32,12 +30,12 @@ public class GuildListener extends ListenerAdapter {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(GuildListener.class);
 
-    private final GuildConfigManager manager;
-    private final GuildConfigDao guildConfigDao;
+    private final GuildConfigManager configManager;
+    private final EmoteManager emoteManager;
 
-    public GuildListener(GuildConfigManager manager, GuildConfigDao guildConfigDao) {
-        this.manager = manager;
-        this.guildConfigDao = guildConfigDao;
+    public GuildListener(GuildConfigManager configManager, EmoteManager emoteManager) {
+        this.configManager = configManager;
+        this.emoteManager = emoteManager;
     }
 
     /**
@@ -51,14 +49,11 @@ public class GuildListener extends ListenerAdapter {
             DBOperations.insertMembers(event.getGuild().getMembers());
             DBOperations.insertGuild(event.getGuild());
 
-            Bootstrap.holo.getEmoteManager().insertEmotes(event.getGuild().getEmojis().stream()
+            emoteManager.insertEmotes(event.getGuild().getEmojis().stream()
                     .map(e -> (CustomEmoji) e)
-                    .toArray(CustomEmoji[]::new)
-            );
+                    .toArray(CustomEmoji[]::new));
 
-            // Create new guild configuration and save it in the DB
-            GuildConfig config = manager.getGuildConfig(event.getGuild());
-            guildConfigDao.insert(config);
+            configManager.ensureConfigExists(event.getGuild());
 
             logInfo("Saving successful for guild ({})", event.getGuild());
         } catch (SQLException ex) {
@@ -77,7 +72,7 @@ public class GuildListener extends ListenerAdapter {
             DBOperations.deleteMembers(event.getGuild().getMembers());
             DBOperations.deleteGuild(event.getGuild());
 
-            guildConfigDao.deleteByGuildId(event.getGuild().getIdLong());
+            configManager.removeConfig(event.getGuild());
 
             logInfo("Successful removed guild ({}) from the database.", event.getGuild());
         } catch (SQLException ex) {
@@ -129,7 +124,7 @@ public class GuildListener extends ListenerAdapter {
     @Override
     public void onEmojiAdded(@NotNull EmojiAddedEvent event) {
         try {
-            Bootstrap.holo.getEmoteManager().insertEmotes(event.getEmoji());
+            emoteManager.insertEmotes(event.getEmoji());
         } catch (SQLException ex) {
             logError("Something went wrong while storing the new emoji in the DB.", ex);
         }

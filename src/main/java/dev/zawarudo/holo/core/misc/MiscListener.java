@@ -1,6 +1,5 @@
 package dev.zawarudo.holo.core.misc;
 
-import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
@@ -17,18 +16,21 @@ import java.sql.SQLException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 /**
  * Class that defines miscellaneous behaviour of the bot as response to certain events.
  */
 public class MiscListener extends ListenerAdapter {
 
-    private final List<Long> existingEmotes;
+    private final EmoteManager emoteManager;
+    private final Set<Long> existingEmotes;
 
     private static final Logger LOGGER = LoggerFactory.getLogger(MiscListener.class);
 
-    public MiscListener() {
-        EmoteManager emoteManager = Bootstrap.holo.getEmoteManager();
+    public MiscListener(EmoteManager emoteManager) {
+        this.emoteManager = emoteManager;
+
         try {
             existingEmotes = emoteManager.getEmoteIds();
         } catch (SQLException ex) {
@@ -75,8 +77,6 @@ public class MiscListener extends ListenerAdapter {
     }
 
     private void storeNewEmotesInDatabase(CustomEmoji... emotes) {
-        EmoteManager emoteManager = Bootstrap.holo.getEmoteManager();
-
         List<CustomEmoji> newEmotes = Arrays.stream(emotes)
                 .filter(e -> !existingEmotes.contains(e.getIdLong()))
                 .toList();
