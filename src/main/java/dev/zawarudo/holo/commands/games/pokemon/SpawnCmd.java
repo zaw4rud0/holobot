@@ -4,7 +4,6 @@ import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
-import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.exceptions.*;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -18,10 +17,10 @@ import org.jetbrains.annotations.NotNull;
 		category = CommandCategory.GAMES)
 public class SpawnCmd extends AbstractCommand {
 
-	private final PokemonSpawnManager manager;
+	private final PokemonSpawnManager pokemonSpawnManager;
 
-	public SpawnCmd() {
-		manager = Bootstrap.holo.getPokemonSpawnManager();
+	public SpawnCmd(PokemonSpawnManager pokemonSpawnManager) {
+		this.pokemonSpawnManager = pokemonSpawnManager;
 	}
 
 	@Override
@@ -34,17 +33,17 @@ public class SpawnCmd extends AbstractCommand {
 			if (args.length == 0 || args.length == 1 && "random".equalsIgnoreCase(args[0])) {
 				// Random spawn
 				Pokemon pokemon = PokeApiClient.getRandomPokemonSpecies().getPokemon();
-				manager.deleteMessage(channelId);
-				manager.spawnNewPokemon(channelId, pokemon);
+				pokemonSpawnManager.deleteMessage(channelId);
+				pokemonSpawnManager.spawnNewPokemon(channelId, pokemon);
 				return;
 			}
 
 			else if ("add".equalsIgnoreCase(args[0])) {
 				// Make Pokémon spawn in a new text channel
-				manager.addChannel(channelId);
+				pokemonSpawnManager.addChannel(channelId);
 
 				Pokemon pokemon = PokeApiClient.getRandomPokemonSpecies().getPokemon();
-				manager.spawnNewPokemon(channelId, pokemon);
+				pokemonSpawnManager.spawnNewPokemon(channelId, pokemon);
 				return;
 			}
 			// Spawn specific Pokémon
@@ -52,8 +51,8 @@ public class SpawnCmd extends AbstractCommand {
 					? PokeApiClient.getPokemon(Integer.parseInt(args[0]))
 					: PokeApiClient.getPokemon(args[0]);
 
-			manager.deleteMessage(channelId);
-			manager.spawnNewPokemon(channelId, pokemon);
+			pokemonSpawnManager.deleteMessage(channelId);
+			pokemonSpawnManager.spawnNewPokemon(channelId, pokemon);
 		} catch (APIException ex) {
 			sendOwnerError("PokéAPI error right now. Try again later.");
 		} catch (NotFoundException | InvalidIdException ex) {

@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.commands.music;
+package dev.zawarudo.holo.modules.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayerManager;

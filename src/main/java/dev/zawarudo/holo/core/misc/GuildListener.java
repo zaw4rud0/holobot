@@ -2,8 +2,8 @@ package dev.zawarudo.holo.core.misc;
 
 import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.DBOperations;
-import dev.zawarudo.holo.commands.music.GuildMusicManager;
-import dev.zawarudo.holo.commands.music.PlayerManager;
+import dev.zawarudo.holo.modules.music.GuildMusicManager;
+import dev.zawarudo.holo.modules.music.PlayerManager;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;

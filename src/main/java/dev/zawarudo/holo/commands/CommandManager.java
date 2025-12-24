@@ -4,16 +4,14 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.anime.AnimeSearchCmd;
 import dev.zawarudo.holo.commands.anime.MangaSearchCmd;
 import dev.zawarudo.holo.commands.fun.*;
-import dev.zawarudo.holo.commands.games.pokemon.CatchCmd;
-import dev.zawarudo.holo.commands.games.pokemon.PokedexCmd;
-import dev.zawarudo.holo.commands.games.pokemon.PokemonTeamCmd;
-import dev.zawarudo.holo.commands.games.pokemon.SpawnCmd;
 import dev.zawarudo.holo.commands.general.*;
 import dev.zawarudo.holo.commands.image.*;
 import dev.zawarudo.holo.commands.image.nsfw.BlockCmd;
-import dev.zawarudo.holo.commands.music.cmds.*;
 import dev.zawarudo.holo.commands.owner.*;
-import dev.zawarudo.holo.core.Bootstrap;
+import dev.zawarudo.holo.core.GuildConfigManager;
+import dev.zawarudo.holo.database.dao.XkcdDao;
+import dev.zawarudo.holo.modules.GitHubClient;
+import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.slf4j.Logger;
@@ -30,12 +28,19 @@ public class CommandManager extends ListenerAdapter {
 
     private final Map<String, AbstractCommand> commands;
 
-    public CommandManager(EventWaiter waiter) {
+    public CommandManager(
+            EventWaiter waiter,
+            List<CommandModule> modules,
+            GitHubClient gitHubClient,
+            GuildConfigManager guildConfigManager,
+            EmoteManager emoteManager,
+            XkcdDao xkcdDao
+    ) {
         commands = new LinkedHashMap<>();
 
         // General Cmds
-        addCommand(new BugCmd(Bootstrap.holo.getGitHubClient()));
-        addCommand(new ConfigCmd(Bootstrap.holo.getGuildConfigManager()));
+        addCommand(new BugCmd(gitHubClient));
+        addCommand(new ConfigCmd(guildConfigManager));
         addCommand(new HelpCmd(this));
         addCommand(new InfoBotCmd());
         addCommand(new PermCmd());
@@ -43,25 +48,12 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new RoleInfoCmd());
         addCommand(new ServerInfoCmd());
         addCommand(new ServerRolesCmd());
-        addCommand(new SuggestionCmd(Bootstrap.holo.getGitHubClient()));
+        addCommand(new SuggestionCmd(gitHubClient));
         addCommand(new WhoisCmd());
 
         // Anime Cmds
         addCommand(new AnimeSearchCmd(waiter));
         addCommand(new MangaSearchCmd(waiter));
-
-        // Music Cmds
-        addCommand(new ClearCmd(waiter));
-        addCommand(new CloneCmd());
-        addCommand(new JoinCmd());
-        addCommand(new LeaveCmd());
-        addCommand(new LoopCmd());
-        addCommand(new NowPlayingCmd());
-        addCommand(new PlayCmd());
-        addCommand(new QueueCmd());
-        addCommand(new ShuffleCmd());
-        addCommand(new SkipCmd(waiter));
-        addCommand(new StopCmd());
 
         // Image Cmds
         addCommand(new ActionCmd());
@@ -71,19 +63,14 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
         addCommand(new DogCmd());
-        addCommand(new EmoteCmd(Bootstrap.holo.getEmoteManager()));
+        addCommand(new EmoteCmd(emoteManager));
         addCommand(new FilterCmd());
         addCommand(new HttpCmd());
         addCommand(new InspiroCmd());
         addCommand(new PaletteCmd());
         addCommand(new PixelateCmd());
         addCommand(new UpscaleCmd());
-        addCommand(new XkcdCmd(Bootstrap.holo.getXkcdDao()));
-
-        // Game Cmds
-        addCommand(new CatchCmd());
-        addCommand(new PokedexCmd());
-        addCommand(new PokemonTeamCmd());
+        addCommand(new XkcdCmd(xkcdDao));
 
         // Misc Cmds
         addCommand(new CoinFlipCmd());
@@ -101,8 +88,12 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new NukeCmd());
         addCommand(new RestartCmd());
         addCommand(new ShutdownCmd());
-        addCommand(new SpawnCmd());
         addCommand(new StatusCmd());
+
+        // Register module commands
+        for (CommandModule m : modules) {
+            m.register(this);
+        }
 
         if (LOGGER.isInfoEnabled()) {
             LOGGER.info("Loaded {} commands!", commands.values().stream().distinct().count());

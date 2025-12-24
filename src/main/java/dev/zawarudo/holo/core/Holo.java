@@ -3,7 +3,10 @@ package dev.zawarudo.holo.core;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.CommandListener;
 import dev.zawarudo.holo.commands.CommandManager;
+import dev.zawarudo.holo.commands.CommandModule;
+import dev.zawarudo.holo.commands.games.pokemon.PokemonModule;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
+import dev.zawarudo.holo.commands.music.MusicModule;
 import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
 import dev.zawarudo.holo.database.SQLManager;
@@ -27,6 +30,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.List;
 
 /**
  * Represents an instance of the bot.
@@ -42,10 +46,6 @@ public class Holo extends ListenerAdapter {
     private SQLManager sqlManager;
     private GitHubClient gitHubClient;
     private EmoteManager emoteManager;
-
-    private GuildConfigDao guildConfigDao;
-    private XkcdDao xkcdDao;
-    private EmoteDao emoteDao;
 
     private final EventWaiter waiter;
 
@@ -81,9 +81,9 @@ public class Holo extends ListenerAdapter {
 
     public void registerManagers() {
         // Register DAOs
-        this.guildConfigDao = new GuildConfigDao(sqlManager);
-        this.xkcdDao = new XkcdDao(sqlManager);
-        this.emoteDao = new EmoteDao(sqlManager);
+        GuildConfigDao guildConfigDao = new GuildConfigDao(sqlManager);
+        XkcdDao xkcdDao = new XkcdDao(sqlManager);
+        EmoteDao emoteDao = new EmoteDao(sqlManager);
 
         try {
             gitHubClient = new GitHubClient(botConfig.getGitHubToken());
@@ -94,10 +94,23 @@ public class Holo extends ListenerAdapter {
         emoteManager = new EmoteManager(emoteDao);
         guildConfigManager = new GuildConfigManager(guildConfigDao);
         pokemonSpawnManager = new PokemonSpawnManager(jda);
+        permissionManager = new PermissionManager();
+
+        // Initialize modules
+        List<CommandModule> modules = List.of(
+                new MusicModule(waiter),
+                new PokemonModule(pokemonSpawnManager)
+        );
 
         // Warning: Commands only get initialized here
-        commandManager = new CommandManager(waiter);
-        permissionManager = new PermissionManager();
+        commandManager = new CommandManager(
+                waiter,
+                modules,
+                gitHubClient,
+                guildConfigManager,
+                emoteManager,
+                xkcdDao
+        );
     }
 
     public void registerListeners() {
@@ -142,18 +155,6 @@ public class Holo extends ListenerAdapter {
 
     public EmoteManager getEmoteManager() {
         return emoteManager;
-    }
-
-    public GuildConfigDao getGuildConfigDao() {
-        return guildConfigDao;
-    }
-
-    public XkcdDao getXkcdDao() {
-        return xkcdDao;
-    }
-
-    public EmoteDao getEmoteDao() {
-        return emoteDao;
     }
 
     @Override

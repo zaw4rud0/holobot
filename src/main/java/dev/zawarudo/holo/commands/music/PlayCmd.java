@@ -1,14 +1,13 @@
-package dev.zawarudo.holo.commands.music.cmds;
+package dev.zawarudo.holo.commands.music;
 
 import com.sedmelluq.discord.lavaplayer.player.AudioLoadResultHandler;
 import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
-import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.commands.music.AbstractMusicCommand;
-import dev.zawarudo.holo.commands.music.GuildMusicManager;
-import dev.zawarudo.holo.commands.music.PlayerManager;
+import dev.zawarudo.holo.modules.music.GuildMusicManager;
+import dev.zawarudo.holo.modules.music.PlayerManager;
+import dev.zawarudo.holo.utils.annotations.Command;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;

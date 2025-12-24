@@ -4,7 +4,6 @@ import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.modules.pokemon.model.PokemonSpecies;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
-import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -31,17 +30,17 @@ import java.util.concurrent.TimeUnit;
 		category = CommandCategory.GAMES)
 public class CatchCmd extends AbstractCommand {
 
-	private final PokemonSpawnManager manager;
+	private final PokemonSpawnManager pokemonSpawnManager;
 	
-	public CatchCmd() {
-		manager = Bootstrap.holo.getPokemonSpawnManager();
+	public CatchCmd(PokemonSpawnManager pokemonSpawnManager) {
+		this.pokemonSpawnManager = pokemonSpawnManager;
 	}
 
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
 		
-		Pokemon pokemon = manager.getPokemon(event.getChannel().getIdLong());
+		Pokemon pokemon = pokemonSpawnManager.getPokemon(event.getChannel().getIdLong());
 
 		// There are no Pokémon in this channel
 		if (pokemon == null) {
@@ -79,10 +78,10 @@ public class CatchCmd extends AbstractCommand {
 
 		String catcher = event.getMember() != null ? event.getMember().getEffectiveName() : event.getAuthor().getName();
 
-		Message msg = manager.getMessage(event.getChannel().getIdLong());
+		Message msg = pokemonSpawnManager.getMessage(event.getChannel().getIdLong());
 		msg.editMessageAttachments(new ArrayList<>()).queue();
 
-		EmbedBuilder builder = new EmbedBuilder(msg.getEmbeds().get(0));
+		EmbedBuilder builder = new EmbedBuilder(msg.getEmbeds().getFirst());
 		builder.clear();
 		
 		builder.setTitle("The wild " + species.getName("en") + " has been caught!");
@@ -91,6 +90,6 @@ public class CatchCmd extends AbstractCommand {
 		builder.setFooter(String.format("Caught by %s", catcher), event.getAuthor().getEffectiveAvatarUrl());
 
 		msg.editMessageEmbeds(builder.build()).queue(m -> m.delete().queueAfter(2, TimeUnit.MINUTES));
-		manager.spawnNewPokemon(event.getChannel().getIdLong());
+		pokemonSpawnManager.spawnNewPokemon(event.getChannel().getIdLong());
 	}
 }
