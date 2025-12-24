@@ -8,9 +8,11 @@ import java.net.JarURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.JarFile;
+import java.util.stream.Stream;
 
 public class SQLManager {
 
@@ -36,11 +38,12 @@ public class SQLManager {
      * @throws IllegalArgumentException If there is no SQL statement with the given name.
      */
     public String getStatement(String name) {
-        String formattedName = formatFileName(name);
-        if (!sqlStatements.containsKey(formattedName)) {
-            throw new IllegalArgumentException("No SQL file found with name: " + formattedName);
+        String key = keyFromRelativePath(name);
+        String stmt = sqlStatements.get(key);
+        if (stmt == null) {
+            throw new IllegalArgumentException("No SQL file found with name: " + key);
         }
-        return sqlStatements.get(formattedName);
+        return stmt;
     }
 
     /**
@@ -78,19 +81,30 @@ public class SQLManager {
             throw new IOException("Expected a directory but found: " + directory.getPath());
         }
 
-        File[] sqlFiles = directory.listFiles((dir, name) -> name.endsWith(".sql"));
-        if (sqlFiles == null) {
-            throw new IOException("Failed to list files in directory: " + directory.getPath());
+        // Recursively walk the database/ folder
+        try (Stream<Path> paths = Files.walk(directory.toPath())) {
+            paths.filter(Files::isRegularFile)
+                    .filter(p -> p.getFileName().toString().endsWith(".sql"))
+                    .forEach(p -> {
+                        try {
+                            String content = Files.readString(p, StandardCharsets.UTF_8);
+
+                            // Build key relative to database/
+                            Path rel = directory.toPath().relativize(p);
+                            String key = keyFromRelativePath(rel.toString());
+
+                            statements.put(key, content);
+                            LOGGER.debug("Loaded SQL file: {} -> key={}", rel, key);
+                        } catch (IOException e) {
+                            throw new UncheckedIOException(e);
+                        }
+                    });
+        } catch (UncheckedIOException e) {
+            throw e.getCause();
         }
 
-        for (File file : sqlFiles) {
-            String content = Files.readString(file.toPath(), StandardCharsets.UTF_8);
-            statements.put(formatFileName(file.getName()), content);
-            LOGGER.debug("Loaded SQL file: {}", file.getName());
-        }
         return statements;
     }
-
 
     private Map<String, String> loadFromJar(URL resourceURL) throws IOException {
         Map<String, String> statements = new HashMap<>();
@@ -98,16 +112,24 @@ public class SQLManager {
         JarURLConnection jarConnection = (JarURLConnection) resourceURL.openConnection();
         JarFile jarFile = jarConnection.getJarFile();
 
+        String prefix = SQL_DIRECTORY_PATH + "/";
+
         jarFile.stream()
-                .filter(entry -> entry.getName().startsWith(SQL_DIRECTORY_PATH) && entry.getName().endsWith(".sql"))
+                .filter(entry -> !entry.isDirectory())
+                .filter(entry -> entry.getName().startsWith(prefix))
+                .filter(entry -> entry.getName().endsWith(".sql"))
                 .forEach(entry -> {
                     try (InputStream is = getClass().getClassLoader().getResourceAsStream(entry.getName())) {
-                        if (is != null) {
-                            String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
-                            String fileName = entry.getName().substring(entry.getName().lastIndexOf('/') + 1);
-                            statements.put(formatFileName(fileName), content);
-                            LOGGER.debug("Loaded SQL file: {}", fileName);
-                        }
+                        if (is == null) return;
+
+                        String content = new String(is.readAllBytes(), StandardCharsets.UTF_8);
+
+                        // Key relative to "database/"
+                        String rel = entry.getName().substring(prefix.length());
+                        String key = keyFromRelativePath(rel);
+
+                        statements.put(key, content);
+                        LOGGER.debug("Loaded SQL file: {} -> key={}", rel, key);
                     } catch (IOException e) {
                         LOGGER.error("Failed to load SQL file: {}", entry.getName(), e);
                     }
@@ -116,13 +138,10 @@ public class SQLManager {
         return statements;
     }
 
-    /**
-     * Formats a file name by removing the ".sql" extension and replacing spaces with hyphens.
-     *
-     * @param fileName The original file name.
-     * @return The formatted file name.
-     */
-    private String formatFileName(String fileName) {
-        return fileName.replace(" ", "-").replaceAll("\\.sql$", "");
+    private String keyFromRelativePath(String relativePath) {
+        String normalized = relativePath.replace('\\', '/');
+        normalized = normalized.replace(" ", "-");
+        normalized = normalized.replaceAll("\\.sql$", "");
+        return normalized;
     }
 }
