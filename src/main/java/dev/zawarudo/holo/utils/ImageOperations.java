@@ -204,8 +204,136 @@ public final class ImageOperations {
         return grayscaleImage;
     }
 
-    private static int calculateGrayscaleValue(int red, int green, int blue) {
+    public static int calculateGrayscaleValue(int red, int green, int blue) {
         return (int) (RED_TO_GRAY_WEIGHT * red + GREEN_TO_GRAY_WEIGHT * green + BLUE_TO_GRAY_WEIGHT * blue);
+    }
+
+    public static int[] readPixels(BufferedImage img) {
+        int w = img.getWidth();
+        int h = img.getHeight();
+        return img.getRGB(0, 0, w, h, null, 0, w);
+    }
+
+    public static BufferedImage writePixels(int[] pixels, int width, int height) {
+        BufferedImage out = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        out.setRGB(0, 0, width, height, pixels, 0, width);
+        return out;
+    }
+
+    /**
+     * Converts an RGB color to HSV.
+     *
+     * @param r Red channel [0–255]
+     * @param g Green channel [0–255]
+     * @param b Blue channel [0–255]
+     * @return float[] { hue [0–360), saturation [0–1], value [0–1] }
+     */
+    public static float[] rgbToHsv(int r, int g, int b) {
+        // Normalize RGB to [0..1] for stable floating-point math
+        float rf = r / 255f;
+        float gf = g / 255f;
+        float bf = b / 255f;
+
+        // Find extrema and delta
+        float max = Math.max(rf, Math.max(gf, bf));
+        float min = Math.min(rf, Math.min(gf, bf));
+        float delta = max - min;
+
+        // Value is highest intensity of the three colors
+        float v = max;
+
+        // Saturation is the "purity" of the color
+        float s = max == 0f ? 0f : (delta / max);
+
+        // Hue is calculated based on which color channel is the dominant one
+        float h;
+        if (delta == 0f) h = 0f;
+        else if (max == rf) h = 60f * (((gf - bf) / delta) % 6f);
+        else if (max == gf) h = 60f * (((bf - rf) / delta) + 2f);
+        else h = 60f * (((rf - gf) / delta) + 4f);
+
+        // Ensure hue is within [0..360)
+        if (h < 0f) h += 360f;
+
+        return new float[]{h, s, v};
+    }
+
+    /**
+     * Converts an HSV color to RGB.
+     *
+     * @param h Hue in degrees [0–360)
+     * @param s Saturation [0–1]
+     * @param v Value (brightness) [0–1]
+     * @return int RGB packed as 0xRRGGBB
+     */
+    public static int hsvToRgb(float h, float s, float v) {
+        // Chroma defines the intensity of the color
+        float c = v * s;
+
+        // Map hue to one of six color sectors
+        float hPrime = h / 60f;
+
+        // Secondary component for interpolation within the sector
+        float x = c * (1f - Math.abs(hPrime % 2f - 1f));
+
+        // Offset to match the desired brightness
+        float m = v - c;
+
+        float rf, gf, bf;
+
+        // Assign RGB based on the active hue sector
+        if (hPrime < 1f) {
+            rf = c;
+            gf = x;
+            bf = 0f;
+        } else if (hPrime < 2f) {
+            rf = x;
+            gf = c;
+            bf = 0f;
+        } else if (hPrime < 3f) {
+            rf = 0f;
+            gf = c;
+            bf = x;
+        } else if (hPrime < 4f) {
+            rf = 0f;
+            gf = x;
+            bf = c;
+        } else if (hPrime < 5f) {
+            rf = x;
+            gf = 0f;
+            bf = c;
+        } else {
+            rf = c;
+            gf = 0f;
+            bf = x;
+        }
+
+        // Convert back to [0..255] and clamp to avoid overflow
+        int r = clamp255(Math.round((rf + m) * 255f));
+        int g = clamp255(Math.round((gf + m) * 255f));
+        int b = clamp255(Math.round((bf + m) * 255f));
+
+        return (r << 16) | (g << 8) | b;
+    }
+
+    /**
+     * Clamps an integer value to the valid 8-bit color channel range.
+     *
+     * @param v Input value
+     * @return Value clamped to [0–255]
+     */
+    public static int clamp255(int v) {
+        return v < 0 ? 0 : Math.min(v, 255);
+    }
+
+    /**
+     * Clamps a floating-point value to the normalized range [0–1].
+     *
+     * @param v Input value
+     * @return Value clamped to [0–1]
+     */
+    public static float clamp01(float v) {
+        return v < 0f ? 0f : Math.min(v, 1f);
     }
 
     /**

@@ -72,6 +72,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new CheckNSFWCmd());
         addCommand(new DogCmd());
         addCommand(new EmoteCmd(Bootstrap.holo.getEmoteManager()));
+        addCommand(new FilterCmd());
         addCommand(new HttpCmd());
         addCommand(new InspiroCmd());
         addCommand(new PaletteCmd());
