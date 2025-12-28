@@ -22,7 +22,7 @@ public final class XkcdDao {
     }
 
     public List<XkcdComic> findAll() throws SQLException {
-        String stmt = sql.getStatement("select-all-xkcd-comics");
+        final String stmt = sql.getStatement("xkcd/select-all-xkcd-comics");
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(stmt);
@@ -30,13 +30,7 @@ public final class XkcdDao {
 
             List<XkcdComic> result = new ArrayList<>();
             while (rs.next()) {
-                XkcdComic comic = new XkcdComic();
-                comic.setIssueNr(rs.getInt("id"));
-                comic.setTitle(rs.getString("title"));
-                comic.setAlt(rs.getString("alt"));
-                comic.setImg(rs.getString("img"));
-                comic.setDate(rs.getInt("day"), rs.getInt("month"), rs.getInt("year"));
-                result.add(comic);
+                result.add(mapRow(rs));
             }
             return result;
         }
@@ -45,7 +39,7 @@ public final class XkcdDao {
     public void insert(XkcdComic comic) throws SQLException {
         if (comic == null) throw new IllegalArgumentException("comic must not be null");
 
-        final String stmt = sql.getStatement("insert-xkcd-comic");
+        final String stmt = sql.getStatement("xkcd/insert-xkcd-comic");
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(stmt)) {
@@ -59,7 +53,7 @@ public final class XkcdDao {
         if (comics == null) throw new IllegalArgumentException("comics must not be null");
         if (comics.isEmpty()) return;
 
-        final String stmt = sql.getStatement("insert-xkcd-comic");
+        final String stmt = sql.getStatement("xkcd/insert-xkcd-comic");
 
         try (Connection conn = Database.getConnection()) {
             boolean origAuto = conn.getAutoCommit();
@@ -90,6 +84,64 @@ public final class XkcdDao {
         }
     }
 
+    public List<XkcdComic> search(String ftsQuery, int limit, int offset) throws SQLException {
+        if (ftsQuery == null || ftsQuery.isBlank()) {
+            return List.of();
+        }
+
+        if (limit <= 0) {
+            limit = 8;
+        }
+        if (offset < 0) {
+            offset = 0;
+        }
+
+        final String stmt = sql.getStatement("xkcd/search-xkcd");
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(stmt)) {
+
+            ps.setString(1, ftsQuery);
+            ps.setInt(2, limit);
+            ps.setInt(3, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                List<XkcdComic> result = new ArrayList<>();
+                while (rs.next()) {
+                    result.add(mapRow(rs));
+                }
+                return result;
+            }
+        }
+    }
+
+    public List<XkcdComic> searchPrioritized(String broadQuery, String phraseQuery, int limit, int offset) throws SQLException {
+        if (broadQuery == null || broadQuery.isBlank()) return List.of();
+        if (limit <= 0) limit = 8;
+        if (offset < 0) offset = 0;
+
+        final String stmt = sql.getStatement("xkcd/search-xkcd-prioritized");
+
+        String safePhrase = (phraseQuery == null || phraseQuery.isBlank()) ? "\"__no_such_phrase__\"" : phraseQuery;
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(stmt)) {
+
+            ps.setString(1, safePhrase);
+            ps.setString(2, broadQuery);
+            ps.setInt(3, limit);
+            ps.setInt(4, offset);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                List<XkcdComic> result = new ArrayList<>();
+                while (rs.next()) {
+                    result.add(mapRow(rs));
+                }
+                return result;
+            }
+        }
+    }
+
     private static void bindInsert(PreparedStatement ps, XkcdComic comic) throws SQLException {
         ps.setInt(1, comic.getIssueNr());
         ps.setString(2, comic.getTitle());
@@ -98,5 +150,19 @@ public final class XkcdDao {
         ps.setInt(5, comic.getDay());
         ps.setInt(6, comic.getMonth());
         ps.setInt(7, comic.getYear());
+    }
+
+    private static XkcdComic mapRow(ResultSet rs) throws SQLException {
+        XkcdComic comic = new XkcdComic();
+        comic.setIssueNr(rs.getInt("id"));
+        comic.setTitle(rs.getString("title"));
+        comic.setAlt(rs.getString("alt"));
+        comic.setImg(rs.getString("img"));
+        comic.setDate(
+                rs.getInt("day"),
+                rs.getInt("month"),
+                rs.getInt("year")
+        );
+        return comic;
     }
 }
