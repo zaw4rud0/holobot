@@ -1,27 +1,23 @@
 package dev.zawarudo.holo.commands.image;
 
-import dev.zawarudo.holo.database.dao.XkcdDao;
-import dev.zawarudo.holo.utils.annotations.Command;
-import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
-import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
+import dev.zawarudo.holo.core.misc.EmbedColor;
+import dev.zawarudo.holo.database.dao.XkcdDao;
+import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
+import dev.zawarudo.holo.modules.xkcd.XkcdComic;
+import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
-import dev.zawarudo.holo.core.misc.EmbedColor;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Command(name = "xkcd",
         description = "Use this command to access the comics of xkcd.",
@@ -38,8 +34,10 @@ public class XkcdCmd extends AbstractCommand {
 
     private final XkcdDao xkcdDao;
 
-    private final Map<Integer, XkcdComic> comics = new HashMap<>();
-    private int newestIssue;
+    private final Map<Integer, XkcdComic> comics = new ConcurrentHashMap<>();
+
+    private final AtomicInteger latestIssue = new AtomicInteger();
+    private final AtomicInteger maxStoredIssue = new AtomicInteger();
 
     public XkcdCmd(XkcdDao xkcdDao) {
         this.xkcdDao = xkcdDao;
@@ -49,21 +47,26 @@ public class XkcdCmd extends AbstractCommand {
 
             if (list.isEmpty()) {
                 logger.warn("No XKCD comics found in DB.");
-                this.newestIssue = 0;
-                return;
-            }
+            } else {
+                Collections.sort(list);
+                logger.info("Loaded {} XKCD comics from DB.", list.size());
 
-            Collections.sort(list);
+                int max = list.getLast().getIssueNr();
+                maxStoredIssue.set(max);
 
-            logger.info("Loaded {} XKCD comics from DB.", list.size());
-            this.newestIssue = list.getLast().getIssueNr();
-
-            for (XkcdComic comic : list) {
-                comics.put(comic.getIssueNr(), comic);
+                for (XkcdComic comic : list) {
+                    comics.put(comic.getIssueNr(), comic);
+                }
             }
         } catch (SQLException ex) {
             logger.error("Something went wrong while fetching the XKCD comics from the DB.", ex);
-            newestIssue = 0;
+        }
+
+        // Try to fetch latest once
+        try {
+            ensureLatestIssue();
+        } catch (APIException ex) {
+            logger.warn("Failed to fetch latest XKCD issue during startup. Will retry on demand.", ex);
         }
     }
 
@@ -82,8 +85,31 @@ public class XkcdCmd extends AbstractCommand {
 
     private void sendRandomComic(MessageReceivedEvent event) {
         try {
-            XkcdComic comic = XkcdAPI.getComic(RANDOM.nextInt(newestIssue) + 1);
-            storeComicIfNew(comic);
+            int upper = latestIssue.get();
+            if (upper <= 0) {
+                upper = maxStoredIssue.get();
+            }
+
+            if (upper <= 0) {
+                ensureLatestIssue();
+                upper = latestIssue.get();
+            }
+
+            if (upper <= 0) {
+                sendErrorEmbed(event, ERROR_RETRIEVING);
+                return;
+            }
+
+            int issue = RANDOM.nextInt(upper) + 1;
+
+            // 404 intentionally missing
+            if (issue == 404) {
+                issue = (upper == 1) ? 1 : RANDOM.nextInt(upper) + 1;
+                if (issue == 404) issue = 403;
+            }
+
+            XkcdComic comic = XkcdAPI.getComic(issue);
+            storeComic(comic);
             sendXkcd(event, comic);
         } catch (APIException | InvalidRequestException | SQLException ex) {
             sendErrorEmbed(event, ERROR_RETRIEVING);
@@ -93,7 +119,10 @@ public class XkcdCmd extends AbstractCommand {
     private void sendNewestComic(MessageReceivedEvent event) {
         try {
             XkcdComic comic = XkcdAPI.getLatest();
-            storeComicIfNew(comic);
+
+            latestIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
+
+            storeComic(comic);
             sendXkcd(event, comic);
         } catch (APIException | SQLException ex) {
             sendErrorEmbed(event, ERROR_RETRIEVING);
@@ -102,15 +131,26 @@ public class XkcdCmd extends AbstractCommand {
 
     private void sendComicByIssueNumber(MessageReceivedEvent event) {
         int num = Integer.parseInt(args[0]);
-        if (num > newestIssue || num < 1) {
+        if (num < 1) {
             sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
             return;
         }
 
         try {
+            if (latestIssue.get() <= 0) {
+                ensureLatestIssue();
+            }
+
+            int latest = latestIssue.get();
+            if (latest > 0 && num > latest) {
+                sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
+                return;
+            }
+
             XkcdComic comic = XkcdAPI.getComic(num);
+            storeComic(comic);
             sendXkcd(event, comic);
-        } catch (APIException | InvalidRequestException ex) {
+        } catch (APIException | InvalidRequestException | SQLException ex) {
             sendErrorEmbed(event, ERROR_RETRIEVING);
         }
     }
@@ -131,7 +171,9 @@ public class XkcdCmd extends AbstractCommand {
 
     private void sendXkcd(MessageReceivedEvent event, XkcdComic comic) {
         String alt = comic.getAlt();
-        alt = alt.length() > MessageEmbed.TEXT_MAX_LENGTH ? alt.substring(0, MessageEmbed.TEXT_MAX_LENGTH - 3) + "..." : alt;
+        alt = alt.length() > MessageEmbed.TEXT_MAX_LENGTH
+                ? alt.substring(0, MessageEmbed.TEXT_MAX_LENGTH - 3) + "..."
+                : alt;
 
         event.getMessage().replyEmbeds(
                 new EmbedBuilder()
@@ -144,40 +186,26 @@ public class XkcdCmd extends AbstractCommand {
         ).queue();
     }
 
-    private void storeComicIfNew(XkcdComic comic) throws SQLException {
-        int num = comic.getIssueNr();
+    private void storeComic(XkcdComic comic) throws SQLException {
+        comics.put(comic.getIssueNr(), comic);
 
-        // Not new
-        if (num <= newestIssue) {
-            return;
+        maxStoredIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
+        latestIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
+
+        xkcdDao.insert(comic);
+    }
+
+    private void ensureLatestIssue() throws APIException {
+        if (latestIssue.get() > 0) return;
+
+        XkcdComic latest = XkcdAPI.getLatest();
+
+        latestIssue.updateAndGet(cur -> Math.max(cur, latest.getIssueNr()));
+
+        try {
+            storeComic(latest);
+        } catch (SQLException ex) {
+            logger.warn("Failed to store latest XKCD comic while ensuring latest issue.", ex);
         }
-
-        List<XkcdComic> newComics = new ArrayList<>();
-
-        // Store all comics up to the newest issue
-        for (int i = newestIssue + 1; i <= num; i++) {
-            // 404 is intentionally missing
-            if (i == 404) {
-                continue;
-            }
-
-            XkcdComic newComic;
-            try {
-                newComic = XkcdAPI.getComic(i);
-                if (logger.isInfoEnabled()) {
-                    logger.info("Storing comic: {} (#{})", newComic.getTitle(), newComic.getIssueNr());
-                }
-            } catch (APIException | InvalidRequestException ex) {
-                if (logger.isErrorEnabled()) {
-                    logger.error("Something went wrong while storing the XKCD comics in the DB.", ex);
-                }
-                return;
-            }
-            comics.put(newComic.getIssueNr(), newComic);
-            newComics.add(newComic);
-        }
-
-        newestIssue = num;
-        xkcdDao.insertAll(newComics);
     }
 }
