@@ -116,6 +116,7 @@ public final class Bootstrap {
      */
     public static void restart() {
         LOGGER.info("Restarting...");
+        shutdown();
         init();
     }
 
@@ -124,7 +125,9 @@ public final class Bootstrap {
      */
     public static void shutdown() {
         LOGGER.info("Shutting down...");
-        holo.getJDA().shutdown();
+        if (holo != null) {
+            holo.close();
+        }
     }
 
     public static long getStartupTime() {

@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.database.dao;
 
+import dev.zawarudo.holo.database.BatchResult;
 import dev.zawarudo.holo.database.Database;
 import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;
@@ -10,6 +11,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public final class XkcdDao {
 
@@ -18,7 +20,7 @@ public final class XkcdDao {
     private final SQLManager sql;
 
     public XkcdDao(SQLManager sql) {
-        this.sql = sql;
+        this.sql = Objects.requireNonNull(sql, "sql must not be null");
     }
 
     public List<XkcdComic> findAll() throws SQLException {
@@ -36,7 +38,12 @@ public final class XkcdDao {
         }
     }
 
-    public void insert(XkcdComic comic) throws SQLException {
+    /**
+     * Executes an INSERT OR IGNORE.
+     *
+     * @return 1 if inserted, 0 if ignored.
+     */
+    public int insertIgnore(XkcdComic comic) throws SQLException {
         if (comic == null) throw new IllegalArgumentException("comic must not be null");
 
         final String stmt = sql.getStatement("xkcd/insert-xkcd-comic");
@@ -45,36 +52,52 @@ public final class XkcdDao {
              PreparedStatement ps = conn.prepareStatement(stmt)) {
 
             bindInsert(ps, comic);
-            ps.executeUpdate();
+            return ps.executeUpdate();
         }
     }
 
-    public void insertAll(List<XkcdComic> comics) throws SQLException {
+    /**
+     * Executes INSERT OR IGNORE in batches inside a single transaction.
+     */
+    public BatchResult insertAllIgnore(List<XkcdComic> comics) throws SQLException {
         if (comics == null) throw new IllegalArgumentException("comics must not be null");
-        if (comics.isEmpty()) return;
+        if (comics.isEmpty()) return new BatchResult(0, 0);
 
         final String stmt = sql.getStatement("xkcd/insert-xkcd-comic");
+
+        int attempted = 0;
+        int affected = 0;
 
         try (Connection conn = Database.getConnection()) {
             boolean origAuto = conn.getAutoCommit();
             conn.setAutoCommit(false);
 
             try (PreparedStatement ps = conn.prepareStatement(stmt)) {
-                int i = 0;
+                int batchCount = 0;
 
                 for (XkcdComic comic : comics) {
                     if (comic == null) continue;
 
+                    attempted++;
                     bindInsert(ps, comic);
                     ps.addBatch();
+                    batchCount++;
 
-                    if (++i % BATCH_SIZE == 0) {
-                        ps.executeBatch();
+                    if (batchCount >= BATCH_SIZE) {
+                        affected = mergeBatchAffected(affected, ps.executeBatch());
+                        ps.clearBatch();
+                        batchCount = 0;
                     }
                 }
 
-                ps.executeBatch();
+                if (batchCount > 0) {
+                    affected = mergeBatchAffected(affected, ps.executeBatch());
+                    ps.clearBatch();
+                }
+
                 conn.commit();
+                return new BatchResult(attempted, affected);
+
             } catch (SQLException e) {
                 conn.rollback();
                 throw e;
@@ -84,17 +107,37 @@ public final class XkcdDao {
         }
     }
 
-    public List<XkcdComic> search(String ftsQuery, int limit, int offset) throws SQLException {
-        if (ftsQuery == null || ftsQuery.isBlank()) {
-            return List.of();
-        }
+    public int countComics() throws SQLException {
+        final String stmt = sql.getStatement("xkcd/count-xkcd-comics");
 
-        if (limit <= 0) {
-            limit = 8;
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(stmt);
+             ResultSet rs = ps.executeQuery()) {
+
+            return rs.next() ? rs.getInt("cnt") : 0;
         }
-        if (offset < 0) {
-            offset = 0;
+    }
+
+    public boolean exists(int issue) throws SQLException {
+        if (issue < 1) throw new IllegalArgumentException("issue must be >= 1");
+
+        final String stmt = sql.getStatement("xkcd/exists-xkcd-comic");
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(stmt)) {
+
+            ps.setInt(1, issue);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
         }
+    }
+
+    public List<XkcdComic> search(String ftsQuery, int limit, int offset) throws SQLException {
+        if (ftsQuery == null || ftsQuery.isBlank()) return List.of();
+        if (limit <= 0) throw new IllegalArgumentException("limit must be > 0");
+        if (offset < 0) throw new IllegalArgumentException("offset must be >= 0");
 
         final String stmt = sql.getStatement("xkcd/search-xkcd");
 
@@ -117,17 +160,19 @@ public final class XkcdDao {
 
     public List<XkcdComic> searchPrioritized(String broadQuery, String phraseQuery, int limit, int offset) throws SQLException {
         if (broadQuery == null || broadQuery.isBlank()) return List.of();
-        if (limit <= 0) limit = 8;
-        if (offset < 0) offset = 0;
+        if (limit <= 0) throw new IllegalArgumentException("limit must be > 0");
+        if (offset < 0) throw new IllegalArgumentException("offset must be >= 0");
+
+        if (phraseQuery == null || phraseQuery.isBlank()) {
+            return search(broadQuery, limit, offset);
+        }
 
         final String stmt = sql.getStatement("xkcd/search-xkcd-prioritized");
-
-        String safePhrase = (phraseQuery == null || phraseQuery.isBlank()) ? "\"__no_such_phrase__\"" : phraseQuery;
 
         try (Connection conn = Database.getConnection();
              PreparedStatement ps = conn.prepareStatement(stmt)) {
 
-            ps.setString(1, safePhrase);
+            ps.setString(1, phraseQuery);
             ps.setString(2, broadQuery);
             ps.setInt(3, limit);
             ps.setInt(4, offset);
@@ -140,6 +185,26 @@ public final class XkcdDao {
                 return result;
             }
         }
+    }
+
+    private static int mergeBatchAffected(int currentAffected, int[] batchResults) {
+        if (currentAffected < 0) return -1;
+
+        int batchAffected = sumBatchResultsOrUnknown(batchResults);
+        if (batchAffected < 0) return -1;
+
+        return currentAffected + batchAffected;
+    }
+
+    private static int sumBatchResultsOrUnknown(int[] results) {
+        int sum = 0;
+        for (int r : results) {
+            if (r == java.sql.Statement.SUCCESS_NO_INFO) {
+                return -1; // unknown
+            }
+            if (r > 0) sum += r;
+        }
+        return sum;
     }
 
     private static void bindInsert(PreparedStatement ps, XkcdComic comic) throws SQLException {

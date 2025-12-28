@@ -6,6 +6,7 @@ import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;
+import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -36,14 +37,16 @@ public class XkcdCmd extends AbstractCommand {
     private static final int SEARCH_LIMIT = 8;
 
     private final XkcdDao xkcdDao;
+    private final XkcdSyncService xkcdSyncService;
 
     private final Map<Integer, XkcdComic> comics = new ConcurrentHashMap<>();
 
     private final AtomicInteger latestIssue = new AtomicInteger();
     private final AtomicInteger maxStoredIssue = new AtomicInteger();
 
-    public XkcdCmd(XkcdDao xkcdDao) {
+    public XkcdCmd(XkcdDao xkcdDao, XkcdSyncService xkcdSyncService) {
         this.xkcdDao = xkcdDao;
+        this.xkcdSyncService = xkcdSyncService;
 
         loadComicsFromDb();
 
@@ -71,6 +74,12 @@ public class XkcdCmd extends AbstractCommand {
         // Full-text search using FTS5
         if (args.length >= 2 && args[0].equalsIgnoreCase("search")) {
             sendSearch(event);
+            return;
+        }
+
+        // Sync xkcd comics
+        if (args.length >= 2 && args[0].equalsIgnoreCase("sync")) {
+            handleSync(event);
             return;
         }
 
@@ -182,6 +191,23 @@ public class XkcdCmd extends AbstractCommand {
         }
     }
 
+    private void handleSync(MessageReceivedEvent event) {
+        if (!isBotOwner(event.getAuthor())) {
+            // Command is owner-only
+            return;
+        }
+
+        String sub = args[1].toLowerCase(Locale.ROOT);
+
+        switch (sub) {
+            case "start" -> syncStart(event);
+            case "status" -> syncStatus(event);
+            case "stop" -> syncStop(event);
+            default -> sendErrorEmbed(event,
+                    "Usage: `" + getPrefix(event) + "xkcd sync <start|status|stop>`");
+        }
+    }
+
     private void sendComicByIssueNumber(MessageReceivedEvent event) {
         int num = Integer.parseInt(args[0]);
         if (num < 1) {
@@ -246,7 +272,11 @@ public class XkcdCmd extends AbstractCommand {
         maxStoredIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
         latestIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
 
-        xkcdDao.insert(comic);
+        int result = xkcdDao.insertIgnore(comic);
+
+        if (result == 0) {
+            logger.debug("XKCD #{} already exists (ignored).", comic.getIssueNr());
+        }
     }
 
     private void ensureLatestIssue() throws APIException {
@@ -315,5 +345,146 @@ public class XkcdCmd extends AbstractCommand {
         } catch (SQLException ex) {
             logger.error("Failed to load XKCD comics from DB.", ex);
         }
+    }
+
+    private void syncStart(@NotNull MessageReceivedEvent event) {
+        int latest;
+        try {
+            if (latestIssue.get() <= 0) {
+                ensureLatestIssue();
+            }
+            latest = latestIssue.get();
+            if (latest <= 0) {
+                sendErrorEmbed(event, ERROR_RETRIEVING);
+                return;
+            }
+        } catch (APIException ex) {
+            logger.error("Failed to start XKCD sync: Could not determine latest issue.", ex);
+            sendErrorEmbed(event, ERROR_RETRIEVING);
+            return;
+        }
+
+        int dbCount;
+        try {
+            dbCount = xkcdDao.countComics();
+        } catch (SQLException ex) {
+            logger.error("Failed to count XKCD comics.", ex);
+            sendErrorEmbed(event, ERROR_RETRIEVING);
+            return;
+        }
+
+        // xkcd #404 is intentionally missing
+        int expectedCount = latest - ((latest >= 404) ? 1 : 0);
+
+        if (dbCount >= expectedCount) {
+            event.getMessage().replyEmbeds(
+                    new EmbedBuilder()
+                            .setTitle("xkcd sync")
+                            .setDescription("Already up to date.\n"
+                                    + "Comics in DB: **" + dbCount + "** / **" + expectedCount + "**\n"
+                                    + "Latest: **#" + latest + "**")
+                            .setColor(getEmbedColor())
+                            .build()
+            ).queue();
+            return;
+        }
+
+        int from = 1;
+        int to = latest;
+
+        boolean started;
+        try {
+            started = xkcdSyncService.start(from, to);
+        } catch (IllegalArgumentException ex) {
+            logger.error("Failed to start XKCD sync due to invalid range: {} -> {}", from, to, ex);
+            sendErrorEmbed(event, "Failed to start sync (invalid range).");
+            return;
+        } catch (Exception ex) {
+            logger.error("Failed to start XKCD sync.", ex);
+            sendErrorEmbed(event, ERROR_RETRIEVING);
+            return;
+        }
+
+        if (!started) {
+            sendErrorEmbed(event, "Sync is already running. Use `" + getPrefix(event) + "xkcd sync status`.");
+            return;
+        }
+
+        event.getMessage().replyEmbeds(
+                new EmbedBuilder()
+                        .setTitle("xkcd sync started")
+                        .setDescription("Syncing comics (safe re-sync) from **#" + from + "** to **#" + to + "**.\n"
+                                + "Progress: **" + dbCount + "** / **" + expectedCount + "** stored.\n"
+                                + "Check progress with `" + getPrefix(event) + "xkcd sync status`.")
+                        .setColor(getEmbedColor())
+                        .build()
+        ).queue();
+    }
+
+    private void syncStatus(@NotNull MessageReceivedEvent event) {
+        int dbCount = -1;
+
+        try {
+            dbCount = xkcdDao.countComics();
+        } catch (SQLException ex) {
+            logger.error("countComics failed", ex);
+        }
+
+        XkcdSyncService.SyncStatus s = xkcdSyncService.status(maxStoredIssue.get(), dbCount);
+
+        StringBuilder desc = new StringBuilder();
+        desc.append("**Running:** ").append(s.running() ? "Yes" : "No").append('\n');
+
+        desc.append("**Max stored issue:** #").append(s.maxStoredIssue()).append('\n');
+        if (s.dbCount() >= 0) {
+            desc.append("**Comics in DB:** ").append(s.dbCount()).append('\n');
+        } else {
+            desc.append("**Comics in DB:** unknown\n");
+        }
+
+        if (s.targetIssue() > 0) {
+            desc.append("**Target (latest):** #").append(s.targetIssue()).append('\n');
+        } else {
+            desc.append("**Target (latest):** unknown\n");
+        }
+
+        desc.append("**Last inserted:** #").append(s.lastInsertedIssue()).append('\n');
+        desc.append("**Left to sync:** ").append(s.leftToSync()).append('\n');
+        desc.append("**Inserted this run:** ").append(s.affectedThisRun()).append('\n');
+
+        if (s.startedAt() != null) {
+            desc.append("**Started:** ").append(s.startedAt()).append('\n');
+        }
+        if (s.lastUpdateAt() != null) {
+            desc.append("**Last update:** ").append(s.lastUpdateAt()).append('\n');
+        }
+        if (s.lastError() != null) {
+            desc.append("\n**Last error:** ").append(s.lastError());
+        }
+
+        event.getMessage().replyEmbeds(
+                new EmbedBuilder()
+                        .setTitle("xkcd sync status")
+                        .setDescription(desc.toString())
+                        .setColor(getEmbedColor())
+                        .build()
+        ).queue();
+    }
+
+    private void syncStop(@NotNull MessageReceivedEvent event) {
+        if (!xkcdSyncService.isRunning()) {
+            sendErrorEmbed(event, "No sync is currently running.");
+            return;
+        }
+
+        xkcdSyncService.stop();
+
+        event.getMessage().replyEmbeds(
+                new EmbedBuilder()
+                        .setTitle("xkcd sync stopping")
+                        .setDescription("Stopping sync... (it should stop shortly)")
+                        .setColor(getEmbedColor())
+                        .build()
+        ).queue();
     }
 }

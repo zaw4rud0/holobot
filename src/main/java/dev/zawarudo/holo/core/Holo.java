@@ -15,6 +15,7 @@ import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
+import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -36,6 +37,8 @@ import java.util.EnumSet;
  */
 public class Holo extends ListenerAdapter {
 
+    private final BotExecutors executors;
+
     private JDA jda;
     private final BotConfig botConfig;
     private GuildConfigManager guildConfigManager;
@@ -54,7 +57,8 @@ public class Holo extends ListenerAdapter {
 
     public Holo(BotConfig botConfig) {
         this.botConfig = botConfig;
-        waiter = new EventWaiter();
+        this.executors = new BotExecutors();
+        this.waiter = new EventWaiter();
         init();
     }
 
@@ -86,6 +90,9 @@ public class Holo extends ListenerAdapter {
         XkcdDao xkcdDao = new XkcdDao(sqlManager);
         EmoteDao emoteDao = new EmoteDao(sqlManager);
 
+        // Register services
+        XkcdSyncService xkcdSyncService = new XkcdSyncService(xkcdDao, executors.io());
+
         try {
             gitHubClient = new GitHubClient(botConfig.getGitHubToken());
         } catch (IOException e) {
@@ -109,16 +116,21 @@ public class Holo extends ListenerAdapter {
                 gitHubClient,
                 guildConfigManager,
                 emoteManager,
-                xkcdDao
+                xkcdDao,
+                xkcdSyncService
         );
     }
 
     public void registerListeners() {
         jda.addEventListener(
-                new CommandListener(commandManager, permissionManager),
+                new CommandListener(commandManager, permissionManager, executors.io()),
                 new MiscListener(emoteManager),
                 new GuildListener(guildConfigManager, emoteManager)
         );
+    }
+
+    public BotExecutors getExecutors() {
+        return executors;
     }
 
     public JDA getJDA() {
@@ -163,9 +175,16 @@ public class Holo extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
-        Bootstrap.holo.registerManagers();
-        Bootstrap.holo.registerListeners();
-
+        registerManagers();
+        registerListeners();
         LOGGER.info("{} is ready!", event.getJDA().getSelfUser().getName());
+    }
+
+    public void close() {
+        try {
+            if (jda != null) jda.shutdown();
+        } finally {
+            executors.close();
+        }
     }
 }

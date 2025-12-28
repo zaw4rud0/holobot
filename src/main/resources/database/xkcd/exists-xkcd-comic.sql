@@ -1,0 +1,4 @@
+SELECT 1
+FROM XkcdComics
+WHERE id = ?
+LIMIT 1;

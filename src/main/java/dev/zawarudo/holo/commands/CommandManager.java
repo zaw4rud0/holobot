@@ -12,6 +12,7 @@ import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
+import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,8 @@ public class CommandManager extends ListenerAdapter {
             GitHubClient gitHubClient,
             GuildConfigManager guildConfigManager,
             EmoteManager emoteManager,
-            XkcdDao xkcdDao
+            XkcdDao xkcdDao,
+            XkcdSyncService xkcdSyncService
     ) {
         // General Cmds
         addCommand(new BugCmd(gitHubClient));
@@ -71,7 +73,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new PaletteCmd());
         addCommand(new PixelateCmd());
         addCommand(new UpscaleCmd());
-        addCommand(new XkcdCmd(xkcdDao));
+        addCommand(new XkcdCmd(xkcdDao, xkcdSyncService));
 
         // Misc Cmds
         addCommand(new CoinFlipCmd());

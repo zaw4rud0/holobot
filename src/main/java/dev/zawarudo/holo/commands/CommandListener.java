@@ -19,7 +19,6 @@ import org.slf4j.MDC;
 import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -39,11 +38,10 @@ public class CommandListener extends ListenerAdapter {
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListener.class);
     private static final Logger AUDIT = LoggerFactory.getLogger("audit");
 
-    public CommandListener(CommandManager cmdManager, PermissionManager permManager) {
+    public CommandListener(CommandManager cmdManager, PermissionManager permManager, ExecutorService executor) {
         this.cmdManager = cmdManager;
         this.permManager = permManager;
-
-        executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+        this.executorService = executor;
     }
 
     @Override
