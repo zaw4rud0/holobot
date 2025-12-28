@@ -15,6 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.File;
 import java.lang.management.ManagementFactory;
 import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.concurrent.TimeUnit;
 
@@ -22,46 +23,18 @@ import java.util.concurrent.TimeUnit;
 		description = "Shows information about me",
 		alias = {"source", "bot", "sauce"},
 		category = CommandCategory.GENERAL)
-public class InfoBotCmd extends AbstractCommand {
+public class BotInfoCmd extends AbstractCommand {
 
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent e) {
 		deleteInvoke(e);
 		
-		OperatingSystemMXBean os = ManagementFactory.getOperatingSystemMXBean();
-		MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
-		
-		String cpuPercentage;
-		int cores = os.getAvailableProcessors();
-		
-		if (os.getSystemLoadAverage() == -1) {
-			cpuPercentage = "N/A";
-		} else {
-			double avg = os.getSystemLoadAverage();
-			double cpuUsage = avg / cores * 100;
-			cpuPercentage = (cpuUsage * 100 / 100.0) + "%";
-		}
-		
-		long usedMemoryBytes = memory.getHeapMemoryUsage().getUsed();
-		long maxMemoryBytes = memory.getHeapMemoryUsage().getMax();
-
-		double usedMemoryMB = usedMemoryBytes / (1024.0 * 1024);
-		double maxMemoryMB = maxMemoryBytes / (1024.0 * 1024);
-
-		double usedMemoryPercentage = (usedMemoryBytes / (double) maxMemoryBytes) * 100;
-		
-		String systemInfo = "**CPU:** `" + cpuPercentage + " on " + cores + " core(s)`\n"
-						+ "**Memory:** `" + String.format("%.2f MB / %.2f MB (%.2f%%)", usedMemoryMB, maxMemoryMB, usedMemoryPercentage) + "`\n"
+		String systemInfo = "**CPU:** " + cpuInfo() + "\n"
+						+ "**Memory:** " + memoryInfo() + "\n"
 						+ "**Uptime:** `" + Formatter.formatTime(System.currentTimeMillis() - Bootstrap.getStartupTime()) + "`";
 
 		String description = "Use `" + getPrefix(e) + "help` to see all commands";
 
-		EmbedBuilder builder = getInfoEmbed(e, description, systemInfo);
-		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
-	}
-
-	@NotNull
-	private static EmbedBuilder getInfoEmbed(@NotNull MessageReceivedEvent e, String description, String systemInfo) {
 		EmbedBuilder builder = new EmbedBuilder();
 		builder.setTitle(e.getJDA().getSelfUser().getName() + " | Information");
 		builder.setThumbnail(e.getJDA().getSelfUser().getEffectiveAvatarUrl().concat("?size=512"));
@@ -72,6 +45,55 @@ public class InfoBotCmd extends AbstractCommand {
 		builder.addField("System Information", systemInfo, false);
 		builder.addField("Database Size", "`" + new File(Database.getDbPath()).length() / 1024 / 1024 + "MB`", false);
 		builder.addField("Source", "[GitHub](https://github.com/xHarlock/HoloBot)", false);
-		return builder;
+
+		sendEmbed(e, builder, true, 1, TimeUnit.MINUTES);
+	}
+
+	private static String cpuInfo() {
+		OperatingSystemMXBean base = ManagementFactory.getOperatingSystemMXBean();
+		int cores = base.getAvailableProcessors();
+
+		if (base instanceof com.sun.management.OperatingSystemMXBean os) {
+			double system = os.getCpuLoad();
+			double proc   = os.getProcessCpuLoad();
+
+			String systemStr = system >= 0 ? String.format("%.1f%%", system * 100) : "N/A";
+			String procStr   = proc >= 0 ? String.format("%.1f%%", proc * 100) : "N/A";
+
+			return "`System: " + systemStr + " | Bot: " + procStr + " | " + cores + " core(s)`";
+		}
+
+		// Fallback
+		double load = base.getSystemLoadAverage();
+		if (load < 0) {
+			return "`N/A | " + cores + " core(s)`";
+		}
+		double approx = (load / cores) * 100.0;
+		return "`~" + String.format("%.1f%%", approx) + " load | " + cores + " core(s)`";
+	}
+
+	private static String memoryInfo() {
+		MemoryMXBean memory = ManagementFactory.getMemoryMXBean();
+		MemoryUsage heap = memory.getHeapMemoryUsage();
+
+		long used = heap.getUsed();
+		long max = heap.getMax();
+
+		String usedMb = formatMb(used);
+
+		if (max > 0) {
+			String maxMb = formatMb(max);
+			double pct = (used / (double) max) * 100.0;
+
+			return "`" + usedMb + " / " + maxMb
+					+ " (" + String.format("%.1f%%", pct) + ")`";
+		}
+
+		// Fallback if max heap is undefined
+		return "`" + usedMb + "`";
+	}
+
+	private static String formatMb(long bytes) {
+		return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
 	}
 }

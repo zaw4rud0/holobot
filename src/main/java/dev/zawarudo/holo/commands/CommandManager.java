@@ -45,7 +45,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new BugCmd(gitHubClient));
         addCommand(new ConfigCmd(guildConfigManager, moduleRegistry));
         addCommand(new HelpCmd(this));
-        addCommand(new InfoBotCmd());
+        addCommand(new BotInfoCmd());
         addCommand(new PermCmd());
         addCommand(new PingCmd());
         addCommand(new RoleInfoCmd());
