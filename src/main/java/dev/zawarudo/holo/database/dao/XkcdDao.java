@@ -12,6 +12,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 
 public final class XkcdDao {
 
@@ -35,6 +36,39 @@ public final class XkcdDao {
                 result.add(mapRow(rs));
             }
             return result;
+        }
+    }
+
+    public Optional<XkcdComic> findById(int issueNr) throws SQLException {
+        if (issueNr < 1) throw new IllegalArgumentException("issue must be >= 1");
+
+        final String stmt = sql.getStatement("xkcd/select-xkcd-by-id");
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(stmt)) {
+
+            ps.setInt(1, issueNr);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
+            }
+        }
+    }
+
+    /**
+     * Searches for a xkcd comic that matches the exact specified title (case-insensitive).
+     */
+    public Optional<XkcdComic> findByExactTitle(String title) throws SQLException {
+        if (title == null || title.isBlank()) return Optional.empty();
+
+        final String stmt = sql.getStatement("xkcd/select-xkcd-by-title-ci");
+
+        try (Connection conn = Database.getConnection();
+             PreparedStatement ps = conn.prepareStatement(stmt)) {
+
+            ps.setString(1, title.trim());
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next() ? Optional.of(mapRow(rs)) : Optional.empty();
+            }
         }
     }
 

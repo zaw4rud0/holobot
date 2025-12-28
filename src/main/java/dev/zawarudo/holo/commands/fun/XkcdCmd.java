@@ -18,7 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Command(name = "xkcd",
@@ -39,23 +38,14 @@ public class XkcdCmd extends AbstractCommand {
     private final XkcdDao xkcdDao;
     private final XkcdSyncService xkcdSyncService;
 
-    private final Map<Integer, XkcdComic> comics = new ConcurrentHashMap<>();
-
     private final AtomicInteger latestIssue = new AtomicInteger();
-    private final AtomicInteger maxStoredIssue = new AtomicInteger();
 
     public XkcdCmd(XkcdDao xkcdDao, XkcdSyncService xkcdSyncService) {
         this.xkcdDao = xkcdDao;
         this.xkcdSyncService = xkcdSyncService;
 
-        loadComicsFromDb();
-
         // Try to fetch latest once
-        try {
-            ensureLatestIssue();
-        } catch (APIException ex) {
-            logger.warn("Failed to fetch latest XKCD issue during startup. Will retry on demand.", ex);
-        }
+        getLatestIssue();
     }
 
     @Override
@@ -95,14 +85,7 @@ public class XkcdCmd extends AbstractCommand {
 
     private void sendRandomComic(MessageReceivedEvent event) {
         try {
-            int upper = latestIssue.get();
-            if (upper <= 0) upper = maxStoredIssue.get();
-
-            if (upper <= 0) {
-                ensureLatestIssue();
-                upper = latestIssue.get();
-            }
-
+            int upper = getLatestIssue();
             if (upper <= 0) {
                 sendErrorEmbed(event, ERROR_RETRIEVING);
                 return;
@@ -111,13 +94,9 @@ public class XkcdCmd extends AbstractCommand {
             int issue = RANDOM.nextInt(upper) + 1;
 
             // 404 intentionally missing
-            if (issue == 404) {
-                issue = (upper == 1) ? 1 : RANDOM.nextInt(upper) + 1;
-                if (issue == 404) issue = 403;
-            }
+            if (issue == 404) issue = 403;
 
-            XkcdComic comic = XkcdAPI.getComic(issue);
-            storeComic(comic);
+            XkcdComic comic = getComicDbFirst(issue).orElseThrow();
             sendXkcd(event, comic);
         } catch (APIException | InvalidRequestException | SQLException ex) {
             logger.error("Failed to fetch/store random XKCD comic.", ex);
@@ -127,15 +106,15 @@ public class XkcdCmd extends AbstractCommand {
 
     private void sendNewestComic(MessageReceivedEvent event) {
         try {
-            XkcdComic comic = XkcdAPI.getLatest();
-
-            latestIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
-
-            storeComic(comic);
-            sendXkcd(event, comic);
-        } catch (APIException | SQLException ex) {
-            logger.error("Failed to fetch/store newest XKCD comic.", ex);
+            XkcdComic latest = XkcdAPI.getLatest();
+            latestIssue.updateAndGet(cur -> Math.max(cur, latest.getIssueNr()));
+            sendXkcd(event, latest);
+            xkcdDao.insertIgnore(latest);
+        } catch (APIException ex) {
+            logger.error("Failed to fetch newest XKCD comic.", ex);
             sendErrorEmbed(event, ERROR_RETRIEVING);
+        } catch (SQLException ex) {
+            logger.warn("Failed to store latest XKCD comic.", ex);
         }
     }
 
@@ -216,37 +195,72 @@ public class XkcdCmd extends AbstractCommand {
         }
 
         try {
-            if (latestIssue.get() <= 0) {
-                ensureLatestIssue();
-            }
-
-            int latest = latestIssue.get();
+            int latest = getLatestIssue();
             if (latest > 0 && num > latest) {
                 sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
                 return;
             }
 
-            XkcdComic comic = XkcdAPI.getComic(num);
-            storeComic(comic);
-            sendXkcd(event, comic);
+            Optional<XkcdComic> comic = getComicDbFirst(num);
+            if (comic.isEmpty()) {
+                sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
+                return;
+            }
+
+            sendXkcd(event, comic.get());
         } catch (APIException | InvalidRequestException | SQLException ex) {
             logger.error("Failed to fetch/store XKCD comic #{}.", num, ex);
             sendErrorEmbed(event, ERROR_RETRIEVING);
         }
     }
 
+    private int getLatestIssue() {
+        int cached = latestIssue.get();
+        if (cached > 0) return cached;
+
+        try {
+            XkcdComic latest = XkcdAPI.getLatest();
+            latestIssue.updateAndGet(cur -> Math.max(cur, latest.getIssueNr()));
+
+            xkcdDao.insertIgnore(latest);
+
+            return latest.getIssueNr();
+        } catch (APIException | SQLException ex) {
+            logger.warn("Could not fetch/store latest XKCD issue.", ex);
+            return latestIssue.get();
+        }
+    }
+
+    private Optional<XkcdComic> getComicDbFirst(int issue) throws SQLException, APIException, InvalidRequestException {
+        if (issue < 1 || issue == 404) return Optional.empty();
+
+        Optional<XkcdComic> fromDb = xkcdDao.findById(issue);
+        if (fromDb.isPresent()) return fromDb;
+
+        XkcdComic fetched = XkcdAPI.getComic(issue);
+        xkcdDao.insertIgnore(fetched);
+        latestIssue.updateAndGet(cur -> Math.max(cur, fetched.getIssueNr()));
+        return Optional.of(fetched);
+    }
+
     private void sendComicByTitle(MessageReceivedEvent event) {
         String title = String.join(" ", args);
-
-        Optional<XkcdComic> optionalComic = comics.values().stream()
-                .filter(c -> c.getTitle().equalsIgnoreCase(title))
-                .findFirst();
-
-        if (optionalComic.isEmpty()) {
-            sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
+        if (title.isBlank()) {
+            sendErrorEmbed(event, "Usage: `" + getPrefix(event) + "xkcd <title>`");
             return;
         }
-        sendXkcd(event, optionalComic.get());
+
+        try {
+            Optional<XkcdComic> comic = xkcdDao.findByExactTitle(title);
+            if (comic.isEmpty()) {
+                sendErrorEmbed(event, String.format(ERROR_DOES_NOT_EXIST, getPrefix(event)));
+                return;
+            }
+            sendXkcd(event, comic.get());
+        } catch (SQLException ex) {
+            logger.error("DB lookup by title failed: '{}'", title, ex);
+            sendErrorEmbed(event, ERROR_RETRIEVING);
+        }
     }
 
     private void sendXkcd(MessageReceivedEvent event, XkcdComic comic) {
@@ -264,33 +278,6 @@ public class XkcdCmd extends AbstractCommand {
                         .setColor(getEmbedColor())
                         .build()
         ).queue();
-    }
-
-    private void storeComic(XkcdComic comic) throws SQLException {
-        comics.put(comic.getIssueNr(), comic);
-
-        maxStoredIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
-        latestIssue.updateAndGet(cur -> Math.max(cur, comic.getIssueNr()));
-
-        int result = xkcdDao.insertIgnore(comic);
-
-        if (result == 0) {
-            logger.debug("XKCD #{} already exists (ignored).", comic.getIssueNr());
-        }
-    }
-
-    private void ensureLatestIssue() throws APIException {
-        if (latestIssue.get() > 0) return;
-
-        XkcdComic latest = XkcdAPI.getLatest();
-
-        latestIssue.updateAndGet(cur -> Math.max(cur, latest.getIssueNr()));
-
-        try {
-            storeComic(latest);
-        } catch (SQLException ex) {
-            logger.error("Failed to store latest XKCD comic during ensureLatestIssue().", ex);
-        }
     }
 
     private static String toBroadQuery(String raw) {
@@ -324,42 +311,14 @@ public class XkcdCmd extends AbstractCommand {
         return "\"" + normalized + "\"";
     }
 
-    private void loadComicsFromDb() {
-        try {
-            List<XkcdComic> list = xkcdDao.findAll();
-
-            if (list.isEmpty()) {
-                logger.warn("No XKCD comics found in DB.");
-                return;
-            }
-
-            Collections.sort(list);
-            logger.info("Loaded {} XKCD comics from DB.", list.size());
-
-            int max = list.getLast().getIssueNr();
-            maxStoredIssue.set(max);
-
-            for (XkcdComic comic : list) {
-                comics.put(comic.getIssueNr(), comic);
-            }
-        } catch (SQLException ex) {
-            logger.error("Failed to load XKCD comics from DB.", ex);
-        }
-    }
-
     private void syncStart(@NotNull MessageReceivedEvent event) {
         int latest;
-        try {
-            if (latestIssue.get() <= 0) {
-                ensureLatestIssue();
-            }
-            latest = latestIssue.get();
-            if (latest <= 0) {
-                sendErrorEmbed(event, ERROR_RETRIEVING);
-                return;
-            }
-        } catch (APIException ex) {
-            logger.error("Failed to start XKCD sync: Could not determine latest issue.", ex);
+
+        if (latestIssue.get() <= 0) {
+            getLatestIssue();
+        }
+        latest = latestIssue.get();
+        if (latest <= 0) {
             sendErrorEmbed(event, ERROR_RETRIEVING);
             return;
         }
@@ -430,12 +389,11 @@ public class XkcdCmd extends AbstractCommand {
             logger.error("countComics failed", ex);
         }
 
-        XkcdSyncService.SyncStatus s = xkcdSyncService.status(maxStoredIssue.get(), dbCount);
+        XkcdSyncService.SyncStatus s = xkcdSyncService.status(0, dbCount);
 
         StringBuilder desc = new StringBuilder();
         desc.append("**Running:** ").append(s.running() ? "Yes" : "No").append('\n');
 
-        desc.append("**Max stored issue:** #").append(s.maxStoredIssue()).append('\n');
         if (s.dbCount() >= 0) {
             desc.append("**Comics in DB:** ").append(s.dbCount()).append('\n');
         } else {
@@ -448,6 +406,7 @@ public class XkcdCmd extends AbstractCommand {
             desc.append("**Target (latest):** unknown\n");
         }
 
+        desc.append("**Last checked:** #").append(s.lastCheckedIssue()).append('\n');
         desc.append("**Last inserted:** #").append(s.lastInsertedIssue()).append('\n');
         desc.append("**Left to sync:** ").append(s.leftToSync()).append('\n');
         desc.append("**Inserted this run:** ").append(s.affectedThisRun()).append('\n');
