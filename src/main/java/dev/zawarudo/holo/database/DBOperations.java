@@ -327,54 +327,6 @@ public final class DBOperations {
     }
 
     /**
-     * Inserts a waifu into the DB.
-     *
-     * @param name  Name of the waifu.
-     * @param tag   Gelbooru tag of the waifu.
-     * @param title Title of the embed.
-     */
-    public static void insertWaifu(String name, String tag, String title) throws SQLException {
-        String sql = Bootstrap.holo.getSQLManager().getStatement("insert-waifu");
-
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, name);
-            ps.setString(2, tag);
-            ps.setString(3, title);
-            ps.execute();
-        }
-    }
-
-    /**
-     * Returns a list of waifu names from the DB.
-     */
-    public static List<String> getWaifuNames() throws SQLException {
-        Connection conn = Database.getConnection();
-        try (PreparedStatement ps = conn.prepareStatement("SELECT id FROM Gelbooru;")) {
-            ResultSet rs = ps.executeQuery();
-            List<String> ids = new ArrayList<>();
-            while (rs.next()) {
-                ids.add(rs.getString("Id"));
-            }
-            return ids;
-        }
-    }
-
-    /**
-     * Returns a set of waifu entries from the DB.
-     */
-    public static ResultSet getWaifu(String name) throws SQLException {
-
-        // TODO: Return a list of waifu objects instead of a ResultSet.
-        //  That should decrease dependency and cohesion
-
-        Connection conn = Database.getConnection();
-        PreparedStatement ps = conn.prepareStatement("SELECT * FROM Gelbooru WHERE id = ?;");
-        ps.setString(1, name);
-        return ps.executeQuery();
-    }
-
-    /**
      * Inserts a blacklisted user into the DB.
      *
      * @param userId The Discord id of the {@link User}.
@@ -477,60 +429,6 @@ public final class DBOperations {
             }
             conn.close();
             return countdowns;
-        }
-    }
-
-    public static void createNewDatabase() throws SQLException {
-        String script = Bootstrap.holo.getSQLManager().getStatement("create-database");
-        try (Connection conn = Database.getConnection()) {
-            runSqlScript(conn, script);
-        }
-    }
-
-    private static void runSqlScript(Connection conn, String script) throws SQLException {
-        // Optional but recommended for SQLite
-        try (var pragma = conn.createStatement()) {
-            pragma.execute("PRAGMA foreign_keys = ON");
-        }
-
-        java.util.List<String> statements = new java.util.ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        boolean inSingle = false, inDouble = false;
-
-        for (int i = 0; i < script.length(); i++) {
-            char c = script.charAt(i);
-            if (c == '\'' && !inDouble) {
-                inSingle = !inSingle;
-            } else if (c == '"' && !inSingle) {
-                inDouble = !inDouble;
-            }
-
-            if (c == ';' && !inSingle && !inDouble) {
-                String stmt = current.toString().trim();
-                if (!stmt.isBlank()) statements.add(stmt);
-                current.setLength(0);
-            } else {
-                current.append(c);
-            }
-        }
-        String tail = current.toString().trim();
-        if (!tail.isBlank()) statements.add(tail);
-
-        // Execute all statements in a transaction
-        boolean origAuto = conn.getAutoCommit();
-        conn.setAutoCommit(false);
-        try (var st = conn.createStatement()) {
-            for (String sql : statements) {
-                // skip single-line comments (optional)
-                String trimmed = sql.replaceAll("(?m)^\\s*--.*$", "").trim();
-                if (!trimmed.isBlank()) st.execute(trimmed);
-            }
-            conn.commit();
-        } catch (SQLException e) {
-            conn.rollback();
-            throw e;
-        } finally {
-            conn.setAutoCommit(origAuto);
         }
     }
 }

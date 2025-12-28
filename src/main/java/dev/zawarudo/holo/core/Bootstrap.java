@@ -1,14 +1,14 @@
 package dev.zawarudo.holo.core;
 
-import dev.zawarudo.holo.database.DBOperations;
 import dev.zawarudo.holo.database.Database;
+import dev.zawarudo.holo.database.FlywayMigrator;
 import dev.zawarudo.holo.utils.VersionInfo;
 import io.github.cdimascio.dotenv.Dotenv;
+import org.flywaydb.core.api.FlywayException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.sql.SQLException;
 
 import static dev.zawarudo.holo.core.BotConfig.mask;
 
@@ -55,10 +55,11 @@ public final class Bootstrap {
 
         BotConfig config = buildConfig(dotenv);
 
+        checkDatabase();
+
+        // Create bot instance
         holo = new Holo(config);
         holo.registerEarlyManagers();
-
-        checkDatabase();
 
         if (LOGGER.isInfoEnabled()) {
             long totalTime = System.currentTimeMillis() - startupTime;
@@ -86,8 +87,12 @@ public final class Bootstrap {
     }
 
     private static void checkDatabase() {
-        String dbPath = dotenv.get("DB_PATH", "./data/Holo.db");
-        Database.setDbPath((dbPath));
+        String envPath = dotenv.get("DB_PATH");
+        if (envPath != null && !envPath.isBlank()) {
+            Database.setDbPath(envPath);
+        }
+
+        String dbPath = Database.getDbPath();
 
         File dbFile = new File(dbPath);
         File parent = dbFile.getParentFile();
@@ -96,18 +101,14 @@ public final class Bootstrap {
             throw new IllegalStateException("Failed to create DB directory: " + parent.getAbsolutePath());
         }
 
-        if (!dbFile.exists()) {
-            try {
-                DBOperations.createNewDatabase();
-                LOGGER.info("Created new database at {}", dbFile.getAbsolutePath());
-            } catch (SQLException ex) {
-                throw new IllegalStateException("Failed to create database at " + dbFile.getAbsolutePath(), ex);
-            }
-        } else {
-            LOGGER.info("Using existing database at {}", dbFile.getAbsolutePath());
+        // Flyway creates the DB file if needed and applies migrations.
+        try {
+            FlywayMigrator.migrate(dbPath);
+        } catch (FlywayException ex) {
+            throw new IllegalStateException("Failed to run DB migrations for " + dbFile.getAbsolutePath(), ex);
         }
 
-        // TODO: Check if the database has all the needed tables and columns
+        LOGGER.info("Database ready at {}", dbFile.getAbsolutePath());
     }
 
     /**

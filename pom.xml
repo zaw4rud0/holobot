@@ -157,6 +157,12 @@
             <artifactId>sqlite-jdbc</artifactId>
             <version>3.51.0.0</version>
         </dependency>
+        <!-- Flyway for database migrations -->
+        <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-core</artifactId>
+            <version>11.20.0</version>
+        </dependency>
 
         <!-- JLyrics to browse lyrics and song information -->
         <dependency>
