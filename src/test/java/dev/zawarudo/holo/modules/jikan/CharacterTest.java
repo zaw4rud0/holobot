@@ -1,6 +1,5 @@
-package modules.jikan;
+package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Appearance;
 import dev.zawarudo.holo.modules.jikan.model.Character;
 import dev.zawarudo.holo.modules.jikan.model.MediaType;
@@ -13,7 +12,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class CharacterTests {
+class CharacterTest {
 
     @Test
     void testCharacterById() throws APIException, InvalidIdException {

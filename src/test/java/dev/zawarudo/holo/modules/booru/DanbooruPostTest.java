@@ -1,4 +1,4 @@
-package modules.booru;
+package dev.zawarudo.holo.modules.booru;
 
 import dev.zawarudo.holo.modules.booru.danbooru.DanbooruApiClient;
 import dev.zawarudo.holo.modules.booru.danbooru.DanbooruPost;

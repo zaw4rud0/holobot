@@ -1,9 +1,8 @@
-package modules.jikan;
+package dev.zawarudo.holo.modules.jikan;
 
 import java.util.List;
 import java.util.Locale;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
@@ -15,7 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AnimeTests {
+class AnimeTest {
 
     @Test
     void testAnime1() throws APIException, InvalidIdException {

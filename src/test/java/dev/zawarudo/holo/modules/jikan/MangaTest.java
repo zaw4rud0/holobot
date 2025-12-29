@@ -1,6 +1,5 @@
-package modules.jikan;
+package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Manga;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
@@ -11,7 +10,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class MangaTests {
+class MangaTest {
 
     @Test
     void testMangaById1() throws APIException, InvalidIdException {

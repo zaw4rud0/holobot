@@ -1,6 +1,5 @@
-package utils;
+package dev.zawarudo.holo.utils;
 
-import dev.zawarudo.holo.utils.DateTimeUtils;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -13,7 +12,7 @@ import java.util.TimeZone;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-class DateTimeTests {
+class DateTimeTest {
 
     private static TimeZone originalTz;
     private static final ZoneId ZH = ZoneId.of("Europe/Zurich");

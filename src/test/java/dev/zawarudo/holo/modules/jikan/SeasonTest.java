@@ -1,6 +1,5 @@
-package modules.jikan;
+package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.modules.jikan.model.Season;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -10,7 +9,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class SeasonTests {
+class SeasonTest {
 
     @Test
     void testSeasonNow() throws APIException {

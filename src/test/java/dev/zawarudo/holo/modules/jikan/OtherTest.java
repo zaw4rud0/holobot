@@ -1,6 +1,5 @@
-package modules.jikan;
+package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.jikan.model.Anime;
 import dev.zawarudo.holo.modules.jikan.model.Related;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -14,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-class OtherTests {
+class OtherTest {
 
     @BeforeAll
     static void setup() {

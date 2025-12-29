@@ -1,7 +1,5 @@
-package modules;
+package dev.zawarudo.holo.modules.xkcd;
 
-import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
-import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import org.junit.jupiter.api.BeforeAll;
@@ -9,7 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class XkcdTests {
+class XkcdTest {
 
     private static XkcdComic latest;
     private static XkcdComic comic;

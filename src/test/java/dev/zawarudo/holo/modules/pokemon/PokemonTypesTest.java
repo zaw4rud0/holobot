@@ -1,18 +1,16 @@
-package modules;
+package dev.zawarudo.holo.modules.pokemon;
 
-import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.PokemonType;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-class TestPokemonTypes {
+class PokemonTypesTest {
 
     @Test
     void testTypeNormal() throws APIException {

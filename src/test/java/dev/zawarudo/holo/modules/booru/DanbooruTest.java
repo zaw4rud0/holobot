@@ -1,6 +1,5 @@
-package modules.booru;
+package dev.zawarudo.holo.modules.booru;
 
-import dev.zawarudo.holo.modules.booru.BooruPost;
 import dev.zawarudo.holo.modules.booru.danbooru.DanbooruApiClient;
 import dev.zawarudo.holo.modules.booru.danbooru.DanbooruPost;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -14,9 +13,9 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DanbooruTests {
+class DanbooruTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(DanbooruTests.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DanbooruTest.class);
 
     @Test
     void testPostCount() throws APIException, InvalidRequestException {

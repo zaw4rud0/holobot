@@ -1,6 +1,5 @@
-package modules;
+package dev.zawarudo.holo.modules;
 
-import dev.zawarudo.holo.modules.DogCeoClient;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import org.junit.jupiter.api.Test;
@@ -9,7 +8,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class DogCeoClientTests {
+class DogCeoClientTest {
 
     @Test
     void testRandomImage() throws APIException {
