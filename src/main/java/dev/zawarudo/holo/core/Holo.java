@@ -14,6 +14,7 @@ import dev.zawarudo.holo.database.dao.EmoteDao;
 import dev.zawarudo.holo.database.dao.GuildConfigDao;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
+import dev.zawarudo.holo.modules.MerriamWebsterClient;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import net.dv8tion.jda.api.JDA;
@@ -47,6 +48,7 @@ public class Holo extends ListenerAdapter {
     private PokemonSpawnManager pokemonSpawnManager;
     private SQLManager sqlManager;
     private GitHubClient gitHubClient;
+    private MerriamWebsterClient merriamWebsterClient;
     private EmoteManager emoteManager;
 
     private ModuleRegistry moduleRegistry;
@@ -93,11 +95,8 @@ public class Holo extends ListenerAdapter {
         // Register services
         XkcdSyncService xkcdSyncService = new XkcdSyncService(xkcdDao, executors.io());
 
-        try {
-            gitHubClient = new GitHubClient(botConfig.getGitHubToken());
-        } catch (IOException e) {
-            throw new IllegalStateException("Something went wrong while registering managers.", e);
-        }
+        gitHubClient = new GitHubClient(botConfig.getGitHubToken());
+        merriamWebsterClient = new MerriamWebsterClient(botConfig.getDictionaryKey(), botConfig.getThesaurusKey());
 
         emoteManager = new EmoteManager(emoteDao);
         guildConfigManager = new GuildConfigManager(guildConfigDao);
@@ -114,6 +113,7 @@ public class Holo extends ListenerAdapter {
                 waiter,
                 moduleRegistry,
                 gitHubClient,
+                merriamWebsterClient,
                 guildConfigManager,
                 emoteManager,
                 xkcdDao,
@@ -163,6 +163,10 @@ public class Holo extends ListenerAdapter {
 
     public GitHubClient getGitHubClient() {
         return gitHubClient;
+    }
+
+    public MerriamWebsterClient getMerriamWebsterClient() {
+        return merriamWebsterClient;
     }
 
     public EmoteManager getEmoteManager() {

@@ -16,15 +16,13 @@ public class GitHubClient {
     // The repository of the bot
     private final GHRepository repository;
 
-    /**
-     * Creates a new instance.
-     *
-     * @param token The OAuth token needed to connect to the GitHub repository.
-     * @throws IOException When something went wrong with the connection.
-     */
-    public GitHubClient(String token) throws IOException {
-        GitHub gitHub = GitHub.connectUsingOAuth(token);
-        repository = gitHub.getRepository("zaw4rud0/holobot");
+    public GitHubClient(String token) {
+        try {
+            GitHub gitHub = GitHub.connectUsingOAuth(token);
+            repository = gitHub.getRepository("zaw4rud0/holobot");
+        } catch (IOException ex) {
+            throw new IllegalStateException("Something went wrong while trying to reach GitHub.", ex);
+        }
     }
 
     /**

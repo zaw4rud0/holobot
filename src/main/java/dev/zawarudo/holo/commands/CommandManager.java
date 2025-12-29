@@ -11,6 +11,7 @@ import dev.zawarudo.holo.commands.owner.*;
 import dev.zawarudo.holo.core.GuildConfigManager;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
+import dev.zawarudo.holo.modules.MerriamWebsterClient;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
@@ -36,6 +37,7 @@ public class CommandManager extends ListenerAdapter {
             EventWaiter waiter,
             ModuleRegistry moduleRegistry,
             GitHubClient gitHubClient,
+            MerriamWebsterClient merriamWebsterClient,
             GuildConfigManager guildConfigManager,
             EmoteManager emoteManager,
             XkcdDao xkcdDao,
