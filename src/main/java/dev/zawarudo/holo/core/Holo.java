@@ -14,6 +14,7 @@ import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.database.dao.*;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.MerriamWebsterClient;
+import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import net.dv8tion.jda.api.JDA;
@@ -31,11 +32,16 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Represents an instance of the bot.
  */
 public class Holo extends ListenerAdapter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(Holo.class);
+
+    private final AtomicBoolean initialized = new AtomicBoolean(false);
 
     private final BotExecutors executors;
 
@@ -45,6 +51,7 @@ public class Holo extends ListenerAdapter {
     private CommandManager commandManager;
     private PermissionManager permissionManager;
     private PokemonSpawnManager pokemonSpawnManager;
+    private AkinatorSessionManager akinatorSessionManager;
     private SQLManager sqlManager;
     private GitHubClient gitHubClient;
     private MerriamWebsterClient merriamWebsterClient;
@@ -53,8 +60,6 @@ public class Holo extends ListenerAdapter {
     private ModuleRegistry moduleRegistry;
 
     private final EventWaiter waiter;
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(Holo.class);
 
     public Holo(BotConfig botConfig) {
         this.botConfig = botConfig;
@@ -103,6 +108,7 @@ public class Holo extends ListenerAdapter {
         emoteManager = new EmoteManager(emoteDao);
         guildConfigManager = new GuildConfigManager(guildConfigDao);
         pokemonSpawnManager = new PokemonSpawnManager(jda);
+        akinatorSessionManager = new AkinatorSessionManager();
         permissionManager = new PermissionManager(blacklistService, guildConfigManager);
 
         // Initialize command modules
@@ -118,6 +124,7 @@ public class Holo extends ListenerAdapter {
                 merriamWebsterClient,
                 guildConfigManager,
                 emoteManager,
+                akinatorSessionManager,
                 xkcdDao,
                 xkcdSyncService,
                 blacklistService,
@@ -183,6 +190,11 @@ public class Holo extends ListenerAdapter {
 
     @Override
     public void onReady(@NotNull ReadyEvent event) {
+        if (!initialized.compareAndSet(false, true)) {
+            LOGGER.warn("onReady fired again; skipping re-initialization");
+            return;
+        }
+
         registerManagers();
         registerListeners();
         LOGGER.info("{} is ready!", event.getJDA().getSelfUser().getName());

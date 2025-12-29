@@ -1,0 +1,86 @@
+package dev.zawarudo.holo.modules.akinator;
+
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import org.eu.zajc.akiwrapper.core.entities.Guess;
+import org.eu.zajc.akiwrapper.core.entities.Query;
+import org.eu.zajc.akiwrapper.core.entities.Question;
+
+import java.time.Instant;
+
+public final class AkinatorEmbedRenderer {
+
+    public static final String IMG_START = "akinator_start.png";
+    public static final String IMG_DEFAULT = "akinator_default.png";
+    public static final String IMG_GUESSING = "akinator_guessing.png";
+    public static final String IMG_VICTORY = "akinator_victory.png";
+    public static final String IMG_DEFEAT = "akinator_defeat.png";
+    public static final String IMG_CANCEL = "akinator_cancel.png";
+
+    public record Rendered(MessageEmbed embed, String attachmentName) {
+    }
+
+    public Rendered render(Query currentQuery, long questionsAnswered) {
+        EmbedBuilder eb = base(questionsAnswered);
+
+        String attach;
+
+        if (currentQuery instanceof Question q) {
+            eb.setDescription("**Question:**\n" + q.getText());
+            attach = IMG_DEFAULT;
+            eb.setThumbnail("attachment://" + attach);
+
+        } else if (currentQuery instanceof Guess g) {
+            eb.setDescription("**Is it:** " + g.getName() + "?\n"
+                    + (!g.getDescription().isBlank() ? "\n" + g.getDescription() : ""));
+
+            var img = g.getImage();
+            if (img != null) {
+                String url = img.toString();
+                if (!url.isBlank()) eb.setImage(url);
+            }
+
+            attach = IMG_GUESSING;
+            eb.setThumbnail("attachment://" + attach);
+
+        } else {
+            eb.setDescription("No more questions.");
+            attach = IMG_DEFEAT;
+            eb.setThumbnail("attachment://" + attach);
+        }
+
+        return new Rendered(eb.build(), attach);
+    }
+
+    public Rendered renderFinal(long questionsAnswered, EndScreen endScreen) {
+        EmbedBuilder eb = base(questionsAnswered);
+
+        eb.setDescription(switch (endScreen) {
+            case VICTORY -> "Akinator guessed correctly!";
+            case DEFEAT -> "I ran out of questions — you win!";
+            case CANCEL -> "Game cancelled.";
+            case TIMEOUT -> "Game timed out.";
+        });
+
+        String attach = switch (endScreen) {
+            case VICTORY -> IMG_VICTORY;
+            case DEFEAT -> IMG_DEFEAT;
+            case CANCEL, TIMEOUT -> IMG_CANCEL;
+        };
+
+        eb.setThumbnail("attachment://" + attach);
+        return new Rendered(eb.build(), attach);
+    }
+
+    public enum EndScreen {VICTORY, DEFEAT, CANCEL, TIMEOUT}
+
+    private EmbedBuilder base(long questionsAnswered) {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Akinator");
+        eb.setTimestamp(Instant.now());
+
+        eb.setFooter("Answered: " + questionsAnswered);
+
+        return eb;
+    }
+}
