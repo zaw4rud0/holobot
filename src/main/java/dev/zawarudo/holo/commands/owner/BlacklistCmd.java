@@ -2,14 +2,12 @@ package dev.zawarudo.holo.commands.owner;
 
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
-import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.PermissionManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.sql.SQLException;
 import java.time.Instant;
@@ -20,96 +18,137 @@ import java.util.Arrays;
  */
 @Command(name = "blacklist",
 		description = "Blacklists an user from using the bot.",
-		usage = "<user id>",
+		usage = "<user id|@mention> [reason...] | remove <user id|@mention>",
 		ownerOnly = true,
 		category = CommandCategory.OWNER)
 public class BlacklistCmd extends AbstractCommand {
 
 	private final PermissionManager permissionManager;
 
-	public BlacklistCmd() {
-		permissionManager = Bootstrap.holo.getPermissionManager();
+	public BlacklistCmd(PermissionManager permissionManager) {
+		this.permissionManager = permissionManager;
 	}
 
 	@Override
 	public void onCommand(@NotNull MessageReceivedEvent event) {
 		deleteInvoke(event);
-		
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTimestamp(Instant.now());
 
-		// No argument was given
 		if (args.length == 0) {
-			builder.setTitle("Incorrect Usage");
-			builder.setDescription("Please only provide the id of the user you want to blacklist!");
-			sendToOwner(builder);
+			sendUsage(event, "Missing arguments.");
 			return;
 		}
 
-		User toBlacklist = getUser(event, args[0]);
-
-		// Couldn't find user (probably because bot doesn't share a server with them)
-		if (toBlacklist == null) {
-			sendUserNotFoundEmbed();
+		if (isRemoveMode(args[0])) {
+			handleRemove(event);
 			return;
 		}
 
-		String reason = args.length > 1
-				? String.join(" ", Arrays.copyOfRange(args, 1, args.length))
-				: "None given";
-
-		try {
-			permissionManager.blacklist(toBlacklist, reason, event.getMessage().getTimeCreated().toLocalDateTime().toString());
-		} catch (SQLException ex) {
-			builder.setTitle("Error");
-			builder.setDescription("An error occurred while trying to blacklist this user!");
-			sendToOwner(builder);
-
-			if (logger.isErrorEnabled()) {
-				logger.error("An error occurred while trying to blacklist the user with id={}.", toBlacklist.getIdLong(), ex);
-			}
-
-			return;
-		}
-
-		String description = String.format("**Name:** %s\n**Tag:** %s\n**Id:** %s\n**Reason:** %s",
-				toBlacklist.getAsMention(), toBlacklist.getName(), toBlacklist.getId(), reason);
-		sendSuccessEmbed(description);
+		handleAdd(event);
 	}
 
-	/**
-	 * Retrieves a {@link User} from a given String.
-	 */
-	@Nullable
-	private User getUser(MessageReceivedEvent event, String arg) {
-		long id;
+	private void handleAdd(@NotNull MessageReceivedEvent event) {
+		Long userId = parseUserId(args[0]);
+		if (userId == null) {
+			sendUsage(event, "Invalid user id / mention: `" + args[0] + "`");
+			return;
+		}
+
+		String reason = parseReasonFromIndex(1);
+
 		try {
-			id = Long.parseLong(arg.replace("<@!", "").replace(">", ""));
-		} catch (NumberFormatException ex) {
+			permissionManager.blacklist(
+					userId,
+					reason,
+					event.getMessage().getTimeCreated().toString()
+			);
+		} catch (SQLException ex) {
+			logger.error("Failed to blacklist userId={}", userId, ex);
+			sendErrorToOwner("Database error while blacklisting user.", ex);
+			return;
+		}
+
+		User cached = event.getJDA().getUserById(userId);
+		String who = formatUser(cached, userId);
+
+		sendToOwner(embed()
+				.setTitle("User successfully blacklisted")
+				.setDescription("**User:** " + who + "\n**Reason:** " + reason));
+	}
+
+
+	private void handleRemove(@NotNull MessageReceivedEvent event) {
+		if (args.length < 2) {
+			sendUsage(event, "Missing user id / mention for remove.");
+			return;
+		}
+
+		Long userId = parseUserId(args[1]);
+		if (userId == null) {
+			sendUsage(event, "Invalid user id / mention: `" + args[1] + "`");
+			return;
+		}
+
+		try {
+			permissionManager.unblacklist(userId);
+		} catch (SQLException ex) {
+			logger.error("Failed to unblacklist userId={}", userId, ex);
+			sendErrorToOwner("Database error while removing user from blacklist.", ex);
+			return;
+		}
+
+		User cached = event.getJDA().getUserById(userId);
+		String who = formatUser(cached, userId);
+
+		sendToOwner(embed()
+				.setTitle("User removed from blacklist")
+				.setDescription("**User:** " + who));
+	}
+
+	private boolean isRemoveMode(String firstArg) {
+		String s = firstArg.toLowerCase();
+		return s.equals("remove") || s.equals("unblacklist") || s.equals("delete");
+	}
+
+	private Long parseUserId(String raw) {
+		String s = raw.trim()
+				.replace("<@!", "")
+				.replace("<@", "")
+				.replace(">", "");
+
+		try {
+			return Long.parseLong(s);
+		} catch (NumberFormatException e) {
 			return null;
 		}
-		return event.getJDA().getUserById(id);
 	}
 
-	/**
-	 * Sends an embed stating that the blacklist was successful.
-	 */
-	private void sendSuccessEmbed(String description) {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("User successfully blacklisted");
-		builder.setDescription(description);
-		builder.setTimestamp(Instant.now());
-		sendToOwner(builder);
+	private String parseReasonFromIndex(int index) {
+		if (args.length <= index) return "None given";
+		String r = String.join(" ", Arrays.copyOfRange(args, index, args.length)).trim();
+		return r.isBlank() ? "None given" : r;
 	}
 
-	/**
-	 * Sends an embed stating that it couldn't find the user
-	 */
-	private void sendUserNotFoundEmbed() {
-		EmbedBuilder builder = new EmbedBuilder();
-		builder.setTitle("Error");
-		builder.setDescription("I couldn't find this user! Make sure to provide a valid user id or mention.");
-		builder.setTimestamp(Instant.now());
-		sendToOwner(builder);
+	private String formatUser(User cached, long userId) {
+		if (cached == null) return "`" + userId + "`";
+		return cached.getAsMention() + " (`" + cached.getName() + "`, `" + cached.getId() + "`)";
+	}
+
+	private void sendUsage(@NotNull MessageReceivedEvent event, String message) {
+		String p = getPrefix(event);
+		sendToOwner(embed()
+				.setTitle("Incorrect Usage")
+				.setDescription(message + "\n\n" +
+						"Add: `" + p + "blacklist <userId|@mention> [reason...]`\n" +
+						"Remove: `" + p + "blacklist remove <userId|@mention>`"));
+	}
+
+	private void sendErrorToOwner(String message, Exception ex) {
+		sendToOwner(embed()
+				.setTitle("Error")
+				.setDescription(message));
+	}
+
+	private EmbedBuilder embed() {
+		return new EmbedBuilder().setTimestamp(Instant.now());
 	}
 }

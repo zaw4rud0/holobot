@@ -10,9 +10,7 @@ import dev.zawarudo.holo.commands.music.MusicModule;
 import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
 import dev.zawarudo.holo.database.SQLManager;
-import dev.zawarudo.holo.database.dao.EmoteDao;
-import dev.zawarudo.holo.database.dao.GuildConfigDao;
-import dev.zawarudo.holo.database.dao.XkcdDao;
+import dev.zawarudo.holo.database.dao.*;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.MerriamWebsterClient;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
@@ -91,6 +89,8 @@ public class Holo extends ListenerAdapter {
         GuildConfigDao guildConfigDao = new GuildConfigDao(sqlManager);
         XkcdDao xkcdDao = new XkcdDao(sqlManager);
         EmoteDao emoteDao = new EmoteDao(sqlManager);
+        BlacklistedDao blacklistedDao = new BlacklistedDao(sqlManager);
+        CountdownDao countdownDao = new CountdownDao(sqlManager);
 
         // Register services
         XkcdSyncService xkcdSyncService = new XkcdSyncService(xkcdDao, executors.io());
@@ -101,7 +101,7 @@ public class Holo extends ListenerAdapter {
         emoteManager = new EmoteManager(emoteDao);
         guildConfigManager = new GuildConfigManager(guildConfigDao);
         pokemonSpawnManager = new PokemonSpawnManager(jda);
-        permissionManager = new PermissionManager();
+        permissionManager = new PermissionManager(blacklistedDao);
 
         // Initialize command modules
         moduleRegistry = new ModuleRegistry();
@@ -115,9 +115,11 @@ public class Holo extends ListenerAdapter {
                 gitHubClient,
                 merriamWebsterClient,
                 guildConfigManager,
+                permissionManager,
                 emoteManager,
                 xkcdDao,
-                xkcdSyncService
+                xkcdSyncService,
+                countdownDao
         );
     }
 

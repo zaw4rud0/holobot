@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.core;
 
 import dev.zawarudo.holo.commands.AbstractCommand;
-import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.database.dao.BlacklistedDao;
 import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
@@ -17,8 +17,8 @@ import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -28,17 +28,16 @@ public class PermissionManager {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(PermissionManager.class);
 
-    private List<Long> blacklisted;
+    private final BlacklistedDao blacklistedDao;
+    private final Set<Long> blacklistedIds = ConcurrentHashMap.newKeySet();
 
-    public PermissionManager() {
-        blacklisted = new ArrayList<>();
+    public PermissionManager(BlacklistedDao blacklistedDao) {
+        this.blacklistedDao = blacklistedDao;
 
         try {
-            blacklisted = DBOperations.getBlacklistedUsers();
+            blacklistedIds.addAll(blacklistedDao.findAllUserIds());
         } catch (SQLException ex) {
-            if (LOGGER.isErrorEnabled()) {
-                LOGGER.error("Something went wrong while fetching the blocked users", ex);
-            }
+            LOGGER.error("Failed to load blacklist", ex);
         }
     }
 
@@ -125,25 +124,26 @@ public class PermissionManager {
 
     /**
      * Checks if a user is blacklisted from using the bot.
-     *
-     * @param user The {@link User} to check.
-     * @return True if the user is blacklisted, false otherwise.
      */
     public boolean isBlacklisted(@NotNull User user) {
-        return blacklisted.contains(user.getIdLong());
+        return blacklistedIds.contains(user.getIdLong());
     }
 
     /**
      * Blacklists a user from using the bot.
-     *
-     * @param user   The {@link User} to blacklist.
-     * @param reason The reason for blacklisting the user.
-     * @param date   The date when the user was blacklisted.
-     * @throws SQLException If the database operation fails.
      */
-    public void blacklist(@NotNull User user, @NotNull String reason, @NotNull String date) throws SQLException {
-        blacklisted.add(user.getIdLong());
-        DBOperations.insertBlacklistedUser(user.getIdLong(), date, reason);
+    public void blacklist(long userId, @NotNull String reason, @NotNull String date) throws SQLException {
+        var entry = new BlacklistedDao.Blacklisted(userId, reason, date);
+        blacklistedDao.insertIgnore(entry);
+        blacklistedIds.add(userId);
+    }
+
+    /**
+     * Removes a user from the blacklist.
+     */
+    public void unblacklist(long userId) throws SQLException {
+        blacklistedDao.deleteByUserId(userId);
+        blacklistedIds.remove(userId);
     }
 
     private GuildConfig getGuildConfig(Guild guild) {

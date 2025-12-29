@@ -51,6 +51,11 @@ public class CommandListener extends ListenerAdapter {
             return;
         }
 
+        // Ignore blacklisted users
+        if (permManager.isBlacklisted(event.getAuthor())) {
+            return;
+        }
+
         final String prefix = getPrefix(event);
         final String rawMsg = event.getMessage().getContentRaw();
 

@@ -2,7 +2,8 @@ package dev.zawarudo.holo.commands.general;
 
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.database.DBOperations;
+import dev.zawarudo.holo.database.dao.CountdownDao;
+import dev.zawarudo.holo.modules.countdown.Countdown;
 import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
@@ -25,18 +26,10 @@ import java.util.Optional;
 )
 public class CountdownCmd extends AbstractCommand {
 
-    /**
-     * Represents a countdown instance.
-     *
-     * @param id          The id of the countdown in the database.
-     * @param name        The name of the countdown given by the user.
-     * @param timeCreated The time of the creation of the countdown.
-     * @param dateTime    The exact date and time the countdown points to.
-     * @param userId      The id of the user who created the countdown.
-     * @param serverId    The id of the server the countdown was created in. It will
-     *                    be used later to define global and server-only countdowns.
-     */
-    public record Countdown(long id, String name, long timeCreated, long dateTime, long userId, long serverId) {
+    private final CountdownDao countdownDao;
+
+    public CountdownCmd(CountdownDao countdownDao) {
+        this.countdownDao = countdownDao;
     }
 
     @Override
@@ -61,9 +54,9 @@ public class CountdownCmd extends AbstractCommand {
             long userId = event.getAuthor().getIdLong();
             long selectedId = Long.parseLong(args[0]);
 
-            Optional<Countdown> selectedCountdown = DBOperations.fetchCountdowns(userId)
+            Optional<Countdown> selectedCountdown = countdownDao.findAllById(userId)
                     .stream()
-                    .filter(cd -> cd.id == selectedId)
+                    .filter(cd -> cd.id() == selectedId)
                     .findFirst();
 
             if (selectedCountdown.isPresent()) {
@@ -71,11 +64,11 @@ public class CountdownCmd extends AbstractCommand {
 
                 EmbedBuilder embedBuilder = new EmbedBuilder();
                 embedBuilder.setTitle("Countdown Information");
-                embedBuilder.addField("ID", String.valueOf(cd.id), false);
-                embedBuilder.addField("Name", cd.name, false);
-                embedBuilder.addField("Date", DateTimeUtils.formatDateTime(cd.dateTime), false);
-                embedBuilder.addField("Remaining Time", Formatter.getRelativeTime(cd.dateTime), false);
-                embedBuilder.addField("Time Created", DateTimeUtils.formatDateTime(cd.timeCreated), false);
+                embedBuilder.addField("ID", String.valueOf(cd.id()), false);
+                embedBuilder.addField("Name", cd.name(), false);
+                embedBuilder.addField("Date", DateTimeUtils.formatDateTime(cd.dateTime()), false);
+                embedBuilder.addField("Remaining Time", Formatter.getRelativeTime(cd.dateTime()), false);
+                embedBuilder.addField("Time Created", DateTimeUtils.formatDateTime(cd.timeCreated()), false);
 
                 event.getMessage().replyEmbeds(embedBuilder.build()).queue();
             } else {
@@ -91,12 +84,12 @@ public class CountdownCmd extends AbstractCommand {
 
     private void showList(MessageReceivedEvent event) {
         try {
-            List<Countdown> countdowns = DBOperations.fetchCountdowns(event.getAuthor().getIdLong());
+            List<Countdown> countdowns = countdownDao.findAllById(event.getAuthor().getIdLong());
             StringBuilder sb = new StringBuilder();
             for (Countdown cd : countdowns) {
-                sb.append("* ").append(String.format("**%s** ", cd.name)).append(String.format("`[ID: %d]`", cd.id)).append("\n")
-                        .append(DateTimeUtils.formatDateTime(cd.dateTime)).append("\n")
-                        .append(Formatter.getRelativeTime(cd.dateTime)).append("\n");
+                sb.append("* ").append(String.format("**%s** ", cd.name())).append(String.format("`[ID: %d]`", cd.id())).append("\n")
+                        .append(DateTimeUtils.formatDateTime(cd.dateTime())).append("\n")
+                        .append(Formatter.getRelativeTime(cd.dateTime())).append("\n");
             }
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
@@ -119,7 +112,7 @@ public class CountdownCmd extends AbstractCommand {
             String dateTime = DateTimeUtils.formatDateTime(millis);
 
             Countdown countdown = new Countdown(-1, name, created, millis, event.getAuthor().getIdLong(), event.getGuild().getIdLong());
-            DBOperations.insertCountdown(countdown);
+            countdownDao.insertIgnore(countdown);
 
             EmbedBuilder embedBuilder = new EmbedBuilder();
             embedBuilder.setTitle("Created countdown");
@@ -141,13 +134,13 @@ public class CountdownCmd extends AbstractCommand {
             long userId = event.getAuthor().getIdLong();
             long selectedId = Long.parseLong(args[0]);
 
-            Optional<Countdown> selectedCountdown = DBOperations.fetchCountdowns(userId)
+            Optional<Countdown> selectedCountdown = countdownDao.findAllById(userId)
                     .stream()
-                    .filter(cd -> cd.id == selectedId)
+                    .filter(cd -> cd.id() == selectedId)
                     .findFirst();
 
             if (selectedCountdown.isPresent()) {
-                DBOperations.deleteCountdown(selectedCountdown.get().id);
+                countdownDao.deleteIgnore(selectedCountdown.get().id());
                 event.getMessage().reply("Successfully removed your countdown.").queue();
             } else {
                 event.getMessage().reply("You don't have a countdown with the given ID! Please check your list and try again.").queue();

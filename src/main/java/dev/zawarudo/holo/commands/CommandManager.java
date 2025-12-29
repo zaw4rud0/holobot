@@ -6,9 +6,10 @@ import dev.zawarudo.holo.commands.anime.MangaSearchCmd;
 import dev.zawarudo.holo.commands.fun.*;
 import dev.zawarudo.holo.commands.general.*;
 import dev.zawarudo.holo.commands.image.*;
-import dev.zawarudo.holo.commands.image.nsfw.BlockCmd;
 import dev.zawarudo.holo.commands.owner.*;
 import dev.zawarudo.holo.core.GuildConfigManager;
+import dev.zawarudo.holo.core.PermissionManager;
+import dev.zawarudo.holo.database.dao.CountdownDao;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.MerriamWebsterClient;
@@ -39,9 +40,11 @@ public class CommandManager extends ListenerAdapter {
             GitHubClient gitHubClient,
             MerriamWebsterClient merriamWebsterClient,
             GuildConfigManager guildConfigManager,
+            PermissionManager permissionManager,
             EmoteManager emoteManager,
             XkcdDao xkcdDao,
-            XkcdSyncService xkcdSyncService
+            XkcdSyncService xkcdSyncService,
+            CountdownDao countdownDao
     ) {
         // General Cmds
         addCommand(new BugCmd(gitHubClient));
@@ -65,7 +68,6 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new AoCStatsCmd());
         addCommand(new AvatarCmd());
         addCommand(new BannerCmd());
-        addCommand(new BlockCmd());
         addCommand(new CheckNSFWCmd());
         addCommand(new DogCmd());
         addCommand(new EmoteCmd(emoteManager));
@@ -79,13 +81,13 @@ public class CommandManager extends ListenerAdapter {
 
         // Misc Cmds
         addCommand(new CoinFlipCmd());
-        addCommand(new CountdownCmd());
+        addCommand(new CountdownCmd(countdownDao));
         addCommand(new Magic8BallCmd());
         addCommand(new UrbanDictionaryCmd(waiter));
         addCommand(new UwuCmd());
 
         // Owner Cmds
-        addCommand(new BlacklistCmd());
+        addCommand(new BlacklistCmd(permissionManager));
         addCommand(new CancelCmd());
         addCommand(new DeleteCmd());
         addCommand(new EchoCmd());
