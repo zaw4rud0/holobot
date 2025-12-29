@@ -9,6 +9,7 @@ import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.commands.music.MusicModule;
 import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
+import dev.zawarudo.holo.core.security.BlacklistService;
 import dev.zawarudo.holo.database.SQLManager;
 import dev.zawarudo.holo.database.dao.*;
 import dev.zawarudo.holo.modules.GitHubClient;
@@ -94,6 +95,7 @@ public class Holo extends ListenerAdapter {
 
         // Register services
         XkcdSyncService xkcdSyncService = new XkcdSyncService(xkcdDao, executors.io());
+        BlacklistService blacklistService = new BlacklistService(blacklistedDao);
 
         gitHubClient = new GitHubClient(botConfig.getGitHubToken());
         merriamWebsterClient = new MerriamWebsterClient(botConfig.getDictionaryKey(), botConfig.getThesaurusKey());
@@ -101,7 +103,7 @@ public class Holo extends ListenerAdapter {
         emoteManager = new EmoteManager(emoteDao);
         guildConfigManager = new GuildConfigManager(guildConfigDao);
         pokemonSpawnManager = new PokemonSpawnManager(jda);
-        permissionManager = new PermissionManager(blacklistedDao);
+        permissionManager = new PermissionManager(blacklistService, guildConfigManager);
 
         // Initialize command modules
         moduleRegistry = new ModuleRegistry();
@@ -115,10 +117,10 @@ public class Holo extends ListenerAdapter {
                 gitHubClient,
                 merriamWebsterClient,
                 guildConfigManager,
-                permissionManager,
                 emoteManager,
                 xkcdDao,
                 xkcdSyncService,
+                blacklistService,
                 countdownDao
         );
     }

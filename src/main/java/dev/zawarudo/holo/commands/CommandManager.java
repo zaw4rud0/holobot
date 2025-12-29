@@ -8,7 +8,7 @@ import dev.zawarudo.holo.commands.general.*;
 import dev.zawarudo.holo.commands.image.*;
 import dev.zawarudo.holo.commands.owner.*;
 import dev.zawarudo.holo.core.GuildConfigManager;
-import dev.zawarudo.holo.core.PermissionManager;
+import dev.zawarudo.holo.core.security.BlacklistService;
 import dev.zawarudo.holo.database.dao.CountdownDao;
 import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
@@ -40,10 +40,10 @@ public class CommandManager extends ListenerAdapter {
             GitHubClient gitHubClient,
             MerriamWebsterClient merriamWebsterClient,
             GuildConfigManager guildConfigManager,
-            PermissionManager permissionManager,
             EmoteManager emoteManager,
             XkcdDao xkcdDao,
             XkcdSyncService xkcdSyncService,
+            BlacklistService blacklistService,
             CountdownDao countdownDao
     ) {
         // General Cmds
@@ -87,7 +87,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new UwuCmd());
 
         // Owner Cmds
-        addCommand(new BlacklistCmd(permissionManager));
+        addCommand(new BlacklistCmd(blacklistService));
         addCommand(new CancelCmd());
         addCommand(new DeleteCmd());
         addCommand(new EchoCmd());

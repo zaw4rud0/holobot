@@ -1,9 +1,9 @@
 package dev.zawarudo.holo.commands.owner;
 
+import dev.zawarudo.holo.core.security.BlacklistService;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.core.PermissionManager;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -23,10 +23,10 @@ import java.util.Arrays;
 		category = CommandCategory.OWNER)
 public class BlacklistCmd extends AbstractCommand {
 
-	private final PermissionManager permissionManager;
+	private final BlacklistService blacklistService;
 
-	public BlacklistCmd(PermissionManager permissionManager) {
-		this.permissionManager = permissionManager;
+	public BlacklistCmd(BlacklistService blacklistService) {
+		this.blacklistService = blacklistService;
 	}
 
 	@Override
@@ -56,7 +56,7 @@ public class BlacklistCmd extends AbstractCommand {
 		String reason = parseReasonFromIndex(1);
 
 		try {
-			permissionManager.blacklist(
+			blacklistService.blacklist(
 					userId,
 					reason,
 					event.getMessage().getTimeCreated().toString()
@@ -89,7 +89,7 @@ public class BlacklistCmd extends AbstractCommand {
 		}
 
 		try {
-			permissionManager.unblacklist(userId);
+			blacklistService.unblacklist(userId);
 		} catch (SQLException ex) {
 			logger.error("Failed to unblacklist userId={}", userId, ex);
 			sendErrorToOwner("Database error while removing user from blacklist.", ex);

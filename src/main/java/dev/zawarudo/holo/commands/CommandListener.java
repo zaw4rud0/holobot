@@ -51,11 +51,6 @@ public class CommandListener extends ListenerAdapter {
             return;
         }
 
-        // Ignore blacklisted users
-        if (permManager.isBlacklisted(event.getAuthor())) {
-            return;
-        }
-
         final String prefix = getPrefix(event);
         final String rawMsg = event.getMessage().getContentRaw();
 
@@ -69,6 +64,7 @@ public class CommandListener extends ListenerAdapter {
         if (split.isEmpty()) {
             return;
         }
+
         String invoke = split.getFirst().toLowerCase(Locale.ROOT);
 
         // Build MDC context for logging
@@ -101,7 +97,7 @@ public class CommandListener extends ListenerAdapter {
 
         AbstractCommand cmd = cmdManager.getCommand(invoke);
 
-        // TODO: Refactor to permission manager maybe?
+        // Module disabled check (guild-only)
         if (event.isFromGuild()) {
             Optional<CommandModule.ModuleId> moduleIdOpt = cmdManager.getModuleOf(cmd);
 
@@ -120,8 +116,9 @@ public class CommandListener extends ListenerAdapter {
             }
         }
 
-        // Check if user can do anything
-        if (!permManager.hasUserPermission(event, cmd) || !permManager.hasChannelPermission(event, cmd)) {
+        var decision = permManager.check(event, cmd);
+        if (!decision.allowed()) {
+            permManager.respondDenied(event, decision);
             return;
         }
 
