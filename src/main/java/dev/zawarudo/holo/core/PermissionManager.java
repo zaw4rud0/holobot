@@ -99,7 +99,9 @@ public class PermissionManager {
             return; // silent denies (blacklist/admin/owner)
         }
 
-        event.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
+        if (event.isFromGuild()) {
+            event.getMessage().delete().queueAfter(30, TimeUnit.SECONDS);
+        }
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Error")

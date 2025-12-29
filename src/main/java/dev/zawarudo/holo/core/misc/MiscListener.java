@@ -19,7 +19,7 @@ import java.util.Locale;
 import java.util.Set;
 
 /**
- * Class that defines miscellaneous behaviour of the bot as response to certain events.
+ * Class that defines miscellaneous behavior of the bot as response to certain events.
  */
 public class MiscListener extends ListenerAdapter {
 
@@ -86,7 +86,15 @@ public class MiscListener extends ListenerAdapter {
         try {
             emoteManager.insertEmotes(newEmotes.toArray(CustomEmoji[]::new));
             existingEmotes.addAll(newEmotes.stream().map(ISnowflake::getIdLong).toList());
-            LOGGER.info("Successfully stored {} new emotes.", newEmotes.size());
+
+            if (LOGGER.isInfoEnabled()) {
+                String emoteInfo = newEmotes.stream()
+                        .map(e -> "%s (%d)".formatted(e.getName(), e.getIdLong()))
+                        .toList()
+                        .toString();
+
+                LOGGER.info("Successfully stored {} new emotes: {}", newEmotes.size(), emoteInfo);
+            }
         } catch (SQLException ex) {
             LOGGER.error("Something went wrong while storing new emotes.", ex);
         }
