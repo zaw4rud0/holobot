@@ -60,6 +60,6 @@ public class ServerInfoCmd extends AbstractCommand {
             builder.setImage(guild.getSplashUrl().replace(".png", ".webp") + "?size=4096");
         }
 
-        sendEmbed(event, builder, true, 1, TimeUnit.MINUTES);
+        sendEmbed(event, builder, true, 5, TimeUnit.MINUTES);
     }
 }
