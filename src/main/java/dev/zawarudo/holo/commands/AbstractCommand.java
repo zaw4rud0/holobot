@@ -207,6 +207,21 @@ public abstract class AbstractCommand {
     }
 
     /**
+     * Parses a positive integer from the given string.
+     *
+     * @param raw The string to parse
+     * @return The parsed integer if it is {@code >= 1}, or {@code -1} if parsing fails or the value is less than 1
+     */
+    protected int parseInt(String raw) {
+        try {
+            int n = Integer.parseInt(raw);
+            return (n >= 1) ? n : -1;
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
+    }
+
+    /**
      * Checks whether a String is a long.
      *
      * @param s The String to check.

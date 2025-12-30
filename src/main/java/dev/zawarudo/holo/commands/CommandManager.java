@@ -99,6 +99,7 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new EchoCmd());
         addCommand(new NicknameCmd());
         addCommand(new NukeCmd());
+        addCommand(new PurgeCmd());
         addCommand(new RestartCmd());
         addCommand(new ShutdownCmd());
         addCommand(new StatusCmd());
