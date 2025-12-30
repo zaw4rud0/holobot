@@ -180,6 +180,6 @@ public class PokemonSpawnManager {
     }
 
     private String getPrefix(Guild guild) {
-        return Bootstrap.holo.getGuildConfigManager().getGuildConfig(guild).getPrefix();
+        return Bootstrap.holo.getGuildConfigManager().getOrCreate(guild).getPrefix();
     }
 }

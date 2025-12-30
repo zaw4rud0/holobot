@@ -37,8 +37,10 @@ public class ConfigCmd extends AbstractCommand {
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
 
+        GuildConfig cfg = configManager.getOrCreate(event.getGuild());
+
         if (args.length == 0) {
-            showCurrentConfig(event);
+            showCurrentConfig(event, cfg);
             return;
         }
 
@@ -46,23 +48,22 @@ public class ConfigCmd extends AbstractCommand {
 
         switch (config) {
             case "prefix" -> {
-                if (args.length == 1) showPrefixInfo(event);
-                else changePrefix(event);
+                if (args.length == 1) showPrefixInfo(event, cfg);
+                else changePrefix(event, cfg);
             }
             case "nsfw" -> {
-                if (args.length == 1) showNSFWInfo(event);
-                else changeNSFW(event);
+                if (args.length == 1) showNSFWInfo(event, cfg);
+                else changeNSFW(event, cfg);
             }
-            case "modules" -> showModules(event);
-            case "module" -> showModule(event);
+            case "modules" -> showModules(event, cfg);
+            case "module" -> showModule(event, cfg);
             case "reset" -> resetConfiguration(event);
             default -> showUnknownConfigurationEmbed(event);
         }
     }
 
-    private void showCurrentConfig(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-        String prefix = config.getPrefix();
+    private void showCurrentConfig(MessageReceivedEvent event, GuildConfig cfg) {
+        String prefix = cfg.getPrefix();
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(String.format("Bot Configuration for %s", event.getGuild().getName()))
@@ -73,15 +74,14 @@ public class ConfigCmd extends AbstractCommand {
                                 Formatter.asCodeBlock(prefix + "config <config_name>")
                 )
                 .addField("Prefix", Formatter.asCodeBlock(prefix), true)
-                .addField("NSFW", Formatter.asCodeBlock(config.isNSFWEnabled() ? "Enabled" : "Disabled"), true)
+                .addField("NSFW", Formatter.asCodeBlock(cfg.isNSFWEnabled() ? "Enabled" : "Disabled"), true)
                 .addField("Modules", Formatter.asCodeBlock(prefix + "config modules"), false);
 
         sendEmbed(event, builder, true, 5, TimeUnit.MINUTES);
     }
 
-    private void showPrefixInfo(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-        String prefix = config.getPrefix();
+    private void showPrefixInfo(MessageReceivedEvent event, GuildConfig cfg) {
+        String prefix = cfg.getPrefix();
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(String.format("Bot Prefix for %s", event.getGuild().getName()))
@@ -95,23 +95,20 @@ public class ConfigCmd extends AbstractCommand {
         sendEmbed(event, builder, true, 5, TimeUnit.MINUTES);
     }
 
-    private void changePrefix(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-
+    private void changePrefix(MessageReceivedEvent event, GuildConfig cfg) {
         String newPrefix = args[1];
-        config.setPrefix(newPrefix);
+        cfg.setPrefix(newPrefix);
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Prefix Changed")
                 .addField("New Prefix", Formatter.asCodeBlock(newPrefix), false);
 
         sendEmbed(event, builder, true, 1, TimeUnit.MINUTES);
-        saveChanges(event, config);
+        saveChanges(event, cfg);
     }
 
-    private void showNSFWInfo(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-        String prefix = config.getPrefix();
+    private void showNSFWInfo(MessageReceivedEvent event, GuildConfig cfg) {
+        String prefix = cfg.getPrefix();
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle(String.format("NSFW Configuration for %s", event.getGuild().getName()))
@@ -122,41 +119,37 @@ public class ConfigCmd extends AbstractCommand {
                                 "To change it, run:\n" +
                                 Formatter.asCodeBlock(prefix + "config nsfw <true/false>")
                 )
-                .addField("Status", Formatter.asCodeBlock(config.isNSFWEnabled() ? "Enabled" : "Disabled"), false);
+                .addField("Status", Formatter.asCodeBlock(cfg.isNSFWEnabled() ? "Enabled" : "Disabled"), false);
 
         sendEmbed(event, builder, true, 5, TimeUnit.MINUTES);
     }
 
-    private void changeNSFW(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-
+    private void changeNSFW(MessageReceivedEvent event, GuildConfig cfg) {
         boolean nsfw = Boolean.parseBoolean(args[1]);
-        config.setAllowNSFW(nsfw);
+        cfg.setAllowNSFW(nsfw);
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("NSFW Config Changed")
                 .setDescription("NSFW commands are now **" + (nsfw ? "enabled" : "disabled") + "**.");
 
         sendEmbed(event, builder, true, 1, TimeUnit.MINUTES);
-        saveChanges(event, config);
+        saveChanges(event, cfg);
     }
 
-    private void showModules(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-
+    private void showModules(MessageReceivedEvent event, GuildConfig cfg) {
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Command Modules")
                 .setDescription(
                         "List of command modules and their status.\n" +
                                 "For details about a module, use:\n" +
-                                Formatter.asCodeBlock(config.getPrefix() + "config module <moduleId>")
+                                Formatter.asCodeBlock(cfg.getPrefix() + "config module <moduleId>")
                 );
 
         boolean any = false;
 
         for (CommandModule module : moduleRegistry.all()) {
             any = true;
-            boolean enabled = config.isModuleEnabled(module.id());
+            boolean enabled = cfg.isModuleEnabled(module.id());
             builder.addField(module.id().id(), Formatter.asCodeBlock(enabled ? "Enabled" : "Disabled"), false);
         }
 
@@ -167,9 +160,8 @@ public class ConfigCmd extends AbstractCommand {
         sendEmbed(event, builder, true, 5, TimeUnit.MINUTES);
     }
 
-    private void showModule(MessageReceivedEvent event) {
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
-        String prefix = config.getPrefix();
+    private void showModule(MessageReceivedEvent event, GuildConfig cfg) {
+        String prefix = cfg.getPrefix();
 
         if (args.length < 2) {
             EmbedBuilder builder = new EmbedBuilder()
@@ -206,7 +198,7 @@ public class ConfigCmd extends AbstractCommand {
             return;
         }
 
-        boolean enabled = config.isModuleEnabled(module.id());
+        boolean enabled = cfg.isModuleEnabled(module.id());
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Module: " + module.id().id())
@@ -222,10 +214,9 @@ public class ConfigCmd extends AbstractCommand {
     }
 
     private void resetConfiguration(MessageReceivedEvent event) {
-        configManager.resetConfigurationForGuild(event.getGuild());
-        GuildConfig config = configManager.getGuildConfig(event.getGuild());
+        GuildConfig newCfg = configManager.resetConfigurationForGuild(event.getGuild());
 
-        String prefix = config.getPrefix();
+        String prefix = newCfg.getPrefix();
 
         EmbedBuilder builder = new EmbedBuilder()
                 .setTitle("Reset Bot Configuration")
@@ -234,7 +225,7 @@ public class ConfigCmd extends AbstractCommand {
 
         sendEmbed(event, builder, true, 30, TimeUnit.SECONDS);
 
-        saveChanges(event, config);
+        saveChanges(event, newCfg);
     }
 
     private void showUnknownConfigurationEmbed(MessageReceivedEvent event) {

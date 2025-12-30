@@ -44,10 +44,10 @@ public abstract class AbstractCommand {
      */
     protected String getPrefix(@NotNull MessageReceivedEvent event) {
         if (event.isFromGuild()) {
-            return Bootstrap.holo.getGuildConfigManager().getGuildConfig(event.getGuild()).getPrefix();
-        } else {
-            return Bootstrap.holo.getConfig().getDefaultPrefix();
+            return Bootstrap.holo.getGuildConfigManager().getOrCreate(event.getGuild()).getPrefix();
         }
+
+        return Bootstrap.holo.getConfig().getDefaultPrefix();
     }
 
     /**
@@ -304,7 +304,8 @@ public abstract class AbstractCommand {
                 long id = Long.parseLong(userId);
                 User user = event.getJDA().getUserById(id);
                 return Optional.ofNullable(user);
-            } catch (NumberFormatException ignored) {}
+            } catch (NumberFormatException ignored) {
+            }
         }
         return Optional.of(event.getAuthor());
     }

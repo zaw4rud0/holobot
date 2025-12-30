@@ -103,7 +103,7 @@ public class CommandListener extends ListenerAdapter {
 
             if (moduleIdOpt.isPresent()) {
                 CommandModule.ModuleId moduleId = moduleIdOpt.get();
-                var cfg = Bootstrap.holo.getGuildConfigManager().getGuildConfig(event.getGuild());
+                var cfg = Bootstrap.holo.getGuildConfigManager().getOrCreate(event.getGuild());
 
                 if (!cfg.isModuleEnabled(moduleId)) {
                     executorService.submit(withMdc(mdc, () ->
@@ -146,10 +146,12 @@ public class CommandListener extends ListenerAdapter {
 
     private String getPrefix(MessageReceivedEvent e) {
         if (e.isFromGuild()) {
-            return Bootstrap.holo.getGuildConfigManager().getGuildConfig(e.getGuild()).getPrefix();
-        } else {
-            return Bootstrap.holo.getConfig().getDefaultPrefix();
+            return Bootstrap.holo.getGuildConfigManager()
+                    .getOrCreate(e.getGuild())
+                    .getPrefix();
         }
+
+        return Bootstrap.holo.getConfig().getDefaultPrefix();
     }
 
     /**

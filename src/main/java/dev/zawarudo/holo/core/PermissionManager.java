@@ -66,7 +66,7 @@ public class PermissionManager {
         }
 
         Guild guild = event.getGuild();
-        GuildConfig config = guildConfigManager.getGuildConfig(guild);
+        GuildConfig config = guildConfigManager.getOrCreate(guild);
 
         if (!config.isNSFWEnabled()) {
             return Decision.deny(
