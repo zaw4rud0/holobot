@@ -13,6 +13,7 @@ public enum EmbedColor {
     ERROR(Color.RED),
     /** The color of Akinator. */
     AKINATOR(new Color(112, 28, 84)),
+    DICTIONARY(Color.WHITE),
     /** The color of Gelbooru. */
     GELBOORU(new Color(0, 100, 225)),
     /** The color of Inspirobot.me. */

@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.music;
 import com.sedmelluq.discord.lavaplayer.player.AudioPlayer;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrackInfo;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.core.misc.Emote;
+import dev.zawarudo.holo.utils.Emote;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
 import dev.zawarudo.holo.utils.Formatter;

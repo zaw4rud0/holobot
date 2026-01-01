@@ -1,13 +1,16 @@
 package dev.zawarudo.holo.modules;
 
+import dev.zawarudo.holo.utils.exceptions.APIException;
+import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.utils.exceptions.NotFoundException;
 import io.github.cdimascio.dotenv.Dotenv;
-import org.junit.jupiter.api.Assumptions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+@TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 class MerriamWebsterClientIT {
 
     private static MerriamWebsterClient client;
@@ -25,7 +28,6 @@ class MerriamWebsterClientIT {
                 dictionaryKey != null && !dictionaryKey.isBlank(),
                 "KEY_DICTIONARY not set – skipping Merriam-Webster tests"
         );
-
         Assumptions.assumeTrue(
                 thesaurusKey != null && !thesaurusKey.isBlank(),
                 "KEY_THESAURUS not set – skipping Merriam-Webster tests"
@@ -35,22 +37,151 @@ class MerriamWebsterClientIT {
     }
 
     @Test
-    void dictionaryLookup() {
-        var result = client.lookupDictionary("car");
+    @Order(1)
+    void dictionaryLookup_returnsEntriesForKnownWord() throws APIException, InvalidRequestException, NotFoundException {
+        var result = client.lookupDictionary("syzygy");
 
         assertNotNull(result);
-        assertTrue(result.hasEntries() || result.hasSuggestions(),
-                "Expected dictionary entries or suggestions"
+        assertTrue(result.hasEntries(), "Expected dictionary entries for a known word");
+        assertFalse(result.hasSuggestions(), "Expected no suggestions when entries exist");
+
+        // Invariants (never null lists)
+        assertNotNull(result.entries());
+        assertNotNull(result.suggestions());
+
+        // Entry validation
+        var first = result.entries().getFirst();
+        assertNotNull(first);
+
+        // headword/label can be null in edge cases, but should usually exist
+        assertTrue(first.shortDefs() != null && !first.shortDefs().isEmpty(),
+                "Expected at least one short definition");
+
+        // Lists should never be null due to record canonical constructor
+        assertNotNull(first.shortDefs());
+        assertNotNull(first.synonyms());
+        assertNotNull(first.antonyms());
+        assertNotNull(first.examples());
+
+        // Definitions should not be blank
+        assertTrue(first.shortDefs().stream().anyMatch(d -> d != null && !d.isBlank()),
+                "Expected non-blank definition text");
+    }
+
+    @Test
+    @Order(2)
+    void dictionaryLookup_returnsSuggestionsForMisspelling() throws APIException, InvalidRequestException, NotFoundException {
+        // Intentionally misspelled. MW usually returns suggestion strings here.
+        var result = client.lookupDictionary("syzygii");
+
+        assertNotNull(result);
+
+        // We expect suggestions for a misspelling, but don't hard-require because APIs can evolve.
+        assertTrue(result.hasSuggestions() || result.hasEntries(),
+                "Expected suggestions (or entries if MW treats it as valid)");
+
+        // If it is suggestions response, ensure it's sensible
+        if (result.hasSuggestions() && !result.hasEntries()) {
+            assertFalse(result.suggestions().isEmpty());
+            assertTrue(result.suggestions().stream().allMatch(s -> s != null && !s.isBlank()),
+                    "Suggestions should be non-blank strings");
+        }
+    }
+
+    @Test
+    @Order(3)
+    void dictionaryLookup_blankInput_returnsEmptyResult() throws APIException, InvalidRequestException, NotFoundException {
+        var result = client.lookupDictionary("   ");
+
+        assertNotNull(result);
+        assertFalse(result.hasEntries());
+        assertFalse(result.hasSuggestions());
+        assertTrue(result.entries().isEmpty());
+        assertTrue(result.suggestions().isEmpty());
+    }
+
+    @Test
+    @Order(4)
+    void dictionaryLookup_examples_areCleanIfPresent() throws APIException, InvalidRequestException, NotFoundException {
+        // Pick a common word that often has examples (not guaranteed).
+        var result = client.lookupDictionary("run");
+
+        assertNotNull(result);
+
+        if (!result.hasEntries()) {
+            Assumptions.assumeTrue(false, "No dictionary entries returned for 'run'; skipping examples assertion.");
+        }
+
+        // If any entry has examples, validate their cleanliness
+        List<String> allExamples = result.entries().stream()
+                .flatMap(e -> e.examples().stream())
+                .toList();
+
+        if (allExamples.isEmpty()) {
+            Assumptions.assumeTrue(false, "No examples returned for 'run'; skipping examples assertion.");
+        }
+
+        assertTrue(allExamples.stream().allMatch(ex -> ex != null && !ex.isBlank()),
+                "Examples should be non-blank");
+        assertTrue(allExamples.stream().noneMatch(ex -> ex.contains("{") || ex.contains("}")),
+                "Examples should not contain MW formatting tokens after cleanup");
+    }
+
+    @Test
+    @Order(5)
+    void thesaurusLookup_returnsEntriesForKnownWord() throws APIException, InvalidRequestException, NotFoundException {
+        var result = client.lookupThesaurus("happy");
+
+        assertNotNull(result);
+        assertTrue(result.hasEntries(), "Expected thesaurus entries for a known word");
+        assertFalse(result.hasSuggestions(), "Expected no suggestions when entries exist");
+
+        var first = result.entries().getFirst();
+
+        // Lists should never be null
+        assertNotNull(first.synonyms());
+        assertNotNull(first.antonyms());
+        assertNotNull(first.shortDefs());
+        assertNotNull(first.examples());
+
+        // Thesaurus should usually have synonyms or antonyms, but avoid brittle strictness:
+        assertTrue(
+                !first.synonyms().isEmpty() || !first.antonyms().isEmpty(),
+                "Expected at least synonyms or antonyms for thesaurus entries"
         );
     }
 
     @Test
-    void thesaurusLookup() {
-        var result = client.lookupThesaurus("happy");
+    @Order(6)
+    void thesaurusLookup_returnsSuggestionsForMisspelling() throws APIException, InvalidRequestException, NotFoundException {
+        var result = client.lookupThesaurus("hapy");
 
         assertNotNull(result);
-        assertTrue(result.hasEntries() || result.hasSuggestions(),
-                "Expected thesaurus entries or suggestions"
+        assertTrue(result.hasSuggestions() || result.hasEntries(),
+                "Expected suggestions (or entries if MW treats it as valid)");
+
+        if (result.hasSuggestions() && !result.hasEntries()) {
+            assertTrue(result.suggestions().stream().allMatch(s -> s != null && !s.isBlank()),
+                    "Suggestions should be non-blank strings");
+        }
+    }
+
+    @Test
+    @Order(7)
+    void invalidKeys_throwClientError() {
+        // The API generally returns 403 for invalid key; your code maps 4xx to InvalidRequestException
+        MerriamWebsterClient bad = new MerriamWebsterClient("invalid", "invalid");
+
+        assertThrows(
+                InvalidRequestException.class,
+                () -> bad.lookupDictionary("test"),
+                "Expected InvalidRequestException for invalid dictionary key"
+        );
+
+        assertThrows(
+                InvalidRequestException.class,
+                () -> bad.lookupThesaurus("test"),
+                "Expected InvalidRequestException for invalid thesaurus key"
         );
     }
 }

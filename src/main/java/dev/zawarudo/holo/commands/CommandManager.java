@@ -18,6 +18,7 @@ import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
 import dev.zawarudo.holo.modules.anime.MediaSearchService;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
+import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -90,6 +91,7 @@ public class CommandManager extends ListenerAdapter {
         // Misc Cmds
         addCommand(new CoinFlipCmd());
         addCommand(new CountdownCmd(countdownDao));
+        addCommand(new DictionaryCmd(waiter, merriamWebsterClient));
         addCommand(new Magic8BallCmd());
         addCommand(new UrbanDictionaryCmd(waiter));
         addCommand(new UwuCmd());
@@ -126,6 +128,13 @@ public class CommandManager extends ListenerAdapter {
     }
 
     public void addCommand(@NotNull AbstractCommand cmd, @Nullable CommandModule.ModuleId moduleId) {
+        // Missing @Command annotation
+        if (!cmd.getClass().isAnnotationPresent(Command.class)) {
+            String msg = "Command " + cmd.getClass().getName() + " is missing @Command annotation";
+            LOGGER.error(msg);
+            throw new IllegalStateException(msg);
+        }
+
         // Ignore deactivated commands
         if (cmd.getClass().isAnnotationPresent(Deactivated.class)) {
             if (LOGGER.isInfoEnabled()) {

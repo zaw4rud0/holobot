@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.utils.interact;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.core.misc.Emote;
+import dev.zawarudo.holo.utils.Emote;
 import dev.zawarudo.holo.utils.HoloUtils;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;

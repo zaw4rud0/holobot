@@ -179,4 +179,41 @@ public final class Formatter {
     public static String asCodeBlock(String text) {
         return String.format("```%n%s%n```", text);
     }
+
+    /**
+     * Converts Merriam-Webster formatting tokens (e.g. <code>{it}</code>, <code>{b}</code>, <code>{bc}</code>)
+     * into Discord-compatible Markdown and punctuation.
+     * <p>
+     * See <a href="https://dictionaryapi.com/products/json#sec-2.tokens">official documentation</a>.
+     */
+    public static String mwToDiscord(@NotNull String s) {
+        if (s.isBlank()) return "";
+
+        // Punctuation tokens
+        s = s.replace("{bc}", "**: ** ");
+        s = s.replace("{ldquo}", "“"); // “
+        s = s.replace("{rdquo}", "”"); // ”
+        s = s.replace("{p_br}", "\n\n");
+
+        // Formatting tokens (basic)
+        s = s.replace("{it}", "*").replace("{/it}", "*");
+        s = s.replace("{b}", "**").replace("{/b}", "**");
+
+        // Small caps: Discord doesn't support it; bold is a decent approximation
+        s = s.replace("{sc}", "**").replace("{/sc}", "**");
+
+        // Sup/sub: no native Markdown in Discord; keep readable
+        s = s.replace("{sup}", "^(").replace("{/sup}", ")");
+        s = s.replace("{inf}", "_(").replace("{/inf}", ")");
+
+        // Link-ish tokens: keep only the display text
+        // e.g. {a_link|ammonia} -> ammonia
+        s = s.replaceAll("\\{[a-z_]+\\|([^}|]+)(?:\\|[^}]*)?}", "$1");
+
+        // Any remaining "{...}" tokens you don't handle yet -> strip token markers but keep content conservative
+        // (prevents raw tokens leaking into Discord)
+        s = s.replaceAll("\\{/?[a-z_]+}", "");
+
+        return s.trim();
+    }
 }

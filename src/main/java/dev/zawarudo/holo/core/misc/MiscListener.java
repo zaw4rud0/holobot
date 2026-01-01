@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.core.misc;
 
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
+import dev.zawarudo.holo.utils.Emote;
 import net.dv8tion.jda.api.entities.ISnowflake;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;

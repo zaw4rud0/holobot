@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.core.misc;
+package dev.zawarudo.holo.utils;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.emoji.EmojiUnion;
@@ -13,7 +13,7 @@ public enum Emote {
     // Misc emotes
     THUMBS_UP("👍"),
     THUMBS_DOWN("👎"),
-    HEART("❤"),
+    HEART("❤️"),
     HEARTS("💕"),
     HEARTBREAK("💔"),
     BLUSH("😊"),
@@ -41,11 +41,11 @@ public enum Emote {
     CROWN("👑"),
     DOLLAR("💵"),
     DIAMOND("💎"),
-    GEAR("⚙"),
+    GEAR("⚙️"),
     HAMMER("🔨"),
-    MAGIC_WAND("🖌"),
+    MAGIC_WAND("\uD83E\uDE84"),
     MAGNET("🧲"),
-    PICKAXE("⛏"),
+    PICKAXE("⛏️"),
     PISTOL("🔫"),
     SAW("🔪"),
     WRENCH("🔧"),
@@ -89,12 +89,12 @@ public enum Emote {
 
     // Signs and warnings
     CROSS("❌"),
-    WARNING("⚠"),
+    WARNING("⚠️"),
     NO_ENTRY("⛔"),
     PROHIBITED("🚫"),
     NO_BICYCLES("🚳"),
-    RADIOACTIVE("☢"),
-    BIOHAZARD("☣"),
+    RADIOACTIVE("☢️"),
+    BIOHAZARD("☣️"),
     UNDERAGE("🔞"),
 
     // ###### Emote section ######
