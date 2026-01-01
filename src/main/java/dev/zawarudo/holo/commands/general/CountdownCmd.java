@@ -13,8 +13,8 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 
 @Deactivated
@@ -34,19 +34,40 @@ public class CountdownCmd extends AbstractCommand {
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
-        if (args.length == 0 || args[0].equals("list")) {
+        if (args.length == 0 || "list".equals(args[0])) {
             showList(event);
-        } else if (args[0].equals("add")) {
-            args = Arrays.copyOfRange(args, 1, args.length);
-            String name = args[0];
-            String dateTime = String.join(" ", Arrays.copyOfRange(args, 1, args.length));
-            createCountdown(event, name, dateTime);
-        } else if (args[0].equals("remove") || args[0].equals("r")) {
-            args = Arrays.copyOfRange(args, 1, args.length);
-            removeCountdown(event);
-        } else {
-            showCountdown(event);
+            return;
         }
+
+        String sub = args[0].toLowerCase(Locale.ROOT);
+
+        if ("add".equals(sub)) {
+            // Expected: add <name> <date time...>
+            if (args.length < 3) {
+                String formatted = String.format("Usage: `%scountdown add <name> <date time>`", getPrefix(event));
+                event.getMessage().reply(formatted).queue();
+                return;
+            }
+
+            String name = args[1];
+            String dateTime = joinFrom(args, 2);
+            createCountdown(event, name, dateTime);
+            return;
+        }
+
+        if ("remove".equals(sub) || "r".equals(sub)) {
+            // Expected: remove <id>
+            if (args.length < 2) {
+                String formatted = String.format("Usage: `%scountdown remove <id>`", getPrefix(event));
+                event.getMessage().reply(formatted).queue();
+                return;
+            }
+
+            removeCountdown(event, args[1]);
+            return;
+        }
+
+        showCountdown(event);
     }
 
     private void showCountdown(MessageReceivedEvent event) {
@@ -129,10 +150,10 @@ public class CountdownCmd extends AbstractCommand {
         }
     }
 
-    private void removeCountdown(MessageReceivedEvent event) {
+    private void removeCountdown(MessageReceivedEvent event, String rawId) {
         try {
             long userId = event.getAuthor().getIdLong();
-            long selectedId = Long.parseLong(args[0]);
+            long selectedId = Long.parseLong(rawId);
 
             Optional<Countdown> selectedCountdown = countdownDao.findAllById(userId)
                     .stream()
@@ -151,5 +172,15 @@ public class CountdownCmd extends AbstractCommand {
         } catch (NumberFormatException e) {
             event.getMessage().reply("Please enter a valid countdown ID!").queue();
         }
+    }
+
+    private static String joinFrom(String[] args, int startIdx) {
+        if (startIdx >= args.length) return "";
+        StringBuilder sb = new StringBuilder();
+        for (int i = startIdx; i < args.length; i++) {
+            if (i > startIdx) sb.append(" ");
+            sb.append(args[i]);
+        }
+        return sb.toString().trim();
     }
 }

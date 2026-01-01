@@ -77,6 +77,8 @@ public class CommandListener extends ListenerAdapter {
         // Action cmd has been called
         ActionCmd actionCmd = (ActionCmd) cmdManager.getCommand("action");
         if (actionCmd.isAction(invoke)) {
+
+            // Logging
             MDC.setContextMap(mdc);
             try {
                 AUDIT.info("Action command invoked");
@@ -84,8 +86,12 @@ public class CommandListener extends ListenerAdapter {
             } finally {
                 MDC.clear();
             }
-            actionCmd.args = split.subList(1, split.size()).toArray(new String[0]);
-            actionCmd.displayAction(event, actionCmd.getAction(invoke));
+
+            String[] directedArgs = (split.size() > 1)
+                    ? split.subList(1, split.size()).toArray(new String[0])
+                    : new String[0];
+
+            actionCmd.displayAction(event, actionCmd.getAction(invoke), directedArgs);
             return;
         }
 

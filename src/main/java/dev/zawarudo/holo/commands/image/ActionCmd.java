@@ -29,7 +29,7 @@ import java.util.stream.Collectors;
 
 /**
  * Class of the Action command. By calling this command, the user can get a random
- * reaction or action gif.
+ * reaction or action GIF.
  */
 @CommandInfo(name = "action",
         description = "Sends an action GIF. For directed actions you can either mention an user or reply to a " +
@@ -57,102 +57,118 @@ public class ActionCmd extends AbstractCommand {
 
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
-        EmbedBuilder builder = new EmbedBuilder();
-
         // Show a list of available actions
         if (args.length == 0 || args[0].equals("list")) {
-            deleteInvoke(event);
-            builder.setTitle("List of Actions");
-            builder.setDescription(getActionsAsString());
-            sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
+            showList(event);
+            return;
         }
 
+        String sub = args[0].toLowerCase(Locale.ROOT);
+
         // Create new action
-        else if (args[0].equals("create") && isBotOwner(event.getAuthor())) {
-            args = Arrays.copyOfRange(args, 1, args.length);
-            createNewAction(event);
+        if ("create".equals(sub) && isBotOwner(event.getAuthor())) {
+            String[] rest = slice(args, 1);
+            createNewAction(event, rest);
+            return;
         }
 
         // Add image or API to action
-        else if (args[0].equals("add") && isBotOwner(event.getAuthor())) {
-            args = Arrays.copyOfRange(args, 1, args.length);
-            addImageToAction(event);
+        if ("add".equals(sub) && isBotOwner(event.getAuthor())) {
+            String[] rest = slice(args, 1);
+            addImageToAction(event, rest);
+            return;
         }
 
         // Call specific action
-        else if (isAction(args[0])) {
-            Action action = actions.get(args[0]);
-            args = Arrays.copyOfRange(args, 1, args.length);
-            displayAction(event, action);
+        if (isAction(sub)) {
+            Action action = actions.get(sub);
+            String[] directed = slice(args, 1);
+            displayAction(event, action, directed);
+            return;
         }
 
         // Unknown action
-        else {
-            sendErrorEmbed(event, "Couldn't find this action. Use `" + getPrefix(event) + "action list` to see all available actions.");
-        }
+        sendErrorEmbed(event, "Couldn't find this action. Use `" + getPrefix(event) + "action list` to see all available actions.");
     }
 
-    private void createNewAction(MessageReceivedEvent event) {
+    private void showList(MessageReceivedEvent event) {
+        deleteInvoke(event);
+        EmbedBuilder builder = new EmbedBuilder()
+                .setTitle("List of Actions")
+                .setDescription(getActionsAsString());
+        sendEmbed(event, builder, true, 1, TimeUnit.MINUTES, getEmbedColor());
+    }
+
+    private void createNewAction(MessageReceivedEvent event, String[] restArgs) {
         // E.g. <action create <name> <is_api> <text>
-        if (args.length < 3) {
+        if (restArgs.length < 3) {
             sendErrorEmbed(event, "Insufficient argument: Expected `<name> <is_api> <sentence>`");
             return;
         }
 
-        String name = args[0];
-        boolean isApi = isBoolean(args[1]) && Boolean.parseBoolean(args[1]);
-        int start = isBoolean(args[1]) ? 2 : 1;
-        String sentence = String.join(" ", Arrays.copyOfRange(args, start, args.length));
+        String name = restArgs[0];
+        boolean isApi = isBoolean(restArgs[1]) && Boolean.parseBoolean(restArgs[1]);
+        int start = isBoolean(restArgs[1]) ? 2 : 1;
+        String sentence = String.join(" ", Arrays.copyOfRange(restArgs, start, restArgs.length));
 
         if (isAction(name)) {
             sendErrorEmbed(event, "This action already exists!");
-        } else if (!sentence.contains("{s}")) {
+            return;
+        }
+
+        if (!sentence.contains("{s}")) {
             sendErrorEmbed(event, "Sentence needs a subject (`{s}`)!");
-        } else {
-            deleteInvoke(event);
-            actions.put(name, new Action(name, sentence, isApi));
-            try {
-                writeActionsToFile();
-                event.getChannel().sendMessage(String.format("Successfully created action: `%s`", name)).queue();
-            } catch (IOException e) {
-                sendErrorEmbed(event, "Something went wrong while storing the updated actions: " + e.getMessage());
-                logger.error("Something went wrong while storing the new action.", e);
-            }
+            return;
+        }
+
+        deleteInvoke(event);
+        actions.put(name, new Action(name, sentence, isApi));
+
+        try {
+            writeActionsToFile();
+            event.getChannel().sendMessage(String.format("Successfully created action: `%s`", name)).queue();
+        } catch (IOException e) {
+            sendErrorEmbed(event, "Something went wrong while storing the updated actions: " + e.getMessage());
+            logger.error("Something went wrong while storing the new action.", e);
         }
     }
 
-    private void addImageToAction(MessageReceivedEvent event) {
+    private void addImageToAction(MessageReceivedEvent event, String[] restArgs) {
         // E.g. <action add <name> <url>
-        if (args.length < 2) {
+        if (restArgs.length < 2) {
             sendErrorEmbed(event, "Insufficient arguments: Expected `<name> <url>`");
             return;
         }
 
-        String name = args[0];
-        String url = args[1];
+        String name = restArgs[0];
+        String url = restArgs[1];
 
         if (!isAction(name)) {
             sendErrorEmbed(event, "Not a valid action: " + args[0]);
-        } else if (!isValidUrl(url)) {
+            return;
+        }
+
+        if (!isValidUrl(url)) {
             sendErrorEmbed(event, "Not a valid URL: " + args[1]);
-        } else {
-            deleteInvoke(event);
-            getAction(name).addNewUrl(url);
-            try {
-                writeActionsToFile();
-                event.getChannel().sendMessage(String.format("Added new link to action: `%s`", name)).queue();
-            } catch (IOException e) {
-                sendErrorEmbed(event, "Something went wrong while storing the updated actions: " + e.getMessage());
-                logger.error("Something went wrong while storing the action with the new url.", e);
-            }
+            return;
+        }
+
+        deleteInvoke(event);
+        getAction(name).addNewUrl(url);
+
+        try {
+            writeActionsToFile();
+            event.getChannel().sendMessage(String.format("Added new link to action: `%s`", name)).queue();
+        } catch (IOException e) {
+            sendErrorEmbed(event, "Something went wrong while storing the updated actions: " + e.getMessage());
+            logger.error("Something went wrong while storing the action with the new url.", e);
         }
     }
 
     /**
-     * Displays the action gif or image in an embed and sends it.
+     * Displays the action GIF or image in an embed and sends it.
      */
-    public void displayAction(@NotNull MessageReceivedEvent event, @NotNull Action action) {
-        // In case the member is a webhook
+    public void displayAction(MessageReceivedEvent event, Action action, String[] directedArgs) {
         if (event.getMember() == null) {
             return;
         }
@@ -164,12 +180,13 @@ public class ActionCmd extends AbstractCommand {
             sendErrorEmbed(event, "Something went wrong while fetching an image. Please try again later.");
             return;
         }
-        String url = result.get();
 
-        String mention = determineMention(event);
-        String title = action.getSentence().replace("{s}", event.getMember().getEffectiveName()).replace("{u}", mention);
+        String mention = determineMention(event, directedArgs);
+        String title = action.getSentence()
+                .replace("{s}", event.getMember().getEffectiveName())
+                .replace("{u}", mention);
 
-        sendActionEmbed(event, url, title);
+        sendActionEmbed(event, result.get(), title);
     }
 
     private Optional<String> fetchActionUrl(Action action) {
@@ -190,17 +207,19 @@ public class ActionCmd extends AbstractCommand {
         }
     }
 
-    private String determineMention(MessageReceivedEvent event) {
+    private String determineMention(MessageReceivedEvent event, String[] directedArgs) {
         Message repliedTo = event.getMessage().getReferencedMessage();
         if (repliedTo != null) {
             return "you";
-        } else if (args.length != 0) {
-            return event.getMessage().getMentions().getMembers().isEmpty() ?
-                    String.join(" ", args) :
-                    event.getMessage().getMentions().getMembers().getFirst().getEffectiveName();
-        } else {
-            return "nothing";
         }
+
+        if (directedArgs.length != 0) {
+            return event.getMessage().getMentions().getMembers().isEmpty() ?
+                    String.join(" ", directedArgs) :
+                    event.getMessage().getMentions().getMembers().getFirst().getEffectiveName();
+        }
+
+        return "nothing";
     }
 
     private void sendActionEmbed(MessageReceivedEvent event, String url, String title) {
@@ -230,7 +249,7 @@ public class ActionCmd extends AbstractCommand {
     }
 
     /**
-     * Initializes all actions using a Json file containing information for each action.
+     * Initializes all actions using a JSON file containing information for each action.
      */
     private void initializeActions() throws IOException {
         JsonArray array;
@@ -301,14 +320,14 @@ public class ActionCmd extends AbstractCommand {
         }
 
         /**
-         * Checks whether the images or gifs are fetched from an API.
+         * Checks whether the images or GIFs are fetched from an API.
          */
         public boolean isApi() {
             return api;
         }
 
         /**
-         * Gets a random URL to a gif or image of this action.
+         * Gets a random URL to a GIF or image of this action.
          */
         public Optional<String> getRandomUrl() {
             if (urls.isEmpty()) {
@@ -333,5 +352,10 @@ public class ActionCmd extends AbstractCommand {
         public boolean equals(Object obj) {
             return obj instanceof Action action && name.equals(action.name);
         }
+    }
+
+    private static String[] slice(String[] a, int from) {
+        if (a == null || from >= a.length) return new String[0];
+        return Arrays.copyOfRange(a, from, a.length);
     }
 }
