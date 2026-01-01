@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.image;
 
 import de.androidpit.colorthief.ColorThief;
 import dev.zawarudo.holo.utils.DateTimeUtils;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.Formatter;
@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Command(name = "palette",
+@CommandInfo(name = "palette",
         description = "Creates a palette of representative colors for a given image.",
         usage = "[<color count>] [<image url>]",
         thumbnail = "https://www.pinclipart.com/picdir/big/141-1416768_painting-clipart-paint-palette-art-emoji-png-transparent.png",

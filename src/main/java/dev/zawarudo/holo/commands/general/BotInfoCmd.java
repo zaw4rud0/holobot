@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.general;
 
 import dev.zawarudo.holo.utils.VersionInfo;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -19,7 +19,7 @@ import java.lang.management.MemoryUsage;
 import java.lang.management.OperatingSystemMXBean;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "info",
+@CommandInfo(name = "info",
 		description = "Shows information about me",
 		alias = {"source", "bot", "sauce"},
 		category = CommandCategory.GENERAL)

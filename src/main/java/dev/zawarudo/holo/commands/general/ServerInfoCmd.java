@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -13,7 +13,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.FormatStyle;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "serverinfo",
+@CommandInfo(name = "serverinfo",
         description = "Shows information about the server",
         category = CommandCategory.GENERAL)
 public class ServerInfoCmd extends AbstractCommand {

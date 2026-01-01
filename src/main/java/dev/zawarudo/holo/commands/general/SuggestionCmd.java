@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "suggestion",
+@CommandInfo(name = "suggestion",
         description = "Use this command if you want to suggest a feature. Suggestions are always appreciated.",
         usage = "<text>",
         example = "Make this bot more awesome <3",

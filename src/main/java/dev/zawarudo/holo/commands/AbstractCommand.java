@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
@@ -368,7 +368,7 @@ public abstract class AbstractCommand {
      */
     @NotNull
     public String getName() {
-        return getClass().getAnnotation(Command.class).name();
+        return getClass().getAnnotation(CommandInfo.class).name();
     }
 
     /**
@@ -376,7 +376,7 @@ public abstract class AbstractCommand {
      */
     @NotNull
     public String getDescription() {
-        return getClass().getAnnotation(Command.class).description();
+        return getClass().getAnnotation(CommandInfo.class).description();
     }
 
     /**
@@ -384,7 +384,7 @@ public abstract class AbstractCommand {
      */
     @Nullable
     public String getUsage() {
-        String usage = getClass().getAnnotation(Command.class).usage();
+        String usage = getClass().getAnnotation(CommandInfo.class).usage();
         if (usage.isEmpty()) {
             return null;
         }
@@ -403,7 +403,7 @@ public abstract class AbstractCommand {
      */
     @Nullable
     public String getExample() {
-        String example = getClass().getAnnotation(Command.class).example();
+        String example = getClass().getAnnotation(CommandInfo.class).example();
         if (example.isEmpty()) {
             return null;
         }
@@ -422,7 +422,7 @@ public abstract class AbstractCommand {
      */
     @NotNull
     public String[] getAlias() {
-        return getClass().getAnnotation(Command.class).alias();
+        return getClass().getAnnotation(CommandInfo.class).alias();
     }
 
     /**
@@ -437,7 +437,7 @@ public abstract class AbstractCommand {
      */
     @Nullable
     public String getThumbnail() {
-        String thumbnail = getClass().getAnnotation(Command.class).thumbnail();
+        String thumbnail = getClass().getAnnotation(CommandInfo.class).thumbnail();
         if (thumbnail.isEmpty()) {
             return null;
         }
@@ -456,7 +456,7 @@ public abstract class AbstractCommand {
      */
     @Nullable
     public Color getEmbedColor() {
-        return getClass().getAnnotation(Command.class).embedColor().getColor();
+        return getClass().getAnnotation(CommandInfo.class).embedColor().getColor();
     }
 
     /**
@@ -464,7 +464,7 @@ public abstract class AbstractCommand {
      */
     @NotNull
     public CommandCategory getCategory() {
-        return getClass().getAnnotation(Command.class).category();
+        return getClass().getAnnotation(CommandInfo.class).category();
     }
 
     /**
@@ -478,27 +478,27 @@ public abstract class AbstractCommand {
      * Checks whether this command can only be used in a guild.
      */
     public boolean isGuildOnly() {
-        return getClass().getAnnotation(Command.class).guildOnly();
+        return getClass().getAnnotation(CommandInfo.class).guildOnly();
     }
 
     /**
      * Checks whether this command can only be used by guild administrators.
      */
     public boolean isAdminOnly() {
-        return getClass().getAnnotation(Command.class).adminOnly();
+        return getClass().getAnnotation(CommandInfo.class).adminOnly();
     }
 
     /**
      * Checks whether this command can only be used by the bot owner.
      */
     public boolean isOwnerOnly() {
-        return getClass().getAnnotation(Command.class).ownerOnly();
+        return getClass().getAnnotation(CommandInfo.class).ownerOnly();
     }
 
     /**
      * Checks whether this command is NSFW (not safe for work).
      */
     public boolean isNSFW() {
-        return getClass().getAnnotation(Command.class).isNSFW();
+        return getClass().getAnnotation(CommandInfo.class).isNSFW();
     }
 }

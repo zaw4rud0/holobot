@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.owner;
 
 import dev.zawarudo.holo.core.security.BlacklistService;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -16,7 +16,7 @@ import java.util.Arrays;
 /**
  * Command to blacklist a user from using the bot.
  */
-@Command(name = "blacklist",
+@CommandInfo(name = "blacklist",
 		description = "Blacklists an user from using the bot.",
 		usage = "<user id|@mention> [reason...] | remove <user id|@mention>",
 		ownerOnly = true,

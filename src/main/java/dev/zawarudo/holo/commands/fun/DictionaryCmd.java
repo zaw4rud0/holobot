@@ -7,7 +7,7 @@ import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.modules.MerriamWebsterClient;
 import dev.zawarudo.holo.utils.Emote;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.utils.exceptions.NotFoundException;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Command(
+@CommandInfo(
         name = "dictionary",
         description = "Looks up a word in the Merriam-Webster Dictionary.",
         usage = "<word>",

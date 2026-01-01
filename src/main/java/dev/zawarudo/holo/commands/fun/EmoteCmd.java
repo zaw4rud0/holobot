@@ -4,7 +4,7 @@ import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.entities.Icon;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
@@ -24,7 +24,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Command(name = "emote",
+@CommandInfo(name = "emote",
         description = "Sends a specified emote in the channel as if you had nitro. It uses a fake profile (also called a webhook message) to show who sent the emote.\n\n You may also just use the emote name with the bot prefix.",
         usage = "<emote_name>",
         example = "kekw",

@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.owner;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -13,7 +13,7 @@ import java.util.Arrays;
 /**
  * Command to set the status of the bot
  */
-@Command(name = "status",
+@CommandInfo(name = "status",
 		description = "Sets the status of the bot.",
 		usage = "[default | listening <message> | watching <message> | playing <message> | competing <message>]",
 		ownerOnly = true,

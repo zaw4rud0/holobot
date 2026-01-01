@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.general;
 
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.commands.CommandManager;
@@ -14,7 +14,7 @@ import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Command(name = "help",
+@CommandInfo(name = "help",
         description = "Shows a list of commands or their respective usage",
         usage = "[command]",
         example = "ping",

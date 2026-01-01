@@ -6,7 +6,7 @@ import dev.zawarudo.holo.modules.anime.MediaPlatform;
 import dev.zawarudo.holo.modules.anime.MediaSearchService;
 import dev.zawarudo.holo.modules.anime.model.AnimeResult;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.utils.exceptions.APIException;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@Command(name = "animesearch",
+@CommandInfo(name = "animesearch",
         description = "Use this command to search for an anime in the database of MyAnimeList.",
         usage = "<title>",
         example = "one piece",

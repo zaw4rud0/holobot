@@ -5,7 +5,7 @@ import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.Emote;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "skip",
+@CommandInfo(name = "skip",
 		description = "Requests to skip the current track. About half of the members " +
 				"in the voice channel (bot excluded) that are actively listening (i.e. " +
 				"not deafened) have to react with an upvote in order to skip the current track.",

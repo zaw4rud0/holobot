@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.games.pokemon;
 
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
 import dev.zawarudo.holo.modules.pokemon.model.PokemonSpecies;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
@@ -22,7 +22,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Command to catch the current Pokémon in a guild channel.
  */
-@Command(name = "catch",
+@CommandInfo(name = "catch",
 		description = "Use this command to catch the current Pokémon of a text channel. " +
 				"Note that you can type either the English or German name of the Pokémon.",
 		usage = "<Pokémon name>",

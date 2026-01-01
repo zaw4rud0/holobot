@@ -7,7 +7,7 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
@@ -15,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "play",
+@CommandInfo(name = "play",
         description = "Use this command to play a given YouTube video or playlist. If there is already a track playing, it gets added to the queue.",
         usage = "<url>",
         alias = {"p"},

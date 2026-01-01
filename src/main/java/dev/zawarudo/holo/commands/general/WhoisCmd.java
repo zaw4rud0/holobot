@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -21,7 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "whois",
+@CommandInfo(name = "whois",
         description = "Returns information about a user or bot.",
         usage = "[user]",
         example = "@Holo",

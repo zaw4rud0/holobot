@@ -1,13 +1,13 @@
 package dev.zawarudo.holo.commands.owner;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-@Command(name = "delete",
+@CommandInfo(name = "delete",
 		description = "Deletes a message of your choice. This works by either passing the message id or replying to a message.",
 		usage = "[msg id]",
 		alias = {"d"},

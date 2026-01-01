@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.music;
 
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.Emote;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.unions.AudioChannelUnion;
@@ -13,7 +13,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "join",
+@CommandInfo(name = "join",
         description = "Makes me join the voice channel you are currently in.",
         category = CommandCategory.MUSIC)
 public class JoinCmd extends AbstractMusicCommand {

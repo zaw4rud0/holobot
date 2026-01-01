@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.fun;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import java.text.DecimalFormat;
 import java.util.Random;
 
-@Command(name = "coinflip",
+@CommandInfo(name = "coinflip",
         description = "Flips a coin. You can provide an additional argument as the number of times I should flip a coin with the limit being 1'000'000 coin flips at once.",
         usage = "[<times>]",
         category = CommandCategory.MISC)

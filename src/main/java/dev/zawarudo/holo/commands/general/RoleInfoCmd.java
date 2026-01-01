@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.general;
 
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 // TODO: Refactor class, split each part into separate methods
 
 @Deactivated
-@Command(name = "roleinfo",
+@CommandInfo(name = "roleinfo",
         description = "Shows information about a role.",
         usage = "<role name, id or mention>",
         category = CommandCategory.GENERAL)

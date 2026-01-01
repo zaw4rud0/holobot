@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.image;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -18,7 +18,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Command(name = "upscale",
+@CommandInfo(name = "upscale",
         description = "This command lets you Upscale a given image with Waifu2x. Please provide an image " +
                 "as an attachment or as a link to process it. Alternatively, you can reply to a message " +
                 "with an image.",

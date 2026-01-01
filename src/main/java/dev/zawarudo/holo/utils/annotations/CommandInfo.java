@@ -13,7 +13,7 @@ import java.lang.annotation.Target;
  */
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface Command {
+public @interface CommandInfo {
     /** The name of the command. */
     String name();
 

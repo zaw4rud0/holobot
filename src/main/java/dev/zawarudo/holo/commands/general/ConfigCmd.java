@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.general;
 import dev.zawarudo.holo.commands.CommandModule;
 import dev.zawarudo.holo.commands.ModuleRegistry;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.GuildConfig;
 import dev.zawarudo.holo.core.GuildConfigManager;
@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Command to change the configurations of the bot for the guild.
  */
-@Command(name = "config",
+@CommandInfo(name = "config",
         description = "See and change the configuration of the bot for this guild.",
         ownerOnly = true,
         category = CommandCategory.GENERAL)

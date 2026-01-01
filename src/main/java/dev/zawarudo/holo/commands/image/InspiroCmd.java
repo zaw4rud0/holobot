@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.commands.image;
 
 import dev.zawarudo.holo.utils.HoloHttp;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
@@ -16,7 +16,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Command to fetch a quote from inspirobot.me and display it in an embed.
  */
-@Command(name = "inspiro",
+@CommandInfo(name = "inspiro",
 		description = "Fetch a random quote from [InspiroBot](https://inspirobot.me).",
 		thumbnail = "https://inspirobot.me/website/images/inspirobot-dark-green.png",
 		embedColor = EmbedColor.INSPIRO,

@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.owner;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.entities.GuildVoiceState;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-@Command(name = "shutdown",
+@CommandInfo(name = "shutdown",
         description = "Shuts down the bot.",
         alias = {"kill"},
         ownerOnly = true,

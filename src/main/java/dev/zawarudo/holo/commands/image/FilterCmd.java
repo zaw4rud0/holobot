@@ -6,7 +6,7 @@ import dev.zawarudo.holo.modules.image.FilterRegistry;
 import dev.zawarudo.holo.modules.image.ImageFilter;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -23,7 +23,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-@Command(
+@CommandInfo(
         name = "filter",
         description = "Applies a dramatic grayscale filter while preserving red tones",
         alias = {"acheron"},

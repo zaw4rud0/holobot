@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.games.pokemon;
 
 import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.ImageOperations;
@@ -20,7 +20,7 @@ import java.util.Random;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "pokemonteam",
+@CommandInfo(name = "pokemonteam",
 		description = "Generates a Pokémon team",
 		usage = "random",
 		alias = {"poketeam"},

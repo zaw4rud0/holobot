@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.owner;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Arrays;
 
 @Deactivated
-@Command(name = "nickname",
+@CommandInfo(name = "nickname",
         description = "Changes the nickname of the bot or of a specified user.",
         usage = "<user> <nickname>",
         alias = {"nick"},

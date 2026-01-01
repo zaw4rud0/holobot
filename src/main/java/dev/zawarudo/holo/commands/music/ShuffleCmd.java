@@ -3,14 +3,14 @@ package dev.zawarudo.holo.commands.music;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "shuffle",
+@CommandInfo(name = "shuffle",
 		description = "Shuffles the current queue.",
 		category = CommandCategory.MUSIC)
 public class ShuffleCmd extends AbstractMusicCommand {

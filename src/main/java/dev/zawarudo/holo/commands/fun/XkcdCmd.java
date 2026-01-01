@@ -8,7 +8,7 @@ import dev.zawarudo.holo.modules.xkcd.XkcdAPI;
 import dev.zawarudo.holo.modules.xkcd.XkcdComic;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -20,7 +20,7 @@ import java.sql.SQLException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@Command(name = "xkcd",
+@CommandInfo(name = "xkcd",
         description = "Use this command to access the comics of xkcd.",
         usage = "[new | search <query> | <issue nr> | <title>]",
         thumbnail = "https://xkcd.com/s/0b7742.png",

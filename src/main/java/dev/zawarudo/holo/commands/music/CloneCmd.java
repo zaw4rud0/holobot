@@ -4,14 +4,14 @@ import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "clone",
+@CommandInfo(name = "clone",
 		description = "Duplicates the currently playing track and adds it on top of the queue.",
 		category = CommandCategory.MUSIC)
 public class CloneCmd extends AbstractMusicCommand {

@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.games.pokemon;
 
 import dev.zawarudo.holo.modules.pokemon.PokeApiClient;
 import dev.zawarudo.holo.modules.pokemon.model.Pokemon;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.exceptions.*;
@@ -10,7 +10,7 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-@Command(name = "spawn",
+@CommandInfo(name = "spawn",
 		description = "Spawns a Pokémon",
 		usage = "[<Pokémon name or id> | random]",
 		ownerOnly = true,

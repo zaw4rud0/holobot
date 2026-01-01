@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.music;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "leave",
+@CommandInfo(name = "leave",
 		description = "Makes me leave the current voice channel.",
 		ownerOnly = true,
 		category = CommandCategory.MUSIC)

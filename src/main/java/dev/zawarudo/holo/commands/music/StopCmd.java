@@ -3,14 +3,14 @@ package dev.zawarudo.holo.commands.music;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "stop",
+@CommandInfo(name = "stop",
 		description = "Stops the current song and clears the queue.",
 		ownerOnly = true,
 		category = CommandCategory.MUSIC)

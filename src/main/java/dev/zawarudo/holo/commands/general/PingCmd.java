@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.general;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "ping",
+@CommandInfo(name = "ping",
         description = "Shows the ping of the bot",
         alias = {"pong"},
         category = CommandCategory.GENERAL)

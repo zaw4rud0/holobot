@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.fun;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.utils.FileUtils;
@@ -14,7 +14,7 @@ import java.io.InputStream;
 import java.util.List;
 import java.util.Random;
 
-@Command(name = "8ball",
+@CommandInfo(name = "8ball",
         description = "Ask the Magic 8 Ball a question and get an answer.",
         usage = "<question>",
         thumbnail = "https://media.discordapp.net/attachments/778991087847079972/946790101109841990/magic8ball.png",

@@ -9,7 +9,7 @@ import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.TypeTokenUtils;
 import dev.zawarudo.holo.utils.Writer;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
  * Class of the Action command. By calling this command, the user can get a random
  * reaction or action gif.
  */
-@Command(name = "action",
+@CommandInfo(name = "action",
         description = "Sends an action GIF. For directed actions you can either mention an user or reply to a " +
                 "message to direct the action towards them.",
         usage = "[<action> | list]",

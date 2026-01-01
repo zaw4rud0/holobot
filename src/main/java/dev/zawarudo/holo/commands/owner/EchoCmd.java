@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.owner;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -8,7 +8,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
 
-@Command(name = "echo",
+@CommandInfo(name = "echo",
 		description = "Repeats a given message by a given amount.",
 		usage = "<amount> <message>",
 		alias = {"say", "repeat"},

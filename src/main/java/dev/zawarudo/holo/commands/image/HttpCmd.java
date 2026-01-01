@@ -2,13 +2,13 @@ package dev.zawarudo.holo.commands.image;
 
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@Command(name = "http",
+@CommandInfo(name = "http",
         description = "Shows a silly cat image with the specified HTTP error code. If " +
                 "the provided argument is not valid, 404 will be returned.",
         usage = "<code>",

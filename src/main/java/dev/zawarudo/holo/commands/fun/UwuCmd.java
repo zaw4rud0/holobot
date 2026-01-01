@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.fun;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.entities.Message;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Random;
 
-@Command(name = "uwu",
+@CommandInfo(name = "uwu",
         description = "Uwuifies a text of your choice. You can also reply to a message to uwuify it.",
         usage = "<text>",
         category = CommandCategory.MISC)

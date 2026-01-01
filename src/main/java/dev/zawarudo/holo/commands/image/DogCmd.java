@@ -2,7 +2,7 @@ package dev.zawarudo.holo.commands.image;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.modules.DogCeoClient;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -20,7 +20,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "dog",
+@CommandInfo(name = "dog",
         description = "Fetches an image of a dog.",
         usage = "[breeds | <breed> | random]",
         category = CommandCategory.IMAGE)

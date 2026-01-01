@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.image;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "avatar",
+@CommandInfo(name = "avatar",
         description = "Retrieves the avatar of a specified user. Tip: Use the id of the user if you don't want to ping them.",
         usage = "[<user id>]",
         alias = {"av", "pfp"},

@@ -8,7 +8,7 @@ import dev.zawarudo.holo.modules.anime.MediaPlatform;
 import dev.zawarudo.holo.modules.anime.MediaSearchService;
 import dev.zawarudo.holo.modules.anime.model.MangaResult;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import dev.zawarudo.holo.utils.interact.ReactionSelector;
@@ -19,7 +19,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-@Command(name = "mangasearch",
+@CommandInfo(name = "mangasearch",
         description = "Use this command to search for a manga in the database of MyAnimeList.",
         usage = "<title>",
         example = "black clover",

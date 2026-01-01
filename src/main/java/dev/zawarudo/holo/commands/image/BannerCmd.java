@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.image;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "banner",
+@CommandInfo(name = "banner",
 		description = "Retrieves the current banner of this guild. Note that a guild " +
 				"needs to be boosted to level 2 in order to have a banner.",
 		category = CommandCategory.IMAGE)

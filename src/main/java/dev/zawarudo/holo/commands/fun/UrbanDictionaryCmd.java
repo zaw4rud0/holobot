@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.fun;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.modules.urbandictionary.UrbanDictionaryEntry;
 import dev.zawarudo.holo.modules.urbandictionary.UrbanDictionaryScraper;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "urban",
+@CommandInfo(name = "urban",
         description = "Searches for a term in the Urban Dictionary",
         usage = "<term>",
         example = "yeet",

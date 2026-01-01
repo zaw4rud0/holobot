@@ -7,7 +7,7 @@ import dev.zawarudo.holo.modules.aoc.graph.AdventOfCodeGraph;
 import dev.zawarudo.holo.modules.aoc.graph.ChartType;
 import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.ImageOperations;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -20,7 +20,7 @@ import java.io.InputStream;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-@Command(name = "aoc",
+@CommandInfo(name = "aoc",
         description = "Displays the graph of Advent of Code",
         category = CommandCategory.IMAGE)
 public class AoCStatsCmd extends AbstractCommand {

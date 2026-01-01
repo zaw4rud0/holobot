@@ -3,7 +3,7 @@ package dev.zawarudo.holo.commands.image;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -26,7 +26,7 @@ import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-@Command(name = "check",
+@CommandInfo(name = "check",
         description = "Checks an image for NSFW elements and returns the likelihood of " +
                 "such elements being present. The image can be provided as a URL or as " +
                 "an attachment. Replying to a message with an image also works. To get " +

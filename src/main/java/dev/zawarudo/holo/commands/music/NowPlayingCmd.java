@@ -7,14 +7,14 @@ import dev.zawarudo.holo.utils.Emote;
 import dev.zawarudo.holo.modules.music.GuildMusicManager;
 import dev.zawarudo.holo.modules.music.PlayerManager;
 import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.TimeUnit;
 
-@Command(name = "now",
+@CommandInfo(name = "now",
 		description = "Shows information about the current track.",
 		alias = {"np", "nowplaying"},
 		category = CommandCategory.MUSIC)

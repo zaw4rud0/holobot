@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands.owner;
 
-import dev.zawarudo.holo.utils.annotations.Command;
+import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -12,7 +12,7 @@ import java.time.Instant;
 /**
  * Command to cancel all requests to JDA.
  */
-@Command(name = "cancel",
+@CommandInfo(name = "cancel",
 		description = "Cancels all the ongoing requests.",
 		ownerOnly = true,
 		category = CommandCategory.OWNER)
