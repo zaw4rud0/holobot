@@ -1,27 +1,34 @@
 package dev.zawarudo.holo.modules.anime.model;
 
 import dev.zawarudo.holo.modules.anime.MediaPlatform;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 public record AnimeResult(
-        MediaPlatform platform,
+        @NotNull MediaPlatform platform,
         int id,
-        String title,
-        String type,
-        String url,
-        String imageUrl,
-        String synopsis,
-        String titleEnglish,
-        String titleJapanese,
+
+        @NotNull String title,
+        @NotNull String type,
+        @NotNull String url,
+
+        @Nullable String imageUrl,
+        @Nullable String synopsis,
+        @Nullable String titleEnglish,
+        @Nullable String titleJapanese,
+
         double score,
         int rank,
         int episodes,
-        String status,
-        String season,
-        List<String> studios,
-        List<String> genres,
-        List<String> themes,
-        List<String> demographics
+
+        @Nullable String status,
+        @Nullable String season,
+
+        @NotNull List<String> studios,
+        @NotNull List<String> genres,
+        @NotNull List<String> themes,
+        @NotNull List<String> demographics
 ) {
 }

@@ -4,7 +4,6 @@ import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.modules.anime.MediaPlatform;
 import dev.zawarudo.holo.modules.anime.MediaSearchService;
-import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.anime.model.AnimeResult;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
@@ -20,11 +19,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 
-/**
- * A command for searching and displaying anime information from the MyAnimeList
- * database. It uses JikanAPI since the official MyAnimeList API doesn't provide
- * all the needed functionalities. See {@link JikanApiClient} for more info.
- */
 @Command(name = "animesearch",
         description = "Use this command to search for an anime in the database of MyAnimeList.",
         usage = "<title>",
@@ -46,7 +40,7 @@ public class AnimeSearchCmd extends AbstractCommand {
                 items -> ReactionSelector.defaultNumberedListEmbed(
                         "Anime Search Results",
                         items,
-                        a -> String.format("%s [%s]", a.title(), safe(a.type())),
+                        a -> String.format("%s [%s]", a.title(), a.type()),
                         getEmbedColor()
                 )
         );
@@ -66,7 +60,7 @@ public class AnimeSearchCmd extends AbstractCommand {
         final List<AnimeResult> results;
         try {
             results = searchService.searchAnime(search, 10);
-        } catch (InvalidRequestException | APIException ex) {
+        } catch (APIException | InvalidRequestException ex) {
             sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
             logger.error("Anime search failed: {}", search, ex);
             return;
@@ -88,7 +82,7 @@ public class AnimeSearchCmd extends AbstractCommand {
     private EmbedBuilder createEmbed(@NotNull AnimeResult anime) {
         EmbedBuilder b = new EmbedBuilder();
 
-        String type = safe(anime.type());
+        String type = anime.type();
         String title = Formatter.truncate(anime.title(), MessageEmbed.TITLE_MAX_LENGTH);
         b.setTitle(String.format("%s [%s]", title, type));
 
@@ -112,7 +106,7 @@ public class AnimeSearchCmd extends AbstractCommand {
 
         String studios = formatList(anime.studios());
         if (studios != null) {
-            b.addField("Studio", formatList(anime.studios()), false);
+            b.addField("Studio", studios, false);
         }
 
         String genres = formatList(anime.genres());
@@ -161,7 +155,7 @@ public class AnimeSearchCmd extends AbstractCommand {
         String linkName = (anime.platform() == MediaPlatform.ANILIST)
                 ? "AniList"
                 : "MyAnimeList";
-        if (anime.url() != null && !anime.url().isBlank()) {
+        if (!anime.url().isBlank()) {
             b.addField("Link", "[" + linkName + "](" + anime.url() + ")", false);
         }
 
@@ -187,13 +181,9 @@ public class AnimeSearchCmd extends AbstractCommand {
     }
 
     private String formatList(List<String> list) {
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             return null;
         }
         return String.join(", ", list);
-    }
-
-    private static String safe(String s) {
-        return (s == null || s.isBlank()) ? "?" : s;
     }
 }

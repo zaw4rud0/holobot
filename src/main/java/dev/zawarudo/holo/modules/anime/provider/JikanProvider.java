@@ -3,6 +3,7 @@ package dev.zawarudo.holo.modules.anime.provider;
 import dev.zawarudo.holo.modules.anime.MediaPlatform;
 import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.anime.jikan.model.Anime;
+import dev.zawarudo.holo.modules.anime.jikan.model.Images;
 import dev.zawarudo.holo.modules.anime.jikan.model.Manga;
 import dev.zawarudo.holo.modules.anime.jikan.model.Nameable;
 import dev.zawarudo.holo.modules.anime.model.AnimeResult;
@@ -11,6 +12,7 @@ import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
@@ -38,21 +40,14 @@ public final class JikanProvider implements MediaSearchProvider {
     }
 
     private static AnimeResult mapAnime(Anime anime) {
-        String title = anime.getTitle();
-
-        String imageUrl = null;
-        if (anime.getImages() != null && anime.getImages().getJpg() != null) {
-            imageUrl = anime.getImages().getJpg().getLargeImage();
-            if (imageUrl == null) imageUrl = anime.getImages().getJpg().getImage();
-        }
-
         return new AnimeResult(
                 MediaPlatform.MAL_JIKAN,
                 anime.getId(),
-                title,
-                anime.getType(),
-                anime.getUrl(),
-                imageUrl,
+                safeText(anime.getTitle(), "Unknown"),
+                safeText(anime.getType(), "?"),
+                safeText(anime.getUrl(), ""),
+
+                pickImageUrl(anime.getImages()),
                 anime.getSynopsis().orElse(null),
 
                 anime.getTitleEnglish().orElse(null),
@@ -61,31 +56,27 @@ public final class JikanProvider implements MediaSearchProvider {
                 anime.getScore(),
                 anime.getRank(),
                 anime.getEpisodes(),
-                anime.getStatus(),
-                anime.getSeason() == null ? null : anime.getSeason(),
-                anime.getStudios().stream().map(Nameable::getName).toList(),
-                anime.getGenres().stream().map(Nameable::getName).toList(),
-                anime.getThemes().stream().map(Nameable::getName).toList(),
-                anime.getDemographics().stream().map(Nameable::getName).toList()
+
+                emptyToNull(anime.getStatus()),
+                anime.getSeason(),
+
+                namesOrEmpty(anime.getStudios()),
+                namesOrEmpty(anime.getGenres()),
+                namesOrEmpty(anime.getThemes()),
+                namesOrEmpty(anime.getDemographics())
         );
     }
 
     private static MangaResult mapManga(Manga manga) {
-        String title = manga.getTitle();
-
-        String imageUrl = null;
-        if (manga.getImages() != null && manga.getImages().getJpg() != null) {
-            imageUrl = manga.getImages().getJpg().getLargeImage();
-            if (imageUrl == null) imageUrl = manga.getImages().getJpg().getImage();
-        }
-
         return new MangaResult(
                 MediaPlatform.MAL_JIKAN,
                 manga.getId(),
-                title,
-                manga.getType(),
-                manga.getUrl(),
-                imageUrl,
+
+                safeText(manga.getTitle(), "Unknown"),
+                safeText(manga.getType(), "?"),
+                safeText(manga.getUrl(), ""),
+
+                pickImageUrl(manga.getImages()),
                 manga.getSynopsis().orElse(null),
 
                 manga.getTitleEnglish().orElse(null),
@@ -95,17 +86,41 @@ public final class JikanProvider implements MediaSearchProvider {
                 manga.getRank(),
                 manga.getChapters(),
                 manga.getVolumes(),
-                manga.getStatus(),
 
+                emptyToNull(manga.getStatus()),
                 formatAuthors(manga.getAuthors()),
 
-                manga.getGenres().stream().map(Nameable::getName).toList(),
-                manga.getThemes().stream().map(Nameable::getName).toList(),
-                manga.getDemographics().stream().map(Nameable::getName).toList()
+                namesOrEmpty(manga.getGenres()),
+                namesOrEmpty(manga.getThemes()),
+                namesOrEmpty(manga.getDemographics())
         );
     }
 
-    private static List<String> formatAuthors(List<Nameable> list) {
-        return list.stream().map(Nameable::getName).map(Formatter::reverseJapaneseName).toList();
+    private static @Nullable String pickImageUrl(@Nullable Images images) {
+        if (images == null || images.getJpg() == null) return null;
+        String large = images.getJpg().getLargeImage();
+        return (large != null) ? large : images.getJpg().getImage();
+    }
+
+    private static @NotNull List<String> namesOrEmpty(@Nullable List<? extends Nameable> list) {
+        if (list == null || list.isEmpty()) return List.of();
+        return list.stream().map(Nameable::getName).toList();
+    }
+
+    // Reverse Japanese name order (family -> given) for display
+    private static @NotNull List<String> formatAuthors(@Nullable List<Nameable> list) {
+        if (list == null || list.isEmpty()) return List.of();
+        return list.stream()
+                .map(Nameable::getName)
+                .map(Formatter::reverseJapaneseName)
+                .toList();
+    }
+
+    private static @NotNull String safeText(@Nullable String s, @NotNull String fallback) {
+        return (s == null || s.isBlank()) ? fallback : s;
+    }
+
+    private static @Nullable String emptyToNull(@Nullable String s) {
+        return (s == null || s.isBlank()) ? null : s;
     }
 }

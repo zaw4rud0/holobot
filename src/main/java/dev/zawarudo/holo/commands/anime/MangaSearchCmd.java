@@ -6,9 +6,6 @@ import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.modules.anime.MediaPlatform;
 import dev.zawarudo.holo.modules.anime.MediaSearchService;
-import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
-import dev.zawarudo.holo.modules.anime.jikan.model.Manga;
-import dev.zawarudo.holo.modules.anime.jikan.model.Nameable;
 import dev.zawarudo.holo.modules.anime.model.MangaResult;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
@@ -20,15 +17,8 @@ import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
-import java.util.stream.Collectors;
 
-/**
- * A command for searching and displaying manga information from the MyAnimeList
- * database. It uses JikanAPI since the official MyAnimeList API doesn't provide
- * all needed functionalities. See {@link JikanApiClient} for more info.
- */
 @Command(name = "mangasearch",
         description = "Use this command to search for a manga in the database of MyAnimeList.",
         usage = "<title>",
@@ -89,28 +79,10 @@ public class MangaSearchCmd extends AbstractCommand {
         });
     }
 
-    protected List<Manga> performSearch(MessageReceivedEvent event, String search) {
-        try {
-            return JikanApiClient.searchManga(search);
-        } catch (InvalidRequestException ex) {
-            sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("Invalid request! This wasn't supposed to happen!", ex);
-            }
-        } catch (APIException ex) {
-            sendErrorEmbed(event, "An error occurred while trying to search for the manga! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("An API error occurred while trying to search for the anime. Manga: " + search, ex);
-            }
-        }
-        return Collections.emptyList();
-    }
-
     private EmbedBuilder createEmbed(@NotNull MangaResult manga) {
         EmbedBuilder b = new EmbedBuilder();
 
         String type = manga.type();
-
         String title = Formatter.truncate(manga.title(), MessageEmbed.TITLE_MAX_LENGTH);
         b.setTitle(String.format("%s [%s]", title, type));
 
@@ -125,7 +97,7 @@ public class MangaSearchCmd extends AbstractCommand {
 
         // Titles
         if (manga.titleEnglish() != null && !manga.titleEnglish().isBlank()
-                && !manga.titleEnglish().equals(manga.title())) {
+                && !manga.titleEnglish().equalsIgnoreCase(manga.title())) {
             b.addField("English Title", manga.titleEnglish(), true);
         }
         if (manga.titleJapanese() != null && !manga.titleJapanese().isBlank()) {
@@ -174,7 +146,7 @@ public class MangaSearchCmd extends AbstractCommand {
         String linkName = (manga.platform() == MediaPlatform.ANILIST)
                 ? "AniList"
                 : "MyAnimeList";
-        if (manga.url() != null && !manga.url().isBlank()) {
+        if (!manga.url().isBlank()) {
             b.addField("Link", "[" + linkName + "](" + manga.url() + ")", false);
         }
 
@@ -205,7 +177,7 @@ public class MangaSearchCmd extends AbstractCommand {
     }
 
     private String formatList(List<String> list) {
-        if (list == null || list.isEmpty()) {
+        if (list.isEmpty()) {
             return null;
         }
         return String.join(", ", list);
