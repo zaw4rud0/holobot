@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.modules.jikan.model;
+package dev.zawarudo.holo.modules.anime.jikan.model;
 
 /**
  * Represents the media type.

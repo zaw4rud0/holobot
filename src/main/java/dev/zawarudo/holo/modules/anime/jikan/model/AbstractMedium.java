@@ -1,7 +1,7 @@
-package dev.zawarudo.holo.modules.jikan.model;
+package dev.zawarudo.holo.modules.anime.jikan.model;
 
 import com.google.gson.annotations.SerializedName;
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
 

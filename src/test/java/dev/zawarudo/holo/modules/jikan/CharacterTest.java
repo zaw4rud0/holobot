@@ -1,8 +1,9 @@
 package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.model.Appearance;
-import dev.zawarudo.holo.modules.jikan.model.Character;
-import dev.zawarudo.holo.modules.jikan.model.MediaType;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.jikan.model.Appearance;
+import dev.zawarudo.holo.modules.anime.jikan.model.Character;
+import dev.zawarudo.holo.modules.anime.jikan.model.MediaType;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
@@ -34,7 +35,7 @@ class CharacterTest {
         List<Appearance> luffy = JikanApiClient.getCharacter(40, MediaType.ANIME);
         assertNotNull(luffy);
         assertFalse(luffy.isEmpty());
-        assertEquals("Main", luffy.get(0).getRole());
+        assertEquals("Main", luffy.getFirst().getRole());
     }
 
     @Test
@@ -43,7 +44,7 @@ class CharacterTest {
 
         assertNotNull(kaidou);
         assertFalse(kaidou.isEmpty());
-        assertEquals("Supporting", kaidou.get(0).getRole());
+        assertEquals("Supporting", kaidou.getFirst().getRole());
     }
 
     @Test

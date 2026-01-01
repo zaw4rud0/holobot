@@ -15,6 +15,10 @@ import dev.zawarudo.holo.database.dao.*;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.MerriamWebsterClient;
 import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
+import dev.zawarudo.holo.modules.anime.MediaPlatform;
+import dev.zawarudo.holo.modules.anime.MediaSearchService;
+import dev.zawarudo.holo.modules.anime.provider.JikanProvider;
+import dev.zawarudo.holo.modules.anime.provider.MediaSearchProvider;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import net.dv8tion.jda.api.JDA;
@@ -32,6 +36,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -102,6 +107,11 @@ public class Holo extends ListenerAdapter {
         XkcdSyncService xkcdSyncService = new XkcdSyncService(xkcdDao, executors.io());
         BlacklistService blacklistService = new BlacklistService(blacklistedDao);
 
+        // Init anime search
+        List<MediaSearchProvider> providers = List.of(new JikanProvider());
+        List<MediaPlatform> order = List.of(MediaPlatform.MAL_JIKAN);
+        MediaSearchService mediaSearchService = new MediaSearchService(providers, order, true);
+
         gitHubClient = new GitHubClient(botConfig.getGitHubToken());
         merriamWebsterClient = new MerriamWebsterClient(botConfig.getDictionaryKey(), botConfig.getThesaurusKey());
 
@@ -128,6 +138,7 @@ public class Holo extends ListenerAdapter {
                 xkcdDao,
                 xkcdSyncService,
                 blacklistService,
+                mediaSearchService,
                 countdownDao
         );
     }

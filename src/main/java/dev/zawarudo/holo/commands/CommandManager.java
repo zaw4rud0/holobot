@@ -15,6 +15,7 @@ import dev.zawarudo.holo.database.dao.XkcdDao;
 import dev.zawarudo.holo.modules.GitHubClient;
 import dev.zawarudo.holo.modules.MerriamWebsterClient;
 import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
+import dev.zawarudo.holo.modules.anime.MediaSearchService;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
@@ -47,6 +48,7 @@ public class CommandManager extends ListenerAdapter {
             XkcdDao xkcdDao,
             XkcdSyncService xkcdSyncService,
             BlacklistService blacklistService,
+            MediaSearchService mediaSearchService,
             CountdownDao countdownDao
     ) {
         // General Cmds
@@ -63,8 +65,8 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new WhoisCmd());
 
         // Anime Cmds
-        addCommand(new AnimeSearchCmd(waiter));
-        addCommand(new MangaSearchCmd(waiter));
+        addCommand(new AnimeSearchCmd(waiter, mediaSearchService));
+        addCommand(new MangaSearchCmd(waiter, mediaSearchService));
 
         // Game Cmds
         addCommand(new AkinatorCmd(waiter, akinatorSessionManager));

@@ -1,7 +1,7 @@
 package dev.zawarudo.holo.modules.anime;
 
-import dev.zawarudo.holo.modules.jikan.model.Anime;
-import dev.zawarudo.holo.modules.jikan.model.Broadcast;
+import dev.zawarudo.holo.modules.anime.jikan.model.Anime;
+import dev.zawarudo.holo.modules.anime.jikan.model.Broadcast;
 
 import java.util.List;
 

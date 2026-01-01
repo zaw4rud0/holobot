@@ -1,7 +1,8 @@
 package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.model.Anime;
-import dev.zawarudo.holo.modules.jikan.model.Season;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.jikan.model.Anime;
+import dev.zawarudo.holo.modules.anime.jikan.model.Season;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import org.junit.jupiter.api.Test;
 

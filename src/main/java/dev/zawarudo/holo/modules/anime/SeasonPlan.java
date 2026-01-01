@@ -1,8 +1,8 @@
 package dev.zawarudo.holo.modules.anime;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
-import dev.zawarudo.holo.modules.jikan.model.Anime;
-import dev.zawarudo.holo.modules.jikan.model.Season;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.jikan.model.Anime;
+import dev.zawarudo.holo.modules.anime.jikan.model.Season;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 
 import java.awt.image.BufferedImage;

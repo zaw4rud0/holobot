@@ -1,21 +1,23 @@
 package dev.zawarudo.holo.commands.anime;
 
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
-import dev.zawarudo.holo.modules.jikan.model.Anime;
+import dev.zawarudo.holo.commands.AbstractCommand;
+import dev.zawarudo.holo.modules.anime.MediaPlatform;
+import dev.zawarudo.holo.modules.anime.MediaSearchService;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.model.AnimeResult;
+import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.annotations.Command;
 import dev.zawarudo.holo.commands.CommandCategory;
 import dev.zawarudo.holo.core.misc.EmbedColor;
-import dev.zawarudo.holo.core.misc.Emote;
-import dev.zawarudo.holo.utils.Formatter;
-import dev.zawarudo.holo.utils.HoloUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;
+import dev.zawarudo.holo.utils.interact.ReactionSelector;
 import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collections;
 import java.util.List;
 
 /**
@@ -31,10 +33,23 @@ import java.util.List;
         thumbnail = "https://upload.wikimedia.org/wikipedia/commons/7/7a/MyAnimeList_Logo.png",
         embedColor = EmbedColor.MAL,
         category = CommandCategory.ANIME)
-public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
+public class AnimeSearchCmd extends AbstractCommand {
 
-    public AnimeSearchCmd(EventWaiter waiter) {
-        super(waiter);
+    private final MediaSearchService searchService;
+    private final ReactionSelector<AnimeResult> selector;
+
+    public AnimeSearchCmd(EventWaiter waiter, MediaSearchService searchService) {
+        this.searchService = searchService;
+
+        this.selector = new ReactionSelector<>(
+                waiter,
+                items -> ReactionSelector.defaultNumberedListEmbed(
+                        "Anime Search Results",
+                        items,
+                        a -> String.format("%s [%s]", a.title(), safe(a.type())),
+                        getEmbedColor()
+                )
+        );
     }
 
     @Override
@@ -47,100 +62,138 @@ public class AnimeSearchCmd extends BaseSearchCmd<Anime> {
         }
 
         String search = String.join(" ", args);
-        List<Anime> result = performSearch(event, search);
 
-        if (result.isEmpty()) {
+        final List<AnimeResult> results;
+        try {
+            results = searchService.searchAnime(search, 10);
+        } catch (InvalidRequestException | APIException ex) {
+            sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
+            logger.error("Anime search failed: {}", search, ex);
+            return;
+        }
+
+        if (results.isEmpty()) {
             sendErrorEmbed(event, "I couldn't find any anime with your given search terms!");
             return;
         }
 
         deleteInvoke(event);
-        showSearchResults(event, result);
+
+        selector.start(event.getMessage(), event.getAuthor(), results, (evt, selected, index) -> {
+            EmbedBuilder builder = createEmbed(selected);
+            sendEmbed(event, builder, true, getEmbedColor());
+        });
     }
 
-    @Override
-    protected List<Anime> performSearch(MessageReceivedEvent event, String search) {
-        try {
-            return JikanApiClient.searchAnime(search);
-        } catch (InvalidRequestException ex) {
-            sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("Invalid request! This wasn't supposed to happen!", ex);
-            }
-        } catch (APIException ex) {
-            sendErrorEmbed(event, "An error occurred while trying to search for the anime! Please try again later.");
-            if (logger.isErrorEnabled()) {
-                logger.error("An API error occurred while trying to search for the anime. Anime: " + search, ex);
-            }
-        }
-        return Collections.emptyList();
-    }
+    private EmbedBuilder createEmbed(@NotNull AnimeResult anime) {
+        EmbedBuilder b = new EmbedBuilder();
 
-    @Override
-    protected EmbedBuilder createSearchResultEmbed(List<Anime> results) {
-        List<Emote> numbers = HoloUtils.getNumbers();
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < results.size(); i++) {
-            Anime anime = results.get(i);
-            String line = String.format("%s %s [%s]%n",
-                    numbers.get(i).getAsEmoji().getFormatted(), anime.getTitle(), anime.getType());
-            sb.append(line);
-        }
-        EmbedBuilder builder = new EmbedBuilder();
-        builder.setTitle("Anime Search results");
-        builder.setDescription(sb + "\nTo select one item, please use the according reaction");
-        builder.setColor(getEmbedColor());
-        return builder;
-    }
+        String type = safe(anime.type());
+        String title = Formatter.truncate(anime.title(), MessageEmbed.TITLE_MAX_LENGTH);
+        b.setTitle(String.format("%s [%s]", title, type));
 
-    @Override
-    protected void setEmbedDetails(EmbedBuilder builder, Anime anime) {
-        if (anime.getTitleEnglish().isPresent() && !anime.getTitleEnglish().equals(anime.getTitle())) {
-            builder.addField("English Title", anime.getTitleEnglish().get(), true);
-        }
-        if (anime.getTitleJapanese().isPresent()) {
-            builder.addField("Japanese Title", anime.getTitleJapanese().get(), true);
+        if (anime.imageUrl() != null) {
+            b.setThumbnail(anime.imageUrl());
         }
 
-        String studios = formatList(anime.getStudios());
+        if (anime.synopsis() != null && !anime.synopsis().isBlank()) {
+            String synopsis = Formatter.truncate(anime.synopsis(), MessageEmbed.DESCRIPTION_MAX_LENGTH);
+            b.setDescription(synopsis);
+        }
+
+        // Titles
+        if (anime.titleEnglish() != null && !anime.titleEnglish().isBlank()
+                && !anime.titleEnglish().equalsIgnoreCase(anime.title())) {
+            b.addField("English Title", anime.titleEnglish(), true);
+        }
+        if (anime.titleJapanese() != null && !anime.titleJapanese().isBlank()) {
+            b.addField("Japanese Title", anime.titleJapanese(), true);
+        }
+
+        String studios = formatList(anime.studios());
         if (studios != null) {
-            builder.addField("Studio", studios, false);
+            b.addField("Studio", formatList(anime.studios()), false);
         }
 
-        String genres = formatList(anime.getGenres());
+        String genres = formatList(anime.genres());
         if (genres != null) {
-            builder.addField("Genres", genres, false);
+            b.addField("Genres", genres, false);
         }
-        String themes = formatList(anime.getThemes());
+        String themes = formatList(anime.themes());
         if (themes != null) {
-            builder.addField("Themes", themes, false);
+            b.addField("Themes", themes, false);
         }
-        String demographics = formatList(anime.getDemographics());
+        String demographics = formatList(anime.demographics());
         if (demographics != null) {
-            builder.addField("Demographics", demographics, false);
+            b.addField("Demographics", demographics, false);
         }
 
-        builder.addField("Status", anime.getStatus(), true);
-        if ("Movie".equals(anime.getType())) {
-            builder.addField("Season", formatAnimeSeason(anime), true);
-            builder.addBlankField(true);
+        // Basic info
+        if (anime.status() != null && !anime.status().isBlank()) {
+            b.addField("Status", anime.status(), true);
+        }
+
+        if ("Movie".equalsIgnoreCase(type)) {
+            b.addField("Season", formatSeason(anime.season()), true);
+            b.addBlankField(true);
         } else {
-            builder.addField("Episodes", formatAnimeEpisodes(anime), true);
-            builder.addField("Season", formatAnimeSeason(anime), true);
+            b.addField("Episodes", formatEpisodes(anime.episodes()), true);
+            b.addField("Season", formatSeason(anime.season()), true);
         }
 
-        builder.addField("MAL Score", formatScore(anime.getScore()), true);
-        builder.addField("MAL Rank", formatRank(anime.getRank()), true);
-        builder.addBlankField(true);
-        builder.addField("Link", "[MyAnimeList](" + anime.getUrl() + ")", false);
+        // Scores
+        String scoreLabel = switch (anime.platform()) {
+            case ANILIST -> "AniList Score";
+            case MAL_JIKAN -> "MAL Score";
+        };
+        String scoreValue = formatScore(anime.score());
+        String rankLabel = switch (anime.platform()) {
+            case ANILIST -> "AniList Rank";
+            case MAL_JIKAN -> "MAL Rank";
+        };
+        String rankValue = formatRank(anime.rank());
+
+        b.addField(scoreLabel, scoreValue, true);
+        b.addField(rankLabel, rankValue, true);
+        b.addBlankField(true);
+
+        // Link
+        String linkName = (anime.platform() == MediaPlatform.ANILIST)
+                ? "AniList"
+                : "MyAnimeList";
+        if (anime.url() != null && !anime.url().isBlank()) {
+            b.addField("Link", "[" + linkName + "](" + anime.url() + ")", false);
+        }
+
+        b.setAuthor(anime.platform().getName(), anime.platform().getUrl(), anime.platform().getIconUrl());
+        return b;
     }
 
-    private String formatAnimeEpisodes(Anime anime) {
-        return anime.getEpisodes() == 0 ? "TBA" : String.valueOf(anime.getEpisodes());
+    private String formatEpisodes(int episodes) {
+        return episodes == 0 ? "TBA" : String.valueOf(episodes);
     }
 
-    private String formatAnimeSeason(Anime anime) {
-        String season = anime.getSeason() == null ? "TBA" : anime.getSeason();
+    private String formatScore(double score) {
+        return score == 0.0 ? "N/A" : String.valueOf(score);
+    }
+
+    private String formatRank(int rank) {
+        return rank == 0 ? "N/A" : String.valueOf(rank);
+    }
+
+    private String formatSeason(String season) {
+        if (season == null || season.isBlank()) return "TBA";
         return Formatter.capitalize(season);
+    }
+
+    private String formatList(List<String> list) {
+        if (list == null || list.isEmpty()) {
+            return null;
+        }
+        return String.join(", ", list);
+    }
+
+    private static String safe(String s) {
+        return (s == null || s.isBlank()) ? "?" : s;
     }
 }

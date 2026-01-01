@@ -1,10 +1,10 @@
 package dev.zawarudo.holo.modules.anime;
 
-import dev.zawarudo.holo.modules.jikan.JikanApiClient;
-import dev.zawarudo.holo.modules.jikan.model.AbstractMedium;
-import dev.zawarudo.holo.modules.jikan.model.Anime;
-import dev.zawarudo.holo.modules.jikan.model.Broadcast;
-import dev.zawarudo.holo.modules.jikan.model.Season;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.jikan.model.AbstractMedium;
+import dev.zawarudo.holo.modules.anime.jikan.model.Anime;
+import dev.zawarudo.holo.modules.anime.jikan.model.Broadcast;
+import dev.zawarudo.holo.modules.anime.jikan.model.Season;
 import dev.zawarudo.holo.utils.DateTimeUtils;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 
@@ -40,7 +40,7 @@ public class AnimeSeason {
                 ));
 
         System.out.println("Anime Releases Fall 2024");
-        System.out.println(map.keySet().size() + " days");
+        System.out.println(map.size() + " days");
 
         for (String key : map.keySet()) {
             System.out.println(key);

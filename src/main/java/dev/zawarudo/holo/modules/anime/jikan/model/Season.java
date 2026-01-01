@@ -1,4 +1,4 @@
-package dev.zawarudo.holo.modules.jikan.model;
+package dev.zawarudo.holo.modules.anime.jikan.model;
 
 /**
  * Represents a season where various new {@link Anime}s are released.

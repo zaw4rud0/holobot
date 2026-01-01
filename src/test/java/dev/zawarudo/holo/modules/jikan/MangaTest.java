@@ -1,6 +1,7 @@
 package dev.zawarudo.holo.modules.jikan;
 
-import dev.zawarudo.holo.modules.jikan.model.Manga;
+import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
+import dev.zawarudo.holo.modules.anime.jikan.model.Manga;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
 import dev.zawarudo.holo.utils.exceptions.InvalidRequestException;

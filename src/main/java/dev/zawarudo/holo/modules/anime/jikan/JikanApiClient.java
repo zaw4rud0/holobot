@@ -1,10 +1,10 @@
-package dev.zawarudo.holo.modules.jikan;
+package dev.zawarudo.holo.modules.anime.jikan;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import dev.zawarudo.holo.modules.jikan.model.*;
-import dev.zawarudo.holo.modules.jikan.model.Character;
+import dev.zawarudo.holo.modules.anime.jikan.model.*;
+import dev.zawarudo.holo.modules.anime.jikan.model.Character;
 import dev.zawarudo.holo.utils.Formatter;
 import dev.zawarudo.holo.utils.HoloHttp;
 import dev.zawarudo.holo.utils.RateLimiter;
@@ -15,6 +15,7 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO: Make JikanApiClient an instance for JikanProvider
 public final class JikanApiClient {
 
     private static final String BASE_URL = "https://api.jikan.moe/v4";
