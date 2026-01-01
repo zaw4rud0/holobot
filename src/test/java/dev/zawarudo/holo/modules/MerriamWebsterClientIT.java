@@ -45,25 +45,20 @@ class MerriamWebsterClientIT {
         assertTrue(result.hasEntries(), "Expected dictionary entries for a known word");
         assertFalse(result.hasSuggestions(), "Expected no suggestions when entries exist");
 
-        // Invariants (never null lists)
         assertNotNull(result.entries());
         assertNotNull(result.suggestions());
 
-        // Entry validation
         var first = result.entries().getFirst();
         assertNotNull(first);
 
-        // headword/label can be null in edge cases, but should usually exist
         assertTrue(first.shortDefs() != null && !first.shortDefs().isEmpty(),
                 "Expected at least one short definition");
 
-        // Lists should never be null due to record canonical constructor
         assertNotNull(first.shortDefs());
         assertNotNull(first.synonyms());
         assertNotNull(first.antonyms());
         assertNotNull(first.examples());
 
-        // Definitions should not be blank
         assertTrue(first.shortDefs().stream().anyMatch(d -> d != null && !d.isBlank()),
                 "Expected non-blank definition text");
     }
@@ -71,16 +66,13 @@ class MerriamWebsterClientIT {
     @Test
     @Order(2)
     void dictionaryLookup_returnsSuggestionsForMisspelling() throws APIException, InvalidRequestException, NotFoundException {
-        // Intentionally misspelled. MW usually returns suggestion strings here.
         var result = client.lookupDictionary("syzygii");
 
         assertNotNull(result);
 
-        // We expect suggestions for a misspelling, but don't hard-require because APIs can evolve.
         assertTrue(result.hasSuggestions() || result.hasEntries(),
                 "Expected suggestions (or entries if MW treats it as valid)");
 
-        // If it is suggestions response, ensure it's sensible
         if (result.hasSuggestions() && !result.hasEntries()) {
             assertFalse(result.suggestions().isEmpty());
             assertTrue(result.suggestions().stream().allMatch(s -> s != null && !s.isBlank()),
@@ -103,7 +95,6 @@ class MerriamWebsterClientIT {
     @Test
     @Order(4)
     void dictionaryLookup_examples_areCleanIfPresent() throws APIException, InvalidRequestException, NotFoundException {
-        // Pick a common word that often has examples (not guaranteed).
         var result = client.lookupDictionary("run");
 
         assertNotNull(result);
@@ -112,7 +103,6 @@ class MerriamWebsterClientIT {
             Assumptions.assumeTrue(false, "No dictionary entries returned for 'run'; skipping examples assertion.");
         }
 
-        // If any entry has examples, validate their cleanliness
         List<String> allExamples = result.entries().stream()
                 .flatMap(e -> e.examples().stream())
                 .toList();
@@ -144,7 +134,6 @@ class MerriamWebsterClientIT {
         assertNotNull(first.shortDefs());
         assertNotNull(first.examples());
 
-        // Thesaurus should usually have synonyms or antonyms, but avoid brittle strictness:
         assertTrue(
                 !first.synonyms().isEmpty() || !first.antonyms().isEmpty(),
                 "Expected at least synonyms or antonyms for thesaurus entries"
@@ -169,7 +158,6 @@ class MerriamWebsterClientIT {
     @Test
     @Order(7)
     void invalidKeys_throwClientError() {
-        // The API generally returns 403 for invalid key; your code maps 4xx to InvalidRequestException
         MerriamWebsterClient bad = new MerriamWebsterClient("invalid", "invalid");
 
         assertThrows(

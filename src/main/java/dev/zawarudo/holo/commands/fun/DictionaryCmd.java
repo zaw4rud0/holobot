@@ -79,9 +79,9 @@ public class DictionaryCmd extends AbstractCommand {
                     .collect(Collectors.joining("\n"));
 
             EmbedBuilder b = new EmbedBuilder();
-            b.setTitle("No exact matches for: " + term);
+            b.setTitle("Not found");
             b.setDescription("Did you mean:\n" + suggestions);
-            sendEmbed(event, b, true, getEmbedColor());
+            sendReplyEmbed(event.getMessage(), b, getEmbedColor());
             return;
         }
 
@@ -114,10 +114,23 @@ public class DictionaryCmd extends AbstractCommand {
 
         b.setDescription(Formatter.truncate(description, MessageEmbed.DESCRIPTION_MAX_LENGTH));
 
-        // Display etymology if present
+        if (entry.pronunciation() != null && !entry.pronunciation().isBlank()) {
+            b.addField("Pronunciation", entry.pronunciation(), true);
+        }
+
+        if (entry.plural() != null && !entry.plural().isBlank()) {
+            b.addField("Plural", entry.plural(), true);
+        }
+
+        // Display etymology if available
         if (entry.etymology() != null && !entry.etymology().isBlank()) {
             String et = Formatter.truncate(entry.etymology(), MessageEmbed.VALUE_MAX_LENGTH);
             b.addField("Etymology", et, false);
+        }
+
+        if (entry.usageNotes() != null && !entry.usageNotes().isBlank()) {
+            String usage = Formatter.truncate(entry.usageNotes(), MessageEmbed.VALUE_MAX_LENGTH);
+            b.addField("Usage note", usage, false);
         }
 
         List<String> examples = entry.examples();

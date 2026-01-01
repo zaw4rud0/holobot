@@ -14,7 +14,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 /**
- * <a href="https://dictionaryapi.com/products/json">Documentation of the JSON structure</a>
+ * <a href="https://dictionaryapi.com/products/json">Documentation of the API responses</a>
  */
 public final class MerriamWebsterClient {
 
@@ -66,15 +66,20 @@ public final class MerriamWebsterClient {
             String id,
             String headword,
             String functionalLabel,
+            String pronunciation,
+            String plural,
             List<String> shortDefs,
             List<String> synonyms,
             List<String> antonyms,
             List<String> examples,
             String etymology,
+            String usageNotes,
             boolean offensive
     ) {
         public Entry {
-            headword = headword.replace("*", "·");
+            headword = headword == null ? null : headword.replace("*", "·");
+            plural = plural == null ? null : plural.replace("*", "·");
+
             shortDefs = shortDefs == null ? List.of() : List.copyOf(shortDefs);
             synonyms = synonyms == null ? List.of() : List.copyOf(synonyms);
             antonyms = antonyms == null ? List.of() : List.copyOf(antonyms);
@@ -158,35 +163,43 @@ public final class MerriamWebsterClient {
             String headword = hwi == null ? null : safeString(hwi.get("hw"));
             String fl = safeString(obj.get("fl"));
 
+            String pronunciation = extractPronunciation(hwi);
+            String plural = extractPlural(obj);
+
             List<String> shortDefs = obj.has("shortdef") && obj.get("shortdef").isJsonArray()
                     ? stringList(obj.getAsJsonArray("shortdef"))
                     : List.of();
 
             List<String> examples = extractExamples(obj);
 
-            List<String> syns = List.of();
-            List<String> ants = List.of();
-            if (product == Product.THESAURUS && meta != null) {
-                syns = flattenNestedStringLists(meta.get("syns"));
-                ants = flattenNestedStringLists(meta.get("ants"));
-            }
+            List<String> syns = (product == Product.THESAURUS && meta != null)
+                    ? flattenNestedStringLists(meta.get("syns"))
+                    : List.of();
+
+            List<String> ants = (product == Product.THESAURUS && meta != null)
+                    ? flattenNestedStringLists(meta.get("ants"))
+                    : List.of();
 
             String etymology = extractEtymology(obj);
 
+            String usageNotes = extractUsageNotes(obj);
+
             boolean offensive = meta != null
                     && meta.has("offensive")
-                    && meta.get("offensive").isJsonPrimitive()
                     && meta.get("offensive").getAsBoolean();
 
             out.add(new Entry(
                     id,
                     headword,
                     fl,
+                    pronunciation,
+                    plural,
                     shortDefs,
                     syns,
                     ants,
                     examples,
                     etymology,
+                    usageNotes,
                     offensive
             ));
         }
@@ -199,22 +212,19 @@ public final class MerriamWebsterClient {
 
         List<String> out = new ArrayList<>();
 
-        JsonArray defArr = obj.getAsJsonArray("def");
-        for (JsonElement defEl : defArr) {
+        for (JsonElement defEl : obj.getAsJsonArray("def")) {
             if (defEl == null || !defEl.isJsonObject()) continue;
             JsonObject defObj = defEl.getAsJsonObject();
 
             if (!defObj.has("sseq") || !defObj.get("sseq").isJsonArray()) continue;
             JsonArray sseq = defObj.getAsJsonArray("sseq");
 
-            // sseq is deeply nested arrays; walk it defensively
             walkJson(sseq, el -> {
                 if (!el.isJsonArray()) return;
 
                 JsonArray arr = el.getAsJsonArray();
                 if (arr.size() < 2) return;
 
-                // In many shapes, [ "sense", { ... } ] appears
                 JsonElement maybeSenseObj = arr.get(1);
                 if (!maybeSenseObj.isJsonObject()) return;
 
@@ -244,7 +254,6 @@ public final class MerriamWebsterClient {
 
         }
 
-        // de-dupe but preserve order, cap a bit
         if (out.isEmpty()) return List.of();
 
         LinkedHashSet<String> dedup = new LinkedHashSet<>(out);
@@ -270,7 +279,7 @@ public final class MerriamWebsterClient {
     private static List<String> stringList(JsonArray arr) {
         List<String> out = new ArrayList<>(arr.size());
         for (JsonElement el : arr) {
-            String s = safeString(el);
+            String s = Formatter.mwToDiscord(safeString(el));
             if (!s.isBlank()) out.add(s);
         }
         return out;
@@ -328,5 +337,86 @@ public final class MerriamWebsterClient {
 
         String joined = String.join(" ", parts).trim();
         return joined.isBlank() ? null : joined;
+    }
+
+    private static @Nullable String extractPronunciation(@Nullable JsonObject hwi) {
+        if (hwi == null) return null;
+
+        JsonElement prsEl = hwi.get("prs");
+        if (prsEl == null || !prsEl.isJsonArray()) return null;
+
+        JsonArray prs = prsEl.getAsJsonArray();
+        if (prs.isEmpty() || !prs.get(0).isJsonObject()) return null;
+
+        String mw = safeString(prs.get(0).getAsJsonObject().get("mw"));
+        return mw.isBlank() ? null : mw;
+    }
+
+    private static @Nullable String extractPlural(JsonObject obj) {
+        JsonElement insEl = obj.get("ins");
+        if (insEl == null || !insEl.isJsonArray()) return null;
+
+        for (JsonElement el : insEl.getAsJsonArray()) {
+            if (el == null || !el.isJsonObject()) continue;
+            JsonObject inf = el.getAsJsonObject();
+
+            if (!"plural".equalsIgnoreCase(safeString(inf.get("il")))) continue;
+
+            String form = safeString(inf.get("if"));
+            if (!form.isBlank()) return form;
+
+            String ifc = safeString(inf.get("ifc"));
+            return ifc.isBlank() ? null : ifc;
+        }
+        return null;
+    }
+
+    private static @Nullable String extractUsageNotes(JsonObject obj) {
+        if (!obj.has("usages") || !obj.get("usages").isJsonArray()) return null;
+
+        List<String> blocks = new ArrayList<>();
+        JsonArray usages = obj.getAsJsonArray("usages");
+
+        for (JsonElement uEl : usages) {
+            if (uEl == null || !uEl.isJsonObject()) continue;
+            JsonObject u = uEl.getAsJsonObject();
+
+            String heading = safeString(u.get("pl"));
+            heading = heading.isBlank() ? "" : Formatter.mwToDiscord(heading);
+
+            String body = extractPtText(u.get("pt"));
+
+            if (!body.isBlank()) {
+                if (!heading.isBlank()) {
+                    blocks.add("**" + heading + "**\n" + body);
+                } else {
+                    blocks.add(body);
+                }
+            }
+        }
+
+        if (blocks.isEmpty()) return null;
+        String joined = String.join("\n\n", blocks).trim();
+        return joined.isBlank() ? null : joined;
+    }
+
+    private static String extractPtText(@Nullable JsonElement ptEl) {
+        if (ptEl == null || !ptEl.isJsonArray()) return "";
+
+        List<String> parts = new ArrayList<>();
+        for (JsonElement el : ptEl.getAsJsonArray()) {
+            if (el == null || !el.isJsonArray()) continue;
+
+            JsonArray pair = el.getAsJsonArray();
+            if (pair.size() < 2) continue;
+
+            String tag = safeString(pair.get(0));
+            if (!"text".equals(tag)) continue;
+
+            String text = Formatter.mwToDiscord(safeString(pair.get(1)));
+            if (!text.isBlank()) parts.add(text);
+        }
+
+        return String.join(" ", parts).trim();
     }
 }
