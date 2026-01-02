@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.commands;
 
+import dev.zawarudo.holo.core.command.ContextCommand;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -34,7 +35,14 @@ public abstract class AbstractCommand {
      *
      * @param event The {@link MessageReceivedEvent} to trigger the command with.
      */
-    public abstract void onCommand(@NotNull MessageReceivedEvent event);
+    public void onCommand(@NotNull MessageReceivedEvent event) {
+        if (this instanceof ContextCommand) {
+            throw new IllegalStateException(
+                    "ContextCommand was invoked via deprecated onCommand(MessageReceivedEvent) without a context bridge. Call via CommandListener context path."
+            );
+        }
+        throw new UnsupportedOperationException(getClass().getSimpleName() + " must override onCommand(MessageReceivedEvent).");
+    }
 
     /**
      * Returns the prefix of the bot in the guild. If the guild didn't

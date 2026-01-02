@@ -4,14 +4,19 @@ import dev.zawarudo.holo.commands.fun.EmoteCmd;
 import dev.zawarudo.holo.commands.image.ActionCmd;
 import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.PermissionManager;
+import dev.zawarudo.holo.core.command.CommandContext;
+import dev.zawarudo.holo.core.command.CommandContextFactory;
+import dev.zawarudo.holo.core.command.ContextCommand;
 import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.emoji.CustomEmoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.internal.utils.PermissionUtil;
+import org.jspecify.annotations.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -35,13 +40,16 @@ public class CommandListener extends ListenerAdapter {
 
     private final ExecutorService executorService;
 
+    private final CommandContextFactory ctxFactory;
+
     private static final Logger LOGGER = LoggerFactory.getLogger(CommandListener.class);
     private static final Logger AUDIT = LoggerFactory.getLogger("audit");
 
-    public CommandListener(CommandManager cmdManager, PermissionManager permManager, ExecutorService executor) {
+    public CommandListener(CommandManager cmdManager, PermissionManager permManager, ExecutorService executor, CommandContextFactory ctxFactory) {
         this.cmdManager = cmdManager;
         this.permManager = permManager;
         this.executorService = executor;
+        this.ctxFactory = ctxFactory;
     }
 
     @Override
@@ -137,17 +145,35 @@ public class CommandListener extends ListenerAdapter {
             MDC.clear();
         }
 
-        cmd.args = (split.size() > 1) ? split.subList(1, split.size()).toArray(new String[0]) : new String[0];
+        List<String> argList = (split.size() > 1) ? split.subList(1, split.size()) : List.of();
+
+        CommandContext ctx = ctxFactory.createForMessage(
+                event,
+                cmd.getName(),
+                invoke,
+                argList,
+                prefix
+        );
 
         executorService.submit(withMdc(mdc, () -> {
             try {
-                cmd.onCommand(event);
+                if (cmd instanceof ContextCommand cc) {
+                    cc.onCommand(ctx);
+                } else {
+                    cmd.args = argList.toArray(new String[0]);
+                    cmd.onCommand(event);
+                }
             } catch (InsufficientPermissionException ex) {
                 handlePermissionError(event, ex);
             } catch (Exception ex) {
                 LOGGER.error("An error occurred while executing a command.", ex);
             }
         }));
+    }
+
+    @Override
+    public void onSlashCommandInteraction(@NonNull SlashCommandInteractionEvent event) {
+        // TODO: Slash command invocations
     }
 
     private String getPrefix(MessageReceivedEvent e) {
@@ -208,9 +234,10 @@ public class CommandListener extends ListenerAdapter {
         String messageLink = String.format("%s/%s", channelLink, messageId);
         builder.addField("Message", messageLink, false);
 
-        event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue(s -> {},
+        event.getAuthor().openPrivateChannel().queue(dm -> dm.sendMessageEmbeds(builder.build()).queue(s -> {
+                },
                 err -> LOGGER.warn("Can't send a private message because I have been blocked by {} (ID: {}).",
-                event.getAuthor().getName(), event.getAuthor().getId())));
+                        event.getAuthor().getName(), event.getAuthor().getId())));
     }
 
     private void checkEmoteInvoke(MessageReceivedEvent event, String invoke) {

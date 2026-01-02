@@ -7,6 +7,7 @@ import dev.zawarudo.holo.commands.ModuleRegistry;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonModule;
 import dev.zawarudo.holo.commands.games.pokemon.PokemonSpawnManager;
 import dev.zawarudo.holo.commands.music.MusicModule;
+import dev.zawarudo.holo.core.command.CommandContextFactory;
 import dev.zawarudo.holo.core.misc.GuildListener;
 import dev.zawarudo.holo.core.misc.MiscListener;
 import dev.zawarudo.holo.core.security.BlacklistService;
@@ -55,6 +56,7 @@ public class Holo extends ListenerAdapter {
     private GuildConfigManager guildConfigManager;
     private CommandManager commandManager;
     private PermissionManager permissionManager;
+    private CommandContextFactory ctxFactory;
     private PokemonSpawnManager pokemonSpawnManager;
     private AkinatorSessionManager akinatorSessionManager;
     private SQLManager sqlManager;
@@ -121,6 +123,8 @@ public class Holo extends ListenerAdapter {
         akinatorSessionManager = new AkinatorSessionManager();
         permissionManager = new PermissionManager(blacklistService, guildConfigManager);
 
+        ctxFactory = new CommandContextFactory();
+
         // Initialize command modules
         moduleRegistry = new ModuleRegistry();
         moduleRegistry.register(new MusicModule(waiter));
@@ -145,7 +149,7 @@ public class Holo extends ListenerAdapter {
 
     public void registerListeners() {
         jda.addEventListener(
-                new CommandListener(commandManager, permissionManager, executors.io()),
+                new CommandListener(commandManager, permissionManager, executors.io(), ctxFactory),
                 new MiscListener(emoteManager),
                 new GuildListener(guildConfigManager, emoteManager)
         );
