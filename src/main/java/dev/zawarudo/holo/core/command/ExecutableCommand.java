@@ -2,7 +2,7 @@ package dev.zawarudo.holo.core.command;
 
 import org.jetbrains.annotations.NotNull;
 
-public interface ContextCommand {
+public interface ExecutableCommand {
 
-    void onCommand(@NotNull CommandContext ctx);
+    void execute(@NotNull CommandContext ctx);
 }

@@ -48,7 +48,8 @@ public class PermissionManager {
         }
 
         if (command.isAdminOnly()) {
-            return command.isGuildAdmin(event)
+            // Bot owner can bypass admin requirement
+            return command.isGuildAdmin(event) || command.isBotOwner(event.getAuthor())
                     ? Decision.allow()
                     : Decision.deny(Decision.DenyReason.ADMIN_ONLY, null);
         }

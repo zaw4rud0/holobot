@@ -2,10 +2,7 @@ package dev.zawarudo.holo.core.command;
 
 import dev.zawarudo.holo.core.GuildConfig;
 import net.dv8tion.jda.api.EmbedBuilder;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -13,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Immutable per-invocation context for commands.
@@ -55,27 +53,27 @@ public final class CommandContext {
     }
 
     @NotNull
-    public String getCommandName() {
+    public String commandName() {
         return commandName;
     }
 
     @NotNull
-    public String getInvokedAs() {
+    public String invokedAs() {
         return invokedAs;
     }
 
     @NotNull
-    public List<String> getArgs() {
+    public List<String> args() {
         return args;
     }
 
     @NotNull
-    public Invocation getInvocation() {
+    public Invocation invocation() {
         return invocation;
     }
 
     @NotNull
-    public Reply getReply() {
+    public Reply reply() {
         return reply;
     }
 
@@ -154,6 +152,12 @@ public final class CommandContext {
         MessageChannelUnion channel();
 
         @Nullable Message message();
+
+        @NotNull List<Role> mentionedRoles();
+
+        @NotNull List<Member> mentionedMembers();
+
+        void deleteInvokeIfPossible();
     }
 
     public enum CommandSource {
@@ -168,13 +172,13 @@ public final class CommandContext {
 
         void embed(@NotNull EmbedBuilder embed);
 
+        void embed(@NotNull MessageEmbed embed, int duration, TimeUnit unit);
+
         default void ephemeralText(@NotNull String content) {
             text(content);
         }
 
-        default void error(@NotNull String content) {
-            text(content);
-        }
+        void errorEmbed(@NotNull String content);
     }
 
     private static String requireNonBlank(String s, String name) {

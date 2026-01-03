@@ -1,6 +1,6 @@
 package dev.zawarudo.holo.commands;
 
-import dev.zawarudo.holo.core.command.ContextCommand;
+import dev.zawarudo.holo.core.command.ExecutableCommand;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.EmbedBuilder;
@@ -36,7 +36,7 @@ public abstract class AbstractCommand {
      * @param event The {@link MessageReceivedEvent} to trigger the command with.
      */
     public void onCommand(@NotNull MessageReceivedEvent event) {
-        if (this instanceof ContextCommand) {
+        if (this instanceof ExecutableCommand) {
             throw new IllegalStateException(
                     "ContextCommand was invoked via deprecated onCommand(MessageReceivedEvent) without a context bridge. Call via CommandListener context path."
             );
@@ -154,17 +154,6 @@ public abstract class AbstractCommand {
     }
 
     /**
-     * Sends an embed as a reply to a given message.
-     */
-    protected void replyEmbed(MessageReceivedEvent event, Message message, EmbedBuilder embedBuilder, boolean footer, Color embedColor) {
-        if (footer) {
-            addFooter(event, embedBuilder);
-        }
-        embedBuilder.setColor(embedColor);
-        message.replyEmbeds(embedBuilder.build()).queue();
-    }
-
-    /**
      * Sends an embed stating that an error occurred with some information.
      */
     protected void sendErrorEmbed(MessageReceivedEvent event, String message) {
@@ -226,21 +215,6 @@ public abstract class AbstractCommand {
             return (n >= 1) ? n : -1;
         } catch (NumberFormatException ignored) {
             return -1;
-        }
-    }
-
-    /**
-     * Checks whether a String is a long.
-     *
-     * @param s The String to check.
-     * @return True if the String is a long, false otherwise.
-     */
-    protected boolean isLong(String s) {
-        try {
-            Long.parseLong(s);
-            return true;
-        } catch (NumberFormatException ex) {
-            return false;
         }
     }
 
@@ -473,13 +447,6 @@ public abstract class AbstractCommand {
     @NotNull
     public CommandCategory getCategory() {
         return getClass().getAnnotation(CommandInfo.class).category();
-    }
-
-    /**
-     * Checks whether this command is available for everyone.
-     */
-    public boolean isPublic() {
-        return !isAdminOnly() && !isOwnerOnly();
     }
 
     /**

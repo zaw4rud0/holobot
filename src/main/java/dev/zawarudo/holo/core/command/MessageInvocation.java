@@ -1,13 +1,14 @@
 package dev.zawarudo.holo.core.command;
 
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.internal.utils.PermissionUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jspecify.annotations.Nullable;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class MessageInvocation implements CommandContext.Invocation {
 
@@ -50,5 +51,56 @@ public class MessageInvocation implements CommandContext.Invocation {
     @Override
     public @NotNull Message message() {
         return event.getMessage();
+    }
+
+    @Override
+    public @NotNull List<Role> mentionedRoles() {
+        if (!inGuild()) {
+            return List.of();
+        }
+
+        List<Role> roles = event.getMessage()
+                .getMentions()
+                .getRoles();
+
+        return roles.isEmpty() ? List.of() : List.copyOf(roles);
+    }
+
+    @Override
+    public @NotNull List<Member> mentionedMembers() {
+        if (!inGuild()) {
+            return List.of();
+        }
+
+        List<Member> members = event.getMessage()
+                .getMentions()
+                .getMembers();
+
+        return members.isEmpty() ? List.of() : List.copyOf(members);
+    }
+
+    @Override
+    public void deleteInvokeIfPossible() {
+        // DMs cannot delete messages
+        if (!inGuild()) {
+            return;
+        }
+
+        boolean canDelete = PermissionUtil.checkPermission(
+                event.getGuildChannel().getPermissionContainer(),
+                event.getGuild().getSelfMember(),
+                Permission.MESSAGE_MANAGE
+        );
+
+        if (!canDelete) return;
+
+        event.getMessage()
+                .delete()
+                .queue(
+                        success -> {
+                        },
+                        failure -> {
+                        }
+                );
     }
 }

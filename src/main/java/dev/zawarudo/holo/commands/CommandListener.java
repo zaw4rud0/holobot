@@ -6,7 +6,7 @@ import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.PermissionManager;
 import dev.zawarudo.holo.core.command.CommandContext;
 import dev.zawarudo.holo.core.command.CommandContextFactory;
-import dev.zawarudo.holo.core.command.ContextCommand;
+import dev.zawarudo.holo.core.command.ExecutableCommand;
 import dev.zawarudo.holo.utils.Formatter;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.Permission;
@@ -16,7 +16,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.InsufficientPermissionException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.internal.utils.PermissionUtil;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
@@ -157,8 +157,8 @@ public class CommandListener extends ListenerAdapter {
 
         executorService.submit(withMdc(mdc, () -> {
             try {
-                if (cmd instanceof ContextCommand cc) {
-                    cc.onCommand(ctx);
+                if (cmd instanceof ExecutableCommand cc) {
+                    cc.execute(ctx);
                 } else {
                     cmd.args = argList.toArray(new String[0]);
                     cmd.onCommand(event);
@@ -172,7 +172,7 @@ public class CommandListener extends ListenerAdapter {
     }
 
     @Override
-    public void onSlashCommandInteraction(@NonNull SlashCommandInteractionEvent event) {
+    public void onSlashCommandInteraction(@NotNull SlashCommandInteractionEvent event) {
         // TODO: Slash command invocations
     }
 

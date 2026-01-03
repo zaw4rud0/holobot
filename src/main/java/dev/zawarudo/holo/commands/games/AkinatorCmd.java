@@ -8,7 +8,7 @@ import dev.zawarudo.holo.modules.akinator.AkinatorSession;
 import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.jspecify.annotations.NonNull;
+import org.jetbrains.annotations.NotNull;
 
 @CommandInfo(
         name = "akinator",
@@ -27,7 +27,7 @@ public class AkinatorCmd extends AbstractCommand {
     }
 
     @Override
-    public void onCommand(@NonNull MessageReceivedEvent event) {
+    public void onCommand(@NotNull MessageReceivedEvent event) {
         long userId = event.getAuthor().getIdLong();
 
         if (sessions.hasActiveSession(userId)) {
