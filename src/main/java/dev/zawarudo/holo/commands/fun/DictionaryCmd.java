@@ -90,6 +90,7 @@ public class DictionaryCmd extends AbstractCommand {
 
     private MessageEmbed createEmbed(MerriamWebsterClient.Entry entry, int index, int total) {
         EmbedBuilder b = new EmbedBuilder();
+        b.setThumbnail("https://dictionaryapi.com/images/MWLogo.png");
 
         String word = entry.headword() == null ? "Unknown" : entry.headword();
         String fl = entry.functionalLabel();
