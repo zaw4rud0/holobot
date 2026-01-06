@@ -33,6 +33,8 @@ public final class AkinatorSession {
     private static final String CONFIRM = "confirm";
     private static final String REJECT = "reject";
     private static final String STOP = "stop";
+    private static final String START = "start";
+    private static final String CANCEL = "cancel";
 
     private final long userId;
     private final long channelId;
@@ -93,6 +95,24 @@ public final class AkinatorSession {
     }
 
     public void start(@NotNull Message commandMsg) {
+        state = State.START;
+
+        var rendered = renderer.renderStart(); // new
+        var rows = List.of(ActionRow.of(
+                Button.primary(prefixed(START), "Start"),
+                Button.danger(prefixed(CANCEL), "Cancel")
+        ));
+
+        commandMsg.replyEmbeds(rendered.embed())
+                .addComponents(rows)
+                .addFiles(resource(rendered.attachmentName()))
+                .queue(msg -> {
+                    this.message = msg;
+                    awaitNext();
+                }, err -> finish(false, "Failed to start Akinator (send message failed)."));
+    }
+
+    public void start2(@NotNull Message commandMsg) {
         currentQuery = aki.getCurrentQuery(); // can be Question or Guess (or null)
         state = State.ASKING;
 
@@ -154,10 +174,30 @@ public final class AkinatorSession {
                 return;
             }
 
+
+            if (State.START == state) {
+                if (START.equals(action)) {
+                    currentQuery = aki.getCurrentQuery();   // now fetch first query
+                    state = State.ASKING;
+
+                    var rendered = renderer.render(currentQuery, questionsAnswered);
+                    var rows = toRows(buttonsFor(currentQuery));
+
+                    message.editMessageEmbeds(rendered.embed())
+                            .setComponents(rows)
+                            .setFiles(resource(rendered.attachmentName()))
+                            .queue(ok -> awaitNext(), err -> awaitNext());
+                    return;
+                }
+
+                awaitNext();
+                return;
+            }
+
             if (currentQuery instanceof Question q) {
                 if (UNDO.equals(action)) {
                     currentQuery = q.undoAnswer();
-                    // undo does not necessarily decrement question count in API; you can track separately if you want
+                    if (questionsAnswered > 0) questionsAnswered--;
                 } else {
                     Akiwrapper.Answer ans = mapAnswer(action);
                     if (ans != null) {
@@ -232,13 +272,17 @@ public final class AkinatorSession {
     private List<Button> buttonsFor(Query q) {
         // Creates buttons depending on the game state
         if (q instanceof Question) {
+            boolean canUndo = questionsAnswered > 0;
+            Button undo = Button.secondary(prefixed(UNDO), "Undo");
+            if (!canUndo) undo = undo.asDisabled();
+
             return List.of(
                     Button.primary(prefixed(YES), "Yes"),
                     Button.primary(prefixed(NO), "No"),
                     Button.primary(prefixed(DONT_KNOW), "Don't know"),
                     Button.primary(prefixed(PROBABLY), "Probably"),
                     Button.primary(prefixed(PROBABLY_NOT), "Probably not"),
-                    Button.secondary(prefixed(UNDO), "Undo"),
+                    undo,
                     Button.danger(prefixed(STOP), "Stop")
             );
         }

@@ -20,13 +20,33 @@ public final class AkinatorEmbedRenderer {
     public record Rendered(MessageEmbed embed, String attachmentName) {
     }
 
+    public Rendered renderStart() {
+        EmbedBuilder eb = new EmbedBuilder();
+        eb.setTitle("Akinator");
+        eb.setTimestamp(Instant.now());
+
+        eb.setDescription("""
+            To start the game, think of a real or fictional character.
+            I will ask questions and try to guess who it is.
+
+            Press **Start** when you're ready, or **Cancel** to stop.
+            """);
+
+        String attach = IMG_START;
+        eb.setThumbnail("attachment://" + attach);
+        return new Rendered(eb.build(), attach);
+    }
+
     public Rendered render(Query currentQuery, long questionsAnswered) {
         EmbedBuilder eb = base(questionsAnswered);
 
         String attach;
 
         if (currentQuery instanceof Question q) {
-            eb.setDescription("**Question:**\n" + q.getText());
+            long n = questionsAnswered + 1;
+
+            eb.setDescription("**Question " + n + ":** " + q.getText());
+
             attach = IMG_DEFAULT;
             eb.setThumbnail("attachment://" + attach);
 
