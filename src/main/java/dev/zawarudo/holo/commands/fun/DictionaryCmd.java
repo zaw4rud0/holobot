@@ -79,6 +79,7 @@ public class DictionaryCmd extends AbstractCommand {
                     .collect(Collectors.joining("\n"));
 
             EmbedBuilder b = new EmbedBuilder();
+            b.setThumbnail("https://dictionaryapi.com/images/MWLogo.png");
             b.setTitle("Not found");
             b.setDescription("Did you mean:\n" + suggestions);
             sendReplyEmbed(event.getMessage(), b, getEmbedColor());
