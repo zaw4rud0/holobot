@@ -11,7 +11,7 @@ import java.time.Instant;
 public final class AkinatorEmbedRenderer {
 
     public static final String IMG_START = "akinator_start.png";
-    public static final String IMG_DEFAULT = "akinator_default.png";
+    public static final String IMG_DEFAULT = "akinator_icon.png";
     public static final String IMG_GUESSING = "akinator_guessing.png";
     public static final String IMG_VICTORY = "akinator_victory.png";
     public static final String IMG_DEFEAT = "akinator_defeat.png";
@@ -32,13 +32,13 @@ public final class AkinatorEmbedRenderer {
             Press **Start** when you're ready, or **Cancel** to stop.
             """);
 
-        String attach = IMG_START;
+        String attach = IMG_DEFAULT;
         eb.setThumbnail("attachment://" + attach);
         return new Rendered(eb.build(), attach);
     }
 
     public Rendered render(Query currentQuery, long questionsAnswered) {
-        EmbedBuilder eb = base(questionsAnswered);
+        EmbedBuilder eb = base();
 
         String attach;
 
@@ -47,11 +47,11 @@ public final class AkinatorEmbedRenderer {
 
             eb.setDescription("**Question " + n + ":** " + q.getText());
 
-            attach = IMG_DEFAULT;
+            attach = IMG_START;
             eb.setThumbnail("attachment://" + attach);
 
         } else if (currentQuery instanceof Guess g) {
-            eb.setDescription("**Is it:** " + g.getName() + "?\n"
+            eb.setDescription("**I think of ** " + g.getName() + "?\n"
                     + (!g.getDescription().isBlank() ? "\n" + g.getDescription() : ""));
 
             var img = g.getImage();
@@ -64,7 +64,7 @@ public final class AkinatorEmbedRenderer {
             eb.setThumbnail("attachment://" + attach);
 
         } else {
-            eb.setDescription("No more questions.");
+            eb.setDescription("I ran out of questions.");
             attach = IMG_DEFEAT;
             eb.setThumbnail("attachment://" + attach);
         }
@@ -72,13 +72,13 @@ public final class AkinatorEmbedRenderer {
         return new Rendered(eb.build(), attach);
     }
 
-    public Rendered renderFinal(long questionsAnswered, EndScreen endScreen) {
-        EmbedBuilder eb = base(questionsAnswered);
+    public Rendered renderFinal(EndScreen endScreen) {
+        EmbedBuilder eb = base();
 
         eb.setDescription(switch (endScreen) {
-            case VICTORY -> "Akinator guessed correctly!";
+            case VICTORY -> "Great, guessed right one more time!";
             case DEFEAT -> "I ran out of questions — you win!";
-            case CANCEL -> "Game cancelled.";
+            case CANCEL -> "You cancelled the game.";
             case TIMEOUT -> "Game timed out.";
         });
 
@@ -94,13 +94,10 @@ public final class AkinatorEmbedRenderer {
 
     public enum EndScreen {VICTORY, DEFEAT, CANCEL, TIMEOUT}
 
-    private EmbedBuilder base(long questionsAnswered) {
+    private EmbedBuilder base() {
         EmbedBuilder eb = new EmbedBuilder();
         eb.setTitle("Akinator");
         eb.setTimestamp(Instant.now());
-
-        eb.setFooter("Answered: " + questionsAnswered);
-
         return eb;
     }
 }

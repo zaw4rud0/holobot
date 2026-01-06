@@ -31,9 +31,11 @@ public class AkinatorCmd extends AbstractCommand {
         long userId = event.getAuthor().getIdLong();
 
         if (sessions.hasActiveSession(userId)) {
-            event.getMessage().reply("You already have an active Akinator game running.").queue();
+            event.getMessage().reply("You already have an active Akinator game running. Please finish that game before starting a new one.").queue();
             return;
         }
+
+        sendTyping(event);
 
         long guildId = event.getGuild().getIdLong();
 
@@ -46,7 +48,7 @@ public class AkinatorCmd extends AbstractCommand {
         );
 
         if (!sessions.registerSession(session)) {
-            event.getMessage().reply("You already have an active Akinator game running.").queue();
+            event.getMessage().reply("You already have an active Akinator game running. Please finish that game before starting a new one.").queue();
             return;
         }
 

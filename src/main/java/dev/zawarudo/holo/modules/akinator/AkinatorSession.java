@@ -34,7 +34,6 @@ public final class AkinatorSession {
     private static final String REJECT = "reject";
     private static final String STOP = "stop";
     private static final String START = "start";
-    private static final String CANCEL = "cancel";
 
     private final long userId;
     private final long channelId;
@@ -100,24 +99,8 @@ public final class AkinatorSession {
         var rendered = renderer.renderStart(); // new
         var rows = List.of(ActionRow.of(
                 Button.primary(prefixed(START), "Start"),
-                Button.danger(prefixed(CANCEL), "Cancel")
+                Button.danger(prefixed(STOP), "Cancel")
         ));
-
-        commandMsg.replyEmbeds(rendered.embed())
-                .addComponents(rows)
-                .addFiles(resource(rendered.attachmentName()))
-                .queue(msg -> {
-                    this.message = msg;
-                    awaitNext();
-                }, err -> finish(false, "Failed to start Akinator (send message failed)."));
-    }
-
-    public void start2(@NotNull Message commandMsg) {
-        currentQuery = aki.getCurrentQuery(); // can be Question or Guess (or null)
-        state = State.ASKING;
-
-        var rendered = renderer.render(currentQuery, questionsAnswered);
-        var rows = toRows(buttonsFor(currentQuery));
 
         commandMsg.replyEmbeds(rendered.embed())
                 .addComponents(rows)
@@ -173,7 +156,6 @@ public final class AkinatorSession {
                 editFinal(AkinatorEmbedRenderer.EndScreen.CANCEL);
                 return;
             }
-
 
             if (State.START == state) {
                 if (START.equals(action)) {
@@ -260,7 +242,7 @@ public final class AkinatorSession {
     private void editFinal(AkinatorEmbedRenderer.EndScreen screen) {
         if (message == null) return;
 
-        var rendered = renderer.renderFinal(questionsAnswered, screen);
+        var rendered = renderer.renderFinal(screen);
 
         message.editMessageEmbeds(rendered.embed())
                 .setComponents(ActionRow.of(Button.secondary(prefixed("done"), "Done").asDisabled()))
@@ -289,7 +271,7 @@ public final class AkinatorSession {
         if (q instanceof Guess) {
             return List.of(
                     Button.primary(prefixed(CONFIRM), "Yes (Correct)"),
-                    Button.primary(prefixed(REJECT), "No"),
+                    Button.primary(prefixed(REJECT), "No (Continue)"),
                     Button.danger(prefixed(STOP), "Stop")
             );
         }
