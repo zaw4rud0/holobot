@@ -42,19 +42,19 @@ public final class AkinatorEmbedRenderer {
 
         String attach;
 
-        if (currentQuery instanceof Question q) {
+        if (currentQuery instanceof Question question) {
             long n = questionsAnswered + 1;
 
-            eb.setDescription("**Question " + n + ":** " + q.getText());
+            eb.setDescription("**Question " + n + ":** " + question.getText());
 
             attach = IMG_START;
             eb.setThumbnail("attachment://" + attach);
 
-        } else if (currentQuery instanceof Guess g) {
-            eb.setDescription("**I think of ** " + g.getName() + "?\n"
-                    + (!g.getDescription().isBlank() ? "\n" + g.getDescription() : ""));
+        } else if (currentQuery instanceof Guess guess) {
+            eb.setDescription("**I think of ** " + guess.getName() + "?\n"
+                    + (!guess.getDescription().isBlank() ? "\n" + guess.getDescription() : ""));
 
-            var img = g.getImage();
+            var img = guess.getImage();
             if (img != null) {
                 String url = img.toString();
                 if (!url.isBlank()) eb.setImage(url);
@@ -72,15 +72,30 @@ public final class AkinatorEmbedRenderer {
         return new Rendered(eb.build(), attach);
     }
 
-    public Rendered renderFinal(EndScreen endScreen) {
+    public Rendered renderFinal(EndScreen endScreen, Guess finalGuess) {
         EmbedBuilder eb = base();
 
-        eb.setDescription(switch (endScreen) {
+        String description = switch (endScreen) {
             case VICTORY -> "Great, guessed right one more time!";
             case DEFEAT -> "I ran out of questions — you win!";
             case CANCEL -> "You cancelled the game.";
             case TIMEOUT -> "Game timed out.";
-        });
+        };
+
+        if (endScreen == EndScreen.VICTORY && finalGuess != null) {
+            description += "\n\n" + finalGuess.getName();
+
+            if (!finalGuess.getDescription().isBlank()) {
+                description += "\n" + finalGuess.getDescription();
+            }
+
+            var img = finalGuess.getImage();
+            if (img != null && !img.toString().isBlank()) {
+                eb.setImage(img.toString()); // embed image (NOT thumbnail)
+            }
+        }
+
+        eb.setDescription(description);
 
         String attach = switch (endScreen) {
             case VICTORY -> IMG_VICTORY;

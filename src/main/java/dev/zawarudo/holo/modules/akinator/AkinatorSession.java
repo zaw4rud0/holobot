@@ -52,6 +52,8 @@ public final class AkinatorSession {
     private volatile Message message;
     private volatile Query currentQuery;
 
+    private volatile Guess finalGuess;
+
     private long questionsAnswered = 0;
 
     public AkinatorSession(
@@ -192,6 +194,7 @@ public final class AkinatorSession {
 
                 if (CONFIRM.equals(action)) {
                     g.confirm();
+                    finalGuess = g;
                     finish(true, "Akinator guessed correctly!");
                     editFinal(AkinatorEmbedRenderer.EndScreen.VICTORY);
                     return;
@@ -242,10 +245,12 @@ public final class AkinatorSession {
     private void editFinal(AkinatorEmbedRenderer.EndScreen screen) {
         if (message == null) return;
 
-        var rendered = renderer.renderFinal(screen);
+        var rendered = renderer.renderFinal(screen, finalGuess);
 
         message.editMessageEmbeds(rendered.embed())
-                .setComponents(ActionRow.of(Button.secondary(prefixed("done"), "Done").asDisabled()))
+                .setComponents(ActionRow.of(
+                        Button.secondary(prefixed("done"), "Done").asDisabled()
+                ))
                 .setFiles(resource(rendered.attachmentName()))
                 .queue(null, ignored -> {
                 });
