@@ -2,6 +2,7 @@ package dev.zawarudo.holo.commands.image;
 
 import de.androidpit.colorthief.ColorThief;
 import dev.zawarudo.holo.utils.DateTimeUtils;
+import dev.zawarudo.holo.utils.ImageResolver;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
@@ -36,10 +37,18 @@ public class PaletteCmd extends AbstractCommand {
     private static final String PALETTE_IMAGE_FORMAT = "palette_%s.png";
     private static final int DEFAULT_BOX_SIZE = 200;
 
+    private final ImageResolver imageResolver;
+
+    public PaletteCmd(ImageResolver imageResolver) {
+        this.imageResolver = imageResolver;
+    }
+
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         Message msg = event.getMessage();
-        Optional<String> url = msg.getReferencedMessage() == null ? getImage(msg) : getImage(msg.getReferencedMessage());
+        Optional<String> url = msg.getReferencedMessage() == null
+                ? imageResolver.resolveImageUrl(msg)
+                : imageResolver.resolveImageUrl(msg.getReferencedMessage());
 
         if (url.isEmpty() || url.get().contains("gif")) {
             sendErrorEmbed(event, "Incorrect usage! Please provide an image, either as an attachment or as an url.");

@@ -22,6 +22,7 @@ import dev.zawarudo.holo.modules.anime.provider.JikanProvider;
 import dev.zawarudo.holo.modules.anime.provider.MediaSearchProvider;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
+import dev.zawarudo.holo.utils.ImageResolver;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Activity;
@@ -63,6 +64,7 @@ public class Holo extends ListenerAdapter {
     private GitHubClient gitHubClient;
     private MerriamWebsterClient merriamWebsterClient;
     private EmoteManager emoteManager;
+    private ImageResolver imageResolver;
 
     private ModuleRegistry moduleRegistry;
 
@@ -123,6 +125,8 @@ public class Holo extends ListenerAdapter {
         akinatorSessionManager = new AkinatorSessionManager();
         permissionManager = new PermissionManager(blacklistService, guildConfigManager);
 
+        imageResolver = new ImageResolver();
+
         ctxFactory = new CommandContextFactory();
 
         // Initialize command modules
@@ -143,7 +147,8 @@ public class Holo extends ListenerAdapter {
                 xkcdSyncService,
                 blacklistService,
                 mediaSearchService,
-                countdownDao
+                countdownDao,
+                imageResolver
         );
     }
 

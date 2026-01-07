@@ -3,12 +3,15 @@ package dev.zawarudo.holo.commands.games;
 import com.jagrosh.jdautilities.commons.waiter.EventWaiter;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.commands.CommandCategory;
+import dev.zawarudo.holo.core.command.CommandContext;
+import dev.zawarudo.holo.core.command.ExecutableCommand;
 import dev.zawarudo.holo.core.misc.EmbedColor;
 import dev.zawarudo.holo.modules.akinator.AkinatorSession;
 import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.ISnowflake;
 import org.jetbrains.annotations.NotNull;
+import org.jspecify.annotations.NonNull;
 
 @CommandInfo(
         name = "akinator",
@@ -16,42 +19,47 @@ import org.jetbrains.annotations.NotNull;
         category = CommandCategory.GAMES,
         embedColor = EmbedColor.AKINATOR
 )
-public class AkinatorCmd extends AbstractCommand {
+public class AkinatorCmd extends AbstractCommand implements ExecutableCommand {
 
     private final EventWaiter waiter;
     private final AkinatorSessionManager sessions;
 
-    public AkinatorCmd(EventWaiter waiter, AkinatorSessionManager sessions) {
+    public AkinatorCmd(@NotNull EventWaiter waiter, @NotNull AkinatorSessionManager sessions) {
         this.waiter = waiter;
         this.sessions = sessions;
     }
 
     @Override
-    public void onCommand(@NotNull MessageReceivedEvent event) {
-        long userId = event.getAuthor().getIdLong();
+    public void execute(@NonNull CommandContext ctx) {
+        long userId = ctx.user().getIdLong();
 
         if (sessions.hasActiveSession(userId)) {
-            event.getMessage().reply("You already have an active Akinator game running. Please finish that game before starting a new one.").queue();
+            ctx.reply().text("You already have an active Akinator game running. Please finish that game before starting a new one.");
             return;
         }
 
-        sendTyping(event);
+        ctx.reply().typing();
 
-        long guildId = event.getGuild().getIdLong();
+        long guildId = ctx.guild()
+                .map(ISnowflake::getIdLong)
+                .orElse(0L);
 
         AkinatorSession session = new AkinatorSession(
                 userId,
-                event.getChannel().getIdLong(),
+                guildId,
                 guildId,
                 waiter,
                 sessions
         );
 
         if (!sessions.registerSession(session)) {
-            event.getMessage().reply("You already have an active Akinator game running. Please finish that game before starting a new one.").queue();
+            ctx.reply().text("You already have an active Akinator game running. Please finish that game before starting a new one.");
             return;
         }
 
-        session.start(event.getMessage());
+        ctx.message().ifPresentOrElse(
+                session::start,
+                () -> ctx.reply().text("This command currently requires a message-based invocation.")
+        );
     }
 }

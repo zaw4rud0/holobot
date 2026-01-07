@@ -18,6 +18,7 @@ import dev.zawarudo.holo.modules.akinator.AkinatorSessionManager;
 import dev.zawarudo.holo.modules.anime.MediaSearchService;
 import dev.zawarudo.holo.modules.emotes.EmoteManager;
 import dev.zawarudo.holo.modules.xkcd.XkcdSyncService;
+import dev.zawarudo.holo.utils.ImageResolver;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -50,7 +51,8 @@ public class CommandManager extends ListenerAdapter {
             XkcdSyncService xkcdSyncService,
             BlacklistService blacklistService,
             MediaSearchService mediaSearchService,
-            CountdownDao countdownDao
+            CountdownDao countdownDao,
+            ImageResolver imageResolver
     ) {
         // General Cmds
         addCommand(new BugCmd(gitHubClient));
@@ -77,15 +79,15 @@ public class CommandManager extends ListenerAdapter {
         addCommand(new AoCStatsCmd());
         addCommand(new AvatarCmd());
         addCommand(new BannerCmd());
-        addCommand(new CheckNSFWCmd());
+        addCommand(new CheckNSFWCmd(imageResolver));
         addCommand(new DogCmd());
         addCommand(new EmoteCmd(emoteManager));
-        addCommand(new FilterCmd());
+        addCommand(new FilterCmd(imageResolver));
         addCommand(new HttpCmd());
         addCommand(new InspiroCmd());
-        addCommand(new PaletteCmd());
-        addCommand(new PixelateCmd());
-        addCommand(new UpscaleCmd());
+        addCommand(new PaletteCmd(imageResolver));
+        addCommand(new PixelateCmd(imageResolver));
+        addCommand(new UpscaleCmd(imageResolver));
         addCommand(new XkcdCmd(xkcdDao, xkcdSyncService));
 
         // Misc Cmds
@@ -110,6 +112,16 @@ public class CommandManager extends ListenerAdapter {
 
         // Register module commands
         for (CommandModule m : moduleRegistry.all()) {
+
+            // Ignore deactivated modules
+            if (m.getClass().isAnnotationPresent(Deactivated.class)) {
+                if (LOGGER.isInfoEnabled()) {
+                    LOGGER.info("Module {} ({}) is deactivated.",
+                            m.id(), m.getClass().getSimpleName());
+                }
+                continue;
+            }
+
             m.register(this);
         }
 
@@ -128,9 +140,9 @@ public class CommandManager extends ListenerAdapter {
     }
 
     public void addCommand(@NotNull AbstractCommand cmd, @Nullable CommandModule.ModuleId moduleId) {
-        // Missing @Command annotation
+        // Missing @CommandInfo annotation
         if (!cmd.getClass().isAnnotationPresent(CommandInfo.class)) {
-            String msg = "Command " + cmd.getClass().getName() + " is missing @Command annotation";
+            String msg = "Command " + cmd.getClass().getName() + " is missing @CommandInfo annotation";
             LOGGER.error(msg);
             throw new IllegalStateException(msg);
         }

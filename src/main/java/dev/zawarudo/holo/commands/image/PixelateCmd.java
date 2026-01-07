@@ -1,5 +1,6 @@
 package dev.zawarudo.holo.commands.image;
 
+import dev.zawarudo.holo.utils.ImageResolver;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.utils.annotations.Deactivated;
 import dev.zawarudo.holo.commands.AbstractCommand;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import org.jetbrains.annotations.NotNull;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,10 +27,18 @@ import java.util.Optional;
         category = CommandCategory.IMAGE)
 public class PixelateCmd extends AbstractCommand {
 
+    private final ImageResolver imageResolver;
+
+    public PixelateCmd(ImageResolver imageResolver) {
+        this.imageResolver = imageResolver;
+    }
+
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         Message referenced = event.getMessage().getReferencedMessage();
-        Optional<String> url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
+        Optional<String> url = referenced != null
+                ? imageResolver.resolveImageUrl(referenced)
+                : imageResolver.resolveImageUrl(event.getMessage());
 
         // User didn't provide an image
         if (url.isEmpty()) {

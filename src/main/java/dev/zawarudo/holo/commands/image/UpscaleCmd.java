@@ -2,6 +2,7 @@ package dev.zawarudo.holo.commands.image;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.zawarudo.holo.utils.ImageResolver;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
@@ -28,12 +29,20 @@ public class UpscaleCmd extends AbstractCommand {
     /** The URL of the Waifu2x API. */
     public static final String API_URL = "https://api.deepai.org/api/waifu2x";
 
+    private final ImageResolver imageResolver;
+
+    public UpscaleCmd(ImageResolver imageResolver) {
+        this.imageResolver = imageResolver;
+    }
+
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
 
         Message referenced = event.getMessage().getReferencedMessage();
-        Optional<String> url = referenced != null ? getImage(referenced) : getImage(event.getMessage());
+        Optional<String> url = referenced != null
+                ? imageResolver.resolveImageUrl(referenced)
+                : imageResolver.resolveImageUrl(event.getMessage());
 
         // User didn't provide an image
         if (url.isEmpty()) {

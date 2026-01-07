@@ -1,8 +1,8 @@
 package dev.zawarudo.holo.commands;
 
+import dev.zawarudo.holo.core.Bootstrap;
 import dev.zawarudo.holo.core.command.ExecutableCommand;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
-import dev.zawarudo.holo.core.Bootstrap;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
@@ -18,8 +18,6 @@ import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
-
-import static net.dv8tion.jda.api.entities.Message.Attachment;
 
 /**
  * Abstract class representing a bot command.
@@ -247,43 +245,6 @@ public abstract class AbstractCommand {
     public boolean hasPings(@NotNull Message msg) {
         Mentions mentions = msg.getMentions();
         return !mentions.getMembers().isEmpty() || !mentions.getRoles().isEmpty() || !mentions.getUsers().isEmpty();
-    }
-
-    /**
-     * Returns the image link from a given message. If no image could be found,
-     * null will be returned.
-     *
-     * @param msg The message to get the image from.
-     * @return The image link from the message, or null if no image could be found.
-     */
-    protected Optional<String> getImage(@NotNull Message msg) {
-        // Image as attachment
-        List<Attachment> attachments = msg.getAttachments();
-        if (!attachments.isEmpty()) {
-            for (Attachment attachment : attachments) {
-                if (attachment.isImage()) {
-                    return Optional.of(attachment.getUrl());
-                }
-            }
-        }
-        // Image in an embed
-        List<MessageEmbed> embeds = msg.getEmbeds();
-        if (!embeds.isEmpty()) {
-            for (MessageEmbed embed : embeds) {
-                MessageEmbed.ImageInfo image = embed.getImage();
-                if (image != null) {
-                    return Optional.ofNullable(image.getUrl());
-                }
-            }
-        }
-        // Image url as message text
-        String[] parts = msg.getContentRaw().split(" ");
-        String content = parts[parts.length - 1];
-        if (isValidUrl(content)) {
-            return Optional.of(content);
-        }
-        // No image found
-        return Optional.empty();
     }
 
     /**

@@ -3,6 +3,7 @@ package dev.zawarudo.holo.commands.image;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import dev.zawarudo.holo.utils.ImageResolver;
 import dev.zawarudo.holo.utils.annotations.CommandInfo;
 import dev.zawarudo.holo.commands.AbstractCommand;
 import dev.zawarudo.holo.core.Bootstrap;
@@ -39,12 +40,20 @@ public class CheckNSFWCmd extends AbstractCommand {
     /** The url of the NSFW Detector API. */
     public static final String API_URL = "https://api.deepai.org/api/nsfw-detector";
 
+    private final ImageResolver imageResolver;
+
+    public CheckNSFWCmd(ImageResolver imageResolver) {
+        this.imageResolver = imageResolver;
+    }
+
     @Override
     public void onCommand(@NotNull MessageReceivedEvent event) {
         deleteInvoke(event);
 
         Message reply = event.getMessage().getReferencedMessage();
-        Optional<String> imageUrl = reply != null ? getImage(reply) : getImage(event.getMessage());
+        Optional<String> imageUrl = reply != null
+                ? imageResolver.resolveImageUrl(reply)
+                : imageResolver.resolveImageUrl(event.getMessage());
 
         if (imageUrl.isEmpty()) {
             sendErrorEmbed(event, "Use `" + getPrefix(event) + "help check` to see the correct usage of this command.");
