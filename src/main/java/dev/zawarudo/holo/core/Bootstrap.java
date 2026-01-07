@@ -63,7 +63,7 @@ public final class Bootstrap {
 
         if (LOGGER.isInfoEnabled()) {
             long totalTime = System.currentTimeMillis() - startupTime;
-            LOGGER.info(String.format("It took %s %d ms to load!", holo.getJDA().getSelfUser().getName(), totalTime));
+            LOGGER.info("It took {} {} ms to load!", holo.getJDA().getSelfUser().getName(), totalTime);
         }
     }
 
