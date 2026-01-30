@@ -21,7 +21,7 @@ public final class UrbanDictionaryScraper {
         String url = String.format("%s/define.php?term=%s", BASE_URL, Formatter.encodeUrl(searchTerm));
 
         Document doc = Jsoup.connect(url)
-                .userAgent("HoloBot (+https://github.com/zaw4rud0/holobot)")
+                .userAgent("HoloBot (+https://github.com/adrmrt/holobot)")
                 .timeout(10_000)
                 .get();
 

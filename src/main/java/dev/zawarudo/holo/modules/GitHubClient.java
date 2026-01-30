@@ -19,7 +19,7 @@ public class GitHubClient {
     public GitHubClient(String token) {
         try {
             GitHub gitHub = GitHub.connectUsingOAuth(token);
-            repository = gitHub.getRepository("zaw4rud0/holobot");
+            repository = gitHub.getRepository("adrmrt/holobot");
         } catch (IOException ex) {
             throw new IllegalStateException("Something went wrong while trying to reach GitHub.", ex);
         }
