@@ -1,9 +1,8 @@
-package dev.zawarudo.holo.modules.jikan;
+package dev.zawarudo.holo.modules.anime.jikan;
 
 import java.util.List;
 import java.util.Locale;
 
-import dev.zawarudo.holo.modules.anime.jikan.JikanApiClient;
 import dev.zawarudo.holo.modules.anime.jikan.model.Anime;
 import dev.zawarudo.holo.utils.exceptions.APIException;
 import dev.zawarudo.holo.utils.exceptions.InvalidIdException;
