@@ -11,7 +11,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class AniListIT {
+class AniListClientIT {
 
     private static AniListProvider provider;
 
@@ -23,9 +23,8 @@ class AniListIT {
     }
 
     @Test
-    @Timeout(10) // prevents hanging forever if something stalls
+    @Timeout(10)
     void searchAnime_realAniList_works() throws Exception {
-        // "Cowboy Bebop" is stable & should always return something
         List<AnimeResult> results = provider.searchAnime("Cowboy Bebop", 3);
 
         assertNotNull(results);
@@ -38,7 +37,6 @@ class AniListIT {
     @Test
     @Timeout(10)
     void searchManga_realAniList_works() throws Exception {
-        // "Berserk" is also stable
         List<MangaResult> results = provider.searchManga("Berserk", 3);
 
         assertNotNull(results);
