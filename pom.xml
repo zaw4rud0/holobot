@@ -62,7 +62,7 @@
                     </from>
                     <to>
                         <!-- Push to GitHub Container Registry -->
-                        <image>ghcr.io/zaw4rud0/holobot</image>
+                        <image>ghcr.io/adrmrt/holobot</image>
                         <tags>
                             <tag>${project.version}</tag>
                             <tag>latest</tag>
@@ -280,8 +280,8 @@
     <distributionManagement>
         <repository>
             <id>github</id>
-            <name>GitHub zaw4rud0 Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/zaw4rud0/holobot</url>
+            <name>GitHub adrmrt Apache Maven Packages</name>
+            <url>https://maven.pkg.github.com/adrmrt/holobot</url>
         </repository>
     </distributionManagement>
 
@@ -310,7 +310,7 @@
         <repository>
             <id>github</id>
             <name>GitHub repository of my packages</name>
-            <url>https://maven.pkg.github.com/zaw4rud0</url>
+            <url>https://maven.pkg.github.com/adrmrt</url>
         </repository>
     </repositories>
 </project>

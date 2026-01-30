@@ -18,7 +18,7 @@ Coming soon!
 
 1. Clone this repository:
 ```bash
-git clone https://github.com/zaw4rud0/holobot.git
+git clone https://github.com/adrmrt/holobot.git
 ```
 2. Navigate to the project directory: 
 ```bash
