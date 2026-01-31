@@ -49,7 +49,7 @@ jobs:
 
     steps:
       - name: Deploy on VM (docker compose pull/up)
-        uses: appleboy/ssh-action@v1.2.4
+        uses: appleboy/ssh-action@v1.2.5
         with:
           host: ${{ secrets.VM_HOST }}
           username: ${{ secrets.VM_USER }}
