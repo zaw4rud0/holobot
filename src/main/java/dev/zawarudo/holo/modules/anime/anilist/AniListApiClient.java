@@ -10,6 +10,12 @@ import dev.zawarudo.holo.utils.exceptions.HttpTransportException;
 
 import java.util.Map;
 
+/**
+ * TODO:
+ *  - https://netflix.github.io/dgs/advanced/java-client/
+ *  - https://spec.graphql.org/draft/
+ *  - https://graphql.org/learn/response/
+ */
 public final class AniListApiClient {
 
     private static final String BASE_URL = "https://graphql.anilist.co";
