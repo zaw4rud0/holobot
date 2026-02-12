@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 public final class HoloHttp {
 
-    public static final String DEFAULT_USER_AGENT = "HoloBot (+https://github.com/zaw4rud0/holobot)";
+    public static final String DEFAULT_USER_AGENT = "HoloBot (+https://github.com/adrmrt/holobot)";
     private static final Gson GSON = new Gson();
 
     private static final HttpClient CLIENT = HttpClient.newBuilder()
@@ -27,7 +27,7 @@ public final class HoloHttp {
             .connectTimeout(Duration.ofSeconds(10))
             .build();
 
-    private static final Map<String, RateLimiter> HOST_LIMITERS = new ConcurrentHashMap<>();
+    private static final Map<String, HoloRateLimiter> HOST_LIMITERS = new ConcurrentHashMap<>();
 
     private HoloHttp() {
         throw new UnsupportedOperationException();
@@ -71,9 +71,18 @@ public final class HoloHttp {
         return GSON.fromJson(body, clazz);
     }
 
-    private static @NotNull HttpResponse<String> sendGet(@NotNull String url, @Nullable Map<String, String> headers) throws HttpTransportException {
-        Objects.requireNonNull(url, "url");
+    public static @NotNull JsonObject postJsonObject(@NotNull String url, @NotNull JsonObject jsonBody, @Nullable Map<String, String> headers) throws HttpStatusException, HttpTransportException {
+        String body = postString(url, jsonBody.toString(), headers);
+        return JsonParser.parseString(body).getAsJsonObject();
+    }
 
+    public static @NotNull String postString(@NotNull String url, @NotNull String body, @Nullable Map<String, String> headers) throws HttpStatusException, HttpTransportException {
+        HttpResponse<String> res = sendPost(url, body, headers);
+        ensure2xx(url, res);
+        return res.body() == null ? "" : res.body();
+    }
+
+    private static @NotNull HttpResponse<String> sendGet(@NotNull String url, @Nullable Map<String, String> headers) throws HttpTransportException {
         final URI uri;
         try {
             uri = URI.create(url);
@@ -82,7 +91,7 @@ public final class HoloHttp {
         }
 
         // Optional per-host limiter
-        RateLimiter limiter = HOST_LIMITERS.get(uri.getHost());
+        HoloRateLimiter limiter = HOST_LIMITERS.get(uri.getHost());
         if (limiter != null) {
             limiter.acquire();
         }
@@ -93,6 +102,43 @@ public final class HoloHttp {
                 .GET()
                 .header("User-Agent", DEFAULT_USER_AGENT)
                 .header("Accept", "application/json, text/plain;q=0.9, */*;q=0.8");
+
+        if (headers != null) {
+            headers.forEach(builder::header);
+        }
+
+        HttpRequest req = builder.build();
+
+        try {
+            return CLIENT.send(req, HttpResponse.BodyHandlers.ofString(StandardCharsets.UTF_8));
+        } catch (IOException e) {
+            throw new HttpTransportException("I/O error while requesting " + uri, e);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            throw new HttpTransportException("Interrupted while requesting " + uri, e);
+        }
+    }
+
+    private static @NotNull HttpResponse<String> sendPost(@NotNull String url, @NotNull String body, @Nullable Map<String, String> headers) throws HttpTransportException {
+        final URI uri;
+        try {
+            uri = URI.create(url);
+        } catch (IllegalArgumentException e) {
+            throw new HttpTransportException("Invalid URL: " + url, e);
+        }
+
+        HoloRateLimiter limiter = HOST_LIMITERS.get(uri.getHost());
+        if (limiter != null) {
+            limiter.acquire();
+        }
+
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(uri)
+                .timeout(Duration.ofSeconds(20))
+                .POST(HttpRequest.BodyPublishers.ofString(body, StandardCharsets.UTF_8))
+                .header("User-Agent", DEFAULT_USER_AGENT)
+                .header("Accept", "application/json")
+                .header("Content-Type", "application/json; charset=utf-8");
 
         if (headers != null) {
             headers.forEach(builder::header);
@@ -123,7 +169,7 @@ public final class HoloHttp {
         return s.substring(0, max) + "...";
     }
 
-    public static void setHostRateLimit(@NotNull String host, @NotNull RateLimiter limiter) {
+    public static void setHostRateLimit(@NotNull String host, @NotNull HoloRateLimiter limiter) {
         HOST_LIMITERS.put(Objects.requireNonNull(host), Objects.requireNonNull(limiter));
     }
 
